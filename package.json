@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "node": "ts-node src/index.ts"
   },
   "private": true,
   "dependencies": {
@@ -19,6 +20,8 @@
     "@angular/platform-browser-dynamic": "^16.1.0",
     "@angular/router": "^16.1.0",
     "rxjs": "~7.8.0",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },
