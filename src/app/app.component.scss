@@ -1,0 +1,9 @@
+.feedback-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #f4f4f4;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 150px; /* Adjust as needed */
+}

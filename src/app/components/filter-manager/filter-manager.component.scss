@@ -1,0 +1,14 @@
+.lists-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.list-container {
+  width: 100%; /* Adjust width as needed */
+  background-color: grey;
+}
+
+.selected {
+  border: 3px solid rgb(108, 10, 147);
+}

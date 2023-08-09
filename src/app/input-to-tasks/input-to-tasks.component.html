@@ -1,4 +1,15 @@
-<p>input-to-tasks works!</p>
-<!-- input-to-tasks.component.html -->
-<textarea [(ngModel)]="inputText" placeholder="Enter text here..."></textarea>
-<button (click)="processText()">Process</button>
+<div class="component-border">
+  <p>input-to-tasks works!</p>
+  <p>Default Parent Suggestion: {{ suggestion }}</p>
+  <!-- input-to-tasks.component.html -->
+  <input [(ngModel)]="defaultParent" placeholder="Enter text here..." />
+  <textarea [(ngModel)]="inputText" placeholder="Enter text here..."></textarea>
+
+  <hr />
+  <span *ngFor="let task of tasks">
+    {{ task?.name }} : {{ task?.owner }}
+    <hr />
+  </span>
+  <button (click)="preview()">Preview</button>
+  <button (click)="save()">Save</button>
+</div>

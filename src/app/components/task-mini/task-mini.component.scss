@@ -1,0 +1,35 @@
+.task-card {
+  width: 350px; /* adjust as needed */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+}
+
+.task-card .task-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px; /* adjust as needed */
+  margin-bottom: 10px; /* new: adds space below the header */
+}
+
+.task-card .task-header .task-name {
+  font-weight: bold; /* new: makes the task name bold */
+}
+
+.task-card .task-content {
+  font-size: 12px; /* adjust as needed */
+  margin-top: 5px;
+  margin-bottom: 10px; /* new: adds space below the content */
+}
+
+.task-card .task-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.task-card .mat-raised-button {
+  font-size: 10px; /* adjust as needed */
+  padding: 3px 5px; /* adjust as needed */
+}

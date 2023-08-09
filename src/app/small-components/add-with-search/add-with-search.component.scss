@@ -1,0 +1,29 @@
+.create-task-navbar {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  gap: 5px;
+}
+
+.create-task-navbar input,
+.create-task-navbar select {
+  padding: 3px 5px;
+  font-size: 0.8em;
+  max-width: 120px; /* adjust this as needed */
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.create-task-navbar button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.create-task-navbar button:hover {
+  background-color: #0056b3;
+}

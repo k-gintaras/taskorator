@@ -1,0 +1,16 @@
+<div class="task-list">
+  <div
+    [class.selected]="selectedTask === task"
+    (click)="selectTask(task)"
+    class="task-item"
+    *ngFor="let task of tasks"
+  >
+    <app-task-mini
+      [task]="task"
+      [actionName]="actionName"
+      [onButtonClick]="onButtonClick"
+      [onSelected]="onSelected"
+      [overlord]="getOverlord(task)"
+    ></app-task-mini>
+  </div>
+</div>

@@ -1,2 +1,44 @@
-<app-task-view></app-task-view>
+<!-- <app-task-view></app-task-view>
+<app-task-importance></app-task-importance>
 <app-input-to-tasks></app-input-to-tasks>
+<app-add-simple-task></app-add-simple-task> -->
+
+<!-- TODO:
+set importance of tasks, taskImportanceComponent
+
+see latest tasks (latestTaskComponent)
+
+set parent for task (draw gow)
+-->
+
+<nav class="navigation">
+  <a>
+    <span [style.color]="feedback.isError === true ? 'red' : 'green'">
+      {{ feedback.text }}
+    </span>
+  </a>
+
+  <div><app-database-status></app-database-status></div>
+  <div><app-add-with-search></app-add-with-search></div>
+  <a routerLink="/task-view">Task View</a>
+  <a routerLink="/task-importance">Task Importance</a>
+  <a routerLink="/input-to-tasks">Input to Tasks</a>
+  <a routerLink="/add-simple-task">Add Simple Task</a>
+  <a routerLink="/overlord-manager">Overlord Manager</a>
+  <a routerLink="/d3-vizualizer">Vizualizer</a>
+  <a routerLink="/filter-manager">Filtering</a>
+</nav>
+<router-outlet></router-outlet>
+<p>show latest task</p>
+<p>
+  edit with node the wow mrt note to add tasks for wow voice app listen to
+  keybind
+</p>
+<p>if ctrl c, check if has keyword (please lets say), respond as usual</p>
+
+<!-- ... Rest of your application ... -->
+
+<footer class="feedback-footer">
+  <!-- <h4>Feedback</h4>
+  <p>{{ feedback }}</p> -->
+</footer>

@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Task } from './task-model/taskModelManager';
-import { TaskService } from 'src/task.service';
+import { Task } from '../task-model/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TextToTasksService {
-  constructor(private taskService: TaskService) {}
+  constructor() {}
 
   processList(text: string) {
     const listData = text
@@ -63,8 +62,8 @@ export class TextToTasksService {
     // For example, you can insert the task into the database or perform any other actions
     console.log('Processing Task:', name + ' --- ' + todo);
     const task = this.loadTaskObject(name, todo);
-    if (task.name) this.taskService.createTask(task).subscribe();
-    console.log('Saved: ' + task.name);
+    // if (task.name) this.taskService.createTask(task).subscribe();
+    // console.log('Saved: ' + task.name);
   }
 
   loadTaskObject(name: string, todo: string) {

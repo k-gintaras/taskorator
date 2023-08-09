@@ -1,0 +1,86 @@
+<!-- <br />
+<span>{{ overlord?.todo }}</span
+><br />
+<span>{{ overlord?.why }}</span
+><br />
+<span>{{ overlord?.owner }}</span
+><br />
+<span>{{ getOverlordName(overlord?.overlord) }}</span
+><br /> -->
+<!-- <span>{{ selectedTask.priority }}</span> -->
+
+<div class="lists-container">
+  <div>
+    <h3>
+      <b>
+        <span (click)="toggleOverlordFilter(overlord?.taskId)">
+          {{ overlord2 ? "Subgroup: " : "All: " }}{{ overlord?.name }}
+        </span>
+      </b>
+    </h3>
+
+    <div class="task-list">
+      <div
+        class="task-item"
+        *ngFor="let task of getTasksForOverlord(selectedOverlordId)"
+        (click)="selectTask(task)"
+      >
+        <span>{{ task.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h3>
+      <b
+        ><span
+          >{{ overlord2 ? "Subgroup: " : "All: " }}{{ overlord?.name }}/</span
+        ></b
+      >
+    </h3>
+
+    <div class="task-list">
+      <div
+        class="task-item"
+        *ngFor="let task of filterByOverlord()"
+        (click)="freeOverlord(task)"
+      >
+        <span>{{ task.name }}</span>
+      </div>
+      <app-create-simple-task
+        [overlordId]="overlord?.taskId"
+      ></app-create-simple-task>
+    </div>
+  </div>
+
+  <div>
+    <label>Filter By: {{ filterType ? "No Overlord" : "Subtasks" }}</label>
+    <input type="checkbox" [(ngModel)]="filterType" />
+    <h3>
+      <b>
+        <span (click)="toggleOverlordFilter2(overlord2?.taskId)">
+          {{ overlord2 ? "Subgroup: " : "All: " }} {{ overlord2?.name }}
+        </span>
+      </b>
+    </h3>
+
+    <div class="task-list">
+      <div
+        (click)="selectTask2(task)"
+        class="task-item"
+        *ngFor="
+          let task of filterType
+            ? filterByNoOverlord()
+            : getTasksForOverlord2(selectedOverlordId2)
+        "
+      >
+        <span>{{ task.name }}</span>
+        <ng-container *ngIf="overlord?.name">
+          <button class="button-archive" (click)="setOverlord(task)">
+            To: {{ overlord?.name }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

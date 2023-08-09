@@ -1,8 +1,121 @@
-Test
-<!-- Assuming this code is in your component's template (e.g., task.component.html) -->
-<p *ngFor="let task of tasks">
-  <!-- <span *ngFor="let value of task | keyvalue">
-    {{ value.key }}: {{ value.value }}
-  </span> -->
-  <!-- {{ task.name }} -->
-</p>
+<div class="component-border">
+  task-view component
+
+  <!-- make it on click option  -->
+  <!-- Assuming you have a selectedTask property in your component to store the currently selected task -->
+  <!-- <select size="3">
+    <ng-container *ngFor="let task of tasks">
+      <option (click)="selectTask(task)">
+        {{ task.name }}
+      </option>
+    </ng-container>
+  </select> -->
+
+  <p *ngIf="selectedTask">
+    <span>{{ selectedTask.name }}</span
+    ><br />
+    <span>{{ selectedTask.todo }}</span
+    ><br />
+    <span>{{ selectedTask.why }}</span
+    ><br />
+    <span>{{ selectedTask.owner }}</span
+    ><br />
+    <span>{{ getOverlordName(selectedTask.overlord) }}</span
+    ><br />
+    <!-- <span>{{ selectedTask.priority }}</span> -->
+  </p>
+  <p *ngIf="subTask">
+    <span>{{ subTask.name }}</span
+    ><br />
+    <span>{{ subTask.todo }}</span
+    ><br />
+    <span>{{ subTask.why }}</span
+    ><br />
+    <span>{{ subTask.owner }}</span
+    ><br />
+    <span>{{ getOverlordName(subTask.overlord) }}</span
+    ><br />
+    <!-- <span>{{ selectedTask.priority }}</span> -->
+  </p>
+
+  <div class="lists-container">
+    <div class="lists-container">
+      <div class="lists-container">
+        <div class="task-list">
+          <!-- ... Other HTML code ... -->
+          <label>Show Archived Tasks</label>
+          <input type="checkbox" [(ngModel)]="showArchivedTasks" />
+          <div
+            class="task-item"
+            *ngFor="let task of tasks"
+            (click)="selectTask(task)"
+            [ngClass]="{ archived: task.stage === 'archived' }"
+          >
+            <ng-container
+              *ngIf="
+                ((!showArchivedTasks && task.stage !== 'archived') ||
+                  showArchivedTasks) &&
+                task.stage !== 'deleted'
+              "
+            >
+              <span>{{ task.name }}</span>
+              <button
+                class="button-{{
+                  task.stage === 'archived' ? 'delete' : 'archive'
+                }}"
+                (click)="
+                  task.stage === 'archived'
+                    ? deleteTask(task)
+                    : archiveTask(task)
+                "
+              >
+                {{ task.stage === "archived" ? "Delete" : "Archive" }}
+              </button>
+              <!-- Allow renewTask(task) if it is archived -->
+              <button
+                *ngIf="task.stage === 'archived'"
+                class="button-renew"
+                (click)="renewTask(task)"
+              >
+                Renew
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="task-list">
+        <div
+          class="task-item"
+          *ngFor="let task of filterByOverlord()"
+          (click)="selectSubTask(task)"
+        >
+          <span>{{ task.name }}</span>
+          <button (click)="deleteTask(task)">Delete</button>
+        </div>
+      </div>
+
+      <div class="task-list">
+        <div
+          class="task-item"
+          *ngFor="let task of filterByOverlordName()"
+          (click)="selectSubTask(task)"
+        >
+          <span>{{ task.name }}</span>
+          <button (click)="deleteTask(task)">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- make this into select please with 3 items visible at a time
+  <ng-container *ngFor="let task of tasks">
+    <p>
+      {{ task.name }}
+    </p>
+  </ng-container> -->
+
+    <!-- <span *ngFor="let value of task | keyvalue">
+      {{ value.key }}: {{ value.value }}
+    </span> -->
+  </div>
+</div>

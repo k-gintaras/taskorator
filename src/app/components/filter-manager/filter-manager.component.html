@@ -1,0 +1,65 @@
+<div
+  class="lists-container"
+  cdkDropList
+  cdkDropListOrientation="horizontal"
+  (cdkDropListDropped)="drop($event)"
+>
+  <div
+    class="list-container"
+    *ngFor="let list of taskLists"
+    [ngClass]="{ selected: selectedList === list }"
+    (click)="selectList(list)"
+    cdkDrag
+    [cdkDragData]="list"
+  >
+    <h3>{{ list.title }}</h3>
+    <app-task-list
+      [tasks]="list.tasks"
+      [onButtonClick]="list.onButtonClick"
+      [onSelected]="list.onSelected"
+      [actionName]="list.actionName"
+    ></app-task-list>
+  </div>
+</div>
+
+<!-- <div class="lists-container">
+  <div class="list-container">
+    <h3>This Week:</h3>
+    <app-task-list
+      [tasks]="getTasksCreatedThisWeek()"
+      [action]="'weekly check'"
+    ></app-task-list>
+  </div>
+
+  <div class="list-container">
+    <h3>All Tasks:</h3>
+    <app-task-list
+      [tasks]="tasks"
+      [action]="'Action for all tasks'"
+    ></app-task-list>
+  </div>
+
+  <div class="list-container">
+    <h3>High Priority Tasks:</h3>
+    <app-task-list
+      [tasks]="getPriorityFiltered()"
+      [action]="priorityAction"
+    ></app-task-list>
+  </div>
+
+  <div class="list-container">
+    <h3>Completed Tasks:</h3>
+    <app-task-list
+      [tasks]="getActiveFiltered()"
+      [action]="activeAction"
+    ></app-task-list>
+  </div>
+
+  <div class="list-container">
+    <h3>Ongoing Tasks:</h3>
+    <app-task-list
+      [tasks]="getStatusFiltered()"
+      [action]="statusAction"
+    ></app-task-list>
+  </div>
+</div> -->
