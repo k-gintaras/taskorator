@@ -13,10 +13,10 @@ export class TaskMiniComponent {
   @Input() overlord: Task | null | undefined;
   @Input() actionName: string | undefined;
   @Input() onButtonClick: Function | undefined;
-  @Input() onSelected: Function | undefined;
+  @Input() onTaskSelected: Function | undefined;
 
   doTask(event: Event, task: Task | undefined) {
-    event.stopPropagation();
+    // event.stopPropagation();
 
     if (this.onButtonClick) {
       console.log('Doing: ' + this.actionName + ' to: ' + task?.name);
@@ -24,5 +24,11 @@ export class TaskMiniComponent {
     }
 
     // if(this.action===Acti)
+  }
+  onTaskSelection() {
+    if (this.onTaskSelected) {
+      console.log('hm');
+      this.onTaskSelected(this.task);
+    }
   }
 }

@@ -6,6 +6,7 @@ import { LocalService } from '../services/local.service';
 import { Task } from '../task-model/taskModelManager';
 import { CodeToTasksService } from '../services/code-to-tasks.service';
 import { BatchOwnerChange } from '../helpers/batch-owner-change';
+import { SyncService } from '../services/sync.service';
 
 @Component({
   selector: 'app-input-to-tasks',
@@ -22,6 +23,7 @@ export class InputToTasksComponent {
     private csvService: CsvToTasksService,
     private textService: TextToTasksService,
     private local: LocalService,
+    private sync: SyncService,
     private codeService: CodeToTasksService
   ) {}
 
@@ -79,7 +81,7 @@ export class InputToTasksComponent {
 
   save() {
     this.tasks.forEach((element) => {
-      if (element.name) this.local.createTask(element);
+      if (element.name) this.sync.createTask(element).subscribe();
       console.log('Saved: ' + element.name);
     });
   }

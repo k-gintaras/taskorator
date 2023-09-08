@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from './task-model/taskModelManager';
+import { Task } from '../task-model/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +61,9 @@ export class CsvToTasksService {
       priority: 0,
       backupLink: '',
       tags: rowData?.tags ? rowData.tags.split(',') : '',
+      lastUpdated: null,
+      imageUrl: null,
+      imageDataUrl: null,
     };
     return t;
   }

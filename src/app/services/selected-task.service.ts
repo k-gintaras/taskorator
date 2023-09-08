@@ -18,7 +18,7 @@ export class SelectedTaskService {
     this.selectedTaskSubject.next(task);
   }
 
-  getSelectedTask(): Task | null {
-    return this.selectedTask;
+  getSelectedTaskSubscription(): Observable<Task | null> {
+    return this.selectedTaskObservable;
   }
 }

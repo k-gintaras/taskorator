@@ -29,7 +29,6 @@ export class TaskOverlordFixerService {
         name: fixString(task.name),
         todo: fixString(task.todo),
         why: fixString(task.why),
-        overlord: fixString(task.overlord),
         repeat: fixString(task.repeat) as RepeatOptions,
         status: fixString(task.status) as TaskStatus,
         stage: fixString(task.stage) as TaskStage,

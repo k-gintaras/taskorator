@@ -4,6 +4,9 @@ import { Task } from '../task-model/taskModelManager';
 import { LocalService } from '../services/local.service';
 import { SelectedTaskService } from '../services/selected-task.service';
 
+/**
+ * @deprecated a little test for deprecated
+ */
 @Component({
   selector: 'app-task-importance',
   templateUrl: './task-importance.component.html',

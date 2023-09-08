@@ -7,7 +7,7 @@ export interface Task {
   lastUpdated: Date | null;
   timeEnd: Date | null; // Completion time of the task (JavaScript Date object or null if not completed)
   duration: number; // Estimated time to complete the task in minutes or hours
-  overlord: number | null | string; // taskId of the parent task if it's part of a hierarchy
+  overlord: number | null; // taskId of the parent task if it's part of a hierarchy
   repeat: RepeatOptions;
   status: TaskStatus; // Task status options
   stage: TaskStage; // Task stage options
@@ -66,6 +66,7 @@ export type RepeatOptions =
   | 'three-monthly'
   | 'half-yearly'
   | 'yearly';
+
 export type TaskType =
   | ''
   | 'code'
@@ -73,6 +74,9 @@ export type TaskType =
   | 'note'
   | 'todo'
   | 'task'
+  | 'next'
+  | 'job'
+  | 'feature'
   | 'schedule'
   | 'project';
 export type TaskSubtype =
@@ -100,7 +104,7 @@ export function getDefaultTask(): Task {
     timeEnd: null,
     duration: 0,
     overlord: null,
-    repeat: 'daily',
+    repeat: 'once',
     status: 'active',
     stage: 'todo',
     type: 'todo',

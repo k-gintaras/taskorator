@@ -1,0 +1,150 @@
+<div>
+  <label>Sort by: </label>
+  <div>
+    <label>
+      <input type="radio" name="sort" (change)="sortTasks('priority')" />
+      Priority
+    </label>
+    <label>
+      <input type="radio" name="sort" (change)="sortTasks('timeCreated')" />
+      Time Created
+    </label>
+    <label>
+      <input type="radio" name="sort" (change)="sortTasks('lastUpdated')" />
+      Last Updated
+    </label>
+    <label>
+      <input type="radio" name="sort" (change)="sortTasks('timeEnd')" /> Time
+      End
+    </label>
+    <label>
+      <input type="radio" name="sort" (change)="sortTasks('duration')" />
+      Duration
+    </label>
+  </div>
+
+  <label>Sort Order: </label>
+  <button (click)="toggleSortOrder()">
+    Toggle Sort Order (Current: {{ sortOrder }})
+  </button>
+</div>
+<div>
+  <label>Name: </label>
+  <input
+    [(ngModel)]="name"
+    (input)="filterTasks()"
+    type="text"
+    placeholder="Search by name"
+  />
+
+  <label>Todo: </label>
+  <input
+    [(ngModel)]="todo"
+    (input)="filterTasks()"
+    type="text"
+    placeholder="Search by todo"
+  />
+
+  <label>Why: </label>
+  <input
+    [(ngModel)]="why"
+    (input)="filterTasks()"
+    type="text"
+    placeholder="Search by why"
+  />
+
+  <label>Owner: </label>
+  <input
+    [(ngModel)]="owner"
+    (input)="filterTasks()"
+    type="text"
+    placeholder="Search by owner"
+  />
+
+  <label>Tags: </label>
+  <input
+    [(ngModel)]="tags"
+    (input)="filterTasks()"
+    type="text"
+    placeholder="Search by tags"
+  />
+  <hr />
+  <label>Size: </label>
+  <select [(ngModel)]="size" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="do now">Do Now</option>
+    <option value="split">Split</option>
+    <option value="delegate">Delegate</option>
+  </select>
+  <label>Stage: </label>
+  <select [(ngModel)]="stage" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="seen">seen</option>
+    <option value="completed">completed</option>
+    <option value="todo">todo</option>
+    <option value="archived">archived</option>
+    <option value="deleted">deleted</option>
+  </select>
+  <label>Status: </label>
+
+  <select [(ngModel)]="status" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="active">active</option>
+    <option value="inactive">inactive</option>
+  </select>
+  <label>Repeat: </label>
+  <select [(ngModel)]="repeat" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="once">Once</option>
+    <option value="never">Never</option>
+    <option value="half-hourly">Half-hourly</option>
+    <option value="hourly">Hourly</option>
+    <option value="half-daily">Half-daily</option>
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="half-monthly">Half-monthly</option>
+    <option value="monthly">Monthly</option>
+    <option value="three-monthly">Three-monthly</option>
+    <option value="half-yearly">Half-yearly</option>
+    <option value="yearly">Yearly</option>
+  </select>
+  <label>Type: </label>
+
+  <select [(ngModel)]="type" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="code">Code</option>
+    <option value="idea">Idea</option>
+    <option value="note">Note</option>
+    <option value="todo">To-Do</option>
+    <option value="task">Task</option>
+    <option value="next">Next</option>
+    <option value="job">Job</option>
+    <option value="feature">Feature</option>
+    <option value="schedule">Schedule</option>
+    <option value="project">Project</option>
+  </select>
+
+  <label>Subtype: </label>
+
+  <select [(ngModel)]="subtype" (change)="filterTasks()">
+    <option value="">All</option>
+    <option value="js">JS</option>
+    <option value="ts">TS</option>
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="sound">Sound</option>
+    <option value="android">Android</option>
+    <option value="angular">Angular</option>
+    <option value="nodejs">NodeJS</option>
+    <option value="java">Java</option>
+    <option value="text">Text</option>
+    <option value="list">List</option>
+  </select>
+  <!-- Repeat for stage, status, repeat, type, subtype -->
+</div>
+
+<app-overlord-browser
+  [overlords]="tasks"
+  [filtered]="filtered"
+  [tasks]="filtered"
+></app-overlord-browser>

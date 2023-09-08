@@ -46,17 +46,53 @@ export class ApiService {
 
           return task as Task;
         })
+      ),
+      // Use filter to remove tasks with stage === 'deleted'
+      map((tasks) => tasks.filter((task) => task.stage !== 'deleted'))
+    );
+  }
+
+  fetchAllTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(this.apiUrl).pipe(
+      map((tasks: any[]) =>
+        tasks.map((task) => {
+          task.timeCreated = new Date(task.timeCreated);
+          if (isNaN(task.timeCreated.getTime())) {
+            task.timeCreated = new Date();
+          }
+
+          if (task.lastUpdated) {
+            task.lastUpdated = new Date(task.lastUpdated);
+            if (isNaN(task.lastUpdated.getTime())) {
+              task.lastUpdated = new Date();
+            }
+          }
+
+          if (task.timeEnd) {
+            task.timeEnd = new Date(task.timeEnd);
+            if (isNaN(task.timeEnd.getTime())) {
+              task.timeEnd = new Date();
+            }
+          }
+
+          return task as Task;
+        })
       )
     );
   }
 
-  getAllTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.apiUrl);
-  }
+  // getAllTasks(): Observable<Task[]> {
+  //   return this.http.get<Task[]>(this.apiUrl);
+  // }
 
   updateTask(task: Task): Observable<Task> {
     const updateUrl = `${this.apiUrl}/${task.taskId}`;
     return this.http.put<Task>(updateUrl, task);
+  }
+
+  updateTasks(tasks: Task[]): Observable<Task[]> {
+    const updateUrl = `${this.apiUrl}/batch-update`;
+    return this.http.put<Task[]>(updateUrl, tasks);
   }
 
   createTask(task: Task): Observable<Task> {

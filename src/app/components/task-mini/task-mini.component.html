@@ -1,4 +1,4 @@
-<div class="task-card">
+<div class="task-card" (click)="onTaskSelection()">
   <div class="task-header">
     <span class="task-name">{{ task?.name }}</span>
     <span class="task-info"
@@ -6,9 +6,9 @@
     >
   </div>
   <div class="task-content">
-    <span><b>Type:</b> {{ task?.type }}. </span>
+    <!-- <span><b>Type:</b> {{ task?.type }}. </span>
     <span><b>Stage:</b> {{ task?.stage }}. </span>
-    <span><b>Size:</b> {{ task?.size }}. </span>
+    <span><b>Size:</b> {{ task?.size }}. </span> -->
     <ng-container *ngIf="onButtonClick">
       <button mat-raised-button color="accent" (click)="doTask($event, task)">
         {{ actionName }}

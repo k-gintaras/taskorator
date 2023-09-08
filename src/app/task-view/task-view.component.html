@@ -1,16 +1,7 @@
+<h1>List</h1>
+<h1>make tasks from this</h1>
+
 <div class="component-border">
-  task-view component
-
-  <!-- make it on click option  -->
-  <!-- Assuming you have a selectedTask property in your component to store the currently selected task -->
-  <!-- <select size="3">
-    <ng-container *ngFor="let task of tasks">
-      <option (click)="selectTask(task)">
-        {{ task.name }}
-      </option>
-    </ng-container>
-  </select> -->
-
   <p *ngIf="selectedTask">
     <span>{{ selectedTask.name }}</span
     ><br />
@@ -91,7 +82,7 @@
           (click)="selectSubTask(task)"
         >
           <span>{{ task.name }}</span>
-          <button (click)="deleteTask(task)">Delete</button>
+          <!-- <button (click)="deleteTask(task)">Delete</button> -->
         </div>
       </div>
 
@@ -102,7 +93,7 @@
           (click)="selectSubTask(task)"
         >
           <span>{{ task.name }}</span>
-          <button (click)="deleteTask(task)">Delete</button>
+          <!-- <button (click)="deleteTask(task)">Delete</button> -->
         </div>
       </div>
     </div>

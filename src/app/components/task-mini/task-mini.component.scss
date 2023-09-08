@@ -1,5 +1,7 @@
 .task-card {
-  width: 350px; /* adjust as needed */
+  min-width: 150px; /* set a minimum width */
+  max-width: 350px; /* set a maximum width */
+  width: auto; /* let it auto adjust */
   border: 1px solid #ccc;
   border-radius: 5px;
   margin: 5px;
@@ -15,12 +17,14 @@
 
 .task-card .task-header .task-name {
   font-weight: bold; /* new: makes the task name bold */
+  overflow-wrap: break-word; /* breaks words onto the next line if they exceed the width of the container */
 }
 
 .task-card .task-content {
   font-size: 12px; /* adjust as needed */
   margin-top: 5px;
   margin-bottom: 10px; /* new: adds space below the content */
+  overflow-wrap: break-word; /* breaks words onto the next line if they exceed the width of the container */
 }
 
 .task-card .task-actions {

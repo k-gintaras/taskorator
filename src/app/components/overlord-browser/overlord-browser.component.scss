@@ -1,0 +1,34 @@
+.task-container {
+  margin: 1rem 0;
+}
+
+.task-card {
+  max-width: 600px;
+  margin: auto;
+}
+
+.task-content {
+  display: flex;
+  align-items: center;
+}
+
+.task-mini {
+  flex-grow: 1;
+  margin: 0 1rem;
+}
+
+.selected-task {
+  background-color: #e6e6e6;
+  border: 1px solid #b3b3b3;
+}
+
+// .task-content {
+//   display: flex;
+//   align-items: center;
+// }
+// .task-content > * {
+//   margin-right: 10px;
+// }
+// .task-mini {
+//   flex-grow: 1;
+// }

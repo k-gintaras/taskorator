@@ -1,0 +1,8 @@
+<app-task-mini [task]="selectedTask"></app-task-mini>
+<div *ngIf="selectedTask">
+  <ul>
+    <li><b>Overlord: </b>{{ getOverlordName() }}</li>
+    <li><b>Todo: </b>{{ selectedTask.todo }}</li>
+    <li><b>Why: </b>{{ selectedTask.why }}</li>
+  </ul>
+</div>

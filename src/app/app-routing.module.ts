@@ -7,8 +7,12 @@ import { TaskViewComponent } from './task-view/task-view.component';
 import { OverlordManagerComponent } from './components/overlord-manager/overlord-manager.component';
 import { D3VizualizerComponent } from './components/d3-vizualizer/d3-vizualizer.component';
 import { FilterManagerComponent } from './components/filter-manager/filter-manager.component';
+import { OverlordBrowserComponent } from './components/overlord-browser/overlord-browser.component';
+import { TaskFilterComponent } from './components/task-filter/task-filter.component';
 
 const routes: Routes = [
+  { path: 'task-filter', component: TaskFilterComponent },
+  { path: 'overlord-browser', component: OverlordBrowserComponent },
   { path: 'task-view', component: TaskViewComponent },
   { path: 'filter-manager', component: FilterManagerComponent },
   { path: 'd3-vizualizer', component: D3VizualizerComponent },

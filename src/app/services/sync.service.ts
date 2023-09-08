@@ -17,6 +17,7 @@ export class SyncService {
   createTask(task: Task): Observable<Task> {
     // Update the task in the local array immediately
     this.localService.createTask(task).subscribe();
+    console.log('saving:   ' + task.overlord);
 
     // Now initiate the API call to update the task on the server (without waiting for the response)
     return this.apiService.createTask(task).pipe(
@@ -57,6 +58,22 @@ export class SyncService {
         // Re-throw the error as a new error using a factory function
         return throwError(
           () => new Error('Failed to update task on the server')
+        );
+      })
+    );
+  }
+
+  updateTasks(tasks: Task[]): Observable<Task[]> {
+    // Update tasks locally
+    tasks.forEach((task) => this.localService.updateTask(task).subscribe());
+
+    // Batch update on the server
+    return this.apiService.updateTasks(tasks).pipe(
+      tap(() => console.log(`Tasks successfully updated on the server`)),
+      catchError((apiError) => {
+        console.error(`API updateTasks failed:`, apiError);
+        return throwError(
+          () => new Error('Failed to update tasks on the server')
         );
       })
     );

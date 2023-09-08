@@ -17,12 +17,18 @@ import { TaskListComponent } from './components/task-list/task-list.component';
 import { FilterManagerComponent } from './components/filter-manager/filter-manager.component';
 import { TaskMiniComponent } from './components/task-mini/task-mini.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AddWithSearchComponent } from './small-components/add-with-search/add-with-search.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { CurrentComponent } from './components/current/current.component';
+import { OverlordBrowserComponent } from './components/overlord-browser/overlord-browser.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TaskFilterComponent } from './components/task-filter/task-filter.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +45,9 @@ import { MatInputModule } from '@angular/material/input';
     FilterManagerComponent,
     TaskMiniComponent,
     AddWithSearchComponent,
+    CurrentComponent,
+    OverlordBrowserComponent,
+    TaskFilterComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,6 +60,9 @@ import { MatInputModule } from '@angular/material/input';
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

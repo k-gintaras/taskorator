@@ -7,12 +7,12 @@ import { SyncService } from '../services/sync.service';
 import { TaskLoaderService } from '../services/task-loader.service';
 import { TaskObjectHelperService } from '../services/task-object-helper.service';
 import { TaskOverlordFixerService } from '../services/task-overlord-fixer.service';
-
 @Component({
   selector: 'app-task-view',
   templateUrl: './task-view.component.html',
   styleUrls: ['./task-view.component.scss'],
 })
+// FIXME: it is probably not used anymore
 export class TaskViewComponent {
   tasks: Task[] = [];
   isDbOnline: boolean = false;
@@ -28,7 +28,6 @@ export class TaskViewComponent {
     private taskObjectHelper: TaskObjectHelperService,
     private taskOverlordFixer: TaskOverlordFixerService
   ) {}
-
   ngOnInit() {
     this.taskLoaderService.loadTasks();
 
@@ -81,9 +80,9 @@ export class TaskViewComponent {
     console.log('Deleting: ' + task.name);
     // we will instead be setting statys as deleted:
 
-    // this.sync.deleteTask(task.taskId).subscribe();
-    task.stage = 'deleted';
-    this.sync.updateTask(task).subscribe();
+    // // this.sync.deleteTask(task.taskId).subscribe();
+    // task.stage = 'deleted';
+    // this.sync.updateTask(task).subscribe();
     // this.local.deleteTask(task.taskId).subscribe();
     // this.selectedTask = task;
     // this.selected.setSelectedTask(task);
@@ -130,13 +129,13 @@ export class TaskViewComponent {
     return null;
   }
 
-  filterByOverlordName(): Task[] | null {
-    if (this.selectedTask) {
-      return this.taskObjectHelper.getTasksByOverlordIdName(
-        this.selectedTask.name,
-        this.tasks
-      );
-    }
-    return null;
-  }
+  // filterByOverlordName(): Task[] | null {
+  //   if (this.selectedTask) {
+  //     return this.taskObjectHelper.getTasksByOverlordIdName(
+  //       this.selectedTask.name,
+  //       this.tasks
+  //     );
+  //   }
+  //   return null;
+  // }
 }

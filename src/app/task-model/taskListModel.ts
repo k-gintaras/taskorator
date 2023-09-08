@@ -5,5 +5,5 @@ export interface TaskList {
   tasks: Task[];
   actionName: string; // popup split and qq...
   onButtonClick: Function;
-  onSelected: Function;
+  onTaskSelected: Function;
 }

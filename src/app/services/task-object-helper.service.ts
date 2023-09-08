@@ -6,6 +6,13 @@ import { Task } from '../task-model/taskModelManager';
 })
 export class TaskObjectHelperService {
   constructor() {}
+
+  getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
+    return tasks?.sort(
+      (a, b) => b.timeCreated.getTime() - a.timeCreated.getTime()
+    )[0];
+  }
+
   getTaskById(taskId: number | string, tasks: Task[]): Task | null {
     const index = tasks.findIndex((t) => t.taskId === taskId);
     if (index !== -1) {
@@ -36,9 +43,9 @@ export class TaskObjectHelperService {
     );
   }
 
-  getTasksByOverlordIdName(overlordName: string, tasks: Task[]): Task[] {
-    return tasks.filter((task) => task.overlord === overlordName);
-  }
+  // getTasksByOverlordIdName(overlordName: string, tasks: Task[]): Task[] {
+  //   return tasks.filter((task) => task.overlord === overlordName);
+  // }
 
   getTasksByOverlordName(overlordName: string, tasks: Task[]): Task[] {
     const overlordTask = this.getTaskByName(overlordName, tasks);

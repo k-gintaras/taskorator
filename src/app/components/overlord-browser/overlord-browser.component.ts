@@ -1,0 +1,180 @@
+import { Component, Input } from '@angular/core';
+import { FeedbackService } from 'src/app/services/feedback.service';
+import { FilterHelperService } from 'src/app/services/filter-helper.service';
+import { ListService } from 'src/app/services/list.service';
+import { LocalService } from 'src/app/services/local.service';
+import { SelectedTaskService } from 'src/app/services/selected-task.service';
+import { SyncService } from 'src/app/services/sync.service';
+import { TaskLoaderService } from 'src/app/services/task-loader.service';
+import { TaskService } from 'src/app/services/task.service';
+import { Task } from 'src/app/task-model/taskModelManager';
+
+@Component({
+  selector: 'app-overlord-browser',
+  templateUrl: './overlord-browser.component.html',
+  styleUrls: ['./overlord-browser.component.scss'],
+})
+export class OverlordBrowserComponent {
+  constructor(
+    private local: LocalService,
+    private sync: SyncService,
+    private taskLoaderService: TaskLoaderService,
+    private filters: FilterHelperService,
+    private selected: SelectedTaskService,
+    private listService: ListService,
+    private taskService: TaskService,
+    private feedbackService: FeedbackService
+  ) {}
+  @Input() overlords: Task[] | undefined;
+  @Input() tasks: Task[] | undefined;
+  @Input() filtered: Task[] | undefined;
+  actionName = 'back';
+
+  isSortPriority = true;
+
+  currentOverlord: Task | undefined;
+  selectedOverlord: Task | undefined;
+  selectedTask: Task | null = null;
+
+  selectedTasks = new Set<Task>();
+
+  // ngOnInit() {
+  //   // this.tasks = tasks;
+  //   if (this.tasks) {
+  //     this.filtered = [...this.tasks];
+  //     console.log('tasks received: ' + this.tasks.length);
+  //   }
+  // }
+  ngOnInit() {
+    this.taskLoaderService.loadTasksSlow().subscribe({
+      next: () => {
+        console.log('Tasks loaded and updated in local storage');
+        this.local.getAllTasks().subscribe((tasks: Task[]) => {
+          if (tasks) {
+            if (!this.tasks) {
+              // show latest task overlor...
+              this.tasks = tasks;
+              this.filtered = [...tasks];
+              this.sortByPriority();
+              console.log('FULL REFRESH');
+            }
+          }
+        });
+      },
+    });
+  }
+
+  refresh() {
+    // refresh;
+  }
+
+  addChild(overlord: Task) {
+    // popup?
+  }
+
+  getOverlords() {
+    return this.filters.getOverlords(this.tasks);
+  }
+
+  onTaskCardClick(task: Task) {
+    if (this.selectedTasks.has(task)) {
+      this.selectedTasks.delete(task);
+    } else {
+      this.selectedTasks.add(task);
+    }
+
+    if (task) {
+      this.selected.setSelectedTask(task);
+    }
+  }
+
+  isSelected(task: Task): boolean {
+    return this.selectedTasks.has(task);
+  }
+
+  // onTaskCardClick(task: Task) {
+  //   const index = this.selectedTasks.indexOf(task);
+  //   if (index > -1) {
+  //     // Task is already selected, unselect it
+  //     this.selectedTasks.splice(index, 1);
+  //   } else {
+  //     // Task is not selected, select it
+  //     this.selectedTasks.push(task);
+  //   }
+  // }
+
+  // isSelected(task: Task): boolean {
+  //   return this.selectedTasks.includes(task);
+  // }
+
+  assignTasksToOverlord() {
+    console.log(
+      'Assigning tasks:',
+      Array.from(this.selectedTasks),
+      'to overlord:',
+      this.selectedOverlord
+    );
+    const toUpdate: Task[] = Array.from(this.selectedTasks);
+    toUpdate.forEach((t) => {
+      if (this.selectedOverlord?.taskId) {
+        t.overlord = this.selectedOverlord?.taskId;
+      }
+    });
+    this.sync.updateTasks(toUpdate).subscribe();
+  }
+
+  onPrevious(task: Task) {
+    if (!this.tasks) {
+      return;
+    }
+    const overlordId = task.overlord;
+
+    if (overlordId) {
+      this.currentOverlord = task;
+      const overlordTask = this.tasks.find((t) => t.taskId === overlordId);
+      if (overlordTask) {
+        const f = overlordTask.overlord
+          ? this.tasks.filter((t) => t.overlord === overlordTask.overlord)
+          : [overlordTask];
+
+        this.setNewFiltered(f);
+      }
+    }
+  }
+
+  promote(task: Task) {
+    this.taskService.increasePriority(task);
+  }
+
+  demote(task: Task) {
+    this.taskService.decreasePriority(task);
+  }
+
+  onNext(task: Task) {
+    console.log('task selected: ' + task.name);
+    if (!this.tasks) {
+      return;
+    }
+
+    this.currentOverlord = task;
+
+    const f = this.tasks.filter((t) => t.overlord === task.taskId);
+    if (f?.length > 0) {
+      console.log(f);
+      // this.filtered = f;
+      this.setNewFiltered(f);
+    }
+  }
+
+  setNewFiltered(arr: Task[]) {
+    this.filtered = arr;
+    this.sortByPriority();
+  }
+
+  sortByPriority() {
+    if (!this.filtered) return;
+    this.filtered.sort((a, b) => {
+      return b.priority - a.priority;
+    });
+  }
+}

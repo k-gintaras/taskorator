@@ -86,6 +86,9 @@ export class TextToTasksService {
       priority: 0,
       backupLink: '',
       tags: [''],
+      lastUpdated: null,
+      imageUrl: null,
+      imageDataUrl: null,
     };
     return t;
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, tap, of, BehaviorSubject } from 'rxjs';
 import { Task } from '../task-model/taskModelManager';
+import { TaskTree } from 'src/task-tree';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,26 @@ export class LocalService {
     []
   );
 
+  private taskTree: TaskTree = new TaskTree();
+
   constructor() {}
+
+  getAllTasks(): Observable<Task[]> {
+    return this.tasksSubject.asObservable();
+  }
+
+  getTaskTree(): TaskTree {
+    return this.taskTree;
+  }
+
+  updateTasks(tasks: Task[]): Observable<void> {
+    // Update the local tasks array with the server tasks
+    this.tasks = tasks;
+    this.tasksSubject.next(this.tasks); // Notify components about the updated tasks
+    this.taskTree.buildTree(this.tasks);
+
+    return of(undefined); // Return an observable of void since there is no asynchronous operation here
+  }
 
   deleteTask(taskId: number): Observable<any> {
     console.log('Deleted' + taskId);
@@ -23,20 +43,9 @@ export class LocalService {
     return of(null);
   }
 
-  getAllTasks(): Observable<Task[]> {
-    return this.tasksSubject.asObservable();
-  }
-
-  updateTasks(tasks: Task[]): Observable<void> {
-    // Update the local tasks array with the server tasks
-    this.tasks = tasks;
-    this.tasksSubject.next(this.tasks); // Notify components about the updated tasks
-
-    return of(undefined); // Return an observable of void since there is no asynchronous operation here
-  }
-
   createTask(task: Task): Observable<Task> {
     this.tasks.push(task);
+    this.tasksSubject.next(this.tasks);
     return of(task);
   }
 
@@ -44,6 +53,7 @@ export class LocalService {
     const existingTask = this.tasks.find((t) => t.taskId === task.taskId);
     if (existingTask) {
       Object.assign(existingTask, task);
+      this.tasksSubject.next(this.tasks);
     }
     return of(task);
   }

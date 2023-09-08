@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
+import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 
 @Component({
   selector: 'app-task-list',
@@ -11,15 +12,23 @@ export class TaskListComponent {
   @Input() tasks: Task[] | undefined;
   @Input() actionName: string | undefined;
   @Input() onButtonClick: Function | undefined;
-  @Input() onSelected: Function | undefined;
+  @Input() onTaskSelected: Function | undefined;
 
   selectedTask: Task | null = null;
 
-  constructor(private helper: TaskObjectHelperService) {}
+  constructor(
+    private helper: TaskObjectHelperService,
+    private selected: SelectedTaskService
+  ) {}
 
   selectTask(task: Task) {
     this.selectedTask = task;
+    this.selected.setSelectedTask(task);
     console.log('Selected: ' + task.name);
+    if (this.onTaskSelected) {
+      console.log('hm');
+      this.onTaskSelected(task);
+    }
   }
 
   getOverlord(task: Task) {

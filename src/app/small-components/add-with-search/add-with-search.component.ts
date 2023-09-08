@@ -64,17 +64,10 @@ export class AddWithSearchComponent {
       return;
     }
 
-    if (this.tasks) {
-      const overlordName = this.taskObjectHelper.getTaskById(
-        newTask.overlord,
-        this.tasks
-      );
-      console.log(overlordName?.name);
-    }
-
     if (newTask.name && newTask.name.length > 2) {
       // If you have other logic or API calls for task creation, place them here
       this.feedback(`Task: ${newTask.name} created.`, false);
+      this.sync.createTask(newTask).subscribe();
     } else {
       this.feedback(
         'The task name should be at least 3 characters long.',

@@ -20,6 +20,7 @@ export class TaskService {
    * creation
    */
   create(task: Task) {
+    task.timeCreated = new Date();
     this.sync.createTask(task).subscribe();
   }
 
@@ -44,6 +45,8 @@ export class TaskService {
   }
 
   update(task: Task) {
+    task.lastUpdated = new Date();
+    console.log(task);
     this.sync.updateTask(task).subscribe();
   }
 
@@ -65,6 +68,16 @@ export class TaskService {
 
   archive(task: Task) {
     task.stage = 'archived';
+    this.update(task);
+  }
+
+  delete(task: Task) {
+    task.stage = 'deleted';
+    this.update(task);
+  }
+
+  renew(task: Task) {
+    task.stage = 'todo';
     this.update(task);
   }
 
