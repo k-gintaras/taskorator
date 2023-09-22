@@ -1,15 +1,54 @@
 <div class="component-border">
-  <p>input-to-tasks works!</p>
-  <p>Default Parent Suggestion: {{ suggestion }}</p>
+  <!-- <p>input-to-tasks works!</p> -->
+  <!-- <p>Default Parent Suggestion: {{ suggestion }}</p> -->
   <!-- input-to-tasks.component.html -->
-  <input [(ngModel)]="defaultParent" placeholder="Enter text here..." />
-  <textarea [(ngModel)]="inputText" placeholder="Enter text here..."></textarea>
+  <!-- <input [(ngModel)]="defaultParent" placeholder="Enter text here..." /> -->
 
-  <hr />
-  <span *ngFor="let task of tasks">
-    {{ task?.name }} : {{ task?.owner }}
-    <hr />
-  </span>
-  <button (click)="preview()">Preview</button>
-  <button (click)="save()">Save</button>
+  <mat-card>
+    <div class="select-overlord">
+      <app-select-overlord [overlords]="overlords"></app-select-overlord>
+    </div>
+  </mat-card>
+
+  <mat-form-field class="text-area">
+    <textarea
+      matInput
+      matTextareaAutosize
+      matAutosizeMinRows="2"
+      [(ngModel)]="inputText"
+      placeholder="mass tasks or code to tasks"
+      (blur)="preview()"
+    ></textarea>
+  </mat-form-field>
+
+  <div>
+    <mat-form-field>
+      <input matInput [(ngModel)]="newTaskName" placeholder="one task" />
+    </mat-form-field>
+
+    <button mat-fab color="primary" (click)="addTask()">
+      <mat-icon>add</mat-icon>
+    </button>
+
+    <button mat-fab color="primary" (click)="preview()">
+      <mat-icon>preview</mat-icon>
+    </button>
+
+    <button mat-fab color="accent" (click)="save()">
+      <mat-icon>save</mat-icon>
+    </button>
+  </div>
+  <div *ngFor="let task of tasks; let i = index">
+    <span>
+      <mat-form-field appearance="fill" style="width: 50%">
+        <input matInput [(ngModel)]="task.name" />
+      </mat-form-field>
+      : {{ getOverlord() }}
+      <mat-icon style="vertical-align: middle" (click)="removeTask(i)"
+        >remove_circle_outline</mat-icon
+      >
+    </span>
+  </div>
 </div>
+
+<!-- <div *ngIf="selectedOverlord">{{ selectedOverlord.name }}</div> -->

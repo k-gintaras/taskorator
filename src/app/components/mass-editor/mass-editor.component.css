@@ -1,0 +1,41 @@
+.filter-options-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+
+.input-group span {
+  display: inline-block;
+  width: 80px; /* Adjust as needed */
+  text-align: left;
+  margin-right: 5px;
+}
+
+.task-mini {
+  flex-grow: 1;
+  margin: 0 1rem;
+  max-width: 50px;
+}
+
+select {
+  width: 100px; /* or any other value */
+}
+
+ng-select {
+  width: 100px; /* Adjust as necessary */
+  display: inline-block;
+  background-color: white;
+}
+
+.input-group input[type="checkbox"] {
+  width: 20px; /* Adjust as needed */
+  align-self: flex-end;
+}

@@ -22,6 +22,7 @@ export class AddWithSearchComponent {
   mostRecentTask: Task | undefined;
 
   filteredOverlordTasks: Task[] = [];
+  itemSelected: boolean = false;
 
   constructor(
     private sync: SyncService,
@@ -117,7 +118,8 @@ export class AddWithSearchComponent {
 
   getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
     return tasks?.sort(
-      (a, b) => b.timeCreated.getTime() - a.timeCreated.getTime()
+      (a, b) =>
+        (b.timeCreated?.getTime() || 0) - (a.timeCreated?.getTime() || 0)
     )[0];
   }
 
@@ -153,15 +155,21 @@ export class AddWithSearchComponent {
     this.feedbackService.sendFeedback(s, isError);
   }
 
-  filterOverlordTasks() {
+  filterOverlordTasks(event: any) {
+    const searchTerm = event.term;
     if (this.tasks) {
-      if (this.searchTerm) {
+      if (searchTerm) {
         this.filteredOverlordTasks = this.tasks.filter((task) =>
-          task.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+          task.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
       } else {
         this.filteredOverlordTasks = this.tasks;
       }
     }
+  }
+
+  getSelectedOverlord() {
+    if (!this.tasks) return;
+    return this.taskObjectHelper.getOverlord(this.newTask, this.tasks)?.name;
   }
 }

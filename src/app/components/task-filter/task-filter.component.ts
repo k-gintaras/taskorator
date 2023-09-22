@@ -20,7 +20,9 @@ import {
 export class TaskFilterComponent {
   @Input() tasks: Task[] | undefined;
   filtered: Task[] = [];
+  overlords: Task[] = [];
   @Output() onFilter = new EventEmitter<Task[]>();
+  isFilterCompleted = true;
 
   // select
   size: TaskSize | '' = '';
@@ -87,23 +89,46 @@ export class TaskFilterComponent {
         console.log('Tasks loaded and updated in local storage');
         this.local.getAllTasks().subscribe((tasks: Task[]) => {
           if (tasks) {
-            if (!this.tasks) {
-              // show latest task overlor...
-              this.tasks = tasks;
-              this.filterTasks();
-              // this.filtered = [...tasks];
-              // this.sortByPriority();
-              // console.log('FULL REFRESH');
-            }
+            // if (!this.tasks) {
+            // show latest task overlor...
+            this.tasks = tasks;
+            this.filterTasks();
+            this.filterOverlords();
+            this.filterCompleted();
+            this.sortTasks('priority');
+            // this.filtered = [...tasks];
+            // this.sortByPriority();
+            // console.log('FULL REFRESH');
           }
+          // }
         });
       },
     });
   }
 
+  filterCompleted() {
+    if (this.isFilterCompleted) {
+      this.filtered = this.filtered.filter((task: Task) => {
+        return (
+          task.stage !== 'completed' &&
+          task.stage !== 'archived' &&
+          task.stage !== 'deleted'
+        );
+      });
+    }
+  }
+
   filterOverlords() {
-    this.filters.getOverlords(this.tasks);
-    this.filters.getSemiOverlords(this.tasks);
+    // this.filters.getOverlords(this.tasks);
+    // this.filters.getSemiOverlords(this.tasks);
+    this.overlords = this.local.getTaskTree().getOverlords();
+    // console.log(this.overlords);
+    // this.local.getAllTasks().subscribe((tasks: Task[]) => {
+    //   console.log(tasks.length);
+    //   console.log(tasks.length);
+    // });
+
+    // console.log(this.local.getTaskTree());
   }
 
   filterTasks() {

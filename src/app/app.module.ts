@@ -29,6 +29,11 @@ import { OverlordBrowserComponent } from './components/overlord-browser/overlord
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TaskFilterComponent } from './components/task-filter/task-filter.component';
+import { TaskoratorComponent } from './components/taskorator/taskorator.component';
+import { EditTaskDirective } from './directives/edit-task.directive';
+import { MassEditorComponent } from './components/mass-editor/mass-editor.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { SelectOverlordComponent } from './small-components/select-overlord/select-overlord.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +53,10 @@ import { TaskFilterComponent } from './components/task-filter/task-filter.compon
     CurrentComponent,
     OverlordBrowserComponent,
     TaskFilterComponent,
+    TaskoratorComponent,
+    EditTaskDirective,
+    MassEditorComponent,
+    SelectOverlordComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,6 +72,7 @@ import { TaskFilterComponent } from './components/task-filter/task-filter.compon
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    NgSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

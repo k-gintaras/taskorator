@@ -3,14 +3,6 @@
 <app-input-to-tasks></app-input-to-tasks>
 <app-add-simple-task></app-add-simple-task> -->
 
-<!-- TODO:
-set importance of tasks, taskImportanceComponent
-
-see latest tasks (latestTaskComponent)
-
-set parent for task (draw gow)
--->
-
 <nav class="navigation">
   <a>
     <span [style.color]="feedback.isError === true ? 'red' : 'green'">
@@ -31,7 +23,7 @@ set parent for task (draw gow)
   <a routerLink="/task-filter">Task Filter</a>
 </nav>
 <!-- below navigation -->
-<app-current></app-current>
+<!-- <app-current></app-current> -->
 <router-outlet></router-outlet>
 <p>show latest task</p>
 <p>

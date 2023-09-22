@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { FilterHelperService } from 'src/app/services/filter-helper.service';
 import { ListService } from 'src/app/services/list.service';
@@ -6,6 +6,7 @@ import { LocalService } from 'src/app/services/local.service';
 import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { SyncService } from 'src/app/services/sync.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
+import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
 import { TaskService } from 'src/app/services/task.service';
 import { Task } from 'src/app/task-model/taskModelManager';
 
@@ -23,7 +24,8 @@ export class OverlordBrowserComponent {
     private selected: SelectedTaskService,
     private listService: ListService,
     private taskService: TaskService,
-    private feedbackService: FeedbackService
+    private feedbackService: FeedbackService,
+    private taskObjectService: TaskObjectHelperService
   ) {}
   @Input() overlords: Task[] | undefined;
   @Input() tasks: Task[] | undefined;
@@ -38,6 +40,24 @@ export class OverlordBrowserComponent {
 
   selectedTasks = new Set<Task>();
 
+  isAllSelected = false;
+
+  visibilityMap = new Map<number, boolean>();
+
+  toggleVisibility(task: Task) {
+    const currentStatus = this.visibilityMap.get(task.taskId) || false;
+    this.visibilityMap.set(task.taskId, !currentStatus);
+  }
+
+  isVisible(task: Task): boolean {
+    return this.visibilityMap.get(task.taskId) || false;
+  }
+
+  getOverlord(task: Task) {
+    if (!this.tasks) return task;
+    return this.taskObjectService.getOverlord(task, this.tasks);
+  }
+
   // ngOnInit() {
   //   // this.tasks = tasks;
   //   if (this.tasks) {
@@ -51,13 +71,18 @@ export class OverlordBrowserComponent {
         console.log('Tasks loaded and updated in local storage');
         this.local.getAllTasks().subscribe((tasks: Task[]) => {
           if (tasks) {
-            if (!this.tasks) {
-              // show latest task overlor...
-              this.tasks = tasks;
-              this.filtered = [...tasks];
-              this.sortByPriority();
-              console.log('FULL REFRESH');
+            // if (!this.tasks) {
+            // show latest task overlor...
+            this.tasks = tasks;
+            this.filtered = [...tasks];
+            this.sortByPriority();
+            console.log('FULL REFRESH');
+
+            // to ensure on each update task (priority), we dont just get back to all tasks, but to current overlord (history)
+            if (this.currentOverlord) {
+              this.onNext(this.currentOverlord);
             }
+            // }
           }
         });
       },
@@ -68,8 +93,8 @@ export class OverlordBrowserComponent {
     // refresh;
   }
 
-  addChild(overlord: Task) {
-    // popup?
+  addChild(task: Task) {
+    this.toggleVisibility(task);
   }
 
   getOverlords() {
@@ -86,10 +111,23 @@ export class OverlordBrowserComponent {
     if (task) {
       this.selected.setSelectedTask(task);
     }
+    // this.cdr.markForCheck();
   }
 
   isSelected(task: Task): boolean {
     return this.selectedTasks.has(task);
+  }
+
+  selectAll(): void {
+    if (this.filtered) {
+      this.filtered.forEach((task) => this.selectedTasks.add(task));
+    }
+    this.isAllSelected = true;
+  }
+
+  deselectAll(): void {
+    this.selectedTasks.clear();
+    this.isAllSelected = false;
   }
 
   // onTaskCardClick(task: Task) {
@@ -123,6 +161,10 @@ export class OverlordBrowserComponent {
     this.sync.updateTasks(toUpdate).subscribe();
   }
 
+  getSelectedTasksAsArray(): Task[] {
+    return Array.from(this.selectedTasks);
+  }
+
   onPrevious(task: Task) {
     if (!this.tasks) {
       return;
@@ -133,6 +175,7 @@ export class OverlordBrowserComponent {
       this.currentOverlord = task;
       const overlordTask = this.tasks.find((t) => t.taskId === overlordId);
       if (overlordTask) {
+        console.log('qq');
         const f = overlordTask.overlord
           ? this.tasks.filter((t) => t.overlord === overlordTask.overlord)
           : [overlordTask];

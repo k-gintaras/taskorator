@@ -2,24 +2,65 @@ import { Task } from './app/task-model/taskModelManager';
 
 export class TaskTree {
   private tree: Map<number, TaskNode> = new Map(); // Assuming task has 'id' property as string
-
   buildTree(tasks: Task[]): void {
+    console.log(tasks.length + ' LLLLLLLLLLL');
     this.tree.clear();
+
+    const rootId = 129;
+
+    // Creating task nodes map
     const taskNodes: Map<number, TaskNode> = tasks.reduce((map, task) => {
       map.set(task.taskId, { ...task, children: [] });
       return map;
     }, new Map<number, TaskNode>());
 
+    const rootTask = taskNodes.get(rootId);
+    if (!rootTask) return;
+
+    // Linking child nodes with their parents
     taskNodes.forEach((taskNode, taskId) => {
-      if (taskNode.overlord) {
+      if (taskNode.overlord !== undefined && taskNode.overlord !== null) {
         const parent = taskNodes.get(taskNode.overlord);
         if (parent) {
           parent.children.push(taskNode);
         }
-      } else {
-        this.tree.set(taskId, taskNode);
       }
     });
+
+    this.tree.set(rootId, rootTask);
+
+    console.log(this.tree);
+  }
+
+  getOverlordsNodes(): TaskNode[] {
+    const overlords = new Set<number>();
+    this.tree.forEach((node, id) => {
+      if (node.children && node.children.length > 0) {
+        console.log('children: ' + node.name);
+        overlords.add(id);
+      }
+    });
+    return Array.from(overlords.values()).map((id) => this.tree.get(id)!);
+  }
+
+  extractTasksFromNode(taskNode: TaskNode): Task[] {
+    if (!taskNode) {
+      console.log('taskNode is undefined or null');
+      return [];
+    }
+    let tasks: Task[] = taskNode.children.length > 0 ? [taskNode] : [];
+    for (const child of taskNode.children) {
+      tasks = tasks.concat(this.extractTasksFromNode(child));
+    }
+    return tasks;
+  }
+
+  translateTaskNodesToTasks(taskNodes: TaskNode[]): Task[] {
+    let tasks: Task[] = [];
+    for (const taskNode of taskNodes) {
+      tasks = tasks.concat(this.extractTasksFromNode(taskNode));
+    }
+    return tasks;
   }
 
   getHierarchy(): TaskNode[] {
@@ -37,8 +78,6 @@ export class TaskTree {
       (taskNode) => !taskNode.overlord && taskNode.children.length === 0
     );
   }
-
-  // You already have getTopLevelTasks method
 
   getTaskHierarchy(): TaskNode[] {
     return this.getHierarchy();
@@ -100,14 +139,8 @@ export class TaskTree {
     return filteredTasks;
   }
 
-  getOverlords(): TaskNode[] {
-    const overlords = new Set<number>();
-    this.tree.forEach((node) => {
-      if (node.overlord) {
-        overlords.add(node.overlord);
-      }
-    });
-    return Array.from(overlords.values()).map((id) => this.tree.get(id)!);
+  getOverlords() {
+    return this.translateTaskNodesToTasks(this.getOverlordsNodes());
   }
 
   getSemiOverlords(): TaskNode[] {

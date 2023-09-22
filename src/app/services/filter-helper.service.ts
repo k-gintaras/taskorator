@@ -58,25 +58,29 @@ export class FilterHelperService {
   }
 
   getTasksCreatedToday(tasks: Task[] | undefined): Task[] | undefined {
-    return tasks?.filter((task) => this.isToday(new Date(task.timeCreated)));
+    return tasks?.filter(
+      (task) => task.timeCreated && this.isToday(new Date(task.timeCreated))
+    );
   }
 
   getTasksCreatedThisWeek(tasks: Task[] | undefined): Task[] | undefined {
     const tasksThisWeek = tasks?.filter(
       (task) =>
+        task.timeCreated &&
         this.isThisWeek(new Date(task.timeCreated)) &&
         task.stage !== 'completed'
     );
 
     return tasksThisWeek?.sort(
       (a, b) =>
-        new Date(b.timeCreated).getTime() - new Date(a.timeCreated).getTime()
+        (b.timeCreated ? new Date(b.timeCreated).getTime() : 0) -
+        (a.timeCreated ? new Date(a.timeCreated).getTime() : 0)
     );
   }
 
   getTasksCreatedThisMonth(tasks: Task[] | undefined): Task[] | undefined {
-    return tasks?.filter((task) =>
-      this.isThisMonth(new Date(task.timeCreated))
+    return tasks?.filter(
+      (task) => task.timeCreated && this.isThisMonth(new Date(task.timeCreated))
     );
   }
 
@@ -128,11 +132,19 @@ export class FilterHelperService {
 
       const lastUpdatedDate = new Date(task.lastUpdated);
 
-      // Check if lastUpdated is more than a day old
-      const isMoreThanADayOld =
-        currentDate.getTime() - lastUpdatedDate.getTime() > 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      // because it does not allow
+      // task completed 23:59, task refreshed 06:00 or even 01:00
+      // we adjust to "next day"
+      // // Check if lastUpdated is more than a day old
+      // const isMoreThanADayOld =
+      //   currentDate.getTime() - lastUpdatedDate.getTime() > 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-      if (isMoreThanADayOld) {
+      const isNextDay =
+        currentDate.getDate() !== lastUpdatedDate.getDate() ||
+        currentDate.getMonth() !== lastUpdatedDate.getMonth() ||
+        currentDate.getFullYear() !== lastUpdatedDate.getFullYear();
+
+      if (isNextDay) {
         return true; // Show the task if it's more than a day old, regardless of its stage
       } else {
         return task.stage !== 'seen' && task.stage !== 'completed'; // Only show if its stage is not set to seen or completed

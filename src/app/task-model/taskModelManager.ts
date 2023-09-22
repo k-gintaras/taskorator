@@ -3,7 +3,7 @@ export interface Task {
   name: string;
   todo: string;
   why: string;
-  timeCreated: Date; // Creation time of the task (JavaScript Date object)
+  timeCreated: Date | null; // Creation time of the task (JavaScript Date object)
   lastUpdated: Date | null;
   timeEnd: Date | null; // Completion time of the task (JavaScript Date object or null if not completed)
   duration: number; // Estimated time to complete the task in minutes or hours
@@ -20,6 +20,12 @@ export interface Task {
   imageUrl: string | null; // URL to the image file
   imageDataUrl: string | null; // Base64 representation of the image
   tags: string[]; // Array of tags associated with the task
+}
+
+interface ExtendedTask extends Task {
+  priorityEdit?: boolean;
+  timeCreatedEdit?: boolean;
+  lastUpdatedEdit?: boolean;
 }
 
 export const maxPriority = 10;
@@ -103,7 +109,7 @@ export function getDefaultTask(): Task {
     lastUpdated: new Date(), // Current date and time
     timeEnd: null,
     duration: 0,
-    overlord: null,
+    overlord: 128, // todo is the overlord 128, overlord is overlord 129
     repeat: 'once',
     status: 'active',
     stage: 'todo',

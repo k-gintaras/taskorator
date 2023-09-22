@@ -11,10 +11,14 @@
   <button (click)="onTaskSelected(task)">go in</button>
   <button (click)="onButtonClick(task)">back</button>
 </p> -->
-
+<app-mass-editor
+  [tasks]="getSelectedTasksAsArray()"
+  [overlords]="overlords"
+></app-mass-editor>
+<hr />
 <mat-card class="task-card">
   <mat-card-content class="task-content">
-    <mat-label>Add Selected to Overlord</mat-label>
+    <!-- <mat-label>Add Selected to Overlord</mat-label>
     <mat-form-field appearance="fill">
       <mat-label>Overlords</mat-label>
       <mat-select [(value)]="selectedOverlord">
@@ -23,7 +27,12 @@
         }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <button mat-raised-button (click)="assignTasksToOverlord()">Set</button>
+    <button mat-raised-button (click)="assignTasksToOverlord()">Set</button> -->
+    <mat-label>Select All</mat-label>
+    <mat-checkbox
+      [(ngModel)]="isAllSelected"
+      (change)="isAllSelected ? selectAll() : deselectAll()"
+    ></mat-checkbox>
   </mat-card-content>
 </mat-card>
 
@@ -40,8 +49,10 @@
         (click)="onTaskCardClick(task)"
         class="task-mini"
         [task]="task"
+        [overlord]="getOverlord(task)"
       ></app-task-mini>
-      <mat-checkbox [checked]="isSelected(task)"></mat-checkbox>
+      <!-- <mat-checkbox [checked]="isSelected(task)"></mat-checkbox> -->
+      [complete or?]
       <button mat-icon-button (click)="addChild(task)">
         <mat-icon aria-label="Go in">add</mat-icon>
       </button>
@@ -51,6 +62,12 @@
       <button mat-icon-button (click)="onNext(task)">
         <mat-icon aria-label="Go in">arrow_forward</mat-icon>
       </button>
+      <!-- this is edit task extra -->
     </mat-card-content>
+    <label>
+      <div>
+        <app-taskorator *ngIf="isVisible(task)" [task]="task"></app-taskorator>
+      </div>
+    </label>
   </mat-card>
 </div>

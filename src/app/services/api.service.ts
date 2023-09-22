@@ -99,10 +99,19 @@ export class ApiService {
     return this.http.post<Task>(this.apiUrl, task);
   }
 
+  createTaskWithId(task: Task): Observable<TaskResponse> {
+    return this.http.post<TaskResponse>(this.apiUrl, task);
+  }
+
   deleteTask(taskId: number): Observable<any> {
     console.log('trying to delete: ' + taskId);
     const deleteUrl = `${this.apiUrl}/${taskId}`;
     console.log(deleteUrl);
     return this.http.delete<any>(deleteUrl);
   }
+}
+
+interface TaskResponse {
+  message: string;
+  taskId: number;
 }

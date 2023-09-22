@@ -9,16 +9,21 @@ export class TaskObjectHelperService {
 
   getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
     return tasks?.sort(
-      (a, b) => b.timeCreated.getTime() - a.timeCreated.getTime()
+      (a, b) =>
+        (b.timeCreated?.getTime() || 0) - (a.timeCreated?.getTime() || 0)
     )[0];
   }
 
-  getTaskById(taskId: number | string, tasks: Task[]): Task | null {
+  getTaskById(taskId: number | null, tasks: Task[]): Task | null {
     const index = tasks.findIndex((t) => t.taskId === taskId);
     if (index !== -1) {
       return tasks[index];
     }
     return null;
+  }
+
+  getOverlord(task: Task, tasks: Task[]): Task | null {
+    return this.getTaskById(task.overlord, tasks);
   }
 
   getTaskByName(name: string, tasks: Task[]): Task | null {
@@ -72,8 +77,8 @@ export class TaskObjectHelperService {
   // Function to get Task[] sorted by timeCreated
   getTasksSortedByTimeCreated(tasks: Task[]): Task[] {
     // Sort the tasks array based on the timeCreated property
-    return tasks.slice().sort((a, b) => {
-      return a.timeCreated.getTime() - b.timeCreated.getTime();
+    return tasks?.slice().sort((a, b) => {
+      return (a.timeCreated?.getTime() || 0) - (b.timeCreated?.getTime() || 0);
     });
   }
 

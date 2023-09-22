@@ -112,7 +112,7 @@ export class TaskViewComponent {
     // this.selected.setSelectedTask(task);
   }
 
-  getOverlordName(id: number | null | string | undefined) {
+  getOverlordName(id: number | null) {
     if (id) {
       return this.taskObjectHelper.getTaskById(id, this.tasks)?.name;
     }

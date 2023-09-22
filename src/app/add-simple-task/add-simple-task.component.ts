@@ -47,7 +47,8 @@ export class AddSimpleTaskComponent {
 
   getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
     return tasks?.sort(
-      (a, b) => b.timeCreated.getTime() - a.timeCreated.getTime()
+      (a, b) =>
+        (b.timeCreated?.getTime() ?? 0) - (a.timeCreated?.getTime() ?? 0)
     )[0];
   }
 }

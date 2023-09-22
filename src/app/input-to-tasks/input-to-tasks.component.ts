@@ -3,10 +3,11 @@ import { TextTypeDetectorService } from '../services/text-type-detector.service'
 import { CsvToTasksService } from '../services/csv-to-tasks.service';
 import { TextToTasksService } from '../services/text-to-tasks.service';
 import { LocalService } from '../services/local.service';
-import { Task } from '../task-model/taskModelManager';
+import { Task, getDefaultTask } from '../task-model/taskModelManager';
 import { CodeToTasksService } from '../services/code-to-tasks.service';
-import { BatchOwnerChange } from '../helpers/batch-owner-change';
 import { SyncService } from '../services/sync.service';
+import { SelectedOverlordService } from '../services/selected-overlord.service';
+import { TaskObjectHelperService } from '../services/task-object-helper.service';
 
 @Component({
   selector: 'app-input-to-tasks',
@@ -16,35 +17,75 @@ import { SyncService } from '../services/sync.service';
 export class InputToTasksComponent {
   inputText: string = '';
   tasks: Task[] = [];
+  overlords: Task[] = [];
   @Input() _defaultParent: string = 'batch tasks';
   suggestion: string = 'batch tasks';
+  selectedOverlord: Task | undefined;
+  newTaskName: string = '';
+
   constructor(
     private textTypeService: TextTypeDetectorService,
     private csvService: CsvToTasksService,
     private textService: TextToTasksService,
     private local: LocalService,
     private sync: SyncService,
-    private codeService: CodeToTasksService
+    private codeService: CodeToTasksService,
+    private overlordService: SelectedOverlordService,
+    private taskObjectHelper: TaskObjectHelperService
   ) {}
 
-  get defaultParent(): string {
-    return this._defaultParent;
+  ngOnInit() {
+    this.local.getAllTasks().subscribe((tasks: Task[]) => {
+      if (tasks) {
+        this.overlords = tasks;
+      }
+    });
+    this.overlordService
+      .getSelectedOverlord()
+      .subscribe((overlord: Task | null) => {
+        if (overlord) {
+          this.selectedOverlord = overlord;
+          console.log('seleced overlord: ' + overlord.name);
+        }
+      });
   }
 
-  set defaultParent(value: string) {
-    const newDefaultParent = value;
-    const previousDefaultParent = this._defaultParent;
+  removeTask(index: number) {
+    this.tasks.splice(index, 1);
+  }
 
-    // Handle the changes here, for example, log the changes
-    console.log(
-      `defaultParent changed from '${previousDefaultParent}' to '${newDefaultParent}'`
-    );
+  addTask() {
+    const newTask: Task = getDefaultTask();
+    newTask.name = this.newTaskName;
+    this.tasks.push(newTask);
+  }
 
-    // Update the private variable with the new value
-    this._defaultParent = value;
-    this.tasks.forEach((task) => {
-      task.owner = this.defaultParent;
-    });
+  // get defaultParent(): string {
+  //   return this._defaultParent;
+  // }
+
+  // set defaultParent(value: string) {
+  //   const newDefaultParent = value;
+  //   const previousDefaultParent = this._defaultParent;
+
+  //   // Handle the changes here, for example, log the changes
+  //   console.log(
+  //     `defaultParent changed from '${previousDefaultParent}' to '${newDefaultParent}'`
+  //   );
+
+  //   // Update the private variable with the new value
+  //   this._defaultParent = value;
+  //   this.tasks.forEach((task) => {
+  //     task.owner = this.defaultParent;
+  //   });
+  // }
+
+  getOverlord() {
+    let id = 128;
+    if (this.selectedOverlord) id = this.selectedOverlord.taskId;
+    const t = this.taskObjectHelper.getTaskById(id, this.overlords);
+    if (!t) return '';
+    return t.name;
   }
 
   preview() {
@@ -77,6 +118,11 @@ export class InputToTasksComponent {
     } else {
       this.tasks.push(this.textService.getLineToTaskObject(trimmedText));
     }
+    this.addMassTasks(this.tasks);
+  }
+  addMassTasks(tasks: Task[]) {
+    // Code to mass add tasks, e.g.
+    this.tasks = [...this.tasks, ...tasks];
   }
 
   save() {

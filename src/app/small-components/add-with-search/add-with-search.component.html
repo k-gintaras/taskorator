@@ -5,16 +5,15 @@
     placeholder="Task Name"
     required
   />
-  <mat-form-field appearance="fill">
-    <mat-label>Belongs To</mat-label>
+  <!-- <mat-form-field appearance="fill">
+    <input
+      matInput
+      placeholder="Search Overlord"
+      [(ngModel)]="searchTerm"
+      (keyup)="filterOverlordTasks()"
+      (click)="$event.stopPropagation()"
+    />
     <mat-select [(ngModel)]="newTask.overlord">
-      <input
-        matInput
-        placeholder="Search Overlord"
-        [(ngModel)]="searchTerm"
-        (keyup)="filterOverlordTasks()"
-        (click)="$event.stopPropagation()"
-      />
       <mat-option value="">No Overlord</mat-option>
       <mat-option
         *ngFor="let task of filteredOverlordTasks"
@@ -23,13 +22,30 @@
         {{ task.name }}
       </mat-option>
     </mat-select>
-  </mat-form-field>
+  </mat-form-field> -->
 
-  <input
+  <div style="display: flex; align-items: center">
+    <ng-select
+      [items]="filteredOverlordTasks"
+      bindLabel="name"
+      bindValue="taskId"
+      [(ngModel)]="newTask.overlord"
+      (search)="filterOverlordTasks($event)"
+      (click)="$event.stopPropagation()"
+      (change)="onOverlordChange($event)"
+      style="flex: 1"
+    >
+    </ng-select>
+    <!-- <div style="margin-left: 20px">
+      {{ getSelectedOverlord() }}
+    </div> -->
+  </div>
+
+  <!-- <input
     type="checkbox"
     id="strictToggle"
     [(ngModel)]="strict"
     title="Strict Search"
-  />
+  /> -->
   <button (click)="createTask()">+</button>
 </div>
