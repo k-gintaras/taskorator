@@ -56,8 +56,10 @@ export class InputToTasksComponent {
 
   addTask() {
     const newTask: Task = getDefaultTask();
-    newTask.name = this.newTaskName;
-    this.tasks.push(newTask);
+    if (this.newTaskName?.length > 0) {
+      newTask.name = this.newTaskName;
+      this.tasks.push(newTask);
+    }
   }
 
   // get defaultParent(): string {
@@ -118,15 +120,36 @@ export class InputToTasksComponent {
     } else {
       this.tasks.push(this.textService.getLineToTaskObject(trimmedText));
     }
+
     this.addMassTasks(this.tasks);
   }
+
+  /**
+   *
+   * @param tasks tasks to add
+   * @return unique non empty tasks (not really return though)
+   */
   addMassTasks(tasks: Task[]) {
-    // Code to mass add tasks, e.g.
-    this.tasks = [...this.tasks, ...tasks];
+    const uniqueNames = new Set(this.tasks.map((task) => task.name));
+
+    const uniqueTasks = tasks.filter((task: Task) => {
+      if (!uniqueNames.has(task.name) && task.name?.length > 0) {
+        uniqueNames.add(task.name);
+        return true;
+      }
+      return false;
+    });
+
+    this.tasks = [...this.tasks, ...uniqueTasks];
   }
 
   save() {
     this.tasks.forEach((element) => {
+      let overlordId = 128;
+      if (this.selectedOverlord?.taskId) {
+        overlordId = this.selectedOverlord.taskId;
+      }
+      element.overlord = overlordId;
       if (element.name) this.sync.createTask(element).subscribe();
       console.log('Saved: ' + element.name);
     });

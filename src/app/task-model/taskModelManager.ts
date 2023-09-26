@@ -117,7 +117,7 @@ export function getDefaultTask(): Task {
     subtype: 'list',
     size: 'do now',
     owner: '',
-    priority: 1,
+    priority: 5, // mid, downgrade possible instead of max, decide if there should be limit 10
     backupLink: '',
     imageUrl: '',
     imageDataUrl: '',

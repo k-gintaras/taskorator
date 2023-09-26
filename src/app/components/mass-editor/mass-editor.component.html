@@ -243,23 +243,25 @@
       </div>
     </div>
   </div>
-  <button mat-raised-button [disabled]="tasks.length < 2" (click)="save()">
-    Save All
-  </button>
-  <button
-    mat-raised-button
-    (click)="saveOne()"
-    [disabled]="task.name.length < 2"
-  >
-    Save One: {{ task.name }}
-  </button>
-  <button
-    mat-raised-button
-    (click)="create()"
-    [disabled]="task.name.length < 2"
-  >
-    Create: {{ task.name }}
-  </button>
+  <div *ngIf="task">
+    <button mat-raised-button [disabled]="tasks.length < 2" (click)="save()">
+      Save All
+    </button>
+    <button
+      mat-raised-button
+      (click)="saveOne()"
+      [disabled]="task.name.length < 2"
+    >
+      Save One: {{ task.name }}
+    </button>
+    <button
+      mat-raised-button
+      (click)="create()"
+      [disabled]="task.name.length < 2"
+    >
+      Create: {{ task.name }}
+    </button>
+  </div>
   <!-- <button
     mat-raised-button
     (click)="createParentAndAdd()"
@@ -268,6 +270,9 @@
     Create Parent and Add
   </button> -->
 </mat-card>
+<!-- <div *ngIf="task">
+  {{ task.name }}
+</div> -->
 
 <!-- <select [(ngModel)]="task.overlord" (change)="taskChanged()">
             <option

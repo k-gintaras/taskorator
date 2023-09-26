@@ -147,7 +147,9 @@ export class AddWithSearchComponent {
   onOverlordChange(t: Task) {
     if (t !== null) {
       this.mostRecentTask = t;
-      this.feedback('Overlord Set: ' + this.mostRecentTask.name, true);
+      if (this.mostRecentTask.name) {
+        this.feedback('Overlord Set: ' + this.mostRecentTask.name, false);
+      }
     }
   }
 

@@ -13,7 +13,7 @@ import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
   styleUrls: ['./mass-editor.component.css'],
 })
 export class MassEditorComponent {
-  task: ExtendedTask = this.getDefaultExtendedTask();
+  @Input() task: ExtendedTask = this.getDefaultExtendedTask();
   @Input() tasks: ExtendedTask[] = [];
   @Input() overlords: Task[] | undefined = [];
   filteredOverlordTasks: Task[] = [];
@@ -27,20 +27,38 @@ export class MassEditorComponent {
   // }
 
   ngOnInit() {
-    if (this.tasks.length === 1) {
-      this.setToTask(this.tasks[0]);
-    }
+    // this.toggleOverlordsTasks(null);
+    // if (!this.task) {
+    //   this.task = getDefaultEditTask();
+    // }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['tasks'] && this.tasks.length === 1) {
-      this.setToTask(this.tasks[0]);
+    if (!this.task) {
+      this.task = getDefaultEditTask();
     }
   }
 
+  // unsetTask() {
+  //   this.task = this.getDefaultExtendedTask();
+  //   this.isTaskSetInitially = false;
+  // }
+
+  // ngOnInit() {
+  //   if (this.tasks.length === 1) {
+  //     this.setToTask(this.tasks[0]);
+  //   }
+  // }
+
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['tasks'] && this.tasks.length === 1) {
+  //     this.setToTask(this.tasks[0]);
+  //   }
+  // }
+
   setToTask(task: Task | ExtendedTask) {
     console.log('Setting task: ', task); // debug log to inspect the task being set
-    this.task = { ...task };
+    this.task = { ...task } as ExtendedTask;
   }
 
   dateToString(date: Date | null): string | null {
@@ -76,7 +94,7 @@ export class MassEditorComponent {
     }
   }
 
-  save() {
+  save2() {
     if (this.tasks.length > 0) {
       this.tasks.forEach((task) => {
         if (this.task.nameEdit) {
@@ -139,6 +157,25 @@ export class MassEditorComponent {
         if (this.task.tagsEdit) {
           task.tags = this.task.tags;
         }
+      });
+      this.taskService.updateTasks(this.tasks).subscribe();
+    }
+  }
+
+  saveSingleTask(taskToUpdate: Task, editableTask: Task) {
+    Object.keys(taskToUpdate).forEach((key) => {
+      const editKey = `${key}Edit` as keyof typeof editableTask;
+      if (editableTask[editKey]) {
+        (taskToUpdate as any)[key] =
+          editableTask[key as keyof typeof editableTask];
+      }
+    });
+  }
+
+  save() {
+    if (this.tasks.length > 0) {
+      this.tasks.forEach((task) => {
+        this.saveSingleTask(task, this.task);
       });
       this.taskService.updateTasks(this.tasks).subscribe();
     }

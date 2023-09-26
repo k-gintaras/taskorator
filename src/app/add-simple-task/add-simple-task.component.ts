@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Task, getDefaultTask } from '../task-model/taskModelManager';
 import { LocalService } from '../services/local.service';
 import { SyncService } from '../services/sync.service';
@@ -11,6 +11,7 @@ import { SyncService } from '../services/sync.service';
 export class AddSimpleTaskComponent {
   tasks: Task[] = [];
   newTask: Task = getDefaultTask();
+  @Input() overlord: Task | undefined;
 
   constructor(private sync: SyncService) {}
 

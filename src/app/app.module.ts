@@ -34,6 +34,7 @@ import { EditTaskDirective } from './directives/edit-task.directive';
 import { MassEditorComponent } from './components/mass-editor/mass-editor.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SelectOverlordComponent } from './small-components/select-overlord/select-overlord.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { SelectOverlordComponent } from './small-components/select-overlord/sele
     MatIconModule,
     MatCheckboxModule,
     NgSelectModule,
+    MatSlideToggleModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

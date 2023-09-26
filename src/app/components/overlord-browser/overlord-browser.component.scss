@@ -1,10 +1,11 @@
 .task-container {
-  margin: 1rem 0;
+  margin: 0px;
 }
 
 .task-card {
   max-width: 600px;
   margin: auto;
+  padding: 0px;
 }
 
 .task-content {
@@ -14,7 +15,7 @@
 
 .task-mini {
   flex-grow: 1;
-  margin: 0 1rem;
+  margin: 0px;
 }
 
 .selected-task {

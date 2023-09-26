@@ -14,6 +14,7 @@ export class TaskMiniComponent {
   @Input() actionName: string | undefined;
   @Input() onButtonClick: Function | undefined;
   @Input() onTaskSelected: Function | undefined;
+  expanded = false;
 
   doTask(event: Event, task: Task | undefined) {
     // event.stopPropagation();

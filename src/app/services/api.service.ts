@@ -4,6 +4,10 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Task } from '../task-model/taskModelManager';
 
+export interface TaskResponse {
+  message: string;
+  taskId: number;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -109,9 +113,4 @@ export class ApiService {
     console.log(deleteUrl);
     return this.http.delete<any>(deleteUrl);
   }
-}
-
-interface TaskResponse {
-  message: string;
-  taskId: number;
 }

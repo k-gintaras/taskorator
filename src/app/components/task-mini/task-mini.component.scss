@@ -12,7 +12,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px; /* adjust as needed */
-  margin-bottom: 10px; /* new: adds space below the header */
+  margin-bottom: 5px; /* new: adds space below the header */
 }
 
 .task-card .task-header .task-name {
@@ -23,17 +23,38 @@
 .task-card .task-content {
   font-size: 12px; /* adjust as needed */
   margin-top: 5px;
-  margin-bottom: 10px; /* new: adds space below the content */
+  margin-bottom: 5px; /* new: adds space below the content */
   overflow-wrap: break-word; /* breaks words onto the next line if they exceed the width of the container */
 }
 
 .task-card .task-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .task-card .mat-raised-button {
-  font-size: 10px; /* adjust as needed */
+  font-size: 5px; /* adjust as needed */
   padding: 3px 5px; /* adjust as needed */
+}
+
+.task-details {
+  font-size: 10px;
+}
+
+.small-text {
+  font-size: 10px;
+}
+
+.expandable-text {
+  max-height: 50px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.expanded {
+  max-height: none;
+  -webkit-line-clamp: none;
 }
