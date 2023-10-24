@@ -35,6 +35,11 @@ import { MassEditorComponent } from './components/mass-editor/mass-editor.compon
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SelectOverlordComponent } from './small-components/select-overlord/select-overlord.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TaskBrowserComponent } from './components/task-browser/task-browser.component';
+import { ParentComponent } from './components/parent/parent.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MenuComponent } from './components/menu/menu.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 @NgModule({
   declarations: [
@@ -58,6 +63,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     EditTaskDirective,
     MassEditorComponent,
     SelectOverlordComponent,
+    TaskBrowserComponent,
+    ParentComponent,
+    MenuComponent,
   ],
   imports: [
     BrowserModule,
@@ -75,6 +83,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatCheckboxModule,
     NgSelectModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
+    MatSidenavModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -3,7 +3,7 @@ import { Task } from './app/task-model/taskModelManager';
 export class TaskTree {
   private tree: Map<number, TaskNode> = new Map(); // Assuming task has 'id' property as string
   buildTree(tasks: Task[]): void {
-    console.log(tasks.length + ' LLLLLLLLLLL');
+    // console.log(tasks.length + ' LLLLLLLLLLL');
     this.tree.clear();
 
     const rootId = 129;
@@ -29,14 +29,14 @@ export class TaskTree {
 
     this.tree.set(rootId, rootTask);
 
-    console.log(this.tree);
+    // console.log(this.tree);
   }
 
   getOverlordsNodes(): TaskNode[] {
     const overlords = new Set<number>();
     this.tree.forEach((node, id) => {
       if (node.children && node.children.length > 0) {
-        console.log('children: ' + node.name);
+        // console.log('children: ' + node.name);
         overlords.add(id);
       }
     });

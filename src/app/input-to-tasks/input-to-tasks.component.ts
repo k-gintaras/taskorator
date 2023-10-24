@@ -22,6 +22,8 @@ export class InputToTasksComponent {
   suggestion: string = 'batch tasks';
   selectedOverlord: Task | undefined;
   newTaskName: string = '';
+  isShortened = false;
+  isOnlyUniques = false;
 
   constructor(
     private textTypeService: TextTypeDetectorService,
@@ -54,11 +56,43 @@ export class InputToTasksComponent {
     this.tasks.splice(index, 1);
   }
 
+  trimAction() {
+    this.tasks.forEach((t) => {
+      t.name.trim();
+      t.todo.trim();
+    });
+    this.preview();
+  }
+
+  ensureUniques() {
+    // Create a map to track unique names
+    const nameMap = new Map<string, number>();
+
+    this.tasks.forEach((task) => {
+      if (nameMap.has(task.name)) {
+        // If the name already exists, append a timestamp
+        task.name += ' ' + new Date().getTime();
+      } else {
+        // Track this name
+        nameMap.set(task.name, 1);
+      }
+    });
+
+    // this.preview();
+  }
+
   addTask() {
     const newTask: Task = getDefaultTask();
     if (this.newTaskName?.length > 0) {
       newTask.name = this.newTaskName;
-      this.tasks.push(newTask);
+      const exists =
+        -1 !==
+        this.tasks.findIndex((task) => {
+          task.name === this.newTaskName;
+        });
+      if (!exists) {
+        this.tasks.unshift(newTask);
+      }
     }
   }
 
@@ -91,6 +125,7 @@ export class InputToTasksComponent {
   }
 
   preview() {
+    console.log('rararwrw');
     // Trim the input text
     const trimmedText = this.inputText.trim();
 
@@ -107,7 +142,10 @@ export class InputToTasksComponent {
       console.log('csv');
       this.tasks = this.csvService.getCsvToTaskObjects(trimmedText);
     } else if (isList && !isCode) {
-      this.tasks = this.textService.getLinesToTaskObjects(trimmedText);
+      this.tasks = this.textService.getLinesToTaskObjects(
+        trimmedText,
+        this.isShortened
+      );
     } else if (isCode) {
       console.log('is CODE');
 
@@ -118,10 +156,12 @@ export class InputToTasksComponent {
       const functions = this.codeService.getFunctions(this.inputText.trim());
       this.tasks = this.textService.getCodeToTaskObjects(functions);
     } else {
-      this.tasks.push(this.textService.getLineToTaskObject(trimmedText));
+      this.tasks.push(
+        this.textService.getLineToTaskObject(trimmedText, this.isShortened)
+      );
     }
 
-    this.addMassTasks(this.tasks);
+    this.tasks = this.addMassTasks(this.tasks, this.isOnlyUniques);
   }
 
   /**
@@ -129,18 +169,65 @@ export class InputToTasksComponent {
    * @param tasks tasks to add
    * @return unique non empty tasks (not really return though)
    */
-  addMassTasks(tasks: Task[]) {
-    const uniqueNames = new Set(this.tasks.map((task) => task.name));
+  addMassTasks(newTasks: Task[], onlyUniques: boolean) {
+    // const uniqueNames = new Set(this.tasks.map((task) => task.name));
+    // let counter = 1;
 
-    const uniqueTasks = tasks.filter((task: Task) => {
-      if (!uniqueNames.has(task.name) && task.name?.length > 0) {
+    // // Filter out tasks with duplicate names if onlyUniques is enabled
+    // const filteredTasks = onlyUniques
+    //   ? newTasks.filter((task) => !uniqueNames.has(task.name))
+    //   : newTasks;
+
+    // // Add a counter and timestamp to the name of any duplicate tasks if onlyUniques is not enabled
+    // const finalTasks = filteredTasks.map((task) => {
+    //   if (uniqueNames.has(task.name)) {
+    //     task.name += `, copy${counter++}_${new Date().getTime()}`;
+    //   }
+    //   uniqueNames.add(task.name);
+    //   return task;
+    // });
+
+    // this.tasks = [...finalTasks];
+
+    if (onlyUniques) {
+      return this.getUniqueTasks(newTasks);
+    } else {
+      return this.ensureUniqueTaskNames(newTasks);
+    }
+  }
+
+  getUniqueTasks(tasks: Task[]): Task[] {
+    const uniqueNames = new Set();
+    const uniqueTasks: Task[] = [];
+
+    for (const task of tasks) {
+      if (!uniqueNames.has(task.name)) {
         uniqueNames.add(task.name);
-        return true;
+        uniqueTasks.push(task);
       }
-      return false;
-    });
+    }
 
-    this.tasks = [...this.tasks, ...uniqueTasks];
+    return uniqueTasks;
+  }
+
+  // Ensures that all tasks have unique names by appending a timestamp to duplicates.
+  ensureUniqueTaskNames(tasks: Task[]): Task[] {
+    console.log('qqqqqq');
+    const uniqueNames = new Set<string>();
+    const updatedTasks: Task[] = [];
+
+    for (const task of tasks) {
+      let uniqueName = task.name;
+      if (uniqueNames.has(task.name)) {
+        uniqueName = `${task.name}_${new Date().getTime()}`;
+      }
+      uniqueNames.add(uniqueName);
+
+      const updatedTask = { ...task, name: uniqueName };
+      updatedTasks.push(updatedTask);
+    }
+
+    return updatedTasks;
   }
 
   save() {

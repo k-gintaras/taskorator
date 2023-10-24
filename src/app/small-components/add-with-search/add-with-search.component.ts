@@ -40,16 +40,16 @@ export class AddWithSearchComponent {
         this.tasks = tasks;
         this.filteredOverlordTasks = this.tasks;
         // console.log(this.tasks);
-        console.log(typeof this.tasks[0].timeCreated);
-        console.log(this.tasks[0].timeCreated);
+        // console.log(typeof this.tasks[0].timeCreated);
+        // console.log(this.tasks[0].timeCreated);
         // assume you have a tasks list already loaded
         this.mostRecentTask = this.getMostRecentTask(this.tasks);
         this.newTask.overlord = this.mostRecentTask
           ? this.mostRecentTask.overlord
           : null;
-        console.log(
-          this.mostRecentTask?.name ? this.mostRecentTask.name : 'recentTask'
-        );
+        // console.log(
+        //   this.mostRecentTask?.name ? this.mostRecentTask.name : 'recentTask'
+        // );
       } else {
         console.error('Error fetching tasks:');
       }

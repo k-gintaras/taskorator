@@ -9,18 +9,20 @@ export class CsvToTasksService {
 
   getCsvToTaskObjects(text: string) {
     const lines = text.trim().split('\n');
-    let separator = this.getSeparator(lines);
-    const headers = lines[0].split(separator);
+    const separator = this.getSeparator(lines);
+    const headers = this.splitCsvLine(lines[0], separator);
     const objs = [];
-    // Process the data for each row (excluding the header row)
+
     for (let i = 1; i < lines.length; i++) {
-      const rowValues = lines[i].split(separator);
-      // Process each column in the row based on the headers
+      const rowValues = this.splitCsvLine(lines[i], separator);
       const rowData: any = {};
-      for (let j = 0; j < headers.length; j++) {
-        rowData[headers[j]] = rowValues[j];
-      }
-      const taskObject = this.loadTaskObject(rowData);
+
+      // TODO: using headers might be too complicated (csv to tasks)
+      // for (let j = 0; j < headers.length; j++) {
+      //   rowData[headers[j]] = rowValues[j];
+      // }
+
+      const taskObject = this.loadTaskObject(rowValues, separator);
       objs.push(taskObject);
     }
 
@@ -30,25 +32,50 @@ export class CsvToTasksService {
   getSeparator(lines: string[]) {
     let separator = ',';
     for (let i = 0; i < 3; i++) {
-      const commasCount = lines[i].split(',').length;
-      const tabsCount = lines[i].split('\t').length;
-
-      if (tabsCount > commasCount) {
-        separator = '\t'; // Tab separator detected
-        break;
+      if (lines[i]) {
+        const commas = this.splitCsvLine(lines[i], ',').length;
+        const tabs = this.splitCsvLine(lines[i], '\t').length;
+        if (tabs > commas) {
+          separator = '\t';
+          break;
+        }
       }
     }
     return separator;
   }
 
-  loadTaskObject(rowData: any) {
-    const t = getDefaultTask();
-    t.name = rowData.name;
-    t.todo = rowData.todo ? rowData.todo : '';
-    t.why = rowData.why + ' ' + rowData.idea;
-    t.overlord = rowData['parent or goal'] ? rowData['parent or goal'] : '';
-    t.type = rowData.type ? rowData.type : '';
-    t.tags = rowData?.tags ? rowData.tags.split(',') : '';
+  splitCsvLine(line: string, separator: string): string[] {
+    const result: string[] = [];
+    let cursor = 0;
+    let insideQuote = false;
+    let token = '';
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+
+      if (char === '"') insideQuote = !insideQuote;
+
+      if (char === separator && !insideQuote) {
+        result.push(token);
+        token = '';
+      } else {
+        token += char;
+      }
+    }
+
+    if (token) result.push(token);
+
+    return result;
+  }
+
+  loadTaskObject(rowData: any, separator: any) {
+    const t = { ...getDefaultTask() };
+    t.name = rowData[0] + new Date().getTime();
+    t.todo = rowData.join(separator);
+    // t.why = rowData.why + ' ' + rowData.idea;
+    // t.overlord = rowData['parent or goal'] ? rowData['parent or goal'] : '';
+    // t.type = rowData.type ? rowData.type : '';
+    // t.tags = rowData?.tags ? rowData.tags.split(',') : '';
     return t;
   }
 }

@@ -15,7 +15,7 @@ export class TaskObjectHelperService {
   }
 
   getTaskById(taskId: number | null, tasks: Task[]): Task | null {
-    const index = tasks.findIndex((t) => t.taskId === taskId);
+    const index = tasks.findIndex((t: Task) => t.taskId === taskId);
     if (index !== -1) {
       return tasks[index];
     }

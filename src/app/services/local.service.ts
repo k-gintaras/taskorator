@@ -32,7 +32,7 @@ export class LocalService {
 
     // TODO: fix all tasks and prefix them here too i guess for now...
     const tidyTasks = this.prepareTaskArray(tasks);
-    console.log(tidyTasks.length);
+    // console.log(tidyTasks.length);
     this.taskTree.buildTree(tidyTasks);
 
     return of(undefined); // Return an observable of void since there is no asynchronous operation here
@@ -74,7 +74,7 @@ export class LocalService {
         }
       }
 
-      console.log('bad task parents: ' + counter);
+      // console.log('bad task parents: ' + counter);
       return preparedTask;
     });
   }

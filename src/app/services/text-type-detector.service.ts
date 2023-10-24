@@ -6,41 +6,45 @@ import { Injectable } from '@angular/core';
 export class TextTypeDetectorService {
   constructor() {}
   isCSV(text: string): boolean {
-    // Split the text into lines
     const lines = text.split('\n');
 
-    if (lines.length < 2) {
-      // If there's only one line, it can't be CSV
-      return false;
-    }
+    if (lines.length < 2) return false;
 
     const separator = this.getSeparator(lines);
-    const separatorCount = lines[0].split(separator).length;
+    const firstLineSeparators = this.countSeparators(lines[0], separator);
 
-    // Check if all lines have the same number of separators
     for (let i = 1; i < 3; i++) {
-      const lineSeparatorCount1 = lines[i].split(separator).length;
-      if (lineSeparatorCount1 < 2) {
-        return false;
-      }
-
-      if (lineSeparatorCount1 !== separatorCount) {
+      if (this.countSeparators(lines[i], separator) !== firstLineSeparators) {
         return false;
       }
     }
 
-    return true; // If all lines have the same number of separators, it's likely CSV
+    return true;
   }
 
-  getSeparator(lines: string[]) {
-    let separator = ',';
-    for (let i = 0; i < 3; i++) {
-      if (lines[i]) {
-        const commasCount = lines[i].split(',').length;
-        const tabsCount = lines[i].split('\t').length;
+  countSeparators(line: string, separator: string): number {
+    let count = 0;
+    let insideQuote = false;
 
-        if (tabsCount > commasCount) {
-          separator = '\t'; // Tab separator detected
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') insideQuote = !insideQuote;
+      if (!insideQuote && char === separator) count++;
+    }
+
+    return count;
+  }
+
+  getSeparator(lines: string[]): string {
+    let separator = ',';
+
+    for (let line of lines) {
+      if (line) {
+        const commas = this.countSeparators(line, ',');
+        const tabs = this.countSeparators(line, '\t');
+
+        if (tabs > commas) {
+          separator = '\t';
           break;
         }
       }

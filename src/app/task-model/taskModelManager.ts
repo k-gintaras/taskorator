@@ -124,5 +124,5 @@ export function getDefaultTask(): Task {
     tags: [],
   };
 
-  return defaultTask;
+  return { ...defaultTask };
 }

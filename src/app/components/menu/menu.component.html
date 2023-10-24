@@ -1,0 +1,20 @@
+<mat-drawer-container>
+  <mat-drawer #drawer mode="side">
+    <ng-container *ngIf="activeDrawer === 'addTask'"> test 1 </ng-container>
+    <ng-container *ngIf="activeDrawer === 'editTask'"> test 2 </ng-container>
+    <ng-container *ngIf="activeDrawer === 'settings'"> test 3 </ng-container>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <!-- Main Content -->
+    <button mat-icon-button (click)="toggleDrawer('addTask')">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+    <button mat-icon-button (click)="toggleDrawer('editTask')">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button (click)="toggleDrawer('settings')">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-drawer-content>
+</mat-drawer-container>

@@ -116,14 +116,14 @@ export class FilterManagerComponent {
     this.taskLists = [
       weekly,
       this.listService.getDaily(this.tasks),
-      this.listService.getOverlordBrowser(this.tasks),
-      this.listService.getSubtasks(this.tasks, this.selectedTask),
-      blankList,
-      this.listService.getWithSubtasks(this.tasks),
+      // this.listService.getOverlordBrowser(this.tasks),
+      // this.listService.getSubtasks(this.tasks, this.selectedTask),
+      // blankList,
+      // this.listService.getWithSubtasks(this.tasks),
 
-      this.listService.getWithNoSubtasks(this.tasks),
-      this.listService.getToArchive(this.tasks),
-      allTasks,
+      // this.listService.getWithNoSubtasks(this.tasks),
+      // this.listService.getToArchive(this.tasks),
+      // allTasks,
     ];
   }
 
