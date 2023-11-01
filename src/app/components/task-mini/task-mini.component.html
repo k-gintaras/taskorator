@@ -16,12 +16,14 @@
   </div>
 </div> -->
 
-<div class="task-card" (click)="onTaskSelection()">
+<div
+  [style.borderColor]="getStatusColor()"
+  class="task-card"
+  (click)="onTaskSelection()"
+>
   <div class="task-header">
     <span class="task-name">{{ task?.name }}</span>
-    <span class="small-text">
-      | of: {{ overlord?.name }} | {{ task?.priority }}</span
-    >
+    <span class="small-text"> | {{ task?.todo }} | {{ task?.priority }}</span>
   </div>
   <div class="task-content">
     <span class="small-text task-details">

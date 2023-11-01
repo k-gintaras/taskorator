@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { LocalService } from 'src/app/services/local.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
+import { completeButtonColorMap } from 'src/app/task-model/colors';
 import { Task } from 'src/app/task-model/taskModelManager';
 
 @Component({
@@ -31,5 +32,9 @@ export class TaskMiniComponent {
       console.log('hm');
       this.onTaskSelected(this.task);
     }
+  }
+
+  getStatusColor() {
+    return this.task?.stage ? completeButtonColorMap[this.task.stage] : 'black';
   }
 }

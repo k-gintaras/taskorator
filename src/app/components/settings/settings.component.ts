@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { SettingsService } from 'src/app/services/settings.service';
+import { completeButtonColorMap } from 'src/app/task-model/colors';
 import { CompleteButtonAction, Settings } from 'src/app/task-model/settings';
 
 @Component({
@@ -11,10 +12,11 @@ import { CompleteButtonAction, Settings } from 'src/app/task-model/settings';
 export class SettingsComponent implements OnInit {
   settingsForm: FormGroup;
   completeButtonActions: CompleteButtonAction[] = [
-    'complete',
-    'archive',
-    'delete',
-    'refresh',
+    'completed',
+    'archived',
+    'deleted',
+    'seen',
+    'todo',
   ];
 
   constructor(
@@ -24,7 +26,10 @@ export class SettingsComponent implements OnInit {
     this.settingsForm = this.fb.group({
       isShowArchived: [false],
       isShowCompleted: [false],
-      completeButtonAction: ['complete'],
+      isShowSeen: [true],
+      isShowDeleted: [false],
+      isShowTodo: [true],
+      completeButtonAction: ['completed'],
     });
   }
 
@@ -45,6 +50,26 @@ export class SettingsComponent implements OnInit {
     this.settingsForm.valueChanges.subscribe((newSettings) => {
       this.settingsService.setSettings(newSettings);
     });
+  }
+
+  // Add to your existing form or component class
+
+  // TypeScript will no longer complain about potential null values
+  setAction(action: string) {
+    this.settingsForm.get('completeButtonAction')?.setValue(action);
+  }
+
+  getColor() {
+    const c = this.settingsForm.get('completeButtonAction')?.value;
+    return this.getButtonColor(c);
+  }
+
+  isActionSelected(action: string): boolean {
+    return this.settingsForm.get('completeButtonAction')?.value === action;
+  }
+
+  getButtonColor(action: CompleteButtonAction): string {
+    return completeButtonColorMap[action] || 'black';
   }
 
   // saveSettings() {

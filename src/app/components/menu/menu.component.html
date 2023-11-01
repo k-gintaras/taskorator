@@ -1,17 +1,21 @@
-<mat-drawer-container>
-  <mat-drawer #drawer mode="side">
-    <ng-container *ngIf="activeDrawer === 'addTask'">
+<mat-drawer-container class="inside-area">
+  <mat-drawer class="content-area" #drawer mode="side">
+    <ng-container *ngIf="activeDrawer === 'addTask'"> add </ng-container>
+    <ng-container *ngIf="activeDrawer === 'searchTask'"> sss 2 </ng-container>
+    <ng-container *ngIf="activeDrawer === 'editTask'"> test 2 </ng-container>
+    <ng-container *ngIf="activeDrawer === 'settings'">
       <app-settings></app-settings>
     </ng-container>
-    <ng-container *ngIf="activeDrawer === 'editTask'"> test 2 </ng-container>
-    <ng-container *ngIf="activeDrawer === 'settings'"> test 3 </ng-container>
   </mat-drawer>
 
-  <mat-drawer-content>
+  <mat-drawer-content class="buttons-area">
     <!-- Main Content -->
     <div class="vertical-menu">
       <button mat-icon-button (click)="toggleDrawer('addTask')">
         <mat-icon>add_circle</mat-icon>
+      </button>
+      <button mat-icon-button (click)="toggleDrawer('searchTask')">
+        <mat-icon>search</mat-icon>
       </button>
       <button mat-icon-button (click)="toggleDrawer('editTask')">
         <mat-icon>edit</mat-icon>

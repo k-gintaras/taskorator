@@ -18,6 +18,7 @@ export class FeedbackService {
   }
 
   log(text: string): void {
+    console.log('Feedback: ' + text);
     this.feedbackSubject.next({ text, isError: false });
     this.snackBar.open(text, 'Close', {
       duration: 2000,

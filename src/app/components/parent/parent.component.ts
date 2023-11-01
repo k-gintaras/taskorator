@@ -4,6 +4,7 @@ import { Observable, filter, map, take } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { FilterBaseService } from 'src/app/services/filter-base.service';
 import { LocalService } from 'src/app/services/local.service';
+import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
@@ -22,6 +23,7 @@ export class ParentComponent {
   filtered: Task[] = [];
   selectedOverlordId: number = 0;
   selectedOverlord: Task | undefined;
+  selectedTasks: Task[] = [];
   private isInitialized = false;
   localSettings: Settings = getDefaultSettings(); // Assuming Settings is your interface
 
@@ -33,7 +35,8 @@ export class ParentComponent {
     private route: ActivatedRoute,
     private selectedOverlordService: SelectedOverlordService,
     private taskObjectService: TaskObjectHelperService,
-    private filterService: FilterBaseService
+    private filterService: FilterBaseService,
+    private selectedMultiple: SelectedMultipleService
   ) {}
 
   ngOnInit() {
@@ -51,6 +54,17 @@ export class ParentComponent {
         this.filterTasks(tasks);
       }
     });
+
+    // maybe make its own component of selected tasks;
+    this.selectedMultiple
+      .getSelectedTasks()
+      .subscribe((selectedTasks: Task[]) => {
+        this.selectedTasks = selectedTasks;
+      });
+  }
+
+  removeTask(t: Task) {
+    this.selectedMultiple.removeSelectedTask(t);
   }
 
   filterTasks(tasks: Task[]) {
@@ -63,6 +77,15 @@ export class ParentComponent {
         }
 
         if (!settings.isShowCompleted && t.stage === 'completed') {
+          valid = false;
+        }
+        if (!settings.isShowSeen && t.stage === 'seen') {
+          valid = false;
+        }
+        if (!settings.isShowDeleted && t.stage === 'deleted') {
+          valid = false;
+        }
+        if (!settings.isShowTodo && t.stage === 'todo') {
           valid = false;
         }
 

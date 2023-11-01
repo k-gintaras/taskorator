@@ -16,7 +16,9 @@
 
 .task-content {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .task-mini {

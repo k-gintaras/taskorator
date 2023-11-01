@@ -1,11 +1,20 @@
 <mat-card>
-  <mat-card-title class="task-card"
-    ><b>{{ selectedOverlord?.name }}</b></mat-card-title
-  >
   <mat-card-content>
-    <app-create-simple-task
-      [overlord]="selectedOverlord"
-    ></app-create-simple-task>
+    <mat-card class="task-card">
+      <div class="task-content">
+        <h1>
+          <b>{{ selectedOverlord?.name }}</b>
+        </h1>
+        <app-create-simple-task
+          style="margin: 10px"
+          [overlord]="selectedOverlord"
+        ></app-create-simple-task>
+
+        <span [style.color]="getColorBySetting()">{{
+          completeButtonActionName
+        }}</span>
+      </div>
+    </mat-card>
     <div *ngFor="let task of filtered" class="task-container">
       <mat-card class="task-card" [class.selected-task]="isSelected(task)">
         <mat-card-content class="task-content">
@@ -25,7 +34,8 @@
           <button
             mat-icon-button
             (click)="complete(task)"
-            style="color: black; background-color: white"
+            style="background-color: white"
+            [style.color]="getColorBySetting()"
           >
             <mat-icon aria-label="Complete">check_circle</mat-icon>
           </button>

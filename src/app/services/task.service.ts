@@ -9,12 +9,13 @@ import {
   maxPriority,
 } from '../task-model/taskModelManager';
 import { SyncService } from './sync.service';
+import { FeedbackService } from './feedback.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
-  constructor(private sync: SyncService) {}
+  constructor(private sync: SyncService, private f: FeedbackService) {}
 
   /**
    * creation
@@ -22,6 +23,7 @@ export class TaskService {
   create(task: Task) {
     task.timeCreated = new Date();
     this.sync.createTask(task).subscribe();
+    this.f.log('Created: ' + task.name);
   }
 
   split(task: Task, taskOne: Task, taskTwo: Task) {
@@ -64,21 +66,25 @@ export class TaskService {
   complete(task: Task) {
     task.stage = 'completed';
     this.update(task);
+    this.f.log('Completed: ' + task.name);
   }
 
   archive(task: Task) {
     task.stage = 'archived';
     this.update(task);
+    this.f.log('Archived: ' + task.name);
   }
 
   delete(task: Task) {
     task.stage = 'deleted';
     this.update(task);
+    this.f.log('Deleted: ' + task.name);
   }
 
   renew(task: Task) {
     task.stage = 'todo';
     this.update(task);
+    this.f.log('Renewed: ' + task.name);
   }
 
   /**
@@ -88,11 +94,13 @@ export class TaskService {
   setAsSeen(task: Task) {
     task.stage = 'seen';
     this.update(task);
+    this.f.log('Seen: ' + task.name);
   }
 
   activate(task: Task) {
     task.stage = 'todo';
     this.update(task);
+    this.f.log('Activated: ' + task.name);
   }
 
   /**
@@ -105,6 +113,7 @@ export class TaskService {
       task.priority = 0;
     }
     this.update(task);
+    this.f.log('Priority increased: ' + task.name);
   }
 
   /**
@@ -117,6 +126,7 @@ export class TaskService {
       task.priority = maxPriority;
     }
     this.update(task);
+    this.f.log('Priority decreased: ' + task.name);
   }
 
   /**
@@ -125,16 +135,19 @@ export class TaskService {
   setWhy(task: Task, why: string) {
     task.why = why;
     this.update(task);
+    this.f.log('Why updated: ' + task.name);
   }
 
   setTodo(task: Task, todo: string) {
     task.todo = todo;
     this.update(task);
+    this.f.log('Todo updated: ' + task.name);
   }
 
   setName(task: Task, name: string) {
     task.name = name;
     this.update(task);
+    this.f.log('Name Updated: ' + task.name);
   }
 
   /**
@@ -185,11 +198,13 @@ export class TaskService {
   setImageUrl(task: Task, imageUrl: string) {
     task.imageUrl = imageUrl;
     this.update(task);
+    this.f.log('Image url updated: ' + task.name);
   }
 
   setImageDataUrl(task: Task, imageDataUrl: string) {
     task.imageDataUrl = imageDataUrl;
     this.update(task);
+    this.f.log('Image updated: ' + task.name);
   }
 
   /**
@@ -198,6 +213,7 @@ export class TaskService {
   setBackupLink(task: Task, url: string) {
     task.backupLink = url;
     this.update(task);
+    this.f.log('Backup link updated: ' + task.name);
   }
 
   /**
@@ -206,11 +222,13 @@ export class TaskService {
   setRepeat(task: Task, repeat: RepeatOptions) {
     task.repeat = repeat;
     this.update(task);
+    this.f.log('Updated repeat: ' + task.name);
   }
 
   setTimeEnd(task: Task, timeEnd: Date) {
     task.timeEnd = timeEnd;
     this.update(task);
+    this.f.log('Updated time end: ' + task.name);
   }
 
   /**
@@ -219,6 +237,7 @@ export class TaskService {
   setDuration(task: Task, duration: number) {
     task.duration = duration;
     this.update(task);
+    this.f.log('Updated duration: ' + task.name);
   }
 
   /**
@@ -227,6 +246,7 @@ export class TaskService {
   setStatus(task: Task, status: TaskStatus) {
     task.status = status;
     this.update(task);
+    this.f.log('Updated status: ' + task.name);
   }
 
   /**
@@ -235,6 +255,7 @@ export class TaskService {
   setType(task: Task, type: TaskType) {
     task.type = type;
     this.update(task);
+    this.f.log('Updated type: ' + task.name);
   }
 
   /**
@@ -243,6 +264,7 @@ export class TaskService {
   setSubType(task: Task, subtype: TaskSubtype) {
     task.subtype = subtype;
     this.update(task);
+    this.f.log('Updated subtype: ' + task.name);
   }
 
   /**
@@ -251,5 +273,6 @@ export class TaskService {
   setSize(task: Task, size: TaskSize) {
     task.size = size;
     this.update(task);
+    this.f.log('Updated size: ' + task.name);
   }
 }

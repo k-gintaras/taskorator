@@ -12,19 +12,44 @@
       <input type="checkbox" formControlName="isShowCompleted" />
     </label>
   </div>
-
   <div class="form-group">
     <label>
-      Complete Button Action:
-      <select formControlName="completeButtonAction">
-        <option *ngFor="let action of completeButtonActions" [value]="action">
-          {{ action }}
-        </option>
-      </select>
+      Show Deleted:
+      <input type="checkbox" formControlName="isShowDeleted" />
+    </label>
+  </div>
+  <div class="form-group">
+    <label>
+      Show Seen:
+      <input type="checkbox" formControlName="isShowSeen" />
+    </label>
+  </div>
+  <div class="form-group">
+    <label>
+      Show Todo:
+      <input type="checkbox" formControlName="isShowTodo" />
     </label>
   </div>
 
-  <!-- <div class="form-group">
-    <button (click)="saveSettings()">Save Settings</button>
-  </div> -->
+  <div class="form-group">
+    <label>Complete Button Action:</label>
+    <div class="button-group">
+      <button
+        mat-icon-button
+        style="background-color: white"
+        [style.color]="getColor()"
+      >
+        <mat-icon aria-label="Complete">check_circle</mat-icon>
+      </button>
+      <button
+        mat-button
+        *ngFor="let action of completeButtonActions"
+        (click)="setAction(action)"
+        [ngClass]="{ active: isActionSelected(action) }"
+        [style.color]="getButtonColor(action)"
+      >
+        {{ action }}
+      </button>
+    </div>
+  </div>
 </form>
