@@ -1,0 +1,30 @@
+<form [formGroup]="settingsForm">
+  <div class="form-group">
+    <label>
+      Show Archived:
+      <input type="checkbox" formControlName="isShowArchived" />
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Show Completed:
+      <input type="checkbox" formControlName="isShowCompleted" />
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Complete Button Action:
+      <select formControlName="completeButtonAction">
+        <option *ngFor="let action of completeButtonActions" [value]="action">
+          {{ action }}
+        </option>
+      </select>
+    </label>
+  </div>
+
+  <!-- <div class="form-group">
+    <button (click)="saveSettings()">Save Settings</button>
+  </div> -->
+</form>

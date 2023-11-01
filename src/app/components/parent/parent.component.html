@@ -1,5 +1,11 @@
 <!-- <p>Overlord ID: {{ selectedOverlordId }}</p> -->
 <app-menu></app-menu>
+<div *ngIf="settingsService.getSettings() | async as settings">
+  Show Archived: {{ settings.isShowArchived }} Show Completed:
+  {{ settings.isShowCompleted }} Complete Button Action:
+  {{ settings.completeButtonAction }}
+</div>
+
 <app-task-browser
   [selectedOverlord]="selectedOverlord"
   [tasks]="tasks"

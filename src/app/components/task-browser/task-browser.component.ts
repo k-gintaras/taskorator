@@ -1,9 +1,15 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, combineLatest, take } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
+import { FilterBaseService as FilterGlobalService } from 'src/app/services/filter-base.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
+import { SelectedTaskService } from 'src/app/services/selected-task.service';
+import { SettingsService } from 'src/app/services/settings.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
+import { TaskService } from 'src/app/services/task.service';
+import { CreateSimpleTaskComponent } from 'src/app/small-components/create-simple-task/create-simple-task.component';
 import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 
 @Component({
@@ -13,85 +19,29 @@ import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 })
 export class TaskBrowserComponent {
   // @Input() tasks: Task[] | undefined;
-  @Input() filtered: Task[] | null = [];
+  @Input() filtered: Task[] | undefined;
   // @Input() tasks$: Observable<Task[]> = new Observable<Task[]>();
-  @Input() tasks: Task[] = [];
+  @Input() tasks: Task[] | undefined;
 
   // tasks: Task[] | null = [];
   @Input() selectedOverlord: Task | undefined;
+
+  selectedTask: Task | null = null;
+  selectedTasks = new Set<Task>();
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private selectedOverlordService: SelectedOverlordService,
     private f: FeedbackService,
-    private taskObjectService: TaskObjectHelperService
+    private taskObjectService: TaskObjectHelperService,
+    private taskService: TaskService,
+    private selected: SelectedTaskService,
+    private settingsService: SettingsService,
+    public dialog: MatDialog
   ) {}
 
-  ngOnInit() {
-    // combineLatest([
-    //   this.selectedOverlordService.getSelectedOverlord(),
-    //   this.tasks$,
-    // ]).subscribe(([selectedOverlord, newTasks]) => {
-    //   if (selectedOverlord) {
-    //     this.selectedOverlord = selectedOverlord;
-    //     console.log('previous overlord::::: ' + selectedOverlord.name);
-    //   }
-
-    //   if (newTasks) {
-    //     // this.tasks = newTasks;
-    //     // this.filtered = newTasks;
-
-    //     if (this.selectedOverlord) {
-    //       const f = this.tasks.filter(
-    //         (t) => t.overlord === this.selectedOverlord!.taskId
-    //       );
-
-    //       if (f?.length > 0) {
-    //         this.setNewFiltered(f);
-    //       }
-    //     }
-    //   } else {
-    //     console.log('qq');
-    //   }
-    // });
-
-    this.selectedOverlordService
-      .getSelectedOverlord()
-      .subscribe((selectedOverlord) => {
-        console.log('overlord UPDATED: ');
-        if (selectedOverlord) {
-          console.log('qq pewpew ' + selectedOverlord.name);
-
-          this.selectedOverlord = selectedOverlord;
-          const f = this.tasks.filter(
-            (t) => t.overlord === this.selectedOverlord!.taskId
-          );
-
-          if (f?.length > 0) {
-            this.setNewFiltered(f);
-          }
-        }
-      });
-  }
-  // ngOnInit() {
-  //   this.selectedOverlordService.getSelectedOverlord().subscribe((o) => {
-  //     if (o) {
-  //       this.selectedOverlord = o;
-  //       console.log('previous ovelord::::: ' + o.name);
-  //       if (this.tasks) {
-  //         const f = this.tasks.filter((t) => t.overlord === o.taskId);
-  //         if (f?.length > 0) {
-  //           this.setNewFiltered(f);
-  //         }
-  //       }
-  //     }
-  //   });
-  //   this.tasks$.subscribe((newTasks) => {
-  //     this.tasks = newTasks;
-  //     this.filtered = newTasks;
-  //   });
-  // }
+  ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['tasks'] && this.tasks) {
@@ -101,39 +51,79 @@ export class TaskBrowserComponent {
     }
   }
 
-  isSelected(task: Task) {}
+  openDialog(task: Task): void {
+    const dialogRef = this.dialog.open(CreateSimpleTaskComponent, {
+      width: '300px',
+      data: { overlord: task },
+    });
+  }
 
   onPrevious(task: Task) {
     if (!this.tasks) {
       return;
     }
 
-    console.log('Task to find the overlord of:', task); // Debug line
-
     const overlordId = task.overlord;
 
     if (overlordId) {
       const overlordTask = this.tasks.find((t) => t.taskId === overlordId);
-      console.log('Found overlord task:', overlordTask); // Debug line
-
       if (overlordTask) {
-        this.selectedOverlord = overlordTask;
-        this.selectedOverlordService.setSelectedOverlord(this.selectedOverlord);
-
-        const f = this.tasks.filter(
-          (t) => t.overlord === overlordTask.overlord
+        // Finding the "grand-overlord" who rules all tasks at the new level.
+        const grandOverlordId = overlordTask.overlord;
+        const grandOverlord = this.tasks.find(
+          (t) => t.taskId === grandOverlordId
         );
-        console.log('Filtered tasks for previous step:', f); // Debug line
 
+        if (grandOverlord) {
+          this.selectedOverlord = grandOverlord;
+          this.selectedOverlordService.setSelectedOverlord(
+            this.selectedOverlord
+          );
+        } else {
+          // Handle the case where no grand-overlord exists, which probably means we're at the top level.
+          this.f.log('No more tasks outside.');
+        }
+
+        // Filter tasks that are ruled by the new selectedOverlord.
+        const f = this.tasks.filter(
+          (t) => t.overlord === (grandOverlord ? grandOverlord.taskId : null)
+        );
         if (f?.length > 0) {
           this.setNewFiltered(f);
         }
-        this.selectedOverlordUpdate(this.selectedOverlord);
+        if (this.selectedOverlord)
+          this.selectedOverlordUpdate(this.selectedOverlord);
       }
     } else {
       console.log('No overlord found for the task'); // Debug line
     }
   }
+
+  // onPrevious(task: Task) {
+  //   if (!this.tasks) {
+  //     return;
+  //   }
+
+  //   const overlordId = task.overlord;
+
+  //   if (overlordId) {
+  //     const overlordTask = this.tasks.find((t) => t.taskId === overlordId);
+  //     if (overlordTask) {
+  //       this.selectedOverlord = overlordTask;
+  //       this.selectedOverlordService.setSelectedOverlord(this.selectedOverlord);
+
+  //       const f = this.tasks.filter(
+  //         (t) => t.overlord === overlordTask.overlord
+  //       );
+  //       if (f?.length > 0) {
+  //         this.setNewFiltered(f);
+  //       }
+  //       this.selectedOverlordUpdate(this.selectedOverlord);
+  //     }
+  //   } else {
+  //     console.log('No overlord found for the task'); // Debug line
+  //   }
+  // }
 
   onNext(task: Task) {
     if (!this.tasks) {
@@ -146,12 +136,21 @@ export class TaskBrowserComponent {
       this.selectedOverlord = task;
       this.selectedOverlordService.setSelectedOverlord(this.selectedOverlord);
       this.setNewFiltered(f);
+
       this.selectedOverlordUpdate(task);
     } else {
-      this.f.log('No more tasks inside.');
-      // TODO: what to show when there is no more tasks, create child???
-      // Reached the root task, handle accordingly.
-      // You can either stop the navigation or do something else here.
+      // when tasks are completed while we are inside
+      // it will not be able to go onNext into empty again
+      // reset instead to previous
+      if (task.overlord) {
+        const overlordTask = this.tasks.find((t) => t.taskId === task.overlord);
+        if (overlordTask) {
+          this.selectedOverlordService.setSelectedOverlord(overlordTask);
+          this.selectedOverlordUpdate(overlordTask);
+        }
+        // this.f.log('No more tasks inside. Going Back.');
+        // this.onPrevious(task);
+      }
     }
   }
 
@@ -177,10 +176,22 @@ export class TaskBrowserComponent {
     // this.selectedOverlordService.setSelectedOverlord(this.selectedOverlord);
   }
 
-  promote(task: Task) {}
-
   onTaskCardClick(task: Task) {
-    // set selected...
+    console.log(task.taskId);
+    if (this.selectedTasks.has(task)) {
+      this.selectedTasks.delete(task);
+    } else {
+      this.selectedTasks.add(task);
+    }
+
+    if (task) {
+      this.selected.setSelectedTask(task);
+    }
+    // this.cdr.markForCheck();
+  }
+
+  isSelected(task: Task): boolean {
+    return this.selectedTasks.has(task);
   }
 
   getOverlord(task: Task) {
@@ -188,7 +199,50 @@ export class TaskBrowserComponent {
     return this.taskObjectService.getOverlord(task, this.tasks);
   }
 
-  complete(task: Task) {}
-  addChild(task: Task) {}
-  demote(task: Task) {}
+  complete(task: Task) {
+    // decide what to do here based on settings
+    // this.settingsService.getSettings().subscribe(() => {});
+    // this.taskService.complete(task);
+
+    this.settingsService
+      .getSettings()
+      .pipe(take(1))
+      .subscribe((settings) => {
+        // Use the 'settings' here
+        // Your logic based on settings
+        switch (settings.completeButtonAction) {
+          case 'complete':
+            console.log('complete' + ' ' + task.name);
+            this.taskService.complete(task);
+            break;
+          case 'archive':
+            console.log('archive' + ' ' + task.name);
+            this.taskService.archive(task);
+            break;
+          case 'delete':
+            console.log('deleted' + ' ' + task.name);
+            this.taskService.delete(task);
+            break;
+          case 'refresh':
+            console.log('refreshed' + ' ' + task.name);
+            this.taskService.renew(task);
+            break;
+
+          default:
+            break;
+        }
+      });
+  }
+
+  addChild(task: Task) {
+    this.openDialog(task);
+  }
+
+  promote(task: Task) {
+    this.taskService.increasePriority(task);
+  }
+
+  demote(task: Task) {
+    this.taskService.decreasePriority(task);
+  }
 }

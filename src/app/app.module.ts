@@ -40,6 +40,9 @@ import { ParentComponent } from './components/parent/parent.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MenuComponent } from './components/menu/menu.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { SettingsComponent } from './components/settings/settings.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -66,6 +69,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     TaskBrowserComponent,
     ParentComponent,
     MenuComponent,
+    SettingsComponent,
   ],
   imports: [
     BrowserModule,
@@ -85,8 +89,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     MatSlideToggleModule,
     MatSnackBarModule,
     MatSidenavModule,
+    ReactiveFormsModule,
+    MatDialogModule,
   ],
-  providers: [],
+  providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

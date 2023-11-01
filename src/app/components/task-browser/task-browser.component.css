@@ -1,3 +1,9 @@
+.create-task-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .task-container {
   margin: 0px;
 }

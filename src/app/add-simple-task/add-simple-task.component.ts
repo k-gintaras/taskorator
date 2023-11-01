@@ -2,7 +2,6 @@ import { Component, Input } from '@angular/core';
 import { Task, getDefaultTask } from '../task-model/taskModelManager';
 import { LocalService } from '../services/local.service';
 import { SyncService } from '../services/sync.service';
-
 @Component({
   selector: 'app-add-simple-task',
   templateUrl: './add-simple-task.component.html',

@@ -1,6 +1,11 @@
 <mat-card>
-  <mat-card-title>{{ selectedOverlord?.name }}</mat-card-title>
+  <mat-card-title class="task-card"
+    ><b>{{ selectedOverlord?.name }}</b></mat-card-title
+  >
   <mat-card-content>
+    <app-create-simple-task
+      [overlord]="selectedOverlord"
+    ></app-create-simple-task>
     <div *ngFor="let task of filtered" class="task-container">
       <mat-card class="task-card" [class.selected-task]="isSelected(task)">
         <mat-card-content class="task-content">

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { ApiService } from './api.service';
+import { ApiService, TaskResponse } from './api.service';
 import { LocalService } from './local.service';
 import { Task } from '../task-model/taskModelManager';
 
@@ -14,27 +14,48 @@ export class SyncService {
     private localService: LocalService
   ) {}
 
-  createTask(task: Task): Observable<Task> {
-    // Update the task in the local array immediately
-    this.localService.createTask(task).subscribe();
-    console.log('saving:   ' + task.overlord);
+  // createTask(task: Task): Observable<TaskResponse> {
+  //   // Update the task in the local array immediately
+  //   this.localService.createTask(task).subscribe();
+  //   console.log('saving:   ' + task.overlord);
 
-    // Now initiate the API call to update the task on the server (without waiting for the response)
-    return this.apiService.createTask(task).pipe(
-      tap(() =>
-        console.log(
-          `Task with ID ${task.name} successfully updated on the server`
-        )
-      ),
+  //   // Now initiate the API call to update the task on the server (without waiting for the response)
+  //   return this.apiService.createTaskWithId(task).pipe(
+  //     tap((taskResponse: TaskResponse) =>
+  //       console.log(
+  //         `Task ${task.name} with ID ${taskResponse.taskId} successfully updated on the server`
+  //       )
+  //     ),
+  //     catchError((apiError) => {
+  //       console.error(
+  //         `API updateTask failed for task with ID ${task.taskId}:`,
+  //         apiError
+  //       );
+  //       // Re-throw the error as a new error using a factory function
+  //       return throwError(
+  //         () => new Error('Failed to update task on the server')
+  //       );
+  //     })
+  //   );
+  // }
+  createTask(task: Task): Observable<TaskResponse | null> {
+    // creating here allows task to exist without existing on server and without an existing ID (which is not allowed)
+    // const localTask = { ...task };
+    // this.localService.createTask(localTask).subscribe();
+
+    return this.apiService.createTaskWithId(task).pipe(
+      tap((taskResponse: TaskResponse) => {
+        // create task with real server database id
+        // can later update it
+        const localTask = { ...task };
+        localTask.taskId = taskResponse.taskId;
+        this.localService.createTask(localTask).subscribe();
+
+        console.log(`Task ${localTask.name} now has ID ${taskResponse.taskId}`);
+      }),
       catchError((apiError) => {
-        console.error(
-          `API updateTask failed for task with ID ${task.taskId}:`,
-          apiError
-        );
-        // Re-throw the error as a new error using a factory function
-        return throwError(
-          () => new Error('Failed to update task on the server')
-        );
+        console.log(`API createTask failed:`, apiError);
+        return of(null);
       })
     );
   }
