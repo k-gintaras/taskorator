@@ -1,18 +1,18 @@
 import { Task } from './app/task-model/taskModelManager';
 
 export class TaskTree {
-  private tree: Map<number, TaskNode> = new Map(); // Assuming task has 'id' property as string
+  private tree: Map<string, TaskNode> = new Map(); // Assuming task has 'id' property as string
   buildTree(tasks: Task[]): void {
     // console.log(tasks.length + ' LLLLLLLLLLL');
     this.tree.clear();
 
-    const rootId = 129;
+    const rootId = '129';
 
     // Creating task nodes map
-    const taskNodes: Map<number, TaskNode> = tasks.reduce((map, task) => {
+    const taskNodes: Map<string, TaskNode> = tasks.reduce((map, task) => {
       map.set(task.taskId, { ...task, children: [] });
       return map;
-    }, new Map<number, TaskNode>());
+    }, new Map<string, TaskNode>());
 
     const rootTask = taskNodes.get(rootId);
     if (!rootTask) return;
@@ -33,7 +33,7 @@ export class TaskTree {
   }
 
   getOverlordsNodes(): TaskNode[] {
-    const overlords = new Set<number>();
+    const overlords = new Set<string>();
     this.tree.forEach((node, id) => {
       if (node.children && node.children.length > 0) {
         // console.log('children: ' + node.name);
@@ -83,7 +83,7 @@ export class TaskTree {
     return this.getHierarchy();
   }
 
-  getTaskDepth(taskId: number): number {
+  getTaskDepth(taskId: string): number {
     let depth = 0;
     let currentTask = this.tree.get(taskId);
     while (currentTask && currentTask.overlord) {
@@ -93,7 +93,7 @@ export class TaskTree {
     return depth;
   }
 
-  getTaskBreadth(taskId: number): number {
+  getTaskBreadth(taskId: string): number {
     const taskNode = this.tree.get(taskId);
     return taskNode ? taskNode.children.length : 0;
   }
@@ -113,8 +113,8 @@ export class TaskTree {
     return leafTasks;
   }
 
-  getTaskPath(taskId: number): number[] {
-    const path: number[] = [];
+  getTaskPath(taskId: string): string[] {
+    const path: string[] = [];
     let currentTask = this.tree.get(taskId);
     while (currentTask) {
       path.push(currentTask.taskId);
@@ -125,7 +125,7 @@ export class TaskTree {
     return path.reverse();
   }
 
-  getOverlordTree(): Map<number, TaskNode> {
+  getOverlordTree(): Map<string, TaskNode> {
     return this.tree;
   }
 
@@ -144,7 +144,7 @@ export class TaskTree {
   }
 
   getSemiOverlords(): TaskNode[] {
-    const overlords = new Set<number>();
+    const overlords = new Set<string>();
     this.tree.forEach((node) => {
       if (node.overlord) {
         overlords.add(node.overlord);
@@ -155,7 +155,7 @@ export class TaskTree {
     );
   }
 
-  toD3Hierarchy(rootTaskId: number): any {
+  toD3Hierarchy(rootTaskId: string): any {
     const root = this.tree.get(rootTaskId);
     if (!root) {
       return null;

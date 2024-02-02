@@ -53,7 +53,7 @@ export class OverlordBrowserComponent {
 
   isAllSelected = false;
 
-  visibilityMap = new Map<number, boolean>();
+  visibilityMap = new Map<string, boolean>();
 
   toggleVisibility(task: Task) {
     const currentStatus = this.visibilityMap.get(task.taskId) || false;

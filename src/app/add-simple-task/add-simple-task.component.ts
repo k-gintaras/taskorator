@@ -35,7 +35,7 @@ export class AddSimpleTaskComponent {
     console.log(this.newTask);
     const newTask: Task = { ...this.newTask }; // Create a new task object
     if (!newTask.overlord) {
-      newTask.overlord = 128;
+      newTask.overlord = '128';
     }
     this.sync.createTask(newTask).subscribe();
   }

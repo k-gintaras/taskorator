@@ -5,8 +5,6 @@ import { Task } from '../task-model/taskModelManager';
   providedIn: 'root',
 })
 export class TaskObjectHelperService {
-  constructor() {}
-
   getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
     return tasks?.sort(
       (a, b) =>
@@ -14,7 +12,7 @@ export class TaskObjectHelperService {
     )[0];
   }
 
-  getTaskById(taskId: number | null, tasks: Task[]): Task | null {
+  getTaskById(taskId: string | null, tasks: Task[]): Task | null {
     const index = tasks.findIndex((t: Task) => t.taskId === taskId);
     if (index !== -1) {
       return tasks[index];
@@ -34,15 +32,15 @@ export class TaskObjectHelperService {
     return null;
   }
 
-  getTasksByOverlordId(overlordId: number, tasks: Task[]): Task[] {
+  getTasksByOverlordId(overlordId: string, tasks: Task[]): Task[] {
     return tasks.filter((task) => task.overlord === overlordId);
   }
 
-  getTasksByNoOverlordId(overlordId: number, tasks: Task[]): Task[] {
+  getTasksByNoOverlordId(overlordId: string, tasks: Task[]): Task[] {
     return tasks.filter((task) => task.overlord !== overlordId);
   }
 
-  getTasksByNoOverlordIdAndItself(overlordId: number, tasks: Task[]): Task[] {
+  getTasksByNoOverlordIdAndItself(overlordId: string, tasks: Task[]): Task[] {
     return tasks.filter(
       (task) => task.overlord !== overlordId && task.taskId !== overlordId
     );

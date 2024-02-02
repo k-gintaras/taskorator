@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "taskorator": {
+      "hosting": {
+        "my-app": [
+          "taskorator"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "taskorator"
+  }
+}

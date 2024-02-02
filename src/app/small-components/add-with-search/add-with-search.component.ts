@@ -123,7 +123,7 @@ export class AddWithSearchComponent {
     )[0];
   }
 
-  getBestMatchingTaskId(): number | undefined {
+  getBestMatchingTaskId(): string | undefined {
     if (!this.searchTerm && this.mostRecentTask !== null) {
       return this.mostRecentTask?.taskId;
     }

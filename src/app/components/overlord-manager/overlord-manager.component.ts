@@ -1,3 +1,4 @@
+import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { FilterHelperService } from 'src/app/services/filter-helper.service';
 import { LocalService } from 'src/app/services/local.service';
@@ -5,7 +6,6 @@ import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { SyncService } from 'src/app/services/sync.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
-import { TaskOverlordFixerService } from 'src/app/services/task-overlord-fixer.service';
 import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 
 @Component({
@@ -14,15 +14,15 @@ import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
   styleUrls: ['./overlord-manager.component.scss'],
 })
 // FIXME: it is probably not used anymore
-export class OverlordManagerComponent {
+export class OverlordManagerComponent implements OnInit {
   tasks: Task[] = [];
   overlord: Task | undefined;
   overlord2: Task | undefined;
   newTask: Task = getDefaultTask();
   filterType = true;
 
-  selectedOverlordId: number | null = null;
-  selectedOverlordId2: number | null = null;
+  selectedOverlordId: string | null = null;
+  selectedOverlordId2: string | null = null;
 
   constructor(
     private sync: SyncService,
@@ -48,7 +48,7 @@ export class OverlordManagerComponent {
     });
   }
 
-  toggleOverlordFilter(overlordId: number | null | undefined) {
+  toggleOverlordFilter(overlordId: string | null | undefined) {
     if (overlordId === undefined) {
       this.selectedOverlordId = null;
     } else {
@@ -57,7 +57,7 @@ export class OverlordManagerComponent {
     }
   }
 
-  toggleOverlordFilter2(overlordId: number | null | undefined) {
+  toggleOverlordFilter2(overlordId: string | null | undefined) {
     if (overlordId === undefined) {
       this.selectedOverlordId2 = null;
     } else {
@@ -66,7 +66,7 @@ export class OverlordManagerComponent {
     }
   }
 
-  getTasksForOverlord(overlordId: number | null): Task[] {
+  getTasksForOverlord(overlordId: string | null): Task[] {
     const filtered = this.filters.getOverlords(this.tasks);
     if (filtered) {
       return filtered;
@@ -78,7 +78,7 @@ export class OverlordManagerComponent {
     return this.tasks.filter((task) => task.overlord === overlordId);
   }
 
-  getTasksForOverlord2(overlordId: number | null): Task[] {
+  getTasksForOverlord2(overlordId: string | null): Task[] {
     if (overlordId === null) {
       return this.tasks; // Show all tasks if there is no selected overlord
     }
@@ -96,8 +96,8 @@ export class OverlordManagerComponent {
   createTask() {
     console.log(this.newTask);
     const newTask: Task = { ...this.newTask }; // Create a new task object
-    if (newTask.overlord === 0) {
-      newTask.overlord = 128;
+    if (newTask.overlord === '0') {
+      newTask.overlord = '128';
     }
     this.sync.createTask(newTask).subscribe();
   }
@@ -134,7 +134,7 @@ export class OverlordManagerComponent {
     return null;
   }
 
-  getOverlordName(id: number | null) {
+  getOverlordName(id: string | null) {
     if (id) {
       return this.taskObjectHelper.getTaskById(id, this.tasks)?.name;
     }
@@ -151,7 +151,7 @@ export class OverlordManagerComponent {
 
   freeOverlord(task: Task) {
     if (task && this.overlord) {
-      task.overlord = 128;
+      task.overlord = '128';
       //this.sync.updateTask(task).subscribe();
     }
   }

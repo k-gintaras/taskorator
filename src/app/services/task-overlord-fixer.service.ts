@@ -13,8 +13,6 @@ import {
   providedIn: 'root',
 })
 export class TaskOverlordFixerService {
-  constructor() {}
-
   fixEscapes(tasks: Task[]) {
     function fixFields(task: Task): Task {
       const fixString = (value: string | undefined | number | null): string => {
@@ -109,13 +107,13 @@ export class TaskOverlordFixerService {
           task.overlord = todoOverlordId;
         } else {
           // If there is no task with name 'todo', you can set a default value or handle it as needed.
-          task.overlord = -1; // Default overlord ID when 'todo' is not found.
+          task.overlord = '-1'; // Default overlord ID when 'todo' is not found.
         }
       }
     });
   }
 
-  getTaskIdByName(name: string | number | null, tasks: Task[]): number | null {
+  getTaskIdByName(name: string | number | null, tasks: Task[]): string | null {
     if (!name) {
       return null;
     }
@@ -123,22 +121,22 @@ export class TaskOverlordFixerService {
     return foundTask ? foundTask.taskId : null;
   }
 
-  getTaskIdByType(type: string, tasks: Task[]): number | null {
+  getTaskIdByType(type: string, tasks: Task[]): string | null {
     const foundTask = tasks.find((task) => task.type === type);
     return foundTask ? foundTask.taskId : null;
   }
 
-  getTaskIdByTags(tags: string[], tasks: Task[]): number | null {
+  getTaskIdByTags(tags: string[], tasks: Task[]): string | null {
     const foundTask = tasks.find((task) => this.compareArrays(task.tags, tags));
     return foundTask ? foundTask.taskId : null;
   }
 
-  getTaskIdBySubtype(subtype: string, tasks: Task[]): number | null {
+  getTaskIdBySubtype(subtype: string, tasks: Task[]): string | null {
     const foundTask = tasks.find((task) => task.subtype === subtype);
     return foundTask ? foundTask.taskId : null;
   }
 
-  getTaskIdByOwner(owner: string, tasks: Task[]): number | null {
+  getTaskIdByOwner(owner: string, tasks: Task[]): string | null {
     const foundTask = tasks.find((task) => task.owner === owner);
     return foundTask ? foundTask.taskId : null;
   }

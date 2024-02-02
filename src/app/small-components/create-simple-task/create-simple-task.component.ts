@@ -1,6 +1,5 @@
 import { Component, Inject, Input, Optional } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { SyncService } from 'src/app/services/sync.service';
 import { TaskService } from 'src/app/services/task.service';
 import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 
@@ -30,12 +29,12 @@ export class CreateSimpleTaskComponent {
   // }
   createTask() {
     const newTask: Task = { ...this.newTask }; // Clone
-    let overlordToUse = this.overlord || this.data?.overlord;
+    const overlordToUse = this.overlord || this.data?.overlord;
 
     if (overlordToUse) {
       newTask.overlord = overlordToUse.taskId;
     } else {
-      newTask.overlord = 128; // Your default Overlord ID
+      newTask.overlord = '128'; // Your default Overlord ID
     }
     this.taskService.create(newTask);
   }

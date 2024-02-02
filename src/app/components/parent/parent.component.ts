@@ -1,3 +1,4 @@
+import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, filter, map, take } from 'rxjs';
@@ -17,11 +18,11 @@ import { Task } from 'src/app/task-model/taskModelManager';
   templateUrl: './parent.component.html',
   styleUrls: ['./parent.component.css'],
 })
-export class ParentComponent {
+export class ParentComponent implements OnInit {
   // tasks$: Observable<Task[]> = new Observable<Task[]>();
   tasks: Task[] = [];
   filtered: Task[] = [];
-  selectedOverlordId: number = 0;
+  selectedOverlordId = '0';
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
   private isInitialized = false;
@@ -107,7 +108,7 @@ export class ParentComponent {
   rememberLastOverlord() {
     // This comment summarizes the function's purpose: To recall the last selected overlord based on query parameters.
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      this.selectedOverlordId = Number(params['selectedOverlord'] || 129); // Default to 129 if not found
+      this.selectedOverlordId = params['selectedOverlord'] || '129'; // Default to 129 if not found
 
       // Only initialize if not already initialized
       if (!this.isInitialized) {

@@ -26,3 +26,20 @@ export type CompleteButtonAction =
   | 'todo'
   | 'archived'
   | 'deleted'; // refresh will clear the "removed" status
+
+export function getButtonName(actionName: CompleteButtonAction) {
+  switch (actionName) {
+    case 'completed':
+      return 'Complete';
+    case 'seen':
+      return 'Seen';
+    case 'todo':
+      return 'Todo';
+    case 'archived':
+      return 'Archive';
+    case 'deleted':
+      return 'Delete';
+    default:
+      return 'X';
+  }
+}

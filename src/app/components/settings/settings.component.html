@@ -1,39 +1,23 @@
 <form [formGroup]="settingsForm">
-  <div class="form-group">
-    <label>
-      Show Archived:
-      <input type="checkbox" formControlName="isShowArchived" />
-    </label>
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-title">Task Filters:</div>
+    <div class="filter-options">
+      <label
+        *ngFor="
+          let option of ['Archived', 'Completed', 'Deleted', 'Seen', 'Todo']
+        "
+      >
+        <input type="checkbox" [formControlName]="'isShow' + option" />
+        {{ option }}
+      </label>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label>
-      Show Completed:
-      <input type="checkbox" formControlName="isShowCompleted" />
-    </label>
-  </div>
-  <div class="form-group">
-    <label>
-      Show Deleted:
-      <input type="checkbox" formControlName="isShowDeleted" />
-    </label>
-  </div>
-  <div class="form-group">
-    <label>
-      Show Seen:
-      <input type="checkbox" formControlName="isShowSeen" />
-    </label>
-  </div>
-  <div class="form-group">
-    <label>
-      Show Todo:
-      <input type="checkbox" formControlName="isShowTodo" />
-    </label>
-  </div>
-
-  <div class="form-group">
-    <label>Complete Button Action:</label>
-    <div class="button-group">
+  <!-- Action Button Section -->
+  <div class="action-section">
+    <div class="action-title">Complete Action:</div>
+    <div class="action-buttons">
       <button
         mat-icon-button
         style="background-color: white"

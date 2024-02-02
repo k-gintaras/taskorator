@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@angular/core';
 import { TaskList } from '../task-model/taskListModel';
 import { Task } from '../task-model/taskModelManager';

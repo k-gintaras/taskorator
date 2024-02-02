@@ -1,5 +1,5 @@
 export interface Task {
-  taskId: number; // Unique identifier for the task
+  taskId: string; // Unique identifier for the task
   name: string;
   todo: string;
   why: string;
@@ -7,7 +7,7 @@ export interface Task {
   lastUpdated: Date | null;
   timeEnd: Date | null; // Completion time of the task (JavaScript Date object or null if not completed)
   duration: number; // Estimated time to complete the task in minutes or hours
-  overlord: number | null; // taskId of the parent task if it's part of a hierarchy
+  overlord: string | null; // taskId of the parent task if it's part of a hierarchy
   repeat: RepeatOptions;
   status: TaskStatus; // Task status options
   stage: TaskStage; // Task stage options
@@ -101,7 +101,7 @@ export type TaskSubtype =
 
 export function getDefaultTask(): Task {
   const defaultTask: Task = {
-    taskId: 0,
+    taskId: '0',
     name: '',
     todo: '',
     why: '',
@@ -109,7 +109,7 @@ export function getDefaultTask(): Task {
     lastUpdated: new Date(), // Current date and time
     timeEnd: null,
     duration: 0,
-    overlord: 128, // todo is the overlord 128, overlord is overlord 129
+    overlord: '128', // todo is the overlord 128, overlord is overlord 129
     repeat: 'once',
     status: 'active',
     stage: 'todo',

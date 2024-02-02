@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TextTypeDetectorService } from '../services/text-type-detector.service';
 import { CsvToTasksService } from '../services/csv-to-tasks.service';
 import { TextToTasksService } from '../services/text-to-tasks.service';
@@ -14,14 +14,14 @@ import { TaskObjectHelperService } from '../services/task-object-helper.service'
   templateUrl: './input-to-tasks.component.html',
   styleUrls: ['./input-to-tasks.component.scss'],
 })
-export class InputToTasksComponent {
-  inputText: string = '';
+export class InputToTasksComponent implements OnInit {
+  inputText = '';
   tasks: Task[] = [];
   overlords: Task[] = [];
-  @Input() _defaultParent: string = 'batch tasks';
-  suggestion: string = 'batch tasks';
+  @Input() _defaultParent = 'batch tasks';
+  suggestion = 'batch tasks';
   selectedOverlord: Task | undefined;
-  newTaskName: string = '';
+  newTaskName = '';
   isShortened = false;
   isOnlyUniques = false;
 
@@ -117,7 +117,7 @@ export class InputToTasksComponent {
   // }
 
   getOverlord() {
-    let id = 128;
+    let id = '128';
     if (this.selectedOverlord) id = this.selectedOverlord.taskId;
     const t = this.taskObjectHelper.getTaskById(id, this.overlords);
     if (!t) return '';
@@ -232,7 +232,7 @@ export class InputToTasksComponent {
 
   save() {
     this.tasks.forEach((element) => {
-      let overlordId = 128;
+      let overlordId = '128';
       if (this.selectedOverlord?.taskId) {
         overlordId = this.selectedOverlord.taskId;
       }

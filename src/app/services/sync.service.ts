@@ -100,7 +100,7 @@ export class SyncService {
     );
   }
 
-  deleteTask(taskId: number): Observable<any> {
+  deleteTask(taskId: string): Observable<any> {
     // Delete the task from the local array immediately
     this.localService.deleteTask(taskId).subscribe();
 

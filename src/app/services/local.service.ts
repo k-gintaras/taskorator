@@ -42,7 +42,7 @@ export class LocalService {
   prepareTaskArray(tasks: Task[]): Task[] {
     // Step 1: Identify existing task IDs
     const taskIds = new Set(tasks.map((task) => task.taskId));
-    const rootId = 129;
+    const rootId = '129';
     let counter = 0;
 
     // Step 2: Prepare tasks
@@ -79,7 +79,7 @@ export class LocalService {
     });
   }
 
-  deleteTask(taskId: number): Observable<any> {
+  deleteTask(taskId: string): Observable<any> {
     console.log('Deleted' + taskId);
     const index = this.tasks.findIndex((t) => t.taskId === taskId);
     if (index !== -1) {

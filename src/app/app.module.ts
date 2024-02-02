@@ -43,6 +43,11 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AddMoveTaskComponent } from './components/add-move-task/add-move-task.component';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { TestFirebaseComponent } from './components/test-firebase/test-firebase.component';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -70,6 +75,8 @@ import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
     ParentComponent,
     MenuComponent,
     SettingsComponent,
+    AddMoveTaskComponent,
+    TestFirebaseComponent,
   ],
   imports: [
     BrowserModule,
@@ -91,6 +98,8 @@ import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
     MatSidenavModule,
     ReactiveFormsModule,
     MatDialogModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
   ],
   providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
   bootstrap: [AppComponent],

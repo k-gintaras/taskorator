@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Task, getDefaultTask } from '../task-model/taskModelManager';
-import { ApiService } from '../services/api.service';
 import { LocalService } from '../services/local.service';
 import { SelectedTaskService } from '../services/selected-task.service';
 import { SyncService } from '../services/sync.service';
@@ -112,7 +111,7 @@ export class TaskViewComponent {
     // this.selected.setSelectedTask(task);
   }
 
-  getOverlordName(id: number | null) {
+  getOverlordName(id: string | null) {
     if (id) {
       return this.taskObjectHelper.getTaskById(id, this.tasks)?.name;
     }

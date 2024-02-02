@@ -11,6 +11,7 @@ import { OverlordBrowserComponent } from './components/overlord-browser/overlord
 import { TaskFilterComponent } from './components/task-filter/task-filter.component';
 import { TaskBrowserComponent } from './components/task-browser/task-browser.component';
 import { ParentComponent } from './components/parent/parent.component';
+import { TestFirebaseComponent } from './components/test-firebase/test-firebase.component';
 
 const routes: Routes = [
   { path: 'task-filter', component: TaskFilterComponent },
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'add-simple-task', component: AddSimpleTaskComponent },
   { path: 'task-browser', component: TaskBrowserComponent },
   { path: 'parent', component: ParentComponent },
+  { path: 'firebase', component: TestFirebaseComponent },
   { path: '', redirectTo: '/task-view', pathMatch: 'full' }, // Default route
   { path: '**', redirectTo: '/task-view' }, // Handle invalid routes
 ];

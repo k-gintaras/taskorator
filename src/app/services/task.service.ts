@@ -10,6 +10,8 @@ import {
 } from '../task-model/taskModelManager';
 import { SyncService } from './sync.service';
 import { FeedbackService } from './feedback.service';
+import { TaskResponse } from './api.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +26,11 @@ export class TaskService {
     task.timeCreated = new Date();
     this.sync.createTask(task).subscribe();
     this.f.log('Created: ' + task.name);
+  }
+
+  createGetId(task: Task): Observable<TaskResponse | null> {
+    task.timeCreated = new Date();
+    return this.sync.createTask(task);
   }
 
   split(task: Task, taskOne: Task, taskTwo: Task) {

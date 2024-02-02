@@ -12,7 +12,11 @@ import { TaskObjectHelperService } from 'src/app/services/task-object-helper.ser
 import { TaskService } from 'src/app/services/task.service';
 import { CreateSimpleTaskComponent } from 'src/app/small-components/create-simple-task/create-simple-task.component';
 import { completeButtonColorMap } from 'src/app/task-model/colors';
-import { CompleteButtonAction, Settings } from 'src/app/task-model/settings';
+import {
+  CompleteButtonAction,
+  Settings,
+  getButtonName,
+} from 'src/app/task-model/settings';
 import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 
 @Component({
@@ -66,6 +70,10 @@ export class TaskBrowserComponent {
         this.onNext(this.selectedOverlord);
       }
     }
+  }
+
+  getButtonName() {
+    return getButtonName(this.completeButtonActionName);
   }
 
   getColorBySetting() {

@@ -9,13 +9,11 @@ import {
   providedIn: 'root',
 })
 export class FilterHelperService {
-  constructor() {}
-
-  getTasksByOverlordId(overlordId: number, tasks: Task[]): Task[] {
+  getTasksByOverlordId(overlordId: string, tasks: Task[]): Task[] {
     return tasks?.filter((task) => task.overlord === overlordId);
   }
 
-  getTasksByNoOverlordId(overlordId: number, tasks: Task[]): Task[] {
+  getTasksByNoOverlordId(overlordId: string, tasks: Task[]): Task[] {
     return tasks.filter((task) => task.overlord !== overlordId);
   }
 
