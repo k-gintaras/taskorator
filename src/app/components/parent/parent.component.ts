@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, filter, map, take } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { FilterBaseService } from 'src/app/services/filter-base.service';
+import { FirebaseDatabaseService } from 'src/app/services/firebase-database.service';
 import { LocalService } from 'src/app/services/local.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
@@ -37,20 +38,27 @@ export class ParentComponent implements OnInit {
     private selectedOverlordService: SelectedOverlordService,
     private taskObjectService: TaskObjectHelperService,
     private filterService: FilterBaseService,
-    private selectedMultiple: SelectedMultipleService
+    private selectedMultiple: SelectedMultipleService,
+    private fb: FirebaseDatabaseService
   ) {}
 
   ngOnInit() {
-    this.taskLoaderService.loadTasksSlow().subscribe({
-      next: () => {
-        this.f.log('Tasks loaded and updated in local storage');
-      },
-      error: (err) => {
-        this.f.error('Failed to load tasks:', err);
-      },
-    });
+    // this.taskLoaderService.loadTasksSlow().subscribe({
+    //   next: () => {
+    //     this.f.log('Tasks loaded and updated in local storage');
+    //   },
+    //   error: (err) => {
+    //     this.f.error('Failed to load tasks:', err);
+    //   },
+    // });
 
-    this.localService.getAllTasks().subscribe((tasks) => {
+    // this.localService.getAllTasks().subscribe((tasks) => {
+    //   if (tasks) {
+    //     this.filterTasks(tasks);
+    //   }
+    // });
+    // NEW REPLACEMENT
+    this.fb.fetchTasks().subscribe((tasks) => {
       if (tasks) {
         this.filterTasks(tasks);
       }

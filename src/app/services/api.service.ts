@@ -36,7 +36,7 @@ export class ApiService {
   private parseTaskDates(task: any): Task {
     ['timeCreated', 'lastUpdated', 'timeEnd'].forEach((dateField) => {
       if (task[dateField]) {
-        let parsedDate = new Date(task[dateField]);
+        const parsedDate = new Date(task[dateField]);
         task[dateField] = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
       }
     });

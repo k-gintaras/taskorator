@@ -1,30 +1,34 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, combineLatest, take } from 'rxjs';
+import { take } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
-import { FilterBaseService as FilterGlobalService } from 'src/app/services/filter-base.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
 import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
 import { TaskService } from 'src/app/services/task.service';
-import { CreateSimpleTaskComponent } from 'src/app/small-components/create-simple-task/create-simple-task.component';
 import { completeButtonColorMap } from 'src/app/task-model/colors';
 import {
   CompleteButtonAction,
   Settings,
   getButtonName,
 } from 'src/app/task-model/settings';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/task-model/taskModelManager';
 
 @Component({
   selector: 'app-task-browser',
   templateUrl: './task-browser.component.html',
   styleUrls: ['./task-browser.component.css'],
 })
-export class TaskBrowserComponent {
+export class TaskBrowserComponent implements OnInit, OnChanges {
   // @Input() tasks: Task[] | undefined;
   @Input() filtered: Task[] | undefined;
   // @Input() tasks$: Observable<Task[]> = new Observable<Task[]>();
@@ -80,11 +84,12 @@ export class TaskBrowserComponent {
     return completeButtonColorMap[this.completeButtonActionName] || 'black';
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onClickPlus(task: Task): void {
-    const dialogRef = this.dialog.open(CreateSimpleTaskComponent, {
-      width: '300px',
-      data: { overlord: task },
-    });
+    // const dialogRef = this.dialog.open(CreateSimpleTaskComponent, {
+    //   width: '300px',
+    //   data: { overlord: task },
+    // });
   }
 
   onPrevious(task: Task) {
@@ -173,10 +178,10 @@ export class TaskBrowserComponent {
     if (!this.filtered) return;
     this.filtered.sort((a, b) => {
       if (b.priority === a.priority) {
-        // Sort by 'updatedAt' if priorities are equal
-        // Assuming 'updatedAt' is a Date object or a timestamp
-        if (b.lastUpdated && a.lastUpdated)
-          return b.lastUpdated.getTime() - a.lastUpdated.getTime();
+        // Ensure lastUpdated is handled correctly
+        const timeB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
+        const timeA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
+        return timeB - timeA;
       }
       return b.priority - a.priority;
     });

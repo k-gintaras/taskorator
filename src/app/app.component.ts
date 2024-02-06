@@ -1,11 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskLoaderService } from './services/task-loader.service';
-import { LocalService } from './services/local.service';
-import { SelectedTaskService } from './services/selected-task.service';
-import { SyncService } from './services/sync.service';
-import { TaskObjectHelperService } from './services/task-object-helper.service';
-import { TaskOverlordFixerService } from './services/task-overlord-fixer.service';
-import { Task } from './task-model/taskModelManager';
 import { FeedbackMessage, FeedbackService } from './services/feedback.service';
 import { Subscription } from 'rxjs';
 
@@ -31,11 +25,11 @@ export class AppComponent {
     );
   }
 
-  ngOnInit() {
-    this.taskLoaderService.loadTasksSlow().subscribe();
-  }
+  // ngOnInit() {
+  //   this.taskLoaderService.loadTasksSlow().subscribe();
+  // }
 
-  ngOnDestroy(): void {
-    this.feedbackSubscription.unsubscribe();
-  }
+  // ngOnDestroy(): void {
+  //   this.feedbackSubscription.unsubscribe();
+  // }
 }

@@ -21,15 +21,7 @@ export interface Task {
   imageDataUrl: string | null; // Base64 representation of the image
   tags: string[]; // Array of tags associated with the task
 }
-
-interface ExtendedTask extends Task {
-  priorityEdit?: boolean;
-  timeCreatedEdit?: boolean;
-  lastUpdatedEdit?: boolean;
-}
-
 export const maxPriority = 10;
-
 export const taskTableName = 'tasks_table';
 export const sqlCreateTable = `CREATE TABLE ${taskTableName} (
   taskId INTEGER PRIMARY KEY,

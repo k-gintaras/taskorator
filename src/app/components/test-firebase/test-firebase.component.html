@@ -1,1 +1,22 @@
 <p>test-firebase works!</p>
+<button mat-fab (click)="testSaveTask()"><mat-icon>play</mat-icon></button>
+<button mat-fab (click)="migrateTasks()"><mat-icon>add</mat-icon></button>
+
+<!-- Display Total Task Count -->
+<!-- <div>Total Tasks: {{ tasks | async | length }}</div> -->
+
+<!-- Iterate Over Each Task and Display Its Name -->
+<!-- <div *ngFor="let task of tasks | async">
+  {{ task.name }}
+</div> -->
+<!-- <div *ngFor="let task of tasksSqlite">
+  {{ task.name }}
+</div>
+<div *ngFor="let task of missingTasks">
+  {{ task.name }}
+</div> -->
+
+<app-task-browser
+  [tasks]="tasksArray"
+  [filtered]="tasksArray"
+></app-task-browser>

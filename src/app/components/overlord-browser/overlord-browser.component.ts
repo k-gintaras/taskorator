@@ -1,9 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  Input,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { FilterHelperService } from 'src/app/services/filter-helper.service';
 import { ListService } from 'src/app/services/list.service';
@@ -16,7 +11,6 @@ import { TaskObjectHelperService } from 'src/app/services/task-object-helper.ser
 import { TaskService } from 'src/app/services/task.service';
 import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
 import { Router, ActivatedRoute } from '@angular/router';
-import { getDefaultEditTask } from 'src/app/task-model/massTaskEditModel';
 
 @Component({
   selector: 'app-overlord-browser',
