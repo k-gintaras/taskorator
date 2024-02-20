@@ -1,4 +1,4 @@
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 
 export class BatchOwnerChange {
   defaultParent: null | string;

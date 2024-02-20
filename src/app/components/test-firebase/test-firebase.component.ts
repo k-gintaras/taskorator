@@ -3,7 +3,7 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { FirebaseDatabaseService } from 'src/app/services/firebase-database.service';
 import { SqliteMigrateFirebaseService } from 'src/app/services/sqlite-migrate-firebase.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-test-firebase',
@@ -35,7 +35,7 @@ export class TestFirebaseComponent implements OnInit {
     tags: [],
   };
 
-  tasks: Observable<Task[]>;
+  // tasks: Observable<Task[]>;
 
   filtered: Task[] = [];
   tasksArray: Task[] = [];
@@ -47,7 +47,7 @@ export class TestFirebaseComponent implements OnInit {
     private migrationService: SqliteMigrateFirebaseService,
     private sqliteApi: ApiService
   ) {
-    this.tasks = fb.fetchTasks();
+    // this.tasks = fb.fetchTasks();
   }
 
   ngOnInit(): void {
@@ -60,31 +60,31 @@ export class TestFirebaseComponent implements OnInit {
   }
 
   async compareTasks() {
-    this.tasks = this.fb.fetchTasks();
-    this.fb.fetchTasks().subscribe((tasks) => {
-      this.tasksArray = tasks;
-      this.filtered = tasks;
-    });
+    // this.tasks = this.fb.fetchTasks();
+    // this.fb.fetchTasks().subscribe((tasks) => {
+    //   this.tasksArray = tasks;
+    //   this.filtered = tasks;
+    // });
     // this.sqliteApi.fetchTasks().subscribe((tasks) => {
     //   this.tasksSqlite = tasks;
     //   // this.finalizeComparison();
     // });
   }
 
-  async finalizeComparison() {
-    // Convert Firebase tasks Observable to a promise
-    const tasksFirebase: Task[] = await lastValueFrom(this.tasks);
+  // async finalizeComparison() {
+  //   // Convert Firebase tasks Observable to a promise
+  //   const tasksFirebase: Task[] = await lastValueFrom(this.tasks);
 
-    // Assuming Task has a unique 'taskId' property to compare
-    const firebaseTaskIds = new Set(tasksFirebase.map((task) => task.taskId));
+  //   // Assuming Task has a unique 'taskId' property to compare
+  //   const firebaseTaskIds = new Set(tasksFirebase.map((task) => task.taskId));
 
-    this.missingTasks = this.tasksSqlite.filter(
-      (task) => !firebaseTaskIds.has(task.taskId)
-    );
+  //   this.missingTasks = this.tasksSqlite.filter(
+  //     (task) => !firebaseTaskIds.has(task.taskId)
+  //   );
 
-    // Now 'missingTasks' holds tasks that are in SQLite but not in Firebase
-    console.log('Missing Tasks:', this.missingTasks);
-  }
+  //   // Now 'missingTasks' holds tasks that are in SQLite but not in Firebase
+  //   console.log('Missing Tasks:', this.missingTasks);
+  // }
 
   testSaveTask() {
     // this.fb.createTask(this.t);

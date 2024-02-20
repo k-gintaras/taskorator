@@ -10,7 +10,7 @@ import {
   RepeatOptions,
   TaskType,
   TaskSubtype,
-} from 'src/app/task-model/taskModelManager';
+} from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-task-filter',

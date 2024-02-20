@@ -6,7 +6,7 @@ import { SyncService } from 'src/app/services/sync.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
 import { TaskOverlordFixerService } from 'src/app/services/task-overlord-fixer.service';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-add-with-search',
@@ -34,27 +34,27 @@ export class AddWithSearchComponent {
     private feedbackService: FeedbackService
   ) {}
 
-  ngOnInit() {
-    this.sync.getAllTasks().subscribe((tasks) => {
-      if (tasks) {
-        this.tasks = tasks;
-        this.filteredOverlordTasks = this.tasks;
-        // console.log(this.tasks);
-        // console.log(typeof this.tasks[0].timeCreated);
-        // console.log(this.tasks[0].timeCreated);
-        // assume you have a tasks list already loaded
-        this.mostRecentTask = this.getMostRecentTask(this.tasks);
-        this.newTask.overlord = this.mostRecentTask
-          ? this.mostRecentTask.overlord
-          : null;
-        // console.log(
-        //   this.mostRecentTask?.name ? this.mostRecentTask.name : 'recentTask'
-        // );
-      } else {
-        console.error('Error fetching tasks:');
-      }
-    });
-  }
+  // ngOnInit() {
+  //   this.sync.getAllTasks().subscribe((tasks) => {
+  //     if (tasks) {
+  //       this.tasks = tasks;
+  //       this.filteredOverlordTasks = this.tasks;
+  //       // console.log(this.tasks);
+  //       // console.log(typeof this.tasks[0].timeCreated);
+  //       // console.log(this.tasks[0].timeCreated);
+  //       // assume you have a tasks list already loaded
+  //       this.mostRecentTask = this.getMostRecentTask(this.tasks);
+  //       this.newTask.overlord = this.mostRecentTask
+  //         ? this.mostRecentTask.overlord
+  //         : null;
+  //       // console.log(
+  //       //   this.mostRecentTask?.name ? this.mostRecentTask.name : 'recentTask'
+  //       // );
+  //     } else {
+  //       console.error('Error fetching tasks:');
+  //     }
+  //   });
+  // }
 
   createTask() {
     const newTask: Task = { ...this.newTask }; // Create a new task object

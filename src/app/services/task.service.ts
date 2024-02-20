@@ -7,30 +7,35 @@ import {
   TaskSubtype,
   TaskType,
   maxPriority,
-} from '../task-model/taskModelManager';
+} from '../models/taskModelManager';
 import { SyncService } from './sync.service';
 import { FeedbackService } from './feedback.service';
 import { TaskResponse } from './api.service';
 import { Observable } from 'rxjs';
+import { FirebaseDatabaseService } from './firebase-database.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
-  constructor(private sync: SyncService, private f: FeedbackService) {}
+  constructor(
+    private firebase: FirebaseDatabaseService,
+    private f: FeedbackService
+  ) {}
 
   /**
    * creation
    */
   create(task: Task) {
     task.timeCreated = new Date();
-    this.sync.createTask(task).subscribe();
-    this.f.log('Created: ' + task.name);
+    this.firebase.createTask(task).then((createdTask: Task) => {
+      this.f.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
+    });
   }
 
-  createGetId(task: Task): Observable<TaskResponse | null> {
+  createGetId(task: Task): Promise<Task> {
     task.timeCreated = new Date();
-    return this.sync.createTask(task);
+    return this.firebase.createTask(task);
   }
 
   split(task: Task, taskOne: Task, taskTwo: Task) {
@@ -41,8 +46,9 @@ export class TaskService {
     const name3 = taskTwo.name;
 
     if (name1 !== name2 && name1 !== name3 && name2 !== name3) {
-      this.sync.createTask(taskOne).subscribe();
-      this.sync.createTask(taskTwo).subscribe();
+      this.firebase.createTasks([taskOne, taskTwo]).then(() => {
+        this.f.log('Created: ' + taskOne.name + ' ' + taskOne.name);
+      });
     } else {
       console.log('task names are the same');
     }
@@ -50,13 +56,15 @@ export class TaskService {
 
   addSubtask(taskTo: Task, subtask: Task) {
     subtask.overlord = taskTo.taskId;
-    this.sync.createTask(subtask).subscribe();
+    this.create(subtask);
   }
 
   update(task: Task) {
     task.lastUpdated = new Date();
     console.log(task);
-    this.sync.updateTask(task).subscribe();
+    this.firebase.updateTask(task).then(() => {
+      this.f.log('Updated: ' + task.name);
+    });
   }
 
   /**

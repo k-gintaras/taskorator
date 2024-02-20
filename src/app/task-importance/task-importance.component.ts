@@ -1,6 +1,6 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 import { LocalService } from '../services/local.service';
 import { SelectedTaskService } from '../services/selected-task.service';
 

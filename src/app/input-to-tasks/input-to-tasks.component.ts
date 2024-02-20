@@ -3,7 +3,7 @@ import { TextTypeDetectorService } from '../services/text-type-detector.service'
 import { CsvToTasksService } from '../services/csv-to-tasks.service';
 import { TextToTasksService } from '../services/text-to-tasks.service';
 import { LocalService } from '../services/local.service';
-import { Task, getDefaultTask } from '../task-model/taskModelManager';
+import { Task, getDefaultTask } from '../models/taskModelManager';
 import { CodeToTasksService } from '../services/code-to-tasks.service';
 import { SyncService } from '../services/sync.service';
 import { SelectedOverlordService } from '../services/selected-overlord.service';

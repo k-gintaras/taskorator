@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { LocalService } from 'src/app/services/local.service';
 import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-current',

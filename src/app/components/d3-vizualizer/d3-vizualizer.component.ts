@@ -8,7 +8,7 @@ import {
 import { LocalService } from 'src/app/services/local.service';
 import { SyncService } from 'src/app/services/sync.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 import { interval } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 

@@ -1,7 +1,7 @@
 import { Component, Inject, Input, Optional } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TaskService } from 'src/app/services/task.service';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-create-simple-task',

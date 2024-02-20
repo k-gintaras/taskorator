@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { LocalService } from 'src/app/services/local.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FilterHelperService } from 'src/app/services/filter-helper.service';
 import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { ListService } from 'src/app/services/list.service';
-import { TaskList } from 'src/app/task-model/taskListModel';
+import { TaskList } from 'src/app/models/taskListModel';
 import { TaskService } from 'src/app/services/task.service';
 import { FeedbackService } from 'src/app/services/feedback.service';
 

@@ -7,7 +7,7 @@ import {
   getDoc,
   writeBatch,
 } from '@angular/fire/firestore';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

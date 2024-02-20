@@ -7,7 +7,7 @@ import {
   TaskStatus,
   TaskSubtype,
   TaskType,
-} from '../task-model/taskModelManager';
+} from '../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

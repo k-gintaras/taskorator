@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Task, getDefaultTask } from '../task-model/taskModelManager';
+import { Task, getDefaultTask } from '../models/taskModelManager';
 import { LocalService } from '../services/local.service';
 import { SelectedTaskService } from '../services/selected-task.service';
 import { SyncService } from '../services/sync.service';

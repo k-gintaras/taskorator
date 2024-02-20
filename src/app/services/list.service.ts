@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@angular/core';
-import { TaskList } from '../task-model/taskListModel';
-import { Task } from '../task-model/taskModelManager';
+import { TaskList } from '../models/taskListModel';
+import { Task } from '../models/taskModelManager';
 import { FilterHelperService } from './filter-helper.service';
 import { TaskService } from './task.service';
 import { FeedbackService } from './feedback.service';

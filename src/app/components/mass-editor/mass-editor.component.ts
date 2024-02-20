@@ -4,8 +4,8 @@ import { TaskService } from 'src/app/services/task.service';
 import {
   ExtendedTask,
   getDefaultEditTask,
-} from 'src/app/task-model/massTaskEditModel';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+} from 'src/app/models/massTaskEditModel';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-mass-editor',

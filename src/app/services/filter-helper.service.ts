@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  RepeatOptions,
-  Task,
-  maxPriority,
-} from '../task-model/taskModelManager';
+import { RepeatOptions, Task, maxPriority } from '../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

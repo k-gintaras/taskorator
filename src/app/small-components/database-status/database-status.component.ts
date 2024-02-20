@@ -7,7 +7,7 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./database-status.component.scss'],
 })
 export class DatabaseStatusComponent {
-  isDbOnline: boolean = false;
+  isDbOnline = false;
   constructor(private taskService: ApiService) {}
   ngOnInit() {
     this.checkApiHealth();

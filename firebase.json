@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "target": "my-app",
+      "target": "taskorator",
       "source": ".",
       "frameworksBackend": {}
     }

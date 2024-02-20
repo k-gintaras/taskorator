@@ -1,13 +1,12 @@
 import { Injectable, Input } from '@angular/core';
-import { Task } from '../task-model/taskModelManager';
-import { ExtendedTask } from '../task-model/massTaskEditModel';
+import { Task } from '../models/taskModelManager';
+import { ExtendedTask } from '../models/massTaskEditModel';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedOverlordService {
-  constructor() {}
   private selectedOverlord = new BehaviorSubject<Task | null>(null);
 
   getSelectedOverlord() {

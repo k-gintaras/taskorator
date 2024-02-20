@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { TaskService } from 'src/app/services/task.service';
-import { Task } from 'src/app/task-model/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-taskorator',

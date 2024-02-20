@@ -1,5 +1,3 @@
-import { Task } from './taskModelManager';
-
 export interface Settings {
   isShowArchived: boolean;
   isShowCompleted: boolean;
@@ -7,7 +5,7 @@ export interface Settings {
   isShowDeleted: boolean;
   isShowTodo: boolean;
   completeButtonAction: CompleteButtonAction;
-  lastOverlordViewId: number;
+  lastOverlordViewId: string;
   // ... more settings here
 }
 
@@ -19,7 +17,7 @@ export function getDefaultSettings() {
     isShowDeleted: false,
     isShowTodo: true,
     completeButtonAction: 'completed',
-    lastOverlordViewId: 128, // the base overlord for all tasks forever
+    lastOverlordViewId: '128', // the base overlord for all tasks forever
   };
   return { ...settings };
 }

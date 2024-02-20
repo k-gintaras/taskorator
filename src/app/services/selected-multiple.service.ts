@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({

@@ -18,7 +18,7 @@
         <span [style.color]="getColorBySetting()">{{ getButtonName() }}</span>
       </div>
     </mat-card>
-    <div *ngFor="let task of filtered" class="task-container">
+    <div *ngFor="let task of tasks" class="task-container">
       <mat-card class="task-card" [class.selected-task]="isSelected(task)">
         <mat-card-content class="task-content">
           <button mat-icon-button (click)="onPrevious(task)">

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, tap, of, BehaviorSubject } from 'rxjs';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 import { TaskTree } from 'src/task-tree';
 
 @Injectable({

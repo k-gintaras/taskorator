@@ -2,7 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
+import { testTasks } from '../test-files/json-to-tasks';
 
 export interface TaskResponse {
   message: string;
@@ -18,10 +19,18 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   checkApiHealth(): Observable<any> {
+    return of(true);
+  }
+
+  checkApiHealth2(): Observable<any> {
     return this.http.get<any>(this.apiHealthUrl);
   }
 
   fetchTasks(): Observable<Task[]> {
+    return of(testTasks);
+  }
+
+  fetchTasks2(): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl).pipe(
       map((tasks: any[]) => tasks.map((task) => this.parseTaskDates(task))),
       map((tasks) => tasks.filter((task) => task.stage !== 'deleted')),
@@ -79,25 +88,48 @@ export class ApiService {
   // }
 
   updateTask(task: Task): Observable<Task> {
-    const updateUrl = `${this.apiUrl}/${task.taskId}`;
-    return this.http.put<Task>(updateUrl, task);
+    return of(task);
   }
 
   updateTasks(tasks: Task[]): Observable<Task[]> {
-    const updateUrl = `${this.apiUrl}/batch-update`;
-    return this.http.put<Task[]>(updateUrl, tasks);
+    return of(tasks);
   }
 
   createTask(task: Task): Observable<Task> {
-    return this.http.post<Task>(this.apiUrl, task);
+    return of(task);
   }
 
   createTaskWithId(task: Task): Observable<TaskResponse> {
-    return this.http.post<TaskResponse>(this.apiUrl, task);
+    const t: TaskResponse = {
+      message: '',
+      taskId: '',
+    };
+    return of(t);
   }
 
   deleteTask(taskId: string): Observable<any> {
-    const deleteUrl = `${this.apiUrl}/${taskId}`;
-    return this.http.delete<any>(deleteUrl);
+    return of(true);
   }
+  // updateTask(task: Task): Observable<Task> {
+  //   const updateUrl = `${this.apiUrl}/${task.taskId}`;
+  //   return this.http.put<Task>(updateUrl, task);
+  // }
+
+  // updateTasks(tasks: Task[]): Observable<Task[]> {
+  //   const updateUrl = `${this.apiUrl}/batch-update`;
+  //   return this.http.put<Task[]>(updateUrl, tasks);
+  // }
+
+  // createTask(task: Task): Observable<Task> {
+  //   return this.http.post<Task>(this.apiUrl, task);
+  // }
+
+  // createTaskWithId(task: Task): Observable<TaskResponse> {
+  //   return this.http.post<TaskResponse>(this.apiUrl, task);
+  // }
+
+  // deleteTask(taskId: string): Observable<any> {
+  //   const deleteUrl = `${this.apiUrl}/${taskId}`;
+  //   return this.http.delete<any>(deleteUrl);
+  // }
 }

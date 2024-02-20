@@ -1,4 +1,4 @@
-import { Task } from './app/task-model/taskModelManager';
+import { Task } from './app/models/taskModelManager';
 
 export class TaskTree {
   private tree: Map<string, TaskNode> = new Map(); // Assuming task has 'id' property as string

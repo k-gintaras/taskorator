@@ -2,7 +2,7 @@
   "targets": {
     "taskorator": {
       "hosting": {
-        "my-app": [
+        "taskorator": [
           "taskorator"
         ]
       }

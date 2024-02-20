@@ -3,7 +3,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { ApiService, TaskResponse } from './api.service';
 import { LocalService } from './local.service';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

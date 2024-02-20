@@ -26,8 +26,8 @@ const routes: Routes = [
   { path: 'task-browser', component: TaskBrowserComponent },
   { path: 'parent', component: ParentComponent },
   { path: 'firebase', component: TestFirebaseComponent },
-  { path: '', redirectTo: '/task-view', pathMatch: 'full' }, // Default route
-  { path: '**', redirectTo: '/task-view' }, // Handle invalid routes
+  { path: '', redirectTo: '/parent', pathMatch: 'full' }, // Default route
+  { path: '**', redirectTo: '/parent' }, // Handle invalid routes
 ];
 
 @NgModule({

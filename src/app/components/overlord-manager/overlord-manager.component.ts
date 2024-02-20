@@ -6,7 +6,7 @@ import { SelectedTaskService } from 'src/app/services/selected-task.service';
 import { SyncService } from 'src/app/services/sync.service';
 import { TaskLoaderService } from 'src/app/services/task-loader.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-overlord-manager',

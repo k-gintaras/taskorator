@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { SettingsService } from 'src/app/services/settings.service';
-import { completeButtonColorMap } from 'src/app/task-model/colors';
-import { CompleteButtonAction, Settings } from 'src/app/task-model/settings';
+import { completeButtonColorMap } from 'src/app/models/colors';
+import { CompleteButtonAction, Settings } from 'src/app/models/settings';
 
 @Component({
   selector: 'app-settings',
@@ -18,6 +18,7 @@ export class SettingsComponent implements OnInit {
     'seen',
     'todo',
   ];
+  currentSettings: Settings | undefined;
 
   constructor(
     private fb: FormBuilder,
@@ -33,23 +34,45 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  // TODO: remove the filter options or not, decide
-  // these should be inside filter service
-  // ngOnInit(): void {
-  //   this.settingsService.getSettings().subscribe((settings: Settings) => {
-  //     this.settingsForm.setValue(settings);
-  //   });
-  // }
+  // Add a private member to control the save operation
+  private isInitializingForm = true;
 
   ngOnInit(): void {
-    // this.settingsService.getSettings().subscribe((settings: Settings) => {
-    //   this.settingsForm.setValue(settings);
-    // });
+    // this.loadCurrentSettings();
 
-    // Automatically save settings when form values change
-    this.settingsForm.valueChanges.subscribe((newSettings) => {
-      this.settingsService.setSettings(newSettings);
+    // Subscribe to form value changes with additional logic to prevent loop
+    this.settingsForm.valueChanges.subscribe((newFormValues) => {
+      // Only save settings if we're not initializing the form
+      if (!this.isInitializingForm) {
+        //this.saveSettings(newFormValues);
+      }
     });
+  }
+
+  private loadCurrentSettings(): void {
+    this.settingsService.getSettings().subscribe((currentSettings) => {
+      // Before patching the form, ensure we're in initialization mode
+      this.isInitializingForm = true;
+
+      // Populate form with current settings
+      this.settingsForm.patchValue(currentSettings);
+
+      // After the form is patched, we're no longer initializing
+      setTimeout(() => (this.isInitializingForm = false), 0);
+
+      // Store currentSettings for later use in merging
+      this.currentSettings = currentSettings;
+    });
+  }
+
+  private saveSettings(newFormValues: any): void {
+    const newSettings: Settings = {
+      ...this.currentSettings,
+      ...newFormValues,
+    };
+
+    // Save the new, merged settings
+    this.settingsService.saveSettings(newSettings);
   }
 
   // Add to your existing form or component class

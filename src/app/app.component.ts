@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskLoaderService } from './services/task-loader.service';
 import { FeedbackMessage, FeedbackService } from './services/feedback.service';
 import { Subscription } from 'rxjs';
 
@@ -9,15 +8,12 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'my-app';
+  title = 'taskorator';
 
   feedback: FeedbackMessage = { text: '', isError: false }; // Change feedbacks array to a single string variable
 
   private feedbackSubscription: Subscription;
-  constructor(
-    private feedbackService: FeedbackService,
-    private taskLoaderService: TaskLoaderService
-  ) {
+  constructor(private feedbackService: FeedbackService) {
     this.feedbackSubscription = this.feedbackService.feedback$.subscribe(
       (message) => {
         this.feedback = message; // Assign the new message to feedback

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../task-model/taskModelManager';
+import { Task } from '../models/taskModelManager';
 import { ApiService } from './api.service';
 import { LocalService } from './local.service';
 import { Observable, catchError, mergeMap, throwError } from 'rxjs';

@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { TaskService } from 'src/app/services/task.service';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-add-move-task',
@@ -41,9 +41,7 @@ export class AddMoveTaskComponent {
     }
 
     try {
-      const newOverlord = await firstValueFrom(
-        this.taskService.createGetId(newTask)
-      ); // Assuming createGetId returns Observable<TaskResponse | null>
+      const newOverlord = await this.taskService.createGetId(newTask); // Promise<Task>;
 
       const selectedTasks = await firstValueFrom(
         this.selectedService.getSelectedTasks()

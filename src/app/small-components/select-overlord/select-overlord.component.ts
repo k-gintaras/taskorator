@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
-import { Task, getDefaultTask } from 'src/app/task-model/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 
 @Component({
   selector: 'app-select-overlord',
