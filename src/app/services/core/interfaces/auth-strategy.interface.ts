@@ -1,6 +1,7 @@
 export interface AuthStrategy {
-  getCurrentUserId(): Promise<string | null>;
-  logOut(): Promise<string | null>;
+  isAuthenticated(): boolean;
+  getCurrentUserId(): Promise<string | undefined>;
+  logOut(): Promise<void>;
   loginWithEmailAndPassword(email: string, password: string): Promise<void>;
 
   // other

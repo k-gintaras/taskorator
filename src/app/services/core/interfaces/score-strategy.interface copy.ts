@@ -1,8 +1,12 @@
 import { Score } from 'src/app/models/score';
 
 export interface ScoreStrategy {
-  createScore(settings: Score): Promise<Score>;
-  getScore(): Promise<Score>;
-  updateScore(settings: Score): Promise<void>;
-  // might have special unique methods later on in life
+  createScore(score: Score): Promise<Score | null>;
+  getScore(): Promise<Score | null>;
+  updateScore(score: Score): Promise<void>;
+}
+export interface ScoreApiStrategy {
+  createScore(userId: string, score: Score): Promise<Score | null>;
+  getScore(userId: string): Promise<Score | null>;
+  updateScore(userId: string, score: Score): Promise<void>;
 }

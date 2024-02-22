@@ -48,6 +48,9 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { TestFirebaseComponent } from './components/test-firebase/test-firebase.component';
 import { environment } from 'src/environments/environment';
+import { LoginComponent } from './components/login/login.component';
+import { ErrorComponent } from './components/error/error.component';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 
 @NgModule({
   declarations: [
@@ -77,6 +80,8 @@ import { environment } from 'src/environments/environment';
     SettingsComponent,
     AddMoveTaskComponent,
     TestFirebaseComponent,
+    LoginComponent,
+    ErrorComponent,
   ],
   imports: [
     BrowserModule,
@@ -100,6 +105,7 @@ import { environment } from 'src/environments/environment';
     MatDialogModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
   ],
   providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
   bootstrap: [AppComponent],

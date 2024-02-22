@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { SettingsStrategy } from './interfaces/settings-strategy.interface';
-import { Settings } from 'src/app/models/settings';
-import { from, switchMap, tap, catchError, throwError } from 'rxjs';
+import { ScoreStrategy } from './interfaces/score-strategy.interface copy';
+import { Score } from 'src/app/models/score';
+import { EventBusService } from './event-bus.service';
 import { AuthService } from './auth.service';
 import { CacheService } from './cache.service';
 import { ConfigService } from './config.service';
 import { ErrorService } from './error.service';
-import { EventBusService } from './event-bus.service';
 import { LogService } from './log.service';
 import ApiService from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SettingsService implements SettingsStrategy {
+export class ScoreService implements ScoreStrategy {
   private authService!: AuthService;
   private cacheService!: CacheService;
   private apiService!: ApiService;
@@ -33,53 +32,53 @@ export class SettingsService implements SettingsStrategy {
     this.errorHandlingService = this.configService.getErrorHandlingStrategy();
   }
 
-  async createSettings(settings: Settings): Promise<Settings> {
+  async createScore(score: Score): Promise<Score> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      await this.apiService.createSettings(userId, settings);
-      await this.cacheService.createSettings(settings);
-      return settings;
+      await this.apiService.createScore(userId, score);
+      await this.cacheService.createScore(score);
+      return score;
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
     }
   }
 
-  async getSettings(): Promise<Settings> {
+  async getScore(): Promise<Score> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      let settings = await this.cacheService.getSettings();
-      if (!settings) {
-        settings = await this.apiService.getSettings(userId);
-        if (!settings) {
-          throw new Error('No settings found');
+      let score = await this.cacheService.getScore();
+      if (!score) {
+        score = await this.apiService.getScore(userId);
+        if (!score) {
+          throw new Error('No score found');
         }
-        this.cacheService.updateSettings(settings);
+        this.cacheService.updateScore(score);
       }
-      return settings;
+      return score;
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
     }
   }
 
-  async updateSettings(settings: Settings): Promise<void> {
+  async updateScore(score: Score): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      await this.apiService.updateSettings(userId, settings);
-      this.cacheService.updateSettings(settings);
+      await this.apiService.updateScore(userId, score);
+      this.cacheService.updateScore(score);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;

@@ -12,6 +12,7 @@ import { TaskFilterComponent } from './components/task-filter/task-filter.compon
 import { TaskBrowserComponent } from './components/task-browser/task-browser.component';
 import { ParentComponent } from './components/parent/parent.component';
 import { TestFirebaseComponent } from './components/test-firebase/test-firebase.component';
+import { canActivate } from './services/core/auth-guard';
 
 const routes: Routes = [
   { path: 'task-filter', component: TaskFilterComponent },
@@ -28,6 +29,13 @@ const routes: Routes = [
   { path: 'firebase', component: TestFirebaseComponent },
   { path: '', redirectTo: '/parent', pathMatch: 'full' }, // Default route
   { path: '**', redirectTo: '/parent' }, // Handle invalid routes
+  { path: '/error', redirectTo: '/parent' }, // Handle invalid login routes
+  { path: '/login', component: ParentComponent },
+  {
+    path: 'protected',
+    component: ParentComponent,
+    canActivate: [canActivate],
+  },
 ];
 
 @NgModule({

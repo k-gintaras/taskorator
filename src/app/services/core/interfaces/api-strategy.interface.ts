@@ -1,13 +1,13 @@
-import { TaskManagementStrategy } from './task-management-strategy.interface';
-import { TreeStrategy } from './tree-strategy.interface';
-import { SettingsStrategy } from './settings-strategy.interface';
-import { ScoreStrategy } from './score-strategy.interface copy';
+import { TaskManagementApiStrategy } from './task-management-strategy.interface';
+import { SettingsApiStrategy } from './settings-strategy.interface';
+import { ScoreApiStrategy } from './score-strategy.interface copy';
+import { TreeApiStrategy } from './tree-strategy.interface';
 
-// auth-strategy.interface.ts
+// TODO: might wanna add SKIN strategy so people can have color scheme and styles... (purchase probably)
 export interface ApiStrategy
-  extends TaskManagementStrategy,
-    TreeStrategy,
-    SettingsStrategy,
-    ScoreStrategy {
+  extends TaskManagementApiStrategy, // using different duo to that it needs user ID
+    TreeApiStrategy,
+    SettingsApiStrategy,
+    ScoreApiStrategy {
   // might have special unique methods later on in life
 }

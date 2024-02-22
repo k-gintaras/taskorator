@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { SettingsStrategy } from './interfaces/settings-strategy.interface';
-import { Settings } from 'src/app/models/settings';
-import { from, switchMap, tap, catchError, throwError } from 'rxjs';
+import { EventBusService } from './event-bus.service';
+import { TreeStrategy } from './interfaces/tree-strategy.interface';
 import { AuthService } from './auth.service';
 import { CacheService } from './cache.service';
 import { ConfigService } from './config.service';
 import { ErrorService } from './error.service';
-import { EventBusService } from './event-bus.service';
 import { LogService } from './log.service';
 import ApiService from './api.service';
+import { TaskTree } from 'src/app/models/taskTree';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SettingsService implements SettingsStrategy {
+export class TreeService implements TreeStrategy {
   private authService!: AuthService;
   private cacheService!: CacheService;
   private apiService!: ApiService;
@@ -33,53 +32,53 @@ export class SettingsService implements SettingsStrategy {
     this.errorHandlingService = this.configService.getErrorHandlingStrategy();
   }
 
-  async createSettings(settings: Settings): Promise<Settings> {
+  async createTree(taskTree: TaskTree): Promise<TaskTree> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      await this.apiService.createSettings(userId, settings);
-      await this.cacheService.createSettings(settings);
-      return settings;
+      await this.apiService.createTree(userId, taskTree);
+      await this.cacheService.createTree(taskTree);
+      return taskTree;
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
     }
   }
 
-  async getSettings(): Promise<Settings> {
+  async getTree(): Promise<TaskTree> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      let settings = await this.cacheService.getSettings();
-      if (!settings) {
-        settings = await this.apiService.getSettings(userId);
-        if (!settings) {
-          throw new Error('No settings found');
+      let tree = await this.cacheService.getTree();
+      if (!tree) {
+        tree = await this.apiService.getTree(userId);
+        if (!tree) {
+          throw new Error('No tree found');
         }
-        this.cacheService.updateSettings(settings);
+        this.cacheService.updateTree(tree);
       }
-      return settings;
+      return tree;
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
     }
   }
 
-  async updateSettings(settings: Settings): Promise<void> {
+  async updateTree(taskTree: TaskTree): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
         throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
       }
 
-      await this.apiService.updateSettings(userId, settings);
-      this.cacheService.updateSettings(settings);
+      await this.apiService.updateTree(userId, taskTree);
+      this.cacheService.updateTree(taskTree);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;

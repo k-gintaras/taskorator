@@ -5,7 +5,7 @@ import { CacheStrategy } from './interfaces/cache-strategy.interface';
 import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
 import { AuthService } from './auth.service';
 import { CacheService } from './cache.service';
-import { ApiService } from './api.service';
+import ApiService from './api.service';
 import { ErrorService } from './error.service';
 import { ApiStrategy } from './interfaces/api-strategy.interface';
 @Injectable({
@@ -19,22 +19,23 @@ export class ConfigService implements ConfigStrategy {
     private errorService: ErrorService
   ) {}
 
-  getAuthStrategy(): AuthStrategy {
+  // TODO: decide strategy for example if offline ...
+  getAuthStrategy(): AuthService {
     // Logic to determine which AuthStrategy to use
     return this.authService;
   }
 
-  getCacheStrategy(): CacheStrategy {
+  getCacheStrategy(): CacheService {
     // Logic to determine which CacheStrategy to use
     return this.cacheService;
   }
 
-  getApiStrategy(): ApiStrategy {
+  getApiStrategy(): ApiService {
     // Logic to determine which TaskStrategy to use
     return this.apiService;
   }
 
-  getErrorHandlingStrategy(): ErrorHandlingStrategy {
+  getErrorHandlingStrategy(): ErrorService {
     // Logic to determine which ErrorHandlingStrategy to use
     return this.errorService;
   }

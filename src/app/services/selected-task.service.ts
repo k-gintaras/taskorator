@@ -6,7 +6,6 @@ import { Task } from '../models/taskModelManager';
   providedIn: 'root',
 })
 export class SelectedTaskService {
-  constructor() {}
   private selectedTask: Task | null = null;
   private selectedTaskSubject: BehaviorSubject<Task | null> =
     new BehaviorSubject<Task | null>(null);
