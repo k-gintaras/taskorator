@@ -3,3 +3,10 @@ export interface Score {
   // completed
   // ...
 }
+
+export function getDefaultScore() {
+  const score: Score = {
+    createdTasks: 1,
+  };
+  return score;
+}

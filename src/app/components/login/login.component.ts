@@ -13,6 +13,10 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  loginWithGmail() {
+    this.authService.loginWithGoogle().then();
+  }
+
   login(email: string, password: string): void {
     this.authService
       .loginWithEmailAndPassword(email, password)

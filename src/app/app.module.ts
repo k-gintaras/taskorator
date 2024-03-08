@@ -51,6 +51,9 @@ import { environment } from 'src/environments/environment';
 import { LoginComponent } from './components/login/login.component';
 import { ErrorComponent } from './components/error/error.component';
 import { getAuth, provideAuth } from '@angular/fire/auth';
+import { RegisterComponent } from './components/register/register.component';
+import { TestTasksComponent } from './components/test-tasks/test-tasks.component';
+import { TaskNavigatorComponent } from './components/task-navigator/task-navigator.component';
 
 @NgModule({
   declarations: [
@@ -82,6 +85,9 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
     TestFirebaseComponent,
     LoginComponent,
     ErrorComponent,
+    RegisterComponent,
+    TestTasksComponent,
+    TaskNavigatorComponent,
   ],
   imports: [
     BrowserModule,

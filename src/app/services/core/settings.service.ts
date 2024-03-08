@@ -50,6 +50,7 @@ export class SettingsService implements SettingsStrategy {
   }
 
   async getSettings(): Promise<Settings> {
+    // TODO: what happens with get settings on change... ?
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {

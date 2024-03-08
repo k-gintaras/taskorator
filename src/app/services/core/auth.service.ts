@@ -5,6 +5,9 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo,
 } from '@angular/fire/auth';
 import { RegistrationService } from './registration.service';
 /**
@@ -70,8 +73,27 @@ export class AuthService implements AuthStrategy {
     throw new Error('Method not implemented.');
   }
 
-  loginWithGoogle(): Promise<unknown> {
-    throw new Error('Method not implemented.');
+  async loginWithGoogle(): Promise<void> {
+    try {
+      const provider = new GoogleAuthProvider();
+      const user = await signInWithPopup(this.auth, provider);
+
+      // Use getAdditionalUserInfo to check for new user
+      const additionalUserInfo = getAdditionalUserInfo(user);
+      const isNewUser = additionalUserInfo?.isNewUser;
+
+      if (isNewUser) {
+        console.log(
+          'Welcome aboard, space cadet! Performing first-time sign-in operations.'
+        );
+        this.registration.registerUser(user);
+      } else {
+        console.log('Welcome back, astronaut! Loading your dashboard.');
+        // Handle returning user logic
+      }
+    } catch (error) {
+      console.error('Error during sign in with Google:', error);
+    }
   }
 
   loginWithYahoo(): Promise<unknown> {

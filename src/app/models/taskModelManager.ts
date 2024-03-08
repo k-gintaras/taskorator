@@ -118,3 +118,33 @@ export function getDefaultTask(): Task {
 
   return { ...defaultTask };
 }
+
+export const ROOT_TASK_NAME = 'overlord';
+
+export function getBaseTask(): Task {
+  const defaultTask: Task = {
+    taskId: '0',
+    name: 'Me',
+    todo: '',
+    why: '',
+    timeCreated: new Date(), // Current date and time
+    lastUpdated: new Date(), // Current date and time
+    timeEnd: null,
+    duration: 0,
+    overlord: ROOT_TASK_NAME, // todo is the overlord 128, overlord is overlord 129
+    repeat: 'once',
+    status: 'active',
+    stage: 'todo',
+    type: 'todo',
+    subtype: 'list',
+    size: 'do now',
+    owner: '',
+    priority: 5, // mid, downgrade possible instead of max, decide if there should be limit 10
+    backupLink: '',
+    imageUrl: '',
+    imageDataUrl: '',
+    tags: [],
+  };
+
+  return { ...defaultTask };
+}

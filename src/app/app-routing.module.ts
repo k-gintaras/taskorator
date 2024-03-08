@@ -13,6 +13,8 @@ import { TaskBrowserComponent } from './components/task-browser/task-browser.com
 import { ParentComponent } from './components/parent/parent.component';
 import { TestFirebaseComponent } from './components/test-firebase/test-firebase.component';
 import { canActivate } from './services/core/auth-guard';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
 
 const routes: Routes = [
   { path: 'task-filter', component: TaskFilterComponent },
@@ -28,9 +30,10 @@ const routes: Routes = [
   { path: 'parent', component: ParentComponent },
   { path: 'firebase', component: TestFirebaseComponent },
   { path: '', redirectTo: '/parent', pathMatch: 'full' }, // Default route
-  { path: '**', redirectTo: '/parent' }, // Handle invalid routes
-  { path: '/error', redirectTo: '/parent' }, // Handle invalid login routes
-  { path: '/login', component: ParentComponent },
+  // { path: '**', redirectTo: '/parent' }, // Handle invalid routes
+  // { path: 'error', component: AddSimpleTaskComponent }, // Handle invalid login routes
+  { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent },
   {
     path: 'protected',
     component: ParentComponent,

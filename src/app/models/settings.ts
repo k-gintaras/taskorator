@@ -1,3 +1,5 @@
+import { ROOT_TASK_NAME } from './taskModelManager';
+
 export interface Settings {
   isShowArchived: boolean;
   isShowCompleted: boolean;
@@ -17,7 +19,7 @@ export function getDefaultSettings() {
     isShowDeleted: false,
     isShowTodo: true,
     completeButtonAction: 'completed',
-    lastOverlordViewId: '128', // the base overlord for all tasks forever
+    lastOverlordViewId: ROOT_TASK_NAME, // the base overlord for all tasks forever
   };
   return { ...settings };
 }
