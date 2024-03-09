@@ -3,7 +3,7 @@ import { ApiStrategy } from './interfaces/api-strategy.interface';
 import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
 import { Score } from 'src/app/models/score';
 import { Settings } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 import {
   Firestore,
   collection,
@@ -50,11 +50,38 @@ export default class ApiService implements ApiStrategy {
   // }
 
   async createTask(userId: string, task: Task): Promise<Task> {
+    if (!task.overlord) {
+      task.overlord = getDefaultTask().overlord;
+    }
     const userTaskCollectionRef = collection(
       this.firestore,
       `users/${userId}/tasks`
     );
     const taskDocRef = doc(userTaskCollectionRef); // Prepare a new document reference within user's tasks collection
+    const newTask = { ...task, taskId: taskDocRef.id }; // Add taskId to the task
+
+    try {
+      await setDoc(taskDocRef, newTask); // Directly set the new task document with the generated ID
+      return newTask; // Return the newly created task with its ID
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      throw new Error('Task creation failed'); // Rethrow or handle as appropriate
+    }
+  }
+
+  async createTaskWithCustomId(
+    userId: string,
+    task: Task,
+    taskId: string
+  ): Promise<Task> {
+    if (!task.overlord) {
+      task.overlord = getDefaultTask().overlord;
+    }
+    const userTaskCollectionRef = collection(
+      this.firestore,
+      `users/${userId}/tasks`
+    );
+    const taskDocRef = doc(userTaskCollectionRef, taskId); // Prepare a new document reference within user's tasks collection
     const newTask = { ...task, taskId: taskDocRef.id }; // Add taskId to the task
 
     try {
@@ -85,6 +112,7 @@ export default class ApiService implements ApiStrategy {
   }
 
   getTaskById(userId: string, taskId: string): Observable<Task | undefined> {
+    console.log(userId + ' ' + taskId);
     if (!userId) {
       throw new Error('User not authenticated');
     }
@@ -101,6 +129,7 @@ export default class ApiService implements ApiStrategy {
       orderBy('timeCreated', 'desc'),
       limit(1)
     );
+    console.log(tasksRef);
     return collectionData(tasksRef, { idField: 'taskId' }).pipe(
       map((tasks) => tasks[0]?.taskId),
       catchError(() => of(undefined))
@@ -141,9 +170,10 @@ export default class ApiService implements ApiStrategy {
   ): Observable<Task[] | undefined> {
     // If not cached, fetch from Firestore
     const queryConstraint = query(
-      collection(this.firestore, 'tasks'),
+      collection(this.firestore, `users/${userId}/tasks`),
       where('overlord', '==', overlordId)
     );
+
     return collectionData(queryConstraint, { idField: 'taskId' }) as Observable<
       Task[]
     >;
@@ -164,8 +194,8 @@ export default class ApiService implements ApiStrategy {
 
     tasks.forEach((task) => {
       if (!task.overlord) {
-        console.log('createTasks Error: Missing task overlord for a task');
-        return;
+        // just set default, let user sort it out themselves later
+        task.overlord = getDefaultTask().overlord;
       }
 
       const userTaskCollectionRef = collection(

@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { FeedbackService } from 'src/app/services/feedback.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
-import { TaskService } from 'src/app/services/task.service';
 import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
+import { TaskService } from 'src/app/services/task/task.service';
 
 @Component({
   selector: 'app-add-move-task',
@@ -28,7 +28,7 @@ export class AddMoveTaskComponent {
     } else {
       newTask.overlord = '128'; // Your default Overlord ID
     }
-    this.taskService.create(newTask);
+    this.taskService.createTask(newTask);
   }
 
   async createAndMove() {
@@ -41,7 +41,7 @@ export class AddMoveTaskComponent {
     }
 
     try {
-      const newOverlord = await this.taskService.createGetId(newTask); // Promise<Task>;
+      const newOverlord = await this.taskService.createTask(newTask); // Promise<Task>;
 
       const selectedTasks = await firstValueFrom(
         this.selectedService.getSelectedTasks()
@@ -50,8 +50,9 @@ export class AddMoveTaskComponent {
       if (selectedTasks && newOverlord) {
         for (const task of selectedTasks) {
           task.overlord = newOverlord.taskId;
-          this.taskService.update(task);
         }
+        this.taskService.updateTasks(selectedTasks);
+
         this.tell('Updated multiple tasks.');
       } else {
         this.tell("Can't update empty tasks or failed to create new overlord.");

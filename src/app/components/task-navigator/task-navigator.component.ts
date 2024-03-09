@@ -8,7 +8,7 @@ import {
   getButtonName,
   getDefaultSettings,
 } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 import { SettingsService } from 'src/app/services/core/settings.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
@@ -48,6 +48,7 @@ export class TaskNavigatorComponent {
       if (s) {
         this.settings = s;
         this.loadPreviouslyViewedTasks();
+        console.log(s);
       }
     });
 
@@ -73,10 +74,14 @@ export class TaskNavigatorComponent {
           this.taskService
             .getLatestTaskId()
             .subscribe((firstTaskId: string | undefined) => {
+              console.log('WTF');
               if (firstTaskId) this.loadOverlordAndChildren(firstTaskId);
             });
+
           return; // Exit the function early since the rest of the logic will execute asynchronously
         }
+      } else {
+        console.log('no url task');
       }
 
       // Proceed to load the overlord and its children using the determined ID
@@ -86,12 +91,17 @@ export class TaskNavigatorComponent {
 
   private loadOverlordAndChildren(overlordId: string) {
     // Load the selected overlord and its children from Firebase
+
+    console.log('tryna get: ' + overlordId);
     this.taskService
       .getTaskById(overlordId)
       .subscribe((task: Task | undefined) => {
         if (task) {
           this.selectedOverlord = task;
+          console.log(task);
         } else {
+          console.log('no overlord?');
+
           // Handle the case where the task is undefined, potentially navigating to a default view
         }
       });
@@ -101,6 +111,28 @@ export class TaskNavigatorComponent {
       .subscribe((tasks: Task[] | undefined) => {
         if (tasks) {
           this.setNewFiltered(tasks);
+          console.log('tasks1 ');
+          console.log(tasks);
+        } else {
+          // TODO: at the beginning get all default tasks with no parent
+          this.taskService
+            .getOverlordChildren('128')
+            .subscribe((tasks: Task[] | undefined) => {
+              if (tasks) {
+                console.log('tasks2  ');
+                console.log(tasks);
+                this.setNewFiltered(tasks);
+              }
+            });
+          // this.setNewFiltered(
+          //   this.tasks
+          //     ? this.tasks
+          //     : [
+          //         this.selectedOverlord
+          //           ? this.selectedOverlord
+          //           : getDefaultTask(),
+          //       ]
+          // );
         }
       });
   }

@@ -15,6 +15,7 @@ import { TestFirebaseComponent } from './components/test-firebase/test-firebase.
 import { canActivate } from './services/core/auth-guard';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { TaskNavigatorComponent } from './components/task-navigator/task-navigator.component';
 
 const routes: Routes = [
   { path: 'task-filter', component: TaskFilterComponent },
@@ -36,7 +37,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: 'protected',
-    component: ParentComponent,
+    component: TaskNavigatorComponent,
     canActivate: [canActivate],
   },
 ];
