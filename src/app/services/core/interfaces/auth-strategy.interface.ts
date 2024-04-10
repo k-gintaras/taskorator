@@ -1,11 +1,14 @@
+import { ApiStrategy } from './api-strategy.interface';
+import { CacheStrategy } from './cache-strategy.interface';
+
 export interface AuthStrategy {
   isAuthenticated(): boolean;
   getCurrentUserId(): Promise<string | undefined>;
   logOut(): Promise<void>;
-  loginWithEmailAndPassword(email: string, password: string): Promise<void>;
+  deleteCurrentUser(): void;
 
-  // other
-  loginWithGoogle(): Promise<unknown>;
+  loginWithEmailAndPassword(email: string, password: string): Promise<void>;
+  loginWithGoogle(): Promise<{ userId: string; isNewUser: boolean }>; // user id
   loginWithYahoo(): Promise<unknown>;
   loginWithFacebook(): Promise<unknown>;
 

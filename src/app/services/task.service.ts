@@ -94,6 +94,7 @@ export class TaskService {
     task.stage = 'deleted';
     this.update(task);
     this.f.log('Deleted: ' + task.name);
+    // TODO: if it has stage deleted already, permanently delete
   }
 
   renew(task: Task) {

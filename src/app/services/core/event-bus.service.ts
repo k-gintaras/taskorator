@@ -57,20 +57,20 @@ export class EventBusService {
     this.emit('updateTask', task);
   }
 
-  getTaskById(taskId: string): void {
-    this.emit('getTaskById', taskId);
+  getTaskById(taskReceived: Task): void {
+    this.emit('getTaskById', taskReceived);
   }
 
-  getLatestTaskId(): void {
-    this.emit('getLatestTaskId', null);
+  getLatestTaskId(taskIdReceived: string): void {
+    this.emit('getLatestTaskId', taskIdReceived);
   }
 
-  getSuperOverlord(taskId: string): void {
-    this.emit('getSuperOverlord', taskId);
+  getSuperOverlord(taskReceived: Task): void {
+    this.emit('getSuperOverlord', taskReceived);
   }
 
-  getOverlordChildren(taskId: string): void {
-    this.emit('getOverlordChildren', taskId);
+  getOverlordChildren(tasksReceived: Task[]): void {
+    this.emit('getOverlordChildren', tasksReceived);
   }
 
   getTasks(userId: string): void {

@@ -23,7 +23,13 @@ import {
   getButtonName,
 } from 'src/app/models/settings';
 import { Task } from 'src/app/models/taskModelManager';
+import { SortService } from 'src/app/services/task/sort.service';
+import { FilterService } from 'src/app/services/task/filter.service';
+import { ApiService } from 'src/app/services/api.service';
 
+/**
+ * @deprecated use task-navigator, because this uses firebase directly and is unwanted
+ */
 @Component({
   selector: 'app-task-browser',
   templateUrl: './task-browser.component.html',
@@ -43,6 +49,7 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
   // completeButtonActionName: CompleteButtonAction = 'completed';
   settings: Settings | undefined;
   selectedTasks: Task[] = [];
+  initializedSettings = false;
 
   constructor(
     private router: Router,
@@ -55,14 +62,18 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
     private settingsService: SettingsService,
     public dialog: MatDialog,
     private selectedMultiple: SelectedMultipleService,
-    private firebase: FirebaseDatabaseService
+    private sortService: SortService,
+    private filterService: FilterService,
+    private apiService: ApiService
   ) {}
 
   ngOnInit() {
     // Load settings and selected tasks
     this.settingsService.getSettings().subscribe((s: Settings) => {
-      if (s) {
+      if (s && !this.initializedSettings) {
         this.settings = s;
+        this.initializedSettings = true;
+        // TODO: see if on changed settings the stuff is not unnecessarily loaded from server
         this.loadPreviouslyViewedTasks();
       }
     });
@@ -74,10 +85,8 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
       });
   }
 
-  // Assume necessary imports, including `take` from RxJS, are already in place
-
   loadPreviouslyViewedTasks() {
-    // First, subscribe to queryParams to check for an 'overlord' in the URL
+    console.log('loading previous task');
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
       let overlordId = params['selectedOverlord']; // Attempt to get the overlord ID from URL
 
@@ -88,9 +97,11 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
         // Further fallback to a default action (e.g., getting the first task) if no suitable ID is found
         if (!overlordId) {
           // Assuming `getFirstTaskId` is a method that retrieves the ID of the first task
-          this.firebase.getFirstTaskId().subscribe((firstTaskId) => {
-            this.loadOverlordAndChildren(firstTaskId);
+          this.apiService.fetchTasks().subscribe((tasks: Task[]) => {
+            this.loadOverlordAndChildren(tasks[0].taskId);
           });
+
+          this.apiService.fetchTasks();
           return; // Exit the function early since the rest of the logic will execute asynchronously
         }
       }
@@ -102,19 +113,40 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
 
   private loadOverlordAndChildren(overlordId: string) {
     // Load the selected overlord and its children from Firebase
-    this.firebase
-      .getTaskById(overlordId)
-      .subscribe((task: Task | undefined) => {
-        if (task) {
-          this.selectedOverlord = task;
-        } else {
-          // Handle the case where the task is undefined, potentially navigating to a default view
-        }
-      });
+    // this.firebase
+    //   .getTaskById(overlordId)
+    //   .subscribe((task: Task | undefined) => {
+    //     if (task) {
+    //       this.selectedOverlord = task;
+    //     } else {
+    //       // Handle the case where the task is undefined, potentially navigating to a default view
+    //     }
+    //   });
 
-    this.firebase.getOverlordChildren(overlordId).subscribe((tasks: Task[]) => {
-      this.tasks = tasks;
-      this.setNewFiltered(this.tasks);
+    this.apiService.fetchTasks().subscribe((tasks: Task[]) => {
+      const overlord = tasks.filter((task) => {
+        task.taskId === overlordId;
+      });
+      if (overlord) {
+        this.selectedOverlord = overlord[0];
+      } else {
+        // Handle the case where the task is undefined, potentially navigating to a default view
+      }
+    });
+
+    // this.firebase.getOverlordChildren(overlordId).subscribe((tasks: Task[]) => {
+    //   this.tasks = tasks;
+    //   this.setNewFiltered(this.tasks);
+    // });
+    this.apiService.fetchTasks().subscribe((tasks: Task[]) => {
+      const children = tasks.filter((task) => {
+        task.overlord === overlordId;
+      });
+      if (children) {
+        this.tasks = children;
+      } else {
+        // Handle the case where the task is undefined, potentially navigating to a default view
+      }
     });
   }
 
@@ -124,50 +156,6 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
       this.onNext(this.selectedOverlord);
     }
   }
-
-  // ngOnInit() {
-  //   this.settingsService.getSettings().subscribe((s: Settings) => {
-  //     if (s) {
-  //       this.settings = s;
-  //       // this.completeButtonActionName = s.completeButtonAction;
-  //     }
-  //   });
-  //   this.selectedMultiple
-  //     .getSelectedTasks()
-  //     .subscribe((selectedTasks: Task[]) => {
-  //       this.selectedTasks = selectedTasks;
-  //     });
-
-  //   this.loadPreviouslyViewedTasks();
-  // }
-
-  // loadPreviouslyViewedTasks() {
-  //   if (!this.settings) return;
-  //   const overlordToView = this.settings.lastOverlordViewId;
-
-  //   // get this overlord from firebase
-  //   this.firebase
-  //     .getTaskById(overlordToView)
-  //     .subscribe((task: Task | undefined) => {
-  //       if (task) {
-  //         this.selectedOverlord = task;
-  //       }
-  //     });
-  //   // get this overlord children
-  //   this.firebase
-  //     .getOverlordChildren(overlordToView)
-  //     .subscribe((tasks: Task[]) => {
-  //       this.tasks = tasks;
-  //     });
-  // }
-
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['tasks'] && this.tasks) {
-  //     if (this.selectedOverlord) {
-  //       this.onNext(this.selectedOverlord);
-  //     }
-  //   }
-  // }
 
   getButtonName() {
     if (!this.settings) return 'Complete';
@@ -194,131 +182,12 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
       console.log('No tasks or overlord defined.');
       return;
     }
-
-    // Fetch the super overlord from the service, which checks the cache first
-    this.firebase
-      .getSuperOverlord(task.overlord)
-      .pipe(
-        tap((grandOverlord: Task | undefined) => {
-          if (grandOverlord) {
-            console.log(grandOverlord.name);
-            this.selectedOverlord = grandOverlord;
-            this.selectedOverlordService.setSelectedOverlord(
-              this.selectedOverlord
-            );
-            this.selectedOverlordUrlUpdate(grandOverlord);
-          } else {
-            console.log('No more tasks outside.');
-          }
-        }),
-        switchMap((grandOverlord: Task | undefined) =>
-          grandOverlord
-            ? this.firebase.getOverlordChildren(grandOverlord.taskId)
-            : of(undefined)
-        ),
-        catchError((error) => {
-          console.error('Error fetching tasks', error);
-          return of(undefined); // Handle errors and continue the observable chain
-        })
-      )
-      .subscribe((children: Task[] | undefined) => {
-        if (children) {
-          this.setNewFiltered(children);
-        }
-      });
-  }
-
-  oldOnPrevious() {
-    // const overlordId = task.overlord;
-    // if (overlordId) {
-    //   const overlordTask = this.tasks.find((t) => t.taskId === overlordId);
-    //   if (overlordTask) {
-    //     // Finding the "grand-overlord" who rules all tasks at the new level.
-    //     const grandOverlordId = overlordTask.overlord;
-    //     const grandOverlord = this.tasks.find(
-    //       (t) => t.taskId === grandOverlordId
-    //     );
-    //     if (grandOverlord) {
-    //       this.selectedOverlord = grandOverlord;
-    //       this.selectedOverlordService.setSelectedOverlord(
-    //         this.selectedOverlord
-    //       );
-    //     } else {
-    //       // Handle the case where no grand-overlord exists, which probably means we're at the top level.
-    //       this.f.log('No more tasks outside.');
-    //     }
-    //     // Filter tasks that are ruled by the new selectedOverlord.
-    //     const f = this.tasks.filter(
-    //       (t) => t.overlord === (grandOverlord ? grandOverlord.taskId : null)
-    //     );
-    //     if (f?.length > 0) {
-    //       this.setNewFiltered(f);
-    //     }
-    //     if (this.selectedOverlord)
-    //       this.selectedOverlordUrlUpdate(this.selectedOverlord);
-    //   }
-    // } else {
-    //   console.log('No overlord found for the task'); // Debug line
-    // }
   }
 
   onNext(task: Task) {
     if (!task || !task.taskId) {
       console.error('Invalid task or task ID provided.');
       return;
-    }
-
-    this.firebase
-      .getOverlordChildren(task.taskId)
-      .pipe(
-        tap((children: Task[]) => {
-          if (children.length > 0) {
-            // Children exist, update the UI accordingly
-            this.selectedOverlord = task;
-            this.selectedOverlordService.setSelectedOverlord(
-              this.selectedOverlord
-            );
-            this.setNewFiltered(children);
-            this.selectedOverlordUrlUpdate(task);
-          } else {
-            // No children found, do nothing
-            console.log('No children found for the selected task.');
-          }
-        }),
-        catchError((error) => {
-          console.error('Error fetching children tasks', error);
-          return of([]); // Return an empty array to gracefully handle the error within the observable chain
-        })
-      )
-      .subscribe();
-  }
-
-  onNextOld(task: Task) {
-    if (!this.tasks) {
-      return;
-    }
-
-    const f = this.tasks.filter((t) => t.overlord === task.taskId);
-
-    if (f?.length > 0) {
-      this.selectedOverlord = task;
-      this.selectedOverlordService.setSelectedOverlord(this.selectedOverlord);
-      this.setNewFiltered(f);
-
-      this.selectedOverlordUrlUpdate(task);
-    } else {
-      // when tasks are completed while we are inside
-      // it will not be able to go onNext into empty again
-      // reset instead to previous
-      if (task.overlord) {
-        const overlordTask = this.tasks.find((t) => t.taskId === task.overlord);
-        if (overlordTask) {
-          this.selectedOverlordService.setSelectedOverlord(overlordTask);
-          this.selectedOverlordUrlUpdate(overlordTask);
-        }
-        // this.f.log('No more tasks inside. Going Back.');
-        // this.onPrevious(task);
-      }
     }
   }
 
@@ -328,55 +197,11 @@ export class TaskBrowserComponent implements OnInit, OnChanges {
 
     // Filter tasks based on settings
     if (this.settings) {
-      this.filterBySettings(this.tasks, this.settings);
+      this.filterService.filterBySettings(this.tasks, this.settings);
     }
 
     // Sort tasks by priority
-    this.sortByPriority();
-  }
-
-  // filterBySettings(tasks: Task[]): Task[] {
-  //   return [];
-  // }
-
-  filterBySettings(tasks: Task[], settings: Settings) {
-    this.tasks = tasks.filter((t: Task) => {
-      // Task should be included if it matches any of the criteria for being shown
-      return (
-        (settings.isShowArchived && t.stage === 'archived') ||
-        (settings.isShowCompleted && t.stage === 'completed') ||
-        (settings.isShowSeen && t.stage === 'seen') ||
-        (settings.isShowDeleted && t.stage === 'deleted') ||
-        (settings.isShowTodo && t.stage === 'todo') ||
-        // If none of the settings apply, it means we don't want to filter this task out based on its stage
-        // This line is necessary if there are stages not covered by the settings, adjust as needed
-        (!settings.isShowArchived &&
-          !settings.isShowCompleted &&
-          !settings.isShowSeen &&
-          !settings.isShowDeleted &&
-          !settings.isShowTodo)
-      );
-    });
-  }
-
-  // sortByPriority() {
-  //   if (!this.filtered) return;
-  //   this.filtered.sort((a, b) => {
-  //     return b.priority - a.priority;
-  //   });
-  // }
-
-  sortByPriority() {
-    if (!this.tasks) return;
-    this.tasks.sort((a, b) => {
-      if (b.priority === a.priority) {
-        // Ensure lastUpdated is handled correctly
-        const timeB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
-        const timeA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
-        return timeB - timeA;
-      }
-      return b.priority - a.priority;
-    });
+    this.sortService.sortByPriority(this.tasks);
   }
 
   selectedOverlordUrlUpdate(task: Task) {

@@ -2,6 +2,11 @@ import { TaskManagementApiStrategy } from './task-management-strategy.interface'
 import { SettingsApiStrategy } from './settings-strategy.interface';
 import { ScoreApiStrategy } from './score-strategy.interface copy';
 import { TreeApiStrategy } from './tree-strategy.interface';
+import { RegisterUserResult } from './register-user';
+import { Score } from 'src/app/models/score';
+import { Task } from 'src/app/models/taskModelManager';
+import { TaskTree } from 'src/app/models/taskTree';
+import { Settings } from 'src/app/models/settings';
 
 // TODO: might wanna add SKIN strategy so people can have color scheme and styles... (purchase probably)
 export interface ApiStrategy
@@ -9,5 +14,13 @@ export interface ApiStrategy
     TreeApiStrategy,
     SettingsApiStrategy,
     ScoreApiStrategy {
+  register(
+    userId: string,
+    initialTask: Task,
+    additionalTasks: Task[],
+    settings: Settings,
+    score: Score,
+    tree: TaskTree
+  ): Promise<RegisterUserResult>;
   // might have special unique methods later on in life
 }

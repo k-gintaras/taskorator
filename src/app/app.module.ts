@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -54,7 +54,14 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { RegisterComponent } from './components/register/register.component';
 import { TestTasksComponent } from './components/test-tasks/test-tasks.component';
 import { TaskNavigatorComponent } from './components/task-navigator/task-navigator.component';
+import { TreeViewComponent } from './components/tree-view/tree-view.component';
+import { ServiceInitiatorService } from './services/core/service-initiator.service';
+import { BaseComponent } from './components/base/base.component';
+import { PopupComponent } from './components/popup/popup.component';
 
+// export function initializeServices(serviceInitiator: ServiceInitiatorService) {
+//   return (): Promise<void> => serviceInitiator.initApiServices();
+// }
 @NgModule({
   declarations: [
     AppComponent,
@@ -88,6 +95,9 @@ import { TaskNavigatorComponent } from './components/task-navigator/task-navigat
     RegisterComponent,
     TestTasksComponent,
     TaskNavigatorComponent,
+    TreeViewComponent,
+    BaseComponent,
+    PopupComponent,
   ],
   imports: [
     BrowserModule,
@@ -113,7 +123,15 @@ import { TaskNavigatorComponent } from './components/task-navigator/task-navigat
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
   ],
-  providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
+  providers: [
+    { provide: MAT_DIALOG_DATA, useValue: {} },
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: initializeServices,
+    //   deps: [ServiceInitiatorService],
+    //   multi: true,
+    // },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

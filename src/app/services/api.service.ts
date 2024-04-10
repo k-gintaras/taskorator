@@ -27,6 +27,7 @@ export class ApiService {
   }
 
   fetchTasks(): Observable<Task[]> {
+    console.log('getting fake tasks.');
     return of(testTasks);
   }
 

@@ -1,46 +1,30 @@
 import { Injectable } from '@angular/core';
 import { ScoreStrategy } from './interfaces/score-strategy.interface copy';
 import { Score } from 'src/app/models/score';
-import { EventBusService } from './event-bus.service';
-import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
 import { ConfigService } from './config.service';
-import { ErrorService } from './error.service';
-import { LogService } from './log.service';
-import ApiService from './api.service';
+import { CoreService } from './core.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ScoreService implements ScoreStrategy {
-  private authService!: AuthService;
-  private cacheService!: CacheService;
-  private apiService!: ApiService;
-  private errorHandlingService!: ErrorService;
+export class ScoreService extends CoreService implements ScoreStrategy {
+  private scoreSubject: BehaviorSubject<Score | null> =
+    new BehaviorSubject<Score | null>(null);
 
-  constructor(
-    private configService: ConfigService,
-    private logService: LogService
-  ) {
-    this.initializeStrategies();
-  }
-
-  private initializeStrategies(): void {
-    this.authService = this.configService.getAuthStrategy();
-    this.cacheService = this.configService.getCacheStrategy();
-    this.apiService = this.configService.getApiStrategy();
-    this.errorHandlingService = this.configService.getErrorHandlingStrategy();
+  constructor(configService: ConfigService) {
+    super(configService);
   }
 
   async createScore(score: Score): Promise<Score> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       await this.apiService.createScore(userId, score);
       await this.cacheService.createScore(score);
+      this.scoreSubject.next(score);
       return score;
     } catch (error) {
       this.errorHandlingService.handleError(error);
@@ -48,13 +32,22 @@ export class ScoreService implements ScoreStrategy {
     }
   }
 
-  async getScore(): Promise<Score> {
+  getScore(): BehaviorSubject<Score | null> {
+    if (
+      this.scoreSubject.value === null &&
+      this.authService.isAuthenticated()
+    ) {
+      this.fetchScore();
+    }
+    return this.scoreSubject;
+  }
+
+  async fetchScore(): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       let score = await this.cacheService.getScore();
       if (!score) {
         score = await this.apiService.getScore(userId);
@@ -63,7 +56,7 @@ export class ScoreService implements ScoreStrategy {
         }
         this.cacheService.updateScore(score);
       }
-      return score;
+      this.scoreSubject.next(score);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
@@ -74,11 +67,11 @@ export class ScoreService implements ScoreStrategy {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       await this.apiService.updateScore(userId, score);
       this.cacheService.updateScore(score);
+      this.scoreSubject.next(score);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;

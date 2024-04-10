@@ -1,42 +1,70 @@
 import { Injectable } from '@angular/core';
 import { ConfigStrategy } from './interfaces/strategy-config.interface';
+import { CacheService } from './cache.service';
+import { ErrorService } from './error.service';
+import { TestAuthService } from '../test/test-auth.service';
+import { TestApiService } from '../test/test-api.service';
 import { AuthStrategy } from './interfaces/auth-strategy.interface';
+import { ApiStrategy } from './interfaces/api-strategy.interface';
 import { CacheStrategy } from './interfaces/cache-strategy.interface';
 import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
-import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
-import ApiService from './api.service';
-import { ErrorService } from './error.service';
-import { ApiStrategy } from './interfaces/api-strategy.interface';
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigService implements ConfigStrategy {
+  private repairTreeEnabled = true;
+  private testing = false;
+
+  private apiService: ApiStrategy | undefined;
+  private authService: AuthStrategy | undefined;
+  private cacheService: CacheStrategy | undefined;
+  private errorService: ErrorHandlingStrategy | undefined;
+
+  // to return either default or whatever we set it to in service initiator, which initiated in app.component
   constructor(
-    private authService: AuthService,
-    private cacheService: CacheService,
-    private apiService: ApiService,
-    private errorService: ErrorService
+    private errorServiceDefault: ErrorService,
+    private cacheServiceDefault: CacheService,
+    private authServiceDefault: TestAuthService,
+    private apiServiceDefault: TestApiService
   ) {}
 
-  // TODO: decide strategy for example if offline ...
-  getAuthStrategy(): AuthService {
-    // Logic to determine which AuthStrategy to use
-    return this.authService;
+  setApiService(service: ApiStrategy) {
+    this.apiService = service;
   }
 
-  getCacheStrategy(): CacheService {
-    // Logic to determine which CacheStrategy to use
-    return this.cacheService;
+  setAuthService(service: AuthStrategy) {
+    this.authService = service;
   }
 
-  getApiStrategy(): ApiService {
-    // Logic to determine which TaskStrategy to use
-    return this.apiService;
+  setCacheService(service: CacheStrategy) {
+    this.cacheService = service;
   }
 
-  getErrorHandlingStrategy(): ErrorService {
-    // Logic to determine which ErrorHandlingStrategy to use
-    return this.errorService;
+  setErrorService(service: ErrorHandlingStrategy) {
+    this.errorService = service;
+  }
+
+  isTesting(): boolean {
+    return this.testing;
+  }
+
+  isRepairTreeEnabled(): boolean {
+    return this.repairTreeEnabled;
+  }
+
+  getAuthStrategy(): AuthStrategy {
+    return this.authService || this.authServiceDefault;
+  }
+
+  getCacheStrategy(): CacheStrategy {
+    return this.cacheService || this.cacheServiceDefault;
+  }
+
+  getApiStrategy(): ApiStrategy {
+    return this.apiService || this.apiServiceDefault;
+  }
+
+  getErrorHandlingStrategy(): ErrorHandlingStrategy {
+    return this.errorService || this.errorServiceDefault;
   }
 }

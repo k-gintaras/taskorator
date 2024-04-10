@@ -1,47 +1,30 @@
 import { Injectable } from '@angular/core';
 import { SettingsStrategy } from './interfaces/settings-strategy.interface';
 import { Settings } from 'src/app/models/settings';
-import { from, switchMap, tap, catchError, throwError } from 'rxjs';
-import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
 import { ConfigService } from './config.service';
-import { ErrorService } from './error.service';
-import { EventBusService } from './event-bus.service';
-import { LogService } from './log.service';
-import ApiService from './api.service';
+import { CoreService } from './core.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SettingsService implements SettingsStrategy {
-  private authService!: AuthService;
-  private cacheService!: CacheService;
-  private apiService!: ApiService;
-  private errorHandlingService!: ErrorService;
+export class SettingsService extends CoreService implements SettingsStrategy {
+  private settingsSubject: BehaviorSubject<Settings | null> =
+    new BehaviorSubject<Settings | null>(null);
 
-  constructor(
-    private configService: ConfigService,
-    private logService: LogService
-  ) {
-    this.initializeStrategies();
-  }
-
-  private initializeStrategies(): void {
-    this.authService = this.configService.getAuthStrategy();
-    this.cacheService = this.configService.getCacheStrategy();
-    this.apiService = this.configService.getApiStrategy();
-    this.errorHandlingService = this.configService.getErrorHandlingStrategy();
+  constructor(configService: ConfigService) {
+    super(configService);
   }
 
   async createSettings(settings: Settings): Promise<Settings> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       await this.apiService.createSettings(userId, settings);
       await this.cacheService.createSettings(settings);
+      this.settingsSubject.next(settings);
       return settings;
     } catch (error) {
       this.errorHandlingService.handleError(error);
@@ -49,14 +32,22 @@ export class SettingsService implements SettingsStrategy {
     }
   }
 
-  async getSettings(): Promise<Settings> {
-    // TODO: what happens with get settings on change... ?
+  getSettings(): BehaviorSubject<Settings | null> {
+    if (
+      this.settingsSubject.value === null &&
+      this.authService.isAuthenticated()
+    ) {
+      this.fetchSettings();
+    }
+    return this.settingsSubject;
+  }
+
+  async fetchSettings(): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       let settings = await this.cacheService.getSettings();
       if (!settings) {
         settings = await this.apiService.getSettings(userId);
@@ -65,7 +56,7 @@ export class SettingsService implements SettingsStrategy {
         }
         this.cacheService.updateSettings(settings);
       }
-      return settings;
+      this.settingsSubject.next(settings);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;
@@ -76,11 +67,11 @@ export class SettingsService implements SettingsStrategy {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+        throw new Error('not logged in');
       }
-
       await this.apiService.updateSettings(userId, settings);
       this.cacheService.updateSettings(settings);
+      this.settingsSubject.next(settings);
     } catch (error) {
       this.errorHandlingService.handleError(error);
       throw error;

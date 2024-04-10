@@ -5,7 +5,7 @@ import { LocalService } from '../services/local.service';
 import { SelectedTaskService } from '../services/selected-task.service';
 
 /**
- * @deprecated a little test for deprecated
+ * @deprecated because task importance is handled in any browser at all times
  */
 @Component({
   selector: 'app-task-importance',

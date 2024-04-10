@@ -41,7 +41,12 @@ export class AddMoveTaskComponent {
     }
 
     try {
-      const newOverlord = await this.taskService.createTask(newTask); // Promise<Task>;
+      // new functionality
+      // if name is empty, just add tasks to the overlord instead of a new task in the overlord
+      let newOverlord = this.overlord;
+      if (newTask.name.length > 0) {
+        newOverlord = await this.taskService.createTask(newTask); // Promise<Task>;
+      }
 
       const selectedTasks = await firstValueFrom(
         this.selectedService.getSelectedTasks()

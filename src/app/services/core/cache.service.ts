@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { CacheStrategy } from './interfaces/cache-strategy.interface';
-import { Observable, of } from 'rxjs';
 import { Score } from 'src/app/models/score';
 import { Settings } from 'src/app/models/settings';
 import { Task } from 'src/app/models/taskModelManager';
 import { EventBusService } from './event-bus.service';
 import { TaskTree } from 'src/app/models/taskTree';
+import { RegisterUserResult } from './interfaces/register-user';
 /**
  * @summary
  *
@@ -25,10 +25,26 @@ export class CacheService implements CacheStrategy {
   private taskTreeCache: TaskTree | null = null;
   private settingsCache: Settings | null = null;
   private scoreCache: Score | null = null;
+  private immediateChildrenMap = new Map<string, Set<string>>();
 
   constructor(private eventBusService: EventBusService) {
     this.subscribeToTaskEvents();
   }
+
+  // register(
+  //   userId: string,
+  //   initialTask: Task,
+  //   additionalTasks: Task[],
+  //   settings: Settings,
+  //   score: Score,
+  //   tree: TaskTree
+  // ): Promise<RegisterUserResult>{
+  //   const result: RegisterUserResult = {
+  //     success: true,
+  //     message: ''
+  //   };
+  //   return result;
+  // }
 
   private subscribeToTaskEvents(): void {
     // tasks
@@ -68,74 +84,83 @@ export class CacheService implements CacheStrategy {
     });
   }
 
-  getTaskById(taskId: string): Observable<Task | undefined> {
-    const task = this.taskChildrenMap.get(taskId) as Task | undefined;
-    return of(task);
+  clearCache(): void {
+    this.taskChildrenMap.clear();
+    this.taskMap.clear();
+    this.taskTreeCache = null;
+    this.settingsCache = null;
+    this.scoreCache = null;
+    this.immediateChildrenMap.clear();
   }
 
-  getLatestTaskId(): Observable<string | undefined> {
+  async getTaskById(taskId: string): Promise<Task | undefined> {
+    const task = this.taskMap.get(taskId) as Task | undefined;
+    return task;
+  }
+
+  async getLatestTaskId(): Promise<string | undefined> {
     const allTasks: Task[] = Array.from(this.taskChildrenMap.values()).flat();
     const latestTask = allTasks.sort(
       (a, b) =>
         (b.timeCreated?.getTime() ?? 0) - (a.timeCreated?.getTime() ?? 0)
     )[0];
-    return of(latestTask?.taskId);
+    return latestTask?.taskId;
   }
 
-  getSuperOverlord(taskId: string): Observable<Task | undefined> {
+  async getSuperOverlord(taskId: string): Promise<Task | undefined> {
     const overlord = this.taskMap.get(taskId);
     if (!overlord) {
-      return of(undefined);
+      return undefined;
     }
     if (!overlord.overlord) {
-      return of(undefined);
+      return undefined;
     }
     const superOverlord = this.taskMap.get(overlord.overlord);
     if (!superOverlord) {
-      return of(undefined);
+      return undefined;
     }
-    return of(superOverlord);
+    return superOverlord;
   }
 
-  getOverlordChildren(taskId: string): Observable<Task[] | undefined> {
-    const cachedTasks = this.taskChildrenMap.get(taskId);
-    if (!cachedTasks) {
-      return of(undefined);
+  async getOverlordChildren(taskId: string): Promise<Task[] | undefined> {
+    const immediateChildrenIds = this.immediateChildrenMap.get(taskId);
+
+    if (immediateChildrenIds && immediateChildrenIds.size > 0) {
+      const immediateChildren = Array.from(immediateChildrenIds)
+        .map((childId) => this.taskMap.get(childId))
+        .filter((task): task is Task => task !== undefined);
+      return immediateChildren;
+    } else {
+      // Cache is empty or null, return undefined
+      return undefined;
     }
-    return of(cachedTasks);
   }
 
-  // TODO: are we allowed to get all tasks? ... cache
-  getTasks(): Promise<Task[]> {
-    throw new Error('Method not implemented.');
-  }
-
-  getCacheTasks(taskId: string): Observable<Task[] | Task | undefined> {
-    return of(this.taskChildrenMap.get(taskId));
-  }
-
-  addCacheTasks(taskId: string, tasks: Task[]): void {
-    this.taskChildrenMap.set(taskId, tasks);
-
-    tasks.forEach((task) => {
-      this.taskMap.set(task.taskId, task);
-    });
-  }
-
-  addCacheTask(task: Task): void {
+  private addCacheTask(task: Task): void {
     this.taskMap.set(task.taskId, task);
 
-    if (task.overlord) {
-      const children = this.taskChildrenMap.get(task.overlord) || [];
-
-      const index = children.findIndex((t) => t.taskId === task.taskId);
-      if (index === -1) {
-        children.push(task);
-      } else {
-        children[index] = task;
+    // Remove task from its previous immediate overlord
+    for (const [
+      overlordId,
+      childrenIds,
+    ] of this.immediateChildrenMap.entries()) {
+      if (childrenIds.has(task.taskId)) {
+        childrenIds.delete(task.taskId);
+        break;
       }
-      this.taskChildrenMap.set(task.overlord, children);
     }
+
+    // Add task to its new immediate overlord
+    if (task.overlord) {
+      const childrenIds =
+        this.immediateChildrenMap.get(task.overlord) || new Set<string>();
+      childrenIds.add(task.taskId);
+      this.immediateChildrenMap.set(task.overlord, childrenIds);
+    }
+  }
+
+  getTasks(): Promise<Task[]> {
+    throw new Error('Method not implemented.');
   }
 
   createTask(task: Task): Promise<Task> {
@@ -172,6 +197,7 @@ export class CacheService implements CacheStrategy {
 
   createTree(taskTree: TaskTree): Promise<TaskTree | null> {
     this.taskTreeCache = taskTree;
+    console.log('tree created in cache');
     return new Promise((resolve) => {
       resolve(this.taskTreeCache);
     });

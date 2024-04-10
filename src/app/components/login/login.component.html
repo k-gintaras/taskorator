@@ -22,7 +22,7 @@
 <div class="login-container">
   <h2>Login</h2>
   <form>
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="email">Email</label>
       <input
         type="email"
@@ -43,10 +43,13 @@
         name="password"
         required
       />
-    </div>
+    </div> -->
     <!-- <button type="submit" class="btn btn-primary" (click)="login()">Login</button> -->
     <button type="button" class="btn btn-secondary" (click)="loginWithGmail()">
       Login with Google
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="deleteUser()">
+      Delete User (test only)
     </button>
   </form>
 </div>

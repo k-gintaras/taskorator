@@ -8,8 +8,10 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getAdditionalUserInfo,
+  deleteUser,
 } from '@angular/fire/auth';
 import { RegistrationService } from './registration.service';
+import { deleteDoc, doc } from '@angular/fire/firestore';
 /**
  * @remarks
  * various ways to login and register with injected `RegistrationService` to help with with creation of data
@@ -19,6 +21,23 @@ import { RegistrationService } from './registration.service';
 })
 export class AuthService implements AuthStrategy {
   constructor(private auth: Auth, private registration: RegistrationService) {}
+
+  async deleteCurrentUser(): Promise<void> {
+    try {
+      const currentUser = this.auth.currentUser;
+      if (currentUser) {
+        // Delete the user from Firebase Authentication
+        await deleteUser(currentUser);
+
+        console.log('User deleted successfully');
+      } else {
+        console.warn('No currently authenticated user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  }
 
   async register(email: string, password: string): Promise<void> {
     try {
@@ -49,6 +68,7 @@ export class AuthService implements AuthStrategy {
 
   async getCurrentUserId(): Promise<string | undefined> {
     const user = this.auth.currentUser;
+    console.log('user: ' + user?.uid);
     return user ? user.uid : undefined;
   }
 
@@ -73,28 +93,56 @@ export class AuthService implements AuthStrategy {
     throw new Error('Method not implemented.');
   }
 
-  async loginWithGoogle(): Promise<void> {
+  async loginWithGoogle(): Promise<{ userId: string; isNewUser: boolean }> {
     try {
       const provider = new GoogleAuthProvider();
-      const user = await signInWithPopup(this.auth, provider);
+      const userCredential = await signInWithPopup(this.auth, provider);
+      const user = userCredential.user;
 
-      // Use getAdditionalUserInfo to check for new user
-      const additionalUserInfo = getAdditionalUserInfo(user);
-      const isNewUser = additionalUserInfo?.isNewUser;
+      if (user) {
+        const additionalUserInfo = getAdditionalUserInfo(userCredential);
+        const isNewUser = additionalUserInfo?.isNewUser;
 
-      if (isNewUser) {
-        console.log(
-          'Welcome aboard, space cadet! Performing first-time sign-in operations.'
-        );
-        this.registration.registerUser(user);
+        if (isNewUser) {
+          console.log(
+            'Welcome aboard, space cadet! Performing first-time sign-in operations.'
+          );
+          return { userId: user.uid, isNewUser: true };
+        } else {
+          console.log('Welcome back, astronaut! Loading your dashboard.');
+          return { userId: user.uid, isNewUser: false };
+        }
       } else {
-        console.log('Welcome back, astronaut! Loading your dashboard.');
-        // Handle returning user logic
+        throw new Error('User not found in the user credential.');
       }
     } catch (error) {
       console.error('Error during sign in with Google:', error);
+      throw error;
     }
   }
+
+  // async loginWithGoogle(): Promise<void> {
+  //   try {
+  //     const provider = new GoogleAuthProvider();
+  //     const user = await signInWithPopup(this.auth, provider);
+
+  //     // Use getAdditionalUserInfo to check for new user
+  //     const additionalUserInfo = getAdditionalUserInfo(user);
+  //     const isNewUser = additionalUserInfo?.isNewUser;
+
+  //     if (isNewUser) {
+  //       console.log(
+  //         'Welcome aboard, space cadet! Performing first-time sign-in operations.'
+  //       );
+  //       this.registration.registerUser(user);
+  //     } else {
+  //       console.log('Welcome back, astronaut! Loading your dashboard.');
+  //       // Handle returning user logic
+  //     }
+  //   } catch (error) {
+  //     console.error('Error during sign in with Google:', error);
+  //   }
+  // }
 
   loginWithYahoo(): Promise<unknown> {
     throw new Error('Method not implemented.');

@@ -1,26 +1,24 @@
 import { Injectable } from '@angular/core';
 import { ApiStrategy } from './interfaces/api-strategy.interface';
-import { Observable, catchError, from, map, of, switchMap, tap } from 'rxjs';
-import { Score } from 'src/app/models/score';
-import { Settings } from 'src/app/models/settings';
-import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 import {
   Firestore,
   collection,
-  collectionData,
   doc,
   updateDoc,
-  addDoc,
-  deleteDoc,
   writeBatch,
   query,
   where,
-  docData,
   limit,
   orderBy,
   getDoc,
   setDoc,
+  getDocs,
+  runTransaction,
 } from '@angular/fire/firestore';
+import { RegisterUserResult } from './interfaces/register-user';
+import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
+import { Settings } from 'src/app/models/settings';
+import { Score } from 'src/app/models/score';
 import { TaskTree } from 'src/app/models/taskTree';
 
 /**
@@ -32,6 +30,83 @@ import { TaskTree } from 'src/app/models/taskTree';
 })
 export default class ApiService implements ApiStrategy {
   constructor(private firestore: Firestore) {}
+
+  async register(
+    userId: string,
+    initialTask: Task,
+    additionalTasks: Task[],
+    settings: Settings,
+    score: Score,
+    tree: TaskTree
+  ): Promise<RegisterUserResult> {
+    console.log('registering: ' + userId);
+    if (!userId) {
+      throw new Error('No user id in user credentials @registerUser()');
+    }
+
+    try {
+      await runTransaction(this.firestore, async (transaction) => {
+        const userTaskCollectionRef = collection(
+          this.firestore,
+          `users/${userId}/tasks`
+        );
+
+        // Create the initial task with the provided taskId
+        const initialTaskDocRef = doc(
+          userTaskCollectionRef,
+          initialTask.taskId
+        );
+        transaction.set(initialTaskDocRef, initialTask);
+
+        // // Create additional tasks with unique IDs
+        // additionalTasks.forEach((task) => {
+        //   const taskDocRef = doc(userTaskCollectionRef);
+        //   const newTask = { ...task, taskId: taskDocRef.id };
+        //   transaction.set(taskDocRef, newTask);
+        // });
+
+        // create custom ids, so that it is simpler for cache and first registration
+        // we don't need to wait this service to complete to adjust tree and cache to correct ids
+        // Create additional tasks with their provided taskId
+        additionalTasks.forEach((task) => {
+          const taskDocRef = doc(userTaskCollectionRef, task.taskId);
+          transaction.set(taskDocRef, task);
+        });
+
+        const settingsDocRef = doc(
+          this.firestore,
+          `users/${userId}/settings/${userId}`
+        );
+        transaction.set(settingsDocRef, settings);
+
+        const scoreDocRef = doc(
+          this.firestore,
+          `users/${userId}/scores/${userId}`
+        );
+        transaction.set(scoreDocRef, score);
+
+        const treeDocRef = doc(
+          this.firestore,
+          `users/${userId}/taskTrees/${userId}`
+        );
+        transaction.set(treeDocRef, tree);
+      });
+
+      const result: RegisterUserResult = {
+        success: true,
+        message: 'User registration successful',
+        userId: userId,
+      };
+      return result;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      const result: RegisterUserResult = {
+        success: false,
+        message: 'User registration failed',
+      };
+      throw result;
+    }
+  }
 
   // async createTask(userId: string, task: Task): Promise<Task> {
   //   if (!userId || !task.overlord) {
@@ -74,6 +149,7 @@ export default class ApiService implements ApiStrategy {
     task: Task,
     taskId: string
   ): Promise<Task> {
+    console.log('trying to create first task on server');
     if (!task.overlord) {
       task.overlord = getDefaultTask().overlord;
     }
@@ -86,6 +162,9 @@ export default class ApiService implements ApiStrategy {
 
     try {
       await setDoc(taskDocRef, newTask); // Directly set the new task document with the generated ID
+      console.log('created');
+      console.log(newTask);
+
       return newTask; // Return the newly created task with its ID
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -111,8 +190,7 @@ export default class ApiService implements ApiStrategy {
     await updateDoc(taskDocRef, { ...task });
   }
 
-  getTaskById(userId: string, taskId: string): Observable<Task | undefined> {
-    console.log(userId + ' ' + taskId);
+  async getTaskById(userId: string, taskId: string): Promise<Task | undefined> {
     if (!userId) {
       throw new Error('User not authenticated');
     }
@@ -120,63 +198,74 @@ export default class ApiService implements ApiStrategy {
       throw new Error('Missing task ID for update');
     }
     const docRef = doc(this.firestore, `users/${userId}/tasks/${taskId}`);
-    return docData(docRef, { idField: 'taskId' }) as Observable<Task>;
+    const snapshot = await getDoc(docRef);
+    if (snapshot.exists()) {
+      return { taskId: snapshot.id, ...snapshot.data() } as Task;
+    }
+    return undefined;
   }
 
-  getLatestTaskId(userId: string): Observable<string | undefined> {
+  async getLatestTaskId(userId: string): Promise<string | undefined> {
     const tasksRef = query(
       collection(this.firestore, `users/${userId}/tasks`),
       orderBy('timeCreated', 'desc'),
       limit(1)
     );
-    console.log(tasksRef);
-    return collectionData(tasksRef, { idField: 'taskId' }).pipe(
-      map((tasks) => tasks[0]?.taskId),
-      catchError(() => of(undefined))
-    );
+    const querySnapshot = await getDocs(tasksRef);
+    const tasks = querySnapshot.docs.map((doc) => ({
+      taskId: doc.id,
+      ...doc.data(),
+    }));
+    return tasks[0]?.taskId;
   }
 
-  getSuperOverlord(
+  async getSuperOverlord(
     userId: string,
     overlordId: string
-  ): Observable<Task | undefined> {
+  ): Promise<Task | undefined> {
     const overlordDocRef = doc(
       this.firestore,
       `users/${userId}/tasks/${overlordId}`
     );
-    return (
-      docData(overlordDocRef, { idField: 'taskId' }) as Observable<
-        Task | undefined
-      >
-    ).pipe(
-      switchMap((overlord: Task | undefined) => {
-        if (!overlord || !overlord.overlord) {
-          return of(undefined);
-        }
-        const superOverlordDocRef = doc(
-          this.firestore,
-          `users/${userId}/tasks/${overlord.overlord}`
-        );
-        return docData(superOverlordDocRef, {
-          idField: 'taskId',
-        }) as Observable<Task | undefined>;
-      })
-    );
+    const overlordSnapshot = await getDoc(overlordDocRef);
+    if (overlordSnapshot.exists()) {
+      const overlord = {
+        taskId: overlordSnapshot.id,
+        ...overlordSnapshot.data(),
+      } as Task;
+      if (!overlord.overlord) {
+        return undefined;
+      }
+      const superOverlordDocRef = doc(
+        this.firestore,
+        `users/${userId}/tasks/${overlord.overlord}`
+      );
+      const superOverlordSnapshot = await getDoc(superOverlordDocRef);
+      if (superOverlordSnapshot.exists()) {
+        return {
+          taskId: superOverlordSnapshot.id,
+          ...superOverlordSnapshot.data(),
+        } as Task;
+      }
+    }
+    return undefined;
   }
 
-  getOverlordChildren(
+  async getOverlordChildren(
     userId: string,
     overlordId: string
-  ): Observable<Task[] | undefined> {
-    // If not cached, fetch from Firestore
+  ): Promise<Task[] | undefined> {
     const queryConstraint = query(
       collection(this.firestore, `users/${userId}/tasks`),
       where('overlord', '==', overlordId)
     );
-
-    return collectionData(queryConstraint, { idField: 'taskId' }) as Observable<
-      Task[]
-    >;
+    const querySnapshot = await getDocs(queryConstraint);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs.map(
+        (doc) => ({ taskId: doc.id, ...doc.data() } as Task)
+      );
+    }
+    return undefined;
   }
 
   /**
@@ -305,7 +394,10 @@ export default class ApiService implements ApiStrategy {
   }
 
   async updateTree(userId: string, taskTree: TaskTree): Promise<void> {
-    const treeDocRef = doc(this.firestore, `users/${userId}/trees/${userId}`); // firebase store stuff inside stuff with keys, so it has to be inside a unique key
+    const treeDocRef = doc(
+      this.firestore,
+      `users/${userId}/taskTrees/${userId}`
+    ); // firebase store stuff inside stuff with keys, so it has to be inside a unique key
     try {
       const taskTreeData = JSON.parse(JSON.stringify(taskTree));
       await setDoc(treeDocRef, taskTreeData, { merge: true });

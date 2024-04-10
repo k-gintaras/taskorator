@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
 import { SelectedTaskService } from 'src/app/archive/selected-task.service';
 import { completeButtonColorMap } from 'src/app/models/colors';
 import {
@@ -8,28 +7,31 @@ import {
   getButtonName,
   getDefaultSettings,
 } from 'src/app/models/settings';
-import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
+import { Task } from 'src/app/models/taskModelManager';
 import { SettingsService } from 'src/app/services/core/settings.service';
 import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { SelectedOverlordService } from 'src/app/services/selected-overlord.service';
 import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
 import { TaskUpdateService } from 'src/app/services/task-update.service';
-import { TaskService } from 'src/app/services/task/task.service';
+import { FilterService } from 'src/app/services/task/filter.service';
+import { PreviousService } from 'src/app/services/task/previous.service';
+import { SortService } from 'src/app/services/task/sort.service';
 import { UrlHelperService } from 'src/app/services/url-helper.service';
+import { TaskNavigatorService } from 'src/app/services/task/task-navigator.service';
+import { ConfigService } from 'src/app/services/core/config.service';
 
 @Component({
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.html',
   styleUrls: ['./task-navigator.component.css'],
 })
-export class TaskNavigatorComponent {
-  @Input() tasks: Task[] | undefined;
+export class TaskNavigatorComponent implements OnInit {
+  tasks: Task[] = [];
   settings: Settings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
 
   constructor(
-    private taskService: TaskService,
     private selectedOverlordService: SelectedOverlordService,
     private urlHelperService: UrlHelperService,
     private taskUpdateService: TaskUpdateService,
@@ -38,17 +40,29 @@ export class TaskNavigatorComponent {
     private selected: SelectedTaskService,
     private settingsService: SettingsService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sortService: SortService,
+    private filterService: FilterService,
+    private previousService: PreviousService,
+    private taskNavigatorService: TaskNavigatorService,
+    private config: ConfigService
   ) {}
 
   ngOnInit() {
-    // TODO: if url available, load from url if settings avaliable, load from settings (previous task view)
-    // Load settings and selected tasks
-    this.settingsService.getSettings().then((s: Settings) => {
+    const on = this.config.getAuthStrategy().isAuthenticated();
+    console.log('Is online: ' + on);
+    this.settingsService.getSettings().subscribe((s: Settings | null) => {
       if (s) {
         this.settings = s;
-        this.loadPreviouslyViewedTasks();
-        console.log(s);
+        this.previousService
+          .getPreviousOverlordId(this.route, this.settings)
+          .then((overlordId: string | undefined) => {
+            if (overlordId) {
+              this.loadTaskNavigationView(overlordId);
+            } else {
+              console.log('could not load previous task');
+            }
+          });
       }
     });
 
@@ -57,203 +71,80 @@ export class TaskNavigatorComponent {
       .subscribe((selectedTasks: Task[]) => {
         this.selectedTasks = selectedTasks;
       });
-  }
 
-  loadPreviouslyViewedTasks() {
-    // First, subscribe to queryParams to check for an 'overlord' in the URL
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      let overlordId = params['selectedOverlord']; // Attempt to get the overlord ID from URL
+    this.taskNavigatorService.getTaskNavigationView().subscribe((view) => {
+      if (view) {
+        this.selectedOverlord = view.taskOverlord;
+        this.tasks = view.taskChildren;
+        this.setNewFiltered(this.tasks);
 
-      if (!overlordId) {
-        // Fallback to settings if URL doesn't contain the desired param
-        overlordId = this.settings?.lastOverlordViewId;
-
-        // Further fallback to a default action (e.g., getting the first task) if no suitable ID is found
-        if (!overlordId) {
-          // Assuming `getFirstTaskId` is a method that retrieves the ID of the first task
-          this.taskService
-            .getLatestTaskId()
-            .subscribe((firstTaskId: string | undefined) => {
-              console.log('WTF');
-              if (firstTaskId) this.loadOverlordAndChildren(firstTaskId);
-            });
-
-          return; // Exit the function early since the rest of the logic will execute asynchronously
-        }
-      } else {
-        console.log('no url task');
+        console.log('got tasks from navigator service');
+        console.log(this.tasks);
+        console.log(this.selectedOverlord);
       }
-
-      // Proceed to load the overlord and its children using the determined ID
-      this.loadOverlordAndChildren(overlordId);
     });
   }
 
-  private loadOverlordAndChildren(overlordId: string) {
-    // Load the selected overlord and its children from Firebase
-
-    console.log('tryna get: ' + overlordId);
-    this.taskService
-      .getTaskById(overlordId)
-      .subscribe((task: Task | undefined) => {
-        if (task) {
-          this.selectedOverlord = task;
-          console.log(task);
-        } else {
-          console.log('no overlord?');
-
-          // Handle the case where the task is undefined, potentially navigating to a default view
-        }
-      });
-
-    this.taskService
-      .getOverlordChildren(overlordId)
-      .subscribe((tasks: Task[] | undefined) => {
-        if (tasks) {
-          this.setNewFiltered(tasks);
-          console.log('tasks1 ');
-          console.log(tasks);
-        } else {
-          // TODO: at the beginning get all default tasks with no parent
-          this.taskService
-            .getOverlordChildren('128')
-            .subscribe((tasks: Task[] | undefined) => {
-              if (tasks) {
-                console.log('tasks2  ');
-                console.log(tasks);
-                this.setNewFiltered(tasks);
-              }
-            });
-          // this.setNewFiltered(
-          //   this.tasks
-          //     ? this.tasks
-          //     : [
-          //         this.selectedOverlord
-          //           ? this.selectedOverlord
-          //           : getDefaultTask(),
-          //       ]
-          // );
-        }
-      });
+  private async loadTaskNavigationView(overlordId: string) {
+    await this.taskNavigatorService.loadTaskNavigationView(overlordId);
   }
 
-  onPrevious(task: Task) {
+  async goBack(task: Task | undefined) {
     if (!task || !task.overlord) {
       this.errorNoTaskOrOverlord(task);
     } else {
-      this.taskService
-        .getSuperOverlord(task.overlord)
-        .subscribe((superOverlord: Task | undefined) => {
-          if (superOverlord) {
-            this.selectedOverlordService.setSelectedOverlord(superOverlord);
-            this.urlHelperService.selectedOverlordUrlUpdate(superOverlord);
-            this.taskService
-              .getOverlordChildren(superOverlord.taskId)
-              .subscribe((tasks: Task[] | undefined) => {
-                if (tasks) {
-                  this.setNewFiltered(tasks);
-                } else {
-                  this.errorNoChildrenInside();
-                }
-              });
-          } else {
-            this.errorNoTasksOutside(task);
-          }
-        });
+      await this.taskNavigatorService.back(task);
     }
   }
 
-  onNext(task: Task) {
+  async onPrevious(task: Task | undefined) {
+    if (!task || !task.overlord) {
+      this.errorNoTaskOrOverlord(task);
+    } else {
+      await this.taskNavigatorService.previous(task);
+    }
+  }
+
+  async onNext(task: Task) {
     if (!task || !task.taskId) {
       console.error('Invalid task or task ID provided.');
     } else {
-      this.taskService
-        .getOverlordChildren(task.taskId)
-        .subscribe((tasks: Task[] | undefined) => {
-          if (tasks) {
-            // this.tasks = tasks;
-            this.setNewFiltered(tasks);
-          } else {
-            this.errorNoChildrenInside();
-          }
-        });
+      await this.taskNavigatorService.next(task);
     }
   }
 
   setNewFiltered(arr: Task[]) {
-    // TODO: extract it to filterHelper
-    // it will simply filter whatever the setup is
-    // sorter helper
-    // it will simply sort as it is setup
-    // Set the tasks array
+    console.log('setting new filtered: ');
+    console.log(arr);
+    console.log('this.selectedOverlord');
+    console.log(this.selectedOverlord);
     this.tasks = arr;
-
-    // Filter tasks based on settings
     if (this.settings) {
-      this.filterBySettings(this.tasks, this.settings);
-    }
-
-    // Sort tasks by priority
-    this.sortByPriority();
-  }
-
-  // filterBySettings(tasks: Task[]): Task[] {
-  //   return [];
-  // }
-
-  filterBySettings(tasks: Task[], settings: Settings) {
-    this.tasks = tasks.filter((t: Task) => {
-      // Task should be included if it matches any of the criteria for being shown
-      return (
-        (settings.isShowArchived && t.stage === 'archived') ||
-        (settings.isShowCompleted && t.stage === 'completed') ||
-        (settings.isShowSeen && t.stage === 'seen') ||
-        (settings.isShowDeleted && t.stage === 'deleted') ||
-        (settings.isShowTodo && t.stage === 'todo') ||
-        // If none of the settings apply, it means we don't want to filter this task out based on its stage
-        // This line is necessary if there are stages not covered by the settings, adjust as needed
-        (!settings.isShowArchived &&
-          !settings.isShowCompleted &&
-          !settings.isShowSeen &&
-          !settings.isShowDeleted &&
-          !settings.isShowTodo)
+      this.tasks = this.filterService.filterBySettings(
+        this.tasks,
+        this.settings
       );
-    });
+    }
+    this.sortService.sortByPriority(this.tasks);
   }
 
-  sortByPriority() {
-    if (!this.tasks) return;
-    this.tasks.sort((a, b) => {
-      if (b.priority === a.priority) {
-        // Ensure lastUpdated is handled correctly
-        const timeB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
-        const timeA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
-        return timeB - timeA;
-      }
-      return b.priority - a.priority;
-    });
-  }
-
-  errorNoTaskOrOverlord(task: Task) {
+  errorNoTaskOrOverlord(task: Task | undefined) {
     console.log('No task or task overlord defined.');
   }
 
   errorNoChildrenInside() {
-    throw new Error('Method not implemented.');
+    console.log('No children inside this task.');
   }
 
   errorNoTasksOutside(task: Task | undefined) {
-    throw new Error('Function not implemented.');
+    console.log('No tasks above this task.');
   }
 
   onTaskCardClick(task: Task) {
-    console.log(task.taskId);
     if (this.selectedTasks.indexOf(task) > -1) {
-      // this.selectedTasks.delete(task);
-      this.selectedMultiple.removeSelectedTask(task); // Automatically notifies subscribers
+      this.selectedMultiple.removeSelectedTask(task);
     } else {
-      // this.selectedTasks.add(task);
-      this.selectedMultiple.addSelectedTask(task); // Automatically notifies subscribers
+      this.selectedMultiple.addSelectedTask(task);
     }
 
     if (task) {
@@ -271,7 +162,6 @@ export class TaskNavigatorComponent {
   }
 
   complete(task: Task) {
-    // Use the loaded settings directly
     if (this.settings) {
       switch (this.settings.completeButtonAction) {
         case 'completed':
@@ -298,7 +188,6 @@ export class TaskNavigatorComponent {
           break;
       }
     } else {
-      // Handle the case when settings are not loaded
       console.error('Settings not loaded');
     }
   }

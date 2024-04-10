@@ -18,6 +18,9 @@
         <span [style.color]="getColorBySetting()">{{ getButtonName() }}</span>
       </div>
     </mat-card>
+    <div *ngIf="tasks?.length === 0" class="task-container">
+      <p>No tasks available.</p>
+    </div>
     <div *ngFor="let task of tasks" class="task-container">
       <mat-card class="task-card" [class.selected-task]="isSelected(task)">
         <mat-card-content class="task-content">

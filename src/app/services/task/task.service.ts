@@ -3,51 +3,28 @@ import { Task } from 'src/app/models/taskModelManager';
 import { ConfigService } from '../core/config.service';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskManagementStrategy } from '../core/interfaces/task-management-strategy.interface';
-import {
-  Observable,
-  catchError,
-  from,
-  mergeMap,
-  of,
-  switchMap,
-  tap,
-  throwError,
-  EMPTY,
-} from 'rxjs';
-import { ErrorService } from '../core/error.service';
-import { AuthService } from '../core/auth.service';
-import { CacheService } from '../core/cache.service';
-import ApiService from '../core/api.service';
-import { LogService } from '../core/log.service';
+import { TaskValidatorService } from '../core/task-validator.service';
+import { CoreService } from '../core/core.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskService implements TaskManagementStrategy {
-  private authService!: AuthService;
-  private cacheService!: CacheService;
-  private apiService!: ApiService;
-  private errorHandlingService!: ErrorService;
-
+export class TaskService extends CoreService implements TaskManagementStrategy {
   constructor(
-    private configService: ConfigService,
+    configService: ConfigService,
     private eventBusService: EventBusService,
-    private logService: LogService
+    private validatorService: TaskValidatorService
   ) {
-    this.initializeStrategies();
-  }
-
-  private initializeStrategies(): void {
-    this.authService = this.configService.getAuthStrategy();
-    this.cacheService = this.configService.getCacheStrategy();
-    this.apiService = this.configService.getApiStrategy();
-    this.errorHandlingService = this.configService.getErrorHandlingStrategy();
+    super(configService);
   }
 
   async createTask(task: Task): Promise<Task> {
     const userId = await this.getUserId();
     if (!userId) {
-      throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+      throw new Error('not logged in');
+    }
+    if (!this.validatorService.isTaskValid(task)) {
+      throw new Error('invalid task, probably because empty');
     }
     const createdTask = await this.apiService.createTask(userId, task);
     this.eventBusService.createTask(createdTask);
@@ -57,7 +34,7 @@ export class TaskService implements TaskManagementStrategy {
   async updateTask(task: Task): Promise<void> {
     const userId = await this.getUserId();
     if (!userId) {
-      throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+      throw new Error('not logged in');
     }
     await this.apiService.updateTask(userId, task);
     this.eventBusService.updateTask(task);
@@ -66,7 +43,7 @@ export class TaskService implements TaskManagementStrategy {
   async createTasks(tasks: Task[]): Promise<Task[]> {
     const userId = await this.getUserId();
     if (!userId) {
-      throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+      throw new Error('not logged in');
     }
     const createdTasks = await this.apiService.createTasks(userId, tasks);
     this.eventBusService.createTasks(createdTasks);
@@ -76,46 +53,89 @@ export class TaskService implements TaskManagementStrategy {
   async updateTasks(tasks: Task[]): Promise<void> {
     const userId = await this.getUserId();
     if (!userId) {
-      throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
+      throw new Error('not logged in');
     }
     await this.apiService.updateTasks(userId, tasks);
     this.eventBusService.updateTasks(tasks);
   }
 
-  getTaskById(taskId: string): Observable<Task | undefined> {
-    console.log(taskId + ' we are querying: ');
-    return this.getUserIdObservable().pipe(
-      switchMap((userId) => this.getCachedOrApiTask(userId, taskId))
-    );
+  async getTaskById(taskId: string): Promise<Task | undefined> {
+    const userId = await this.getUserId();
+    if (userId) {
+      let task = await this.cacheService.getTaskById(taskId);
+      if (!task) {
+        task = await this.apiService.getTaskById(userId, taskId);
+        if (task) {
+          await this.cacheService.createTask(task);
+        }
+      }
+      if (task) {
+        this.eventBusService.getTaskById(task);
+      }
+      return task;
+    }
+    return undefined;
   }
 
-  getLatestTaskId(): Observable<string | undefined> {
-    return this.getUserIdObservable().pipe(
-      switchMap((userId) =>
-        userId
-          ? this.cacheService.getLatestTaskId() ||
-            this.apiService
-              .getLatestTaskId(userId)
-              .pipe(catchError((error) => this.handleError(error)))
-          : EMPTY
-      )
-    );
+  async getLatestTaskId(): Promise<string | undefined> {
+    const userId = await this.getUserId();
+    if (userId) {
+      let latestTaskId = await this.cacheService.getLatestTaskId();
+      if (!latestTaskId) {
+        latestTaskId = await this.apiService.getLatestTaskId(userId);
+      }
+      if (latestTaskId) {
+        this.eventBusService.getLatestTaskId(latestTaskId);
+      }
+      return latestTaskId;
+    }
+    return undefined;
   }
 
-  getSuperOverlord(taskId: string): Observable<Task | undefined> {
-    return this.getUserIdObservable().pipe(
-      switchMap((userId) =>
-        this.getCachedOrApiTask(userId, taskId, 'getSuperOverlord')
-      )
-    );
+  async getSuperOverlord(taskId: string): Promise<Task | undefined> {
+    const userId = await this.getUserId();
+    if (userId) {
+      let task = await this.cacheService.getSuperOverlord(taskId);
+      console.log('task of task cache: ' + task?.name);
+      if (!task) {
+        task = await this.apiService.getSuperOverlord(userId, taskId);
+        console.log('task of task api: ' + task?.name);
+
+        if (task) {
+          await this.cacheService.createTask(task);
+        }
+      }
+      if (task) {
+        this.eventBusService.getSuperOverlord(task);
+      }
+      return task;
+    }
+    return undefined;
   }
 
-  getOverlordChildren(taskId: string): Observable<Task[] | undefined> {
-    return this.getUserIdObservable().pipe(
-      switchMap((userId) =>
-        this.getCachedOrApiTasks(userId, taskId, 'getOverlordChildren')
-      )
-    );
+  async getOverlordChildren(taskId: string): Promise<Task[] | undefined> {
+    console.log('task getOverlordChildren: ' + taskId);
+
+    const userId = await this.getUserId();
+    if (userId) {
+      let tasks = await this.cacheService.getOverlordChildren(taskId);
+      console.log('getOverlordChildren cache: ');
+      console.log(tasks);
+
+      if (!tasks) {
+        tasks = await this.apiService.getOverlordChildren(userId, taskId);
+        console.log('getOverlordChildren api: ');
+        console.log(tasks);
+        if (tasks) {
+          await this.cacheService.createTasks(tasks);
+        }
+      }
+      if (tasks) {
+        this.eventBusService.getOverlordChildren(tasks);
+      }
+      return tasks;
+    }
+    return undefined;
   }
 
   // TODO: we may never use it, due to how heavy it is if 500 tasks or more...
@@ -123,140 +143,17 @@ export class TaskService implements TaskManagementStrategy {
     throw new Error('Method not implemented.');
   }
 
-  private getUserId(): Promise<string | undefined> {
-    return this.authService.getCurrentUserId().catch((error) => {
+  private async getUserId(): Promise<string | undefined> {
+    try {
+      return await this.authService.getCurrentUserId();
+    } catch (error) {
       this.handleError(error);
-      throw new Error(this.errorHandlingService.ERROR_NOT_LOGGED_IN);
-    });
-  }
-
-  private getUserIdObservable(): Observable<string | undefined> {
-    return from(this.getUserId()).pipe(
-      catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      })
-    );
-  }
-
-  private getCachedOrApiTask(
-    userId: string | undefined,
-    taskId: string,
-    apiMethod: 'getTaskById' | 'getSuperOverlord' = 'getTaskById'
-  ): Observable<Task | undefined> {
-    if (!userId || !this.cacheService || !this.apiService) {
-      return EMPTY;
-    }
-
-    let cachedTask$: Observable<Task | undefined>;
-
-    switch (apiMethod) {
-      case 'getTaskById':
-        cachedTask$ = this.cacheService.getTaskById(taskId);
-        break;
-      case 'getSuperOverlord':
-        cachedTask$ = this.cacheService.getSuperOverlord(taskId);
-        break;
-      default:
-        cachedTask$ = EMPTY;
-    }
-
-    return cachedTask$.pipe(
-      switchMap((cachedTask) =>
-        cachedTask
-          ? of(cachedTask)
-          : this.callApiMethod(apiMethod, userId, taskId)
-      ),
-      catchError((error) => this.handleError(error))
-    );
-  }
-
-  private callApiMethod(
-    apiMethod: 'getTaskById' | 'getSuperOverlord',
-    userId: string,
-    taskId: string
-  ): Observable<Task | undefined> {
-    switch (apiMethod) {
-      case 'getTaskById':
-        return this.apiService.getTaskById(userId, taskId).pipe(
-          tap((task) => {
-            if (task) {
-              this.cacheService.addCacheTask(task);
-            }
-          })
-        );
-      case 'getSuperOverlord':
-        return this.apiService.getSuperOverlord(userId, taskId).pipe(
-          tap((task) => {
-            if (task) {
-              this.cacheService.addCacheTask(task);
-            }
-          })
-        );
-      default:
-        return EMPTY;
+      throw new Error('not logged in');
     }
   }
 
-  private getCachedOrApiTasks(
-    userId: string | undefined,
-    taskId: string,
-    apiMethod: 'getOverlordChildren' = 'getOverlordChildren'
-  ): Observable<Task[] | undefined> {
-    if (!userId || !this.cacheService || !this.apiService) {
-      return EMPTY;
-    }
-
-    let cachedTasks$: Observable<Task[] | undefined>;
-
-    switch (apiMethod) {
-      case 'getOverlordChildren':
-        cachedTasks$ = this.cacheService.getOverlordChildren(taskId);
-        console.log('cached??? ');
-        break;
-      default:
-        cachedTasks$ = EMPTY;
-    }
-
-    console.log('cached??? ');
-    console.log(cachedTasks$);
-
-    return cachedTasks$.pipe(
-      switchMap((cachedTasks) => {
-        console.log('cached tasks:');
-        console.log(cachedTasks);
-        return cachedTasks
-          ? of(cachedTasks)
-          : this.callApiTasksMethod(apiMethod, userId, taskId);
-      }),
-      catchError((error) => this.handleError(error))
-    );
-  }
-
-  private callApiTasksMethod(
-    apiMethod: 'getOverlordChildren',
-    userId: string,
-    taskId: string
-  ): Observable<Task[] | undefined> {
-    switch (apiMethod) {
-      case 'getOverlordChildren':
-        return this.apiService.getOverlordChildren(userId, taskId).pipe(
-          tap((tasks) => {
-            console.log('getting tasks from server');
-            console.log(tasks);
-
-            if (tasks) {
-              this.cacheService.addCacheTasks(taskId, tasks);
-            }
-          })
-        );
-      default:
-        return EMPTY;
-    }
-  }
-
-  private handleError(error: unknown): Observable<never> {
+  private handleError(error: unknown): void {
     this.errorHandlingService.handleError(error);
-    return throwError(() => error);
+    throw error;
   }
 }

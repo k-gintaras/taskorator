@@ -14,17 +14,22 @@
   <!-- <div><app-add-with-search></app-add-with-search></div> -->
   <!-- <a routerLink="/task-view">Task View</a> -->
   <!-- <a routerLink="/task-importance">Task Importance</a> -->
-  <a routerLink="/input-to-tasks">Mass Add</a>
-  <a routerLink="/add-simple-task">Add Simple Task</a>
-  <a routerLink="/overlord-manager">Overlord Swapper</a>
+  <div *ngIf="testing">
+    <a routerLink="/input-to-tasks">Mass Add</a>
+    <a routerLink="/add-simple-task">Add Simple Task</a>
+    <a routerLink="/overlord-manager">Overlord Swapper</a>
+    <a routerLink="/filter-manager">Various Lists</a>
+    <a routerLink="/parent">Task Browser</a>
+    <!-- <a routerLink="/overlord-browser">Various Lists</a> -->
+    <a routerLink="/task-filter">Mass Editor</a>
+  </div>
   <a routerLink="/d3-vizualizer">Vizualizer</a>
-  <a routerLink="/filter-manager">Various Lists</a>
-  <a routerLink="/parent">Task Browser</a>
-  <!-- <a routerLink="/overlord-browser">Various Lists</a> -->
-  <a routerLink="/task-filter">Mass Editor</a>
-  <a routerLink="/login">Login</a>
-  <a routerLink="/register">Register</a>
-  <a routerLink="/protected">Login Test</a>
+
+  <div *ngIf="!authenticated">
+    <a routerLink="/login">Login</a>
+  </div>
+  <!-- <a routerLink="/register">Register</a> -->
+  <a routerLink="/protected">Tasks</a>
   <!-- <a routerLink="/firebase">Firebase Test</a> -->
 </nav>
 <!-- below navigation -->
