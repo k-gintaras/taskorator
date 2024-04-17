@@ -15,12 +15,12 @@ export class BaseComponent {
     private errorService: ErrorService
   ) {}
 
-  error(message: string): void {
+  error(message: string, error: unknown): void {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
       panelClass: 'error-snackbar',
     });
-    this.errorService.handleError(message);
+    this.errorService.error(error);
   }
 
   log(message: string): void {
@@ -28,13 +28,12 @@ export class BaseComponent {
   }
 
   popup(message: string): void {
+    // maybe...
     // this.dialog.open(PopupComponent, {
     //   data: { message },
     // });
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-      panelClass: 'error-snackbar',
-    });
+
+    // has internal popup...
     this.errorService.feedback(message);
   }
 

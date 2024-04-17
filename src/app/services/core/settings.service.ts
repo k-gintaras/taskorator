@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SettingsStrategy } from './interfaces/settings-strategy.interface';
-import { Settings } from 'src/app/models/settings';
+import { Settings, getDefaultSettings } from 'src/app/models/settings';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
@@ -27,7 +27,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
       this.settingsSubject.next(settings);
       return settings;
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -45,20 +45,24 @@ export class SettingsService extends CoreService implements SettingsStrategy {
   async fetchSettings(): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
-      if (!userId) {
-        throw new Error('not logged in');
-      }
+      if (!userId) throw new Error('Not logged in');
+
       let settings = await this.cacheService.getSettings();
       if (!settings) {
         settings = await this.apiService.getSettings(userId);
         if (!settings) {
-          throw new Error('No settings found');
+          // Settings not found or error occurred
+          const defaultSettings = getDefaultSettings(); // Assume some default settings exist
+          this.log('recreating settings:');
+
+          await this.createSettings(defaultSettings);
+          settings = defaultSettings;
         }
-        this.cacheService.updateSettings(settings);
       }
+      this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -73,7 +77,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
       this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }

@@ -1,22 +1,42 @@
 import { Injectable } from '@angular/core';
 import { AuthStrategy } from '../core/interfaces/auth-strategy.interface';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TestAuthService implements AuthStrategy {
-  deleteCurrentUser(): void {
-    localStorage.removeItem(this.USER_ID_KEY);
-  }
-
   private readonly USER_ID_KEY = 'test_user_id';
 
+  private currentUserSubject = new BehaviorSubject<unknown | null>(null);
+
+  constructor() {
+    this.currentUserSubject.next(this.getCurrentUserSync());
+  }
+
+  async logout(): Promise<void> {
+    localStorage.removeItem(this.USER_ID_KEY);
+    this.currentUserSubject.next(null);
+  }
+
+  getCurrentUser(): Observable<unknown | null> {
+    return this.currentUserSubject.asObservable();
+  }
+
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.USER_ID_KEY);
+    return !!this.getCurrentUserSync();
   }
 
   async getCurrentUserId(): Promise<string | undefined> {
-    return localStorage.getItem(this.USER_ID_KEY) || undefined;
+    return this.getCurrentUserSync() || undefined;
+  }
+
+  private getCurrentUserSync(): string | null {
+    return localStorage.getItem(this.USER_ID_KEY);
+  }
+
+  deleteCurrentUser(): void {
+    localStorage.removeItem(this.USER_ID_KEY);
   }
 
   async loginWithGoogle(): Promise<{ userId: string; isNewUser: boolean }> {
@@ -40,13 +60,10 @@ export class TestAuthService implements AuthStrategy {
     }
   }
 
-  async logout(): Promise<void> {
+  async logOut(): Promise<void> {
     localStorage.removeItem(this.USER_ID_KEY);
   }
 
-  logOut(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
   loginWithEmailAndPassword(email: string, password: string): Promise<void> {
     throw new Error('Method not implemented.');
   }

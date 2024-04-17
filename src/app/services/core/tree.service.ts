@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { EventBusService } from './event-bus.service';
 import { TreeStrategy } from './interfaces/tree-strategy.interface';
 import { ConfigService } from './config.service';
-import { TaskTree } from 'src/app/models/taskTree';
+import { TaskTree, getDefaultTree } from 'src/app/models/taskTree';
 import { TreeNodeService } from './tree-node.service';
 import { Task } from 'src/app/models/taskModelManager';
 import { CoreService } from './core.service';
@@ -129,7 +129,7 @@ export class TreeService extends CoreService implements TreeStrategy {
       this.treeSubject.next(taskTree);
       return taskTree;
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -145,24 +145,27 @@ export class TreeService extends CoreService implements TreeStrategy {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error('not logged in');
+        throw new Error('Not logged in');
       }
 
       let tree = await this.cacheService.getTree();
       if (!tree) {
         tree = await this.apiService.getTree(userId);
         if (!tree) {
-          throw new Error('No tree found');
+          // Assume a default tree structure; define it as appropriate for your application
+          const defaultTree = getDefaultTree(); // Example: an empty tree, adjust as necessary
+          this.log('recreating tree');
+          await this.createTree(defaultTree); // Assuming createTree method exists
+          tree = defaultTree;
         }
-
         this.cacheService.updateTree(tree);
-        console.log('tree from api?');
+        console.log('Tree from API?');
       } else {
-        console.log('tree from cache?');
+        console.log('Tree from cache?');
       }
       this.treeSubject.next(tree);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -178,7 +181,7 @@ export class TreeService extends CoreService implements TreeStrategy {
       this.cacheService.updateTree(taskTree);
       this.treeSubject.next(taskTree);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }

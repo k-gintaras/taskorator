@@ -101,7 +101,7 @@ export function getDefaultTask(): Task {
     lastUpdated: new Date(), // Current date and time
     timeEnd: null,
     duration: 0,
-    overlord: '128', // todo is the overlord 128, overlord is overlord 129
+    overlord: ROOT_TASK_ID, // todo is the overlord 128, overlord is overlord 129
     repeat: 'once',
     status: 'active',
     stage: 'todo',
@@ -119,11 +119,11 @@ export function getDefaultTask(): Task {
   return { ...defaultTask };
 }
 
-export const ROOT_TASK_NAME = 'overlord';
+export const ROOT_TASK_ID = '128';
 
 export function getBaseTask(): Task {
   const defaultTask: Task = {
-    taskId: '0',
+    taskId: ROOT_TASK_ID,
     name: 'Me',
     todo: '',
     why: '',
@@ -131,7 +131,7 @@ export function getBaseTask(): Task {
     lastUpdated: new Date(), // Current date and time
     timeEnd: null,
     duration: 0,
-    overlord: ROOT_TASK_NAME, // todo is the overlord 128, overlord is overlord 129
+    overlord: null, // todo is the overlord 128, overlord is overlord 129
     repeat: 'once',
     status: 'active',
     stage: 'todo',

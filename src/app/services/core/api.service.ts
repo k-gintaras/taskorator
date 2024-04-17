@@ -31,6 +31,22 @@ import { TaskTree } from 'src/app/models/taskTree';
 export default class ApiService implements ApiStrategy {
   constructor(private firestore: Firestore) {}
 
+  private getScoreLocation(userId: string) {
+    return `users/${userId}/scores/${userId}`;
+  }
+
+  private getSettingsLocation(userId: string) {
+    return `users/${userId}/settings/${userId}`;
+  }
+
+  private getTasksLocation(userId: string) {
+    return `users/${userId}/tasks`;
+  }
+
+  private getTreeLocation(userId: string) {
+    return `users/${userId}/taskTrees/${userId}`;
+  }
+
   async register(
     userId: string,
     initialTask: Task,
@@ -39,74 +55,127 @@ export default class ApiService implements ApiStrategy {
     score: Score,
     tree: TaskTree
   ): Promise<RegisterUserResult> {
+    const firestore = this.firestore;
     console.log('registering: ' + userId);
     if (!userId) {
       throw new Error('No user id in user credentials @registerUser()');
     }
 
     try {
-      await runTransaction(this.firestore, async (transaction) => {
-        const userTaskCollectionRef = collection(
-          this.firestore,
-          `users/${userId}/tasks`
-        );
+      await runTransaction(firestore, async (transaction) => {
+        const userBaseRef = doc(firestore, `users/${userId}`);
+        const userProfile = {
+          canCreate: false,
+          allowedTemplates: [], // Initially empty, or predefined IDs could be listed here
+          canUseGpt: false,
+          role: 'basic',
+        };
+        transaction.set(userBaseRef, userProfile);
 
-        // Create the initial task with the provided taskId
+        // Handling task creation within the transaction
+        const userTaskCollectionRef = collection(
+          firestore,
+          this.getTasksLocation(userId)
+        );
         const initialTaskDocRef = doc(
           userTaskCollectionRef,
           initialTask.taskId
         );
         transaction.set(initialTaskDocRef, initialTask);
-
-        // // Create additional tasks with unique IDs
-        // additionalTasks.forEach((task) => {
-        //   const taskDocRef = doc(userTaskCollectionRef);
-        //   const newTask = { ...task, taskId: taskDocRef.id };
-        //   transaction.set(taskDocRef, newTask);
-        // });
-
-        // create custom ids, so that it is simpler for cache and first registration
-        // we don't need to wait this service to complete to adjust tree and cache to correct ids
-        // Create additional tasks with their provided taskId
         additionalTasks.forEach((task) => {
           const taskDocRef = doc(userTaskCollectionRef, task.taskId);
           transaction.set(taskDocRef, task);
         });
 
-        const settingsDocRef = doc(
-          this.firestore,
-          `users/${userId}/settings/${userId}`
-        );
+        // Settings, Score, and TaskTree
+        const settingsDocRef = doc(firestore, this.getSettingsLocation(userId));
         transaction.set(settingsDocRef, settings);
-
-        const scoreDocRef = doc(
-          this.firestore,
-          `users/${userId}/scores/${userId}`
-        );
+        const scoreDocRef = doc(firestore, this.getScoreLocation(userId));
         transaction.set(scoreDocRef, score);
-
-        const treeDocRef = doc(
-          this.firestore,
-          `users/${userId}/taskTrees/${userId}`
-        );
+        const treeDocRef = doc(firestore, this.getTreeLocation(userId));
         transaction.set(treeDocRef, tree);
       });
 
-      const result: RegisterUserResult = {
+      return {
         success: true,
         message: 'User registration successful',
         userId: userId,
       };
-      return result;
     } catch (error) {
       console.error('Registration failed:', error);
-      const result: RegisterUserResult = {
+      throw {
         success: false,
         message: 'User registration failed',
       };
-      throw result;
     }
   }
+  // async register(
+  //   userId: string,
+  //   initialTask: Task,
+  //   additionalTasks: Task[],
+  //   settings: Settings,
+  //   score: Score,
+  //   tree: TaskTree
+  // ): Promise<RegisterUserResult> {
+  //   console.log('registering: ' + userId);
+  //   if (!userId) {
+  //     throw new Error('No user id in user credentials @registerUser()');
+  //   }
+
+  //   try {
+  //     await runTransaction(this.firestore, async (transaction) => {
+  //       const userTaskCollectionRef = collection(
+  //         this.firestore,
+  //         `users/${userId}/tasks`
+  //       );
+
+  //       // Create the initial task with the provided taskId
+  //       const initialTaskDocRef = doc(
+  //         userTaskCollectionRef,
+  //         initialTask.taskId
+  //       );
+  //       transaction.set(initialTaskDocRef, initialTask);
+
+  //       // Create additional tasks with their provided taskId
+  //       additionalTasks.forEach((task) => {
+  //         const taskDocRef = doc(userTaskCollectionRef, task.taskId);
+  //         transaction.set(taskDocRef, task);
+  //       });
+
+  //       const settingsDocRef = doc(
+  //         this.firestore,
+  //         `users/${userId}/settings/${userId}`
+  //       );
+  //       transaction.set(settingsDocRef, settings);
+
+  //       const scoreDocRef = doc(
+  //         this.firestore,
+  //         `users/${userId}/scores/${userId}`
+  //       );
+  //       transaction.set(scoreDocRef, score);
+
+  //       const treeDocRef = doc(
+  //         this.firestore,
+  //         `users/${userId}/taskTrees/${userId}`
+  //       );
+  //       transaction.set(treeDocRef, tree);
+  //     });
+
+  //     const result: RegisterUserResult = {
+  //       success: true,
+  //       message: 'User registration successful',
+  //       userId: userId,
+  //     };
+  //     return result;
+  //   } catch (error) {
+  //     console.error('Registration failed:', error);
+  //     const result: RegisterUserResult = {
+  //       success: false,
+  //       message: 'User registration failed',
+  //     };
+  //     throw result;
+  //   }
+  // }
 
   // async createTask(userId: string, task: Task): Promise<Task> {
   //   if (!userId || !task.overlord) {
@@ -255,17 +324,37 @@ export default class ApiService implements ApiStrategy {
     userId: string,
     overlordId: string
   ): Promise<Task[] | undefined> {
+    console.log(
+      'get -> real API overlordId ******************************************'
+    );
+    console.log(
+      `Fetching tasks for overlordId: ${overlordId} and userId: ${userId}`
+    );
+
+    const tasksCollection = collection(this.firestore, `users/${userId}/tasks`);
     const queryConstraint = query(
-      collection(this.firestore, `users/${userId}/tasks`),
+      tasksCollection,
       where('overlord', '==', overlordId)
     );
+
+    console.log(
+      `Executing query on Firestore: users/${userId}/tasks with overlord == ${overlordId}`
+    );
     const querySnapshot = await getDocs(queryConstraint);
+
+    console.log(
+      `Query executed. Found ${querySnapshot.docs.length} documents.`
+    );
     if (!querySnapshot.empty) {
-      return querySnapshot.docs.map(
+      const tasks = querySnapshot.docs.map(
         (doc) => ({ taskId: doc.id, ...doc.data() } as Task)
       );
+      console.log(`Mapped ${tasks.length} tasks from documents.`);
+      return tasks;
+    } else {
+      console.log('No tasks found for the specified overlord ID.');
+      return undefined;
     }
-    return undefined;
   }
 
   /**

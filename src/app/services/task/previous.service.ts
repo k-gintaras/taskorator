@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { lastValueFrom, take } from 'rxjs';
 import { Settings } from 'src/app/models/settings';
 import { TaskService } from './task.service';
+import { ROOT_TASK_ID } from 'src/app/models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -29,9 +30,10 @@ export class PreviousService {
           if (!overlordId) {
             // Assuming `getFirstTaskId` is a method that retrieves the ID of the first task
             try {
-              const firstTaskId: string | undefined =
-                await this.taskService.getLatestTaskId();
-              resolve(firstTaskId);
+              // const firstTaskId: string | undefined =
+              //   await this.taskService.getLatestTaskId();
+              // resolve(firstTaskId);
+              resolve(ROOT_TASK_ID); // just give back root
             } catch (error) {
               console.error('Error retrieving the latest task ID:', error);
               resolve(undefined);

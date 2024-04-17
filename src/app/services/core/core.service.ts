@@ -27,11 +27,19 @@ export class CoreService {
     return this.configService.getErrorHandlingStrategy();
   }
 
-  protected log(message: string): void {
+  protected log(message: unknown): void {
     this.errorHandlingService.log(message);
   }
 
-  protected error(message: string): void {
-    this.errorHandlingService.handleError(message);
+  protected error(message: unknown): void {
+    this.errorHandlingService.error(message);
+  }
+
+  protected feedback(message: string): void {
+    this.errorHandlingService.feedback(message);
+  }
+
+  protected popup(message: string): void {
+    this.errorHandlingService.popup(message);
   }
 }

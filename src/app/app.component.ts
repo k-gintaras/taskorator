@@ -5,6 +5,7 @@ import { TreeService } from './services/core/tree.service';
 import { ScoreService } from './services/core/score.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
 import { ConfigService } from './services/core/config.service';
+import { ErrorService } from './services/core/error.service';
 
 @Component({
   selector: 'app-root',
@@ -16,20 +17,20 @@ export class AppComponent implements OnInit {
   testing = true;
   authenticated = true;
 
-  feedback: FeedbackMessage = { text: '', isError: false }; // Change feedbacks array to a single string variable
+  feedback = ''; // Change feedbacks array to a single string variable
 
   private feedbackSubscription: Subscription;
   // we init services here so their listeners are able to activate when necessary, because these services are kinda updated in background with eventBus
   constructor(
     private serviceInitiator: ServiceInitiatorService,
-    private feedbackService: FeedbackService,
+    private errorService: ErrorService,
     private config: ConfigService
   ) {
-    this.feedbackSubscription = this.feedbackService.feedback$.subscribe(
-      (message) => {
-        this.feedback = message; // Assign the new message to feedback
-      }
-    );
+    this.feedbackSubscription = this.errorService
+      .getFeedback()
+      .subscribe((message) => {
+        if (message) this.feedback = message; // Assign the new message to feedback
+      });
   }
 
   async ngOnInit(): Promise<void> {

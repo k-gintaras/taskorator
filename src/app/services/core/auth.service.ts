@@ -9,9 +9,13 @@ import {
   signInWithPopup,
   getAdditionalUserInfo,
   deleteUser,
+  onAuthStateChanged,
+  User,
 } from '@angular/fire/auth';
 import { RegistrationService } from './registration.service';
 import { deleteDoc, doc } from '@angular/fire/firestore';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Observable } from 'rxjs';
 /**
  * @remarks
  * various ways to login and register with injected `RegistrationService` to help with with creation of data
@@ -20,7 +24,19 @@ import { deleteDoc, doc } from '@angular/fire/firestore';
   providedIn: 'root',
 })
 export class AuthService implements AuthStrategy {
-  constructor(private auth: Auth, private registration: RegistrationService) {}
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+
+  constructor(private auth: Auth, private registration: RegistrationService) {
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+        this.currentUserSubject.next(user);
+        console.log('User is logged in:', user.uid);
+      } else {
+        this.currentUserSubject.next(null);
+        console.log('User is not logged in');
+      }
+    });
+  }
 
   async deleteCurrentUser(): Promise<void> {
     try {
@@ -72,8 +88,12 @@ export class AuthService implements AuthStrategy {
     return user ? user.uid : undefined;
   }
 
+  getCurrentUser(): Observable<User | null> {
+    return this.currentUserSubject.asObservable();
+  }
+
   isAuthenticated(): boolean {
-    return !!this.auth.currentUser;
+    return !!this.currentUserSubject.getValue();
   }
 
   async logOut(): Promise<void> {
@@ -94,27 +114,36 @@ export class AuthService implements AuthStrategy {
   }
 
   async loginWithGoogle(): Promise<{ userId: string; isNewUser: boolean }> {
+    if (this.isAuthenticated()) {
+      console.log('User already logged in, skipping Google sign-in');
+      const currentUser = this.auth.currentUser;
+      if (currentUser) {
+        return { userId: currentUser.uid, isNewUser: false }; // Assume false as they are already logged in
+      }
+      throw new Error('Authentication state inconsistency detected.');
+    }
+
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(this.auth, provider);
       const user = userCredential.user;
 
-      if (user) {
-        const additionalUserInfo = getAdditionalUserInfo(userCredential);
-        const isNewUser = additionalUserInfo?.isNewUser;
-
-        if (isNewUser) {
-          console.log(
-            'Welcome aboard, space cadet! Performing first-time sign-in operations.'
-          );
-          return { userId: user.uid, isNewUser: true };
-        } else {
-          console.log('Welcome back, astronaut! Loading your dashboard.');
-          return { userId: user.uid, isNewUser: false };
-        }
-      } else {
+      if (!user) {
         throw new Error('User not found in the user credential.');
       }
+
+      const additionalUserInfo = getAdditionalUserInfo(userCredential);
+      const isNewUser = additionalUserInfo?.isNewUser ?? false; // Default to false if undefined
+
+      if (isNewUser) {
+        console.log(
+          'Welcome aboard, space cadet! Performing first-time sign-in operations.'
+        );
+      } else {
+        console.log('Welcome back, astronaut! Loading your dashboard.');
+      }
+
+      return { userId: user.uid, isNewUser: isNewUser };
     } catch (error) {
       console.error('Error during sign in with Google:', error);
       throw error;

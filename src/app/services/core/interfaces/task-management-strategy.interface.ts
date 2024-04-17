@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { Task } from 'src/app/models/taskModelManager';
 
 export interface TaskManagementCacheStrategy {
-  createTask(task: Task): Promise<Task>;
+  createTask(task: Task, from: string): Promise<Task>;
   updateTask(task: Task): Promise<void>;
   getTaskById(taskId: string): Promise<Task | undefined>;
   getLatestTaskId(): Promise<string | undefined>;

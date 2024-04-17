@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScoreStrategy } from './interfaces/score-strategy.interface copy';
-import { Score } from 'src/app/models/score';
+import { Score, getDefaultScore } from 'src/app/models/score';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
@@ -27,7 +27,7 @@ export class ScoreService extends CoreService implements ScoreStrategy {
       this.scoreSubject.next(score);
       return score;
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -46,19 +46,24 @@ export class ScoreService extends CoreService implements ScoreStrategy {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error('not logged in');
+        throw new Error('Not logged in');
       }
       let score = await this.cacheService.getScore();
       if (!score) {
         score = await this.apiService.getScore(userId);
         if (!score) {
-          throw new Error('No score found');
+          // Assume a default score; create it as appropriate for your application
+          const defaultScore = getDefaultScore(); // Assuming default score is 0, adjust as necessary
+          this.log('recreating score');
+
+          await this.createScore(defaultScore); // Assuming createScore method exists
+          score = defaultScore;
         }
         this.cacheService.updateScore(score);
       }
       this.scoreSubject.next(score);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }
@@ -73,7 +78,7 @@ export class ScoreService extends CoreService implements ScoreStrategy {
       this.cacheService.updateScore(score);
       this.scoreSubject.next(score);
     } catch (error) {
-      this.errorHandlingService.handleError(error);
+      this.error(error);
       throw error;
     }
   }

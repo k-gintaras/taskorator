@@ -1,9 +1,8 @@
-import { ApiStrategy } from './api-strategy.interface';
-import { CacheStrategy } from './cache-strategy.interface';
-
+import { Observable } from 'rxjs';
 export interface AuthStrategy {
   isAuthenticated(): boolean;
   getCurrentUserId(): Promise<string | undefined>;
+  getCurrentUser(): Observable<unknown | undefined>; // firebase User or whatever... for now unknown...
   logOut(): Promise<void>;
   deleteCurrentUser(): void;
 

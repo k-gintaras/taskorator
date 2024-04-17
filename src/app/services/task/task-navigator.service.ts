@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { TaskService } from './task.service';
-import { Task } from 'src/app/models/taskModelManager';
+import { ROOT_TASK_ID, Task } from 'src/app/models/taskModelManager';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { EventBusService } from '../core/event-bus.service';
 import { CoreService } from '../core/core.service';
 import { ConfigService } from '../core/config.service';
+import { Settings } from 'src/app/models/settings';
+import { PreviousService } from './previous.service';
+import { ActivatedRoute } from '@angular/router';
 
 export interface TaskNavigationView {
   taskOverlord: Task;
@@ -21,6 +24,7 @@ export class TaskNavigatorService extends CoreService {
   constructor(
     private taskService: TaskService,
     private eventBusService: EventBusService,
+    private previousService: PreviousService,
     configService: ConfigService
   ) {
     super(configService);
@@ -42,13 +46,34 @@ export class TaskNavigatorService extends CoreService {
     });
   }
 
+  async getPreviousTaskId(
+    settings: Settings,
+    route: ActivatedRoute
+  ): Promise<string> {
+    if (!settings) {
+      this.error('Settings are required to initialize tasks.');
+      return ROOT_TASK_ID;
+    }
+    const overlordId = await this.previousService.getPreviousOverlordId(
+      route,
+      settings
+    );
+    if (!overlordId) {
+      return ROOT_TASK_ID;
+    }
+    return overlordId;
+  }
+
   async loadTaskNavigationView(overlordId: string): Promise<void> {
-    const overlord = await this.taskService.getTaskById(overlordId);
+    const overlord: Task | undefined = await this.taskService.getTaskById(
+      overlordId
+    );
     if (overlord) {
-      const children = await this.taskService.getOverlordChildren(overlordId);
+      const children: Task[] | undefined =
+        await this.taskService.getOverlordChildren(overlordId);
       this.setTaskNavigationView(overlord, children || []);
     } else {
-      console.log('no overlord?');
+      this.error('No overlord found.');
     }
   }
 
@@ -56,17 +81,13 @@ export class TaskNavigatorService extends CoreService {
     const currentView = this.taskNavigationViewSubject.value;
     if (currentView) {
       if (task.overlord === currentView.taskOverlord.taskId) {
-        // The created task belongs to the current task overlord
         const updatedChildren = [...currentView.taskChildren, task];
         this.setTaskNavigationView(currentView.taskOverlord, updatedChildren);
       } else {
-        // The created task belongs to a different overlord
-        // Check if the current view needs to be updated
         if (!task.overlord)
           throw new Error("Can't check overlord null @handleTaskCreated");
         const overlord = await this.taskService.getTaskById(task.overlord);
         if (overlord && overlord.overlord === currentView.taskOverlord.taskId) {
-          // The created task's overlord is a child of the current view's overlord
           const updatedChildren = [...currentView.taskChildren];
           const index = updatedChildren.findIndex(
             (child) => child.taskId === overlord.taskId
@@ -92,13 +113,10 @@ export class TaskNavigatorService extends CoreService {
         );
         this.setTaskNavigationView(currentView.taskOverlord, updatedChildren);
       } else {
-        // The updated task has a new overlord
-        // Remove the task from the current view's children
         const updatedChildren = currentView.taskChildren.filter(
           (child) => child.taskId !== task.taskId
         );
         this.setTaskNavigationView(currentView.taskOverlord, updatedChildren);
-        // Check if the new overlord is a child of the current view's overlord
         if (!task.overlord)
           throw new Error("Can't check overlord null @handleTaskUpdated");
         const overlord = await this.taskService.getTaskById(task.overlord);
@@ -132,11 +150,10 @@ export class TaskNavigatorService extends CoreService {
 
   async previous(task: Task): Promise<void> {
     if (!task.overlord) {
-      console.error('No overlord found for the task.');
+      this.error('No overlord found for the task.');
       return;
     }
 
-    console.log('get boss of: ' + task.name);
     const superOverlord = await this.taskService.getSuperOverlord(
       task.overlord
     );
@@ -146,23 +163,22 @@ export class TaskNavigatorService extends CoreService {
       );
       if (tasks) this.setTaskNavigationView(superOverlord, tasks);
     } else {
-      console.error('No super overlord found for the task.');
+      this.error('No super overlord found for the task.');
     }
   }
 
   async back(task: Task): Promise<void> {
     if (!task.overlord) {
-      console.error('No overlord found for the task.');
+      this.error('No overlord found for the task.');
       return;
     }
 
-    // console.log('get boss of: ' + task.name);
     const superOverlord = await this.taskService.getSuperOverlord(task.taskId);
     if (superOverlord) {
       const tasks = await this.taskService.getOverlordChildren(task.overlord);
       if (tasks) this.setTaskNavigationView(superOverlord, tasks);
     } else {
-      console.error('No super overlord found for the task.');
+      this.error('No super overlord found for the task.');
     }
   }
 
@@ -173,9 +189,9 @@ export class TaskNavigatorService extends CoreService {
   }
 
   setTaskNavigationView(taskOverlord: Task, taskChildren: Task[]): void {
-    console.log('Setting new view: ');
-    console.log(taskOverlord);
-    console.log(taskChildren);
+    this.log('Setting new view:');
+    this.log(taskOverlord);
+    this.log(taskChildren);
     const view: TaskNavigationView = {
       taskOverlord,
       taskChildren,

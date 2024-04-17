@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { UserCredential } from 'firebase/auth';
 // import ApiService from './api.service';
 import {
+  ROOT_TASK_ID,
   Task,
   getBaseTask,
   getDefaultTask,
@@ -72,9 +73,11 @@ export class RegistrationService extends CoreService {
           registrationResult.success
         );
 
-        await this.cacheService.createTask(initialTask);
+        await this.cacheService.createTask(initialTask, 'registerUserById');
         await Promise.all(
-          additionalTasks.map((task) => this.cacheService.createTask(task))
+          additionalTasks.map((task) =>
+            this.cacheService.createTask(task, 'registerUserById')
+          )
         );
         await this.cacheService.createSettings(settings);
         await this.cacheService.createScore(score);
@@ -93,7 +96,7 @@ export class RegistrationService extends CoreService {
 
   private getInitialTask(): Task {
     const task = getBaseTask();
-    task.taskId = '128';
+    task.taskId = ROOT_TASK_ID;
     return task;
   }
 
@@ -148,44 +151,44 @@ export class RegistrationService extends CoreService {
   //   this.registerUserById(userId);
   // }
 
-  async registerUserById1(userId: string) {
-    // TODO: pass this to api new method, to register as transaction
-    // decide how we get default objects and where from
-    // do we pass
-    // do we get from api ?
-    // pass... less rewriting, easier to change stuff later depending on "premoiun, not premium for example..."
-    console.log('registering: ' + userId);
-    if (!userId) {
-      throw new Error('No user id in user credentials @registerUser()');
-    }
+  // async registerUserById1(userId: string) {
+  //   // TODO: pass this to api new method, to register as transaction
+  //   // decide how we get default objects and where from
+  //   // do we pass
+  //   // do we get from api ?
+  //   // pass... less rewriting, easier to change stuff later depending on "premoiun, not premium for example..."
+  //   console.log('registering: ' + userId);
+  //   if (!userId) {
+  //     throw new Error('No user id in user credentials @registerUser()');
+  //   }
 
-    //TODO: initial task will be received with the whole thing
-    // because without other stuff, it is worthless
+  //   //TODO: initial task will be received with the whole thing
+  //   // because without other stuff, it is worthless
 
-    const initialTask = await this.createInitialTask(userId);
-    const additionalTasks = await this.createAdditionalTasks(
-      userId,
-      initialTask
-    );
-    const settings = await this.createSettings(userId, initialTask.taskId);
-    const score = await this.createScore(userId);
-    const tree = await this.createTree(userId, initialTask);
+  //   const initialTask = await this.createInitialTask(userId);
+  //   const additionalTasks = await this.createAdditionalTasks(
+  //     userId,
+  //     initialTask
+  //   );
+  //   const settings = await this.createSettings(userId, initialTask.taskId);
+  //   const score = await this.createScore(userId);
+  //   const tree = await this.createTree(userId, initialTask);
 
-    await this.cacheService.createTask(initialTask);
-    await Promise.all(
-      additionalTasks.map((task) => this.cacheService.createTask(task))
-    );
-    await this.cacheService.createSettings(settings);
-    await this.cacheService.createScore(score);
-    await this.cacheService.createTree(tree);
-  }
+  //   await this.cacheService.createTask(initialTask);
+  //   await Promise.all(
+  //     additionalTasks.map((task) => this.cacheService.createTask(task))
+  //   );
+  //   await this.cacheService.createSettings(settings);
+  //   await this.cacheService.createScore(score);
+  //   await this.cacheService.createTree(tree);
+  // }
 
   private async createInitialTask(userId: string): Promise<Task> {
     const apiService = this.configService.getApiStrategy();
     const task = await apiService.createTaskWithCustomId(
       userId,
       getBaseTask(),
-      '128'
+      ROOT_TASK_ID
     );
 
     if (!task) {

@@ -63,6 +63,9 @@ export class TaskNavigatorComponent implements OnInit {
               console.log('could not load previous task');
             }
           });
+      } else {
+        console.log('NO SETTINGS _>>>>>>>>>>>>>>>>>>>');
+        // no settings so what are we loading?
       }
     });
 
@@ -74,6 +77,7 @@ export class TaskNavigatorComponent implements OnInit {
 
     this.taskNavigatorService.getTaskNavigationView().subscribe((view) => {
       if (view) {
+        console.log('init view: ');
         this.selectedOverlord = view.taskOverlord;
         this.tasks = view.taskChildren;
         this.setNewFiltered(this.tasks);
@@ -83,6 +87,18 @@ export class TaskNavigatorComponent implements OnInit {
         console.log(this.selectedOverlord);
       }
     });
+  }
+
+  testCacheTasks() {
+    this.config
+      .getCacheStrategy()
+      .getOverlordChildren('128')
+      .then((result) => {
+        console.log(
+          'TASKS *""""""""""""""""""""""""""""""""""""""""""""""""""""'
+        );
+        console.log(result);
+      });
   }
 
   private async loadTaskNavigationView(overlordId: string) {

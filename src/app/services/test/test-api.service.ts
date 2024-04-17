@@ -11,6 +11,11 @@ import { RegisterUserResult } from '../core/interfaces/register-user';
   providedIn: 'root',
 })
 export class TestApiService implements ApiStrategy {
+  private tasks: Task[] = [];
+  // private taskTree: TaskTree | null = null;
+  // private settings: Settings | null = null;
+  // private score: Score | null = null;
+
   async register(
     userId: string,
     initialTask: Task,
@@ -19,6 +24,7 @@ export class TestApiService implements ApiStrategy {
     score: Score,
     tree: TaskTree
   ): Promise<RegisterUserResult> {
+    this.tasks = [];
     console.log('additionalTasks--------------------');
     console.log(additionalTasks);
 
@@ -39,15 +45,13 @@ export class TestApiService implements ApiStrategy {
     return result;
   }
 
-  private tasks: Task[] = [];
-  // private taskTree: TaskTree | null = null;
-  // private settings: Settings | null = null;
-  // private score: Score | null = null;
-
   async createTask(userId: string, task: Task): Promise<Task> {
     console.log('API TASKS');
     console.log(this.tasks);
-    const newTask = { ...task, taskId: this.generateTaskId() };
+    const newTask = {
+      ...task,
+      taskId: task.taskId !== '0' ? task.taskId : this.generateTaskId(),
+    };
     this.tasks.push(newTask);
     return newTask;
   }
@@ -104,6 +108,9 @@ export class TestApiService implements ApiStrategy {
     overlordId: string
   ): Promise<Task[] | undefined> {
     const children = this.tasks.filter((t) => t.overlord === overlordId);
+
+    console.log('children GGGGGGGGGGGGGGGGGGGGG');
+    console.log(children);
     return children;
   }
 
