@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ScoreStrategy } from './interfaces/score-strategy.interface copy';
+import { ScoreStrategy } from '../../models/service-strategies/score-strategy.interface copy';
 import { Score, getDefaultScore } from 'src/app/models/score';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';

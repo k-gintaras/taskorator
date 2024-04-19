@@ -1,20 +1,11 @@
-import {
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  CanActivateFn,
-  UrlTree,
-  CanActivateChildFn,
-} from '@angular/router';
+import { CanActivateFn, UrlTree, CanActivateChildFn } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 
-export const canActivate: CanActivateFn = (
-  route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
-): Observable<boolean | UrlTree> => {
+export const canActivate: CanActivateFn = (): Observable<boolean | UrlTree> => {
   const authService = inject(AuthService);
   const router = inject(Router);
 

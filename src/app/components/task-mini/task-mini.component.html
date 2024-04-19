@@ -1,21 +1,3 @@
-<!-- <div class="task-card" (click)="onTaskSelection()">
-  <div class="task-header">
-    <span class="task-name">{{ task?.name }}</span>
-    <span class="task-info">
-      | of: {{ overlord?.name }} | {{ task?.priority }}</span
-    ><br />
-    <span class="task-details">{{ task?.todo }}</span>
-    <span class="task-details">{{ task?.why }}</span>
-  </div>
-  <div class="task-content">
-    <ng-container *ngIf="onButtonClick">
-      <button mat-raised-button color="accent" (click)="doTask($event, task)">
-        {{ actionName }}
-      </button>
-    </ng-container>
-  </div>
-</div> -->
-
 <div
   [style.borderColor]="getStatusColor()"
   class="task-card"
@@ -37,3 +19,29 @@
     </ng-container>
   </div>
 </div>
+
+<!-- possible fix -->
+
+<!-- <div
+  [style.borderColor]="getStatusColor()"
+  class="task-card"
+  role="button" tabindex="0"
+  (click)="onTaskSelection()"
+  (keyup.enter)="onTaskSelection()"
+>
+  <div class="task-header">
+    <span class="task-name">{{ task?.name }}</span>
+    <span class="small-text"> | {{ task?.todo }} | {{ task?.priority }}</span>
+  </div>
+  <div class="task-content">
+    <span class="small-text task-details">
+      {{ task?.todo }}
+    </span>
+    <span class="small-text task-details">{{ task?.why }}</span>
+    <ng-container *ngIf="onButtonClick">
+      <button mat-raised-button color="accent" (click)="doTask($event, task)" (keyup.enter)="doTask($event, task)">
+        {{ actionName }}
+      </button>
+    </ng-container>
+  </div>
+</div> -->

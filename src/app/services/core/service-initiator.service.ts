@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { ScoreService } from './score.service';
 import { TreeService } from './tree.service';
-import { ApiStrategy } from './interfaces/api-strategy.interface';
-import { AuthStrategy } from './interfaces/auth-strategy.interface';
-import { CacheStrategy } from './interfaces/cache-strategy.interface';
-import { TestApiService } from '../test/test-api.service';
-import { TestAuthService } from '../test/test-auth.service';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
+// import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
+import { TestApiService } from '../test-services/test-api.service';
+import { TestAuthService } from '../test-services/test-auth.service';
 import { AuthService } from './auth.service';
 import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
 import ApiService from './api.service';
 import { ConfigService } from './config.service';
-import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
+import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +46,7 @@ export class ServiceInitiatorService {
     let apiService: ApiStrategy = this.apiService;
     let authService: AuthStrategy = this.authService;
     const errorService: ErrorHandlingStrategy = this.errorService;
+    // TODO: allow different caching?
     const cacheService = this.cacheService;
 
     if (this.configService.isTesting()) {

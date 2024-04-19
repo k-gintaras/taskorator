@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ConfigService } from './config.service';
-import { ApiStrategy } from './interfaces/api-strategy.interface';
-import { AuthStrategy } from './interfaces/auth-strategy.interface';
-import { CacheStrategy } from './interfaces/cache-strategy.interface';
-import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
+import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
+import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
 
 @Injectable({
   providedIn: 'root',

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthStrategy } from './interfaces/auth-strategy.interface';
+import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
 import {
   Auth,
   signInWithEmailAndPassword,
@@ -13,7 +13,6 @@ import {
   User,
 } from '@angular/fire/auth';
 import { RegistrationService } from './registration.service';
-import { deleteDoc, doc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Observable } from 'rxjs';
 /**
@@ -105,10 +104,12 @@ export class AuthService implements AuthStrategy {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async sendSignInLinkToEmail(email: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async confirmSignInWithEmail(url: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -149,29 +150,6 @@ export class AuthService implements AuthStrategy {
       throw error;
     }
   }
-
-  // async loginWithGoogle(): Promise<void> {
-  //   try {
-  //     const provider = new GoogleAuthProvider();
-  //     const user = await signInWithPopup(this.auth, provider);
-
-  //     // Use getAdditionalUserInfo to check for new user
-  //     const additionalUserInfo = getAdditionalUserInfo(user);
-  //     const isNewUser = additionalUserInfo?.isNewUser;
-
-  //     if (isNewUser) {
-  //       console.log(
-  //         'Welcome aboard, space cadet! Performing first-time sign-in operations.'
-  //       );
-  //       this.registration.registerUser(user);
-  //     } else {
-  //       console.log('Welcome back, astronaut! Loading your dashboard.');
-  //       // Handle returning user logic
-  //     }
-  //   } catch (error) {
-  //     console.error('Error during sign in with Google:', error);
-  //   }
-  // }
 
   loginWithYahoo(): Promise<unknown> {
     throw new Error('Method not implemented.');

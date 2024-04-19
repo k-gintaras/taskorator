@@ -1,6 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { Component, Input } from '@angular/core';
-import { LocalService } from 'src/app/services/local.service';
-import { TaskObjectHelperService } from 'src/app/services/task-object-helper.service';
 import { completeButtonColorMap } from 'src/app/models/colors';
 import { Task } from 'src/app/models/taskModelManager';
 

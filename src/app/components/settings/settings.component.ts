@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { SettingsService } from 'src/app/services/settings.service';
+import { SettingsService } from 'src/app/services/core/settings.service';
 import { completeButtonColorMap } from 'src/app/models/colors';
 import { CompleteButtonAction, Settings } from 'src/app/models/settings';
 
@@ -41,6 +41,7 @@ export class SettingsComponent implements OnInit {
     // this.loadCurrentSettings();
 
     // Subscribe to form value changes with additional logic to prevent loop
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.settingsForm.valueChanges.subscribe((newFormValues) => {
       // Only save settings if we're not initializing the form
       if (!this.isInitializingForm) {
@@ -51,20 +52,23 @@ export class SettingsComponent implements OnInit {
 
   private loadCurrentSettings(): void {
     this.settingsService.getSettings().subscribe((currentSettings) => {
-      // Before patching the form, ensure we're in initialization mode
-      this.isInitializingForm = true;
+      if (currentSettings) {
+        // Before patching the form, ensure we're in initialization mode
+        this.isInitializingForm = true;
 
-      // Populate form with current settings
-      this.settingsForm.patchValue(currentSettings);
+        // Populate form with current settings
+        this.settingsForm.patchValue(currentSettings);
 
-      // After the form is patched, we're no longer initializing
-      setTimeout(() => (this.isInitializingForm = false), 0);
+        // After the form is patched, we're no longer initializing
+        setTimeout(() => (this.isInitializingForm = false), 0);
 
-      // Store currentSettings for later use in merging
-      this.currentSettings = currentSettings;
+        // Store currentSettings for later use in merging
+        this.currentSettings = currentSettings;
+      }
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private saveSettings(newFormValues: any): void {
     const newSettings: Settings = {
       ...this.currentSettings,
@@ -72,7 +76,7 @@ export class SettingsComponent implements OnInit {
     };
 
     // Save the new, merged settings
-    this.settingsService.saveSettings(newSettings);
+    this.settingsService.updateSettings(newSettings);
   }
 
   // Add to your existing form or component class

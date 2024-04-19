@@ -1,0 +1,61 @@
+<mat-card>
+  <mat-card-content>
+    <mat-card class="task-card">
+      <div class="task-content">
+        <h1>
+          <b>{{ selectedOverlord?.name }}</b>
+        </h1>
+        <app-add-move-task
+          style="margin: 10px"
+          [overlord]="selectedOverlord"
+        ></app-add-move-task>
+      </div>
+    </mat-card>
+    <div *ngIf="tasks?.length === 0" class="task-container">
+      <mat-card class="task-card">
+        <mat-card-content class="task-content">
+          <button mat-icon-button (click)="goBack(selectedOverlord)">
+            <mat-icon aria-label="Back">arrow_back</mat-icon>
+          </button>
+          <p>No tasks yet.</p>
+        </mat-card-content></mat-card
+      >
+    </div>
+    <div *ngFor="let task of tasks" class="task-container">
+      <mat-card class="task-card" [class.selected-task]="isSelected(task)">
+        <mat-card-content class="task-content">
+          <button mat-icon-button (click)="onPrevious(task)">
+            <mat-icon aria-label="Back">arrow_back</mat-icon>
+          </button>
+          <button mat-icon-button (click)="promote(task)">
+            <mat-icon aria-label="Go in">arrow_upward</mat-icon>
+          </button>
+          <app-task-mini
+            (click)="onTaskCardClick(task)"
+            class="task-mini"
+            [task]="task"
+            [overlord]="getOverlord(task)"
+          ></app-task-mini>
+          <button
+            mat-icon-button
+            (click)="complete(task)"
+            style="background-color: white"
+            [style.color]="getColorBySetting()"
+          >
+            <mat-icon aria-label="Complete">check_circle</mat-icon>
+          </button>
+
+          <button mat-icon-button (click)="addChild(task)">
+            <mat-icon aria-label="Go in">add</mat-icon>
+          </button>
+          <button mat-icon-button (click)="demote(task)">
+            <mat-icon aria-label="Go in">arrow_downward</mat-icon>
+          </button>
+          <button mat-icon-button (click)="onNext(task)">
+            <mat-icon aria-label="Go in">arrow_forward</mat-icon>
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-card-content>
+</mat-card>

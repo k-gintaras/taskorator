@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiStrategy } from './interfaces/api-strategy.interface';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import {
   Firestore,
   collection,
@@ -15,7 +15,7 @@ import {
   getDocs,
   runTransaction,
 } from '@angular/fire/firestore';
-import { RegisterUserResult } from './interfaces/register-user';
+import { RegisterUserResult } from '../../models/service-strategies/register-user';
 import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 import { Settings } from 'src/app/models/settings';
 import { Score } from 'src/app/models/score';
@@ -109,89 +109,6 @@ export default class ApiService implements ApiStrategy {
       };
     }
   }
-  // async register(
-  //   userId: string,
-  //   initialTask: Task,
-  //   additionalTasks: Task[],
-  //   settings: Settings,
-  //   score: Score,
-  //   tree: TaskTree
-  // ): Promise<RegisterUserResult> {
-  //   console.log('registering: ' + userId);
-  //   if (!userId) {
-  //     throw new Error('No user id in user credentials @registerUser()');
-  //   }
-
-  //   try {
-  //     await runTransaction(this.firestore, async (transaction) => {
-  //       const userTaskCollectionRef = collection(
-  //         this.firestore,
-  //         `users/${userId}/tasks`
-  //       );
-
-  //       // Create the initial task with the provided taskId
-  //       const initialTaskDocRef = doc(
-  //         userTaskCollectionRef,
-  //         initialTask.taskId
-  //       );
-  //       transaction.set(initialTaskDocRef, initialTask);
-
-  //       // Create additional tasks with their provided taskId
-  //       additionalTasks.forEach((task) => {
-  //         const taskDocRef = doc(userTaskCollectionRef, task.taskId);
-  //         transaction.set(taskDocRef, task);
-  //       });
-
-  //       const settingsDocRef = doc(
-  //         this.firestore,
-  //         `users/${userId}/settings/${userId}`
-  //       );
-  //       transaction.set(settingsDocRef, settings);
-
-  //       const scoreDocRef = doc(
-  //         this.firestore,
-  //         `users/${userId}/scores/${userId}`
-  //       );
-  //       transaction.set(scoreDocRef, score);
-
-  //       const treeDocRef = doc(
-  //         this.firestore,
-  //         `users/${userId}/taskTrees/${userId}`
-  //       );
-  //       transaction.set(treeDocRef, tree);
-  //     });
-
-  //     const result: RegisterUserResult = {
-  //       success: true,
-  //       message: 'User registration successful',
-  //       userId: userId,
-  //     };
-  //     return result;
-  //   } catch (error) {
-  //     console.error('Registration failed:', error);
-  //     const result: RegisterUserResult = {
-  //       success: false,
-  //       message: 'User registration failed',
-  //     };
-  //     throw result;
-  //   }
-  // }
-
-  // async createTask(userId: string, task: Task): Promise<Task> {
-  //   if (!userId || !task.overlord) {
-  //     throw new Error(
-  //       !userId ? 'User not authenticated' : 'Missing task overlord'
-  //     );
-  //   }
-
-  //   const userTasksCollectionRef = collection(
-  //     this.firestore,
-  //     `users/${userId}/tasks`
-  //   );
-  //   const docRef = await addDoc(userTasksCollectionRef, task);
-  //   const newTask = { ...task, taskId: docRef.id };
-  //   return newTask;
-  // }
 
   async createTask(userId: string, task: Task): Promise<Task> {
     if (!task.overlord) {
@@ -423,48 +340,6 @@ export default class ApiService implements ApiStrategy {
     }
   }
 
-  // async updateTree(userId: string, taskTree: TaskTree): Promise<void> {
-  //   const treeDocRef = doc(this.firestore, `users/${userId}/tree`);
-  //   try {
-  //     const taskTreeData = JSON.parse(JSON.stringify(taskTree));
-  //     await updateDoc(treeDocRef, taskTreeData);
-  //   } catch (error) {
-  //     console.error('Failed to update tree:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // async createTree(
-  //   userId: string,
-  //   taskTree: TaskTree
-  // ): Promise<TaskTree | null> {
-  //   const treeDocRef = doc(this.firestore, `users/${userId}/tree`);
-  //   try {
-  //     const taskTreeData = JSON.parse(JSON.stringify(taskTree)); // Convert TaskTree to a plain object
-  //     await setDoc(treeDocRef, taskTreeData);
-  //     return taskTree; // Assuming taskTree does not need the Firestore-generated ID
-  //   } catch (error) {
-  //     console.error('Failed to create tree:', error);
-  //     return null;
-  //   }
-  // }
-
-  // async getTree(userId: string): Promise<TaskTree | null> {
-  //   const treeDocRef = doc(this.firestore, `users/${userId}/tree`);
-  //   try {
-  //     const docSnap = await getDoc(treeDocRef);
-  //     if (docSnap.exists()) {
-  //       const data = docSnap.data();
-  //       return JSON.parse(JSON.stringify(data)); // Assuming direct conversion is sufficient
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to get tree:', error);
-  //     return null;
-  //   }
-  // }
-
   async createTree(
     userId: string,
     taskTree: TaskTree
@@ -513,48 +388,6 @@ export default class ApiService implements ApiStrategy {
       return null;
     }
   }
-
-  // async createSettings(
-  //   userId: string,
-  //   settings: Settings
-  // ): Promise<Settings | null> {
-  //   const settingsDocRef = doc(this.firestore, `users/${userId}/settings`);
-  //   try {
-  //     const settingsData = JSON.parse(JSON.stringify(settings)); // Convert Settings to a plain object
-  //     await setDoc(settingsDocRef, settingsData);
-  //     return settings;
-  //   } catch (error) {
-  //     console.error('Failed to create settings:', error);
-  //     return null;
-  //   }
-  // }
-
-  // async getSettings(userId: string): Promise<Settings | null> {
-  //   const settingsDocRef = doc(this.firestore, `users/${userId}/settings`);
-  //   try {
-  //     const docSnap = await getDoc(settingsDocRef);
-  //     if (docSnap.exists()) {
-  //       const data = docSnap.data();
-  //       return JSON.parse(JSON.stringify(data)); // Convert Firestore data to Settings object
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to get settings:', error);
-  //     return null;
-  //   }
-  // }
-
-  // async updateSettings(userId: string, settings: Settings): Promise<void> {
-  //   const settingsDocRef = doc(this.firestore, `users/${userId}/settings`);
-  //   try {
-  //     const settingsData = JSON.parse(JSON.stringify(settings)); // Convert Settings to a plain object for update
-  //     await updateDoc(settingsDocRef, settingsData);
-  //   } catch (error) {
-  //     console.error('Failed to update settings:', error);
-  //     throw error;
-  //   }
-  // }
 
   async createSettings(
     userId: string,
@@ -607,43 +440,6 @@ export default class ApiService implements ApiStrategy {
     }
   }
 
-  // async createScore(userId: string, score: Score): Promise<Score | null> {
-  //   const scoreDocRef = doc(this.firestore, `users/${userId}/score`);
-  //   try {
-  //     const scoreData = JSON.parse(JSON.stringify(score)); // Convert Score to a plain object
-  //     await setDoc(scoreDocRef, scoreData);
-  //     return score;
-  //   } catch (error) {
-  //     console.error('Failed to create score:', error);
-  //     return null;
-  //   }
-  // }
-
-  // async getScore(userId: string): Promise<Score | null> {
-  //   const scoreDocRef = doc(this.firestore, `users/${userId}/score`);
-  //   try {
-  //     const docSnap = await getDoc(scoreDocRef);
-  //     if (docSnap.exists()) {
-  //       const data = docSnap.data();
-  //       return JSON.parse(JSON.stringify(data)); // Convert Firestore data to Score object
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to get score:', error);
-  //     return null;
-  //   }
-  // }
-
-  // async updateScore(userId: string, score: Score): Promise<void> {
-  //   const scoreDocRef = doc(this.firestore, `users/${userId}/score`);
-  //   try {
-  //     const scoreData = JSON.parse(JSON.stringify(score)); // Convert Score to a plain object for update
-  //     await updateDoc(scoreDocRef, scoreData);
-  //   } catch (error) {
-  //     console.error('Failed to update score:', error);
-  //     throw error;
-  //   }
   async createScore(userId: string, score: Score): Promise<Score | null> {
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {

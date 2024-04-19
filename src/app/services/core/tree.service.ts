@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { EventBusService } from './event-bus.service';
-import { TreeStrategy } from './interfaces/tree-strategy.interface';
+import { TreeStrategy } from '../../models/service-strategies/tree-strategy.interface';
 import { ConfigService } from './config.service';
 import { TaskTree, getDefaultTree } from 'src/app/models/taskTree';
 import { TreeNodeService } from './tree-node.service';
@@ -159,9 +159,6 @@ export class TreeService extends CoreService implements TreeStrategy {
           tree = defaultTree;
         }
         this.cacheService.updateTree(tree);
-        console.log('Tree from API?');
-      } else {
-        console.log('Tree from cache?');
       }
       this.treeSubject.next(tree);
     } catch (error) {

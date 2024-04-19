@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ConfigStrategy } from './interfaces/strategy-config.interface';
+import { ConfigStrategy } from '../../models/service-strategies/strategy-config.interface';
 import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
-import { TestAuthService } from '../test/test-auth.service';
-import { TestApiService } from '../test/test-api.service';
-import { AuthStrategy } from './interfaces/auth-strategy.interface';
-import { ApiStrategy } from './interfaces/api-strategy.interface';
-import { CacheStrategy } from './interfaces/cache-strategy.interface';
-import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
+import { TestAuthService } from '../test-services/test-auth.service';
+import { TestApiService } from '../test-services/test-api.service';
+import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
+import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigService implements ConfigStrategy {
   private repairTreeEnabled = true;
-  private testing = true;
+  private testing = false;
 
   private apiService: ApiStrategy | undefined;
   private authService: AuthStrategy | undefined;

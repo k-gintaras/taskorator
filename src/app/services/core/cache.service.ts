@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
-import { CacheStrategy } from './interfaces/cache-strategy.interface';
+import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
 import { Score } from 'src/app/models/score';
 import { Settings } from 'src/app/models/settings';
 import { Task } from 'src/app/models/taskModelManager';
@@ -141,13 +141,6 @@ export class CacheService implements CacheStrategy {
       resolve(task);
     });
   }
-
-  // createTask(task: Task): Promise<Task> {
-  //   return new Promise((resolve) => {
-  //     this.addCacheTask(task);
-  //     resolve(task);
-  //   });
-  // }
 
   updateTask(task: Task): Promise<void> {
     return new Promise((resolve) => {

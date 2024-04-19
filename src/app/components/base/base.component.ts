@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { PopupComponent } from '../popup/popup.component';
+// import { PopupComponent } from '../popup/popup.component';
 import { ErrorService } from 'src/app/services/core/error.service';
 @Component({
   selector: 'app-base',

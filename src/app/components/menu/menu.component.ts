@@ -8,7 +8,7 @@ import { Component, ViewChild } from '@angular/core';
 export class MenuComponent {
   activeDrawer: string | undefined;
   @ViewChild('drawer') drawer: { toggle: () => void } | undefined;
-  isDrawerOpen: boolean = false;
+  isDrawerOpen = false;
 
   // toggleDrawer(type: string) {
   //   this.activeDrawer = type;

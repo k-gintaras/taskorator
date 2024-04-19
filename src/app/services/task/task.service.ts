@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '../core/config.service';
 import { CoreService } from '../core/core.service';
 import { EventBusService } from '../core/event-bus.service';
-import { TaskManagementStrategy } from '../core/interfaces/task-management-strategy.interface';
+import { TaskManagementStrategy } from '../../models/service-strategies/task-management-strategy.interface';
 import { TaskValidatorService } from '../core/task-validator.service';
 
 @Injectable({
@@ -136,32 +136,6 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
     }
   }
 
-  // async getTaskById(taskId: string): Promise<Task | undefined> {
-  //   try {
-  //     const userId = await this.getUserId();
-  //     if (userId) {
-  //       let task = await this.cacheService.getTaskById(taskId);
-  //       if (!task) {
-  //         task = await this.apiService.getTaskById(userId, taskId);
-  //         if (task) {
-  //           await this.cacheService.createTask(task);
-  //         }
-  //       }
-  //       if (task) {
-  //         this.eventBusService.getTaskById(task);
-  //         this.log(`Task with ID ${taskId} retrieved successfully`);
-  //       } else {
-  //         this.log(`Task with ID ${taskId} not found`);
-  //       }
-  //       return task;
-  //     }
-  //     return undefined;
-  //   } catch (error) {
-  //     this.handleError(error);
-  //     throw error;
-  //   }
-  // }
-
   async getLatestTaskId(): Promise<string | undefined> {
     try {
       const userId = await this.getUserId();
@@ -231,13 +205,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
             this.log(
               `Retrieved ${tasks.length} tasks from API for task ID ${taskId}`
             );
-            console.log(
-              'received mental amount of tasks maybe crist UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU'
-            );
-            console.log(tasks);
             await this.cacheService.createTasks(tasks);
-            console.log('jesus crist aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-            console.log(tasks);
           }
         }
         if (tasks) {
@@ -251,8 +219,6 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
           );
         }
 
-        console.log('jesus crist PPPPPPPPPPPPPPPPPPPPP');
-        console.log(tasks);
         return tasks;
       }
       return undefined;

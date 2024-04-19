@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ErrorHandlingStrategy } from './interfaces/error-handling-strategy.interface';
+import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, Observable } from 'rxjs';
 

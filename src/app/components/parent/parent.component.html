@@ -1,11 +1,4 @@
-<!-- <p>Overlord ID: {{ selectedOverlordId }}</p> -->
 <app-menu></app-menu>
-
-<!-- <div *ngIf="settingsService.getSettings() | async as settings">
-  Show Archived: {{ settings.isShowArchived }} Show Completed:
-  {{ settings.isShowCompleted }} Complete Button Action:
-  {{ settings.completeButtonAction }}
-</div> -->
 <div class="selectedTasks">
   <div class="selectedTask" *ngFor="let t of selectedTasks">
     <button (click)="removeTask(t)" mat-button class="taskName">
@@ -14,4 +7,4 @@
   </div>
 </div>
 
-<app-task-browser></app-task-browser>
+<app-task-navigator></app-task-navigator>

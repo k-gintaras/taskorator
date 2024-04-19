@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { FeedbackService } from 'src/app/services/feedback.service';
-import { SelectedMultipleService } from 'src/app/services/selected-multiple.service';
 import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
 import { TaskService } from 'src/app/services/task/task.service';
+import { ErrorService } from 'src/app/services/core/error.service';
+import { SelectedMultipleService } from 'src/app/services/task/selected-multiple.service';
 
 @Component({
   selector: 'app-add-move-task',
@@ -17,7 +17,7 @@ export class AddMoveTaskComponent {
   constructor(
     private taskService: TaskService,
     private selectedService: SelectedMultipleService,
-    private feedbackService: FeedbackService
+    private feedbackService: ErrorService
   ) {}
 
   createTask() {

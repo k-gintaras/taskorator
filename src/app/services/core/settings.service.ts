@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SettingsStrategy } from './interfaces/settings-strategy.interface';
+import { SettingsStrategy } from '../../models/service-strategies/settings-strategy.interface';
 import { Settings, getDefaultSettings } from 'src/app/models/settings';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';

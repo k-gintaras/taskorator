@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FeedbackMessage, FeedbackService } from './services/feedback.service';
 import { Subscription } from 'rxjs';
-import { TreeService } from './services/core/tree.service';
-import { ScoreService } from './services/core/score.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
 import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';

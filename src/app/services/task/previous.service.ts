@@ -1,18 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { lastValueFrom, take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { take } from 'rxjs';
 import { Settings } from 'src/app/models/settings';
-import { TaskService } from './task.service';
 import { ROOT_TASK_ID } from 'src/app/models/taskModelManager';
-
 @Injectable({
   providedIn: 'root',
 })
 export class PreviousService {
-  constructor(private taskService: TaskService) {}
-  // instead of this.loadOverlordAndChildren(firstTaskId) just return the id
-  // please rewrite it and keep in mind that it has async part, so beware of return value and modify if needed
-
   async getPreviousOverlordId(
     route: ActivatedRoute,
     settings: Settings
@@ -40,8 +34,6 @@ export class PreviousService {
             }
             return;
           }
-        } else {
-          console.log('no url task');
         }
         resolve(overlordId);
       });
