@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskTree, TaskTreeNode } from 'src/app/models/taskTree';
 import * as d3 from 'd3';
-import { TreeService } from 'src/app/services/core/tree.service';
+import { TaskTreeNode, TaskTree } from '../../models/taskTree';
+import { TreeService } from '../../services/core/tree.service';
 
 interface TreeNode extends TaskTreeNode {
   x?: number;
@@ -10,6 +10,7 @@ interface TreeNode extends TaskTreeNode {
 
 @Component({
   selector: 'app-tree-view',
+  standalone: true,
   templateUrl: './tree-view.component.html',
   styleUrls: ['./tree-view.component.css'],
 })
@@ -76,7 +77,7 @@ export class TreeViewComponent implements OnInit {
   private createTreeData(root: TaskTreeNode) {
     const nodes = d3.hierarchy<TreeNode>(
       root as TreeNode,
-      (d) => d.children as TreeNode[]
+      (d: any) => d.children as TreeNode[]
     );
     return this.treemap(nodes);
   }

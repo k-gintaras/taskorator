@@ -1,20 +1,25 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Settings } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
+import { TaskSettings } from '../../models/settings';
+import { Task } from '../../models/taskModelManager';
+import { MenuComponent } from '../menu/menu.component';
+import { TaskNavigatorComponent } from '../../features/task-navigator/task-navigator/task-navigator.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-parent',
+  standalone: true,
   templateUrl: './parent.component.html',
   styleUrls: ['./parent.component.css'],
+  imports: [MenuComponent, TaskNavigatorComponent, CommonModule], // Directly import the standalone component
 })
 export class ParentComponent implements OnInit {
   selectedOverlordId = '0';
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
   private isInitialized = false;
-  settings: Settings = {
+  settings: TaskSettings = {
     isShowArchived: false,
     isShowCompleted: false,
     isShowSeen: false,
@@ -33,7 +38,7 @@ export class ParentComponent implements OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  filterTasks(tasks: Task[], settings: Settings) {
+  filterTasks(tasks: Task[], settings: TaskSettings) {
     // Placeholder for filtering tasks based on settings
   }
 

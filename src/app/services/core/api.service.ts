@@ -16,10 +16,10 @@ import {
   runTransaction,
 } from '@angular/fire/firestore';
 import { RegisterUserResult } from '../../models/service-strategies/register-user';
-import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
-import { Settings } from 'src/app/models/settings';
-import { Score } from 'src/app/models/score';
-import { TaskTree } from 'src/app/models/taskTree';
+import { Score } from '../../models/score';
+import { Task, getDefaultTask } from '../../models/taskModelManager';
+import { TaskTree } from '../../models/taskTree';
+import { TaskSettings } from '../../models/settings';
 
 /**
  * @todo
@@ -51,7 +51,7 @@ export default class ApiService implements ApiStrategy {
     userId: string,
     initialTask: Task,
     additionalTasks: Task[],
-    settings: Settings,
+    settings: TaskSettings,
     score: Score,
     tree: TaskTree
   ): Promise<RegisterUserResult> {
@@ -391,8 +391,8 @@ export default class ApiService implements ApiStrategy {
 
   async createSettings(
     userId: string,
-    settings: Settings
-  ): Promise<Settings | null> {
+    settings: TaskSettings
+  ): Promise<TaskSettings | null> {
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -407,7 +407,7 @@ export default class ApiService implements ApiStrategy {
     }
   }
 
-  async getSettings(userId: string): Promise<Settings | null> {
+  async getSettings(userId: string): Promise<TaskSettings | null> {
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -426,7 +426,7 @@ export default class ApiService implements ApiStrategy {
     }
   }
 
-  async updateSettings(userId: string, settings: Settings): Promise<void> {
+  async updateSettings(userId: string, settings: TaskSettings): Promise<void> {
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`

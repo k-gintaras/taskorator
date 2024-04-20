@@ -1,31 +1,43 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SelectedTaskService } from 'src/app/services/task/selected-task.service';
-import { completeButtonColorMap } from 'src/app/models/colors';
+import { completeButtonColorMap } from '../../../models/colors';
 import {
-  Settings,
-  getButtonName,
+  TaskSettings,
   getDefaultSettings,
-} from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
-import { SettingsService } from 'src/app/services/core/settings.service';
-import { TaskObjectHelperService } from 'src/app/features/input-to-tasks/services/task-object-helper.service';
-import { TaskUpdateService } from 'src/app/services/task/task-update.service';
-import { FilterService } from 'src/app/services/task/filter.service';
-import { PreviousService } from 'src/app/services/task/previous.service';
-import { SortService } from 'src/app/services/task/sort.service';
-import { TaskNavigatorService } from 'src/app/services/task/task-navigator.service';
-import { ConfigService } from 'src/app/services/core/config.service';
-import { SelectedMultipleService } from 'src/app/services/task/selected-multiple.service';
+  getButtonName,
+} from '../../../models/settings';
+import { Task } from '../../../models/taskModelManager';
+import { SettingsService } from '../../../services/core/settings.service';
+import { FilterService } from '../../../services/task/filter.service';
+import { PreviousService } from '../../../services/task/previous.service';
+import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
+import { SelectedTaskService } from '../../../services/task/selected-task.service';
+import { SortService } from '../../../services/task/sort.service';
+import { TaskNavigatorService } from '../../../services/task/task-navigator.service';
+import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { TaskObjectHelperService } from '../../input-to-tasks/services/task-object-helper.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
+import { TaskMiniComponent } from '../../../components/task-mini/task-mini.component';
+import { AddMoveTaskComponent } from '../../../components/add-move-task/add-move-task.component';
 
 @Component({
   selector: 'app-task-navigator',
+  standalone: true,
   templateUrl: './task-navigator.component.html',
-  styleUrls: ['./task-navigator.component.css'],
+  styleUrls: ['./task-navigator.component.scss'],
+  imports: [
+    MatCardModule,
+    MatIcon,
+    CommonModule,
+    TaskMiniComponent,
+    AddMoveTaskComponent,
+  ], // Import MatCardModule directly here
 })
 export class TaskNavigatorComponent implements OnInit {
   tasks: Task[] = [];
-  settings: Settings = getDefaultSettings();
+  settings: TaskSettings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
 
@@ -39,12 +51,11 @@ export class TaskNavigatorComponent implements OnInit {
     private sortService: SortService,
     private filterService: FilterService,
     private previousService: PreviousService,
-    private taskNavigatorService: TaskNavigatorService,
-    private config: ConfigService
+    private taskNavigatorService: TaskNavigatorService
   ) {}
 
   ngOnInit() {
-    this.settingsService.getSettings().subscribe((s: Settings | null) => {
+    this.settingsService.getSettings().subscribe((s: TaskSettings | null) => {
       if (s) {
         this.settings = s;
         this.previousService

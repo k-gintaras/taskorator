@@ -1,24 +1,30 @@
 <div class="create-task-container">
-  <mat-card class="task-card">
-    <mat-card-content class="task-content">
-      <input
-        placeholder="{{ overlord?.name }}"
-        type="text"
-        id="name"
-        [(ngModel)]="newTask.name"
-        required
-      />
-      <button mat-icon-button (click)="createTask()">
-        <mat-icon aria-label="Go in">save</mat-icon>
-      </button>
-      <button mat-icon-button (click)="createAndMove()">
-        <mat-icon aria-label="Go in">playlist_add</mat-icon>
-      </button>
-    </mat-card-content>
-  </mat-card>
+  <div class="task-input-group">
+    <input
+      class="task-input"
+      placeholder="{{ overlord?.name }}"
+      type="text"
+      id="name"
+      [(ngModel)]="newTask.name"
+      required
+      aria-label="Task name"
+    />
+    <button class="task-btn save" (click)="createTask()" aria-label="Save task">
+      <mat-icon>save</mat-icon>
+    </button>
+    <button
+      class="task-btn add"
+      (click)="createAndMove()"
+      aria-label="Create and move task"
+    >
+      <mat-icon>playlist_add</mat-icon>
+    </button>
+    <button
+      class="task-btn add"
+      (click)="createAndMove()"
+      aria-label="edit task dropdown"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
 </div>
-
-<!--
-<span class="material-symbols-outlined">
-move_group
-</span> -->

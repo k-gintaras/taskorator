@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
-import { Settings } from 'src/app/models/settings';
-import { ROOT_TASK_ID } from 'src/app/models/taskModelManager';
+import { TaskSettings } from '../../models/settings';
+import { ROOT_TASK_ID } from '../../models/taskModelManager';
 @Injectable({
   providedIn: 'root',
 })
 export class PreviousService {
   async getPreviousOverlordId(
     route: ActivatedRoute,
-    settings: Settings
+    settings: TaskSettings
   ): Promise<string | undefined> {
     return new Promise<string | undefined>((resolve) => {
       // First, subscribe to queryParams to check for an 'overlord' in the URL

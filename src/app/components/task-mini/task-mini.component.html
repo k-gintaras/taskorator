@@ -1,47 +1,37 @@
-<div
-  [style.borderColor]="getStatusColor()"
-  class="task-card"
-  (click)="onTaskSelection()"
->
-  <div class="task-header">
-    <span class="task-name">{{ task?.name }}</span>
-    <span class="small-text"> | {{ task?.todo }} | {{ task?.priority }}</span>
-  </div>
-  <div class="task-content">
-    <span class="small-text task-details">
-      {{ task?.todo }}
-    </span>
-    <span class="small-text task-details">{{ task?.why }}</span>
-    <ng-container *ngIf="onButtonClick">
-      <button mat-raised-button color="accent" (click)="doTask($event, task)">
-        {{ actionName }}
-      </button>
-    </ng-container>
-  </div>
+<div class="mini-task-details">
+  <!-- Use the safe navigation operator to safely access task properties -->
+  <p class="task-title">{{ task?.name }}</p>
+  <p class="task-info">
+    <!-- Display date only if timeEnd is available -->
+    <span class="task-due-date" *ngIf="task?.timeEnd">{{
+      task?.timeEnd | date : "mediumDate"
+    }}</span>
+    <!-- Display duration only if it is available -->
+    <span class="task-duration" *ngIf="task?.duration"
+      >{{ task?.duration }} min</span
+    >
+    <!-- Display priority only if it is available and apply class conditionally -->
+    <!-- <span class="task-priority" *ngIf="task?.priority">
+      Priority: {{ task?.priority }}
+      <span [class.high-priority]="task?.priority > 7"></span>
+    </span> -->
+  </p>
 </div>
-
-<!-- possible fix -->
-
-<!-- <div
-  [style.borderColor]="getStatusColor()"
-  class="task-card"
-  role="button" tabindex="0"
-  (click)="onTaskSelection()"
-  (keyup.enter)="onTaskSelection()"
->
-  <div class="task-header">
-    <span class="task-name">{{ task?.name }}</span>
-    <span class="small-text"> | {{ task?.todo }} | {{ task?.priority }}</span>
-  </div>
-  <div class="task-content">
-    <span class="small-text task-details">
-      {{ task?.todo }}
-    </span>
-    <span class="small-text task-details">{{ task?.why }}</span>
-    <ng-container *ngIf="onButtonClick">
-      <button mat-raised-button color="accent" (click)="doTask($event, task)" (keyup.enter)="doTask($event, task)">
-        {{ actionName }}
-      </button>
-    </ng-container>
-  </div>
+<!-- <div class="task-actions">
+  <button
+    mat-icon-button
+    (click)="editTask(task)"
+    matTooltip="Edit Task"
+    *ngIf="task"
+  >
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    (click)="viewDetails(task)"
+    matTooltip="View Details"
+    *ngIf="task"
+  >
+    <mat-icon>visibility</mat-icon>
+  </button>
 </div> -->

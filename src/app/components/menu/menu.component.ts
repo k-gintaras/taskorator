@@ -1,9 +1,26 @@
 import { Component, ViewChild } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatDrawer,
+  MatDrawerContainer,
+  MatDrawerContent,
+} from '@angular/material/sidenav';
+import { SettingsComponent } from '../settings/settings.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-menu',
+  standalone: true,
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
+  imports: [
+    MatIcon,
+    MatDrawer,
+    MatDrawerContent,
+    SettingsComponent,
+    MatDrawerContainer,
+    CommonModule,
+  ],
 })
 export class MenuComponent {
   activeDrawer: string | undefined;

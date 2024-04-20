@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { UserCredential } from 'firebase/auth';
-import {
-  ROOT_TASK_ID,
-  Task,
-  getBaseTask,
-  getDefaultTask,
-} from 'src/app/models/taskModelManager';
-import { Settings, getDefaultSettings } from 'src/app/models/settings';
-import { getDefaultScore } from 'src/app/models/score';
-import { TaskTree, getDefaultTree } from 'src/app/models/taskTree';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { TreeNodeService } from './tree-node.service';
+import { getDefaultScore } from '../../models/score';
+import { getDefaultSettings, TaskSettings } from '../../models/settings';
+import {
+  Task,
+  getBaseTask,
+  ROOT_TASK_ID,
+  getDefaultTask,
+} from '../../models/taskModelManager';
+import { TaskTree, getDefaultTree } from '../../models/taskTree';
 
 /**
  * Registration additional service
@@ -113,7 +113,7 @@ export class RegistrationService extends CoreService {
     return additionalTasks;
   }
 
-  private getBaseSettings(initialTaskId: string): Settings {
+  private getBaseSettings(initialTaskId: string): TaskSettings {
     const baseSettings = getDefaultSettings();
     baseSettings.lastOverlordViewId = initialTaskId;
 

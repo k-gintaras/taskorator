@@ -1,14 +1,19 @@
 import { Component, Input } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Task, getDefaultTask } from 'src/app/models/taskModelManager';
-import { TaskService } from 'src/app/services/task/task.service';
-import { ErrorService } from 'src/app/services/core/error.service';
-import { SelectedMultipleService } from 'src/app/services/task/selected-multiple.service';
+import { getDefaultTask, Task } from '../../models/taskModelManager';
+import { TaskService } from '../../services/task/task.service';
+import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
+import { ErrorService } from '../../services/core/error.service';
+import { MatIcon } from '@angular/material/icon';
+import { FormsModule, NgModel } from '@angular/forms';
+import { MatCard, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-add-move-task',
   templateUrl: './add-move-task.component.html',
-  styleUrls: ['./add-move-task.component.css'],
+  styleUrls: ['./add-move-task.component.scss'],
+  standalone: true,
+  imports: [MatIcon, FormsModule, MatCardContent, MatCard],
 })
 export class AddMoveTaskComponent {
   @Input() overlord: Task | undefined;

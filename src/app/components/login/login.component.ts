@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoggedInUser } from 'src/app/models/user';
-import { ConfigService } from 'src/app/services/core/config.service';
-import { RegistrationService } from 'src/app/services/core/registration.service';
 import { BaseComponent } from '../base/base.component';
+import { LoggedInUser } from '../../models/user';
+import { ConfigService } from '../../services/core/config.service';
+import { ErrorService } from '../../services/core/error.service';
+import { RegistrationService } from '../../services/core/registration.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ErrorService } from 'src/app/services/core/error.service';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })

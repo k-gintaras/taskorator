@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
-import { Score } from 'src/app/models/score';
-import { Settings } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
 import { EventBusService } from './event-bus.service';
-import { TaskTree } from 'src/app/models/taskTree';
+import { Score } from '../../models/score';
+import { Task } from '../../models/taskModelManager';
+import { TaskTree } from '../../models/taskTree';
+import { TaskSettings } from '../../models/settings';
 /**
  * @summary
  *
@@ -27,7 +27,7 @@ export class CacheService implements CacheStrategy {
   private currentOverlordMap: Map<string, string> = new Map();
 
   private taskTreeCache: TaskTree | null = null;
-  private settingsCache: Settings | null = null;
+  private settingsCache: TaskSettings | null = null;
   private scoreCache: Score | null = null;
 
   constructor(private eventBusService: EventBusService) {
@@ -211,20 +211,20 @@ export class CacheService implements CacheStrategy {
     });
   }
 
-  createSettings(settings: Settings): Promise<Settings | null> {
+  createSettings(settings: TaskSettings): Promise<TaskSettings | null> {
     this.settingsCache = settings;
     return new Promise((resolve) => {
       resolve(this.settingsCache);
     });
   }
 
-  getSettings(): Promise<Settings | null> {
+  getSettings(): Promise<TaskSettings | null> {
     return new Promise((resolve) => {
       resolve(this.settingsCache);
     });
   }
 
-  updateSettings(settings: Settings): Promise<void> {
+  updateSettings(settings: TaskSettings): Promise<void> {
     this.settingsCache = settings;
     return new Promise((resolve) => {
       resolve();

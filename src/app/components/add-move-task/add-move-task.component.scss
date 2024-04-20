@@ -1,0 +1,39 @@
+.create-task-container {
+  padding: 20px;
+  background-color: #f4f4f4; /* Light grey background */
+  border: 1px solid #ddd; /* Subtle border for definition */
+}
+
+.task-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-input {
+  flex-grow: 1; /* Input takes up remaining space */
+  padding: 8px 12px;
+  border: 2px solid #ccc; /* More pronounced border for input */
+  border-radius: 4px; /* Slightly rounded corners for the input field */
+}
+
+button.task-btn {
+  background-color: white; /* Flat white background for buttons */
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px; /* Consistency in rounding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Minimal shadow for depth */
+}
+
+button.task-btn:hover {
+  background-color: #e0e0e0; /* Light grey background on hover for better interaction feedback */
+}
+
+mat-icon {
+  font-size: 24px; /* Ensuring icons are adequately sized for interaction */
+  color: #666; /* Subdued icon color for a modern look */
+}

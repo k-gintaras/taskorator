@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Settings } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
+import { TaskSettings } from '../../models/settings';
+import { Task } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterService {
-  filterBySettings(tasks: Task[], settings: Settings): Task[] {
+  filterBySettings(tasks: Task[], settings: TaskSettings): Task[] {
     return tasks.filter((t: Task) => {
       // Task should be included if it matches any of the criteria for being shown
       return (

@@ -1,14 +1,10 @@
 import { Injectable } from '@angular/core';
-import {
-  ROOT_TASK_ID,
-  Task,
-  getBaseTask,
-} from 'src/app/models/taskModelManager';
 import { ConfigService } from '../core/config.service';
 import { CoreService } from '../core/core.service';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskManagementStrategy } from '../../models/service-strategies/task-management-strategy.interface';
 import { TaskValidatorService } from '../core/task-validator.service';
+import { Task, ROOT_TASK_ID, getBaseTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

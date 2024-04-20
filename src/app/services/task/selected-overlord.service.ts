@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ExtendedTask } from 'src/app/models/massTaskEditModel';
-import { Task } from 'src/app/models/taskModelManager';
+import { ExtendedTask } from '../../models/massTaskEditModel';
+import { Task } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

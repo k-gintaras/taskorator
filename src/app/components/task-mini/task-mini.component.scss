@@ -1,60 +1,39 @@
-.task-card {
-  min-width: 150px; /* set a minimum width */
-  max-width: 350px; /* set a maximum width */
-  width: auto; /* let it auto adjust */
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px;
-}
-
-.task-card .task-header {
+.mini-task {
   display: flex;
   justify-content: space-between;
-  font-size: 14px; /* adjust as needed */
-  margin-bottom: 5px; /* new: adds space below the header */
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
 }
 
-.task-card .task-header .task-name {
-  font-weight: bold; /* new: makes the task name bold */
-  overflow-wrap: break-word; /* breaks words onto the next line if they exceed the width of the container */
+.mini-task-details {
+  flex-grow: 1;
 }
 
-.task-card .task-content {
-  font-size: 12px; /* adjust as needed */
-  margin-top: 5px;
-  margin-bottom: 5px; /* new: adds space below the content */
-  overflow-wrap: break-word; /* breaks words onto the next line if they exceed the width of the container */
+.task-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
 }
 
-.task-card .task-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 5px;
+.task-info {
+  font-size: 0.85rem;
+  color: #666;
 }
 
-.task-card .mat-raised-button {
-  font-size: 5px; /* adjust as needed */
-  padding: 3px 5px; /* adjust as needed */
+.task-due-date {
+  margin-right: 10px;
 }
 
-.task-details {
-  font-size: 10px;
+.task-duration,
+.task-priority {
+  margin-right: 5px;
 }
 
-.small-text {
-  font-size: 10px;
+.high-priority {
+  color: #ff6347; /* Tomato color for high priority */
 }
 
-.expandable-text {
-  max-height: 50px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.expanded {
-  max-height: none;
-  -webkit-line-clamp: none;
+.task-actions button {
+  margin: 0 5px;
 }

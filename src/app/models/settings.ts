@@ -1,6 +1,6 @@
 import { ROOT_TASK_ID } from './taskModelManager';
 
-export interface Settings {
+export interface TaskSettings {
   isShowArchived: boolean;
   isShowCompleted: boolean;
   isShowSeen: boolean;
@@ -12,7 +12,7 @@ export interface Settings {
 }
 
 export function getDefaultSettings() {
-  const settings: Settings = {
+  const settings: TaskSettings = {
     isShowArchived: false,
     isShowCompleted: false,
     isShowSeen: true,

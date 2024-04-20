@@ -1,13 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { SettingsService } from 'src/app/services/core/settings.service';
-import { completeButtonColorMap } from 'src/app/models/colors';
-import { CompleteButtonAction, Settings } from 'src/app/models/settings';
+import { Component, NgModule, OnInit } from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  FormControlName,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { completeButtonColorMap } from '../../models/colors';
+import { CompleteButtonAction, TaskSettings } from '../../models/settings';
+import { SettingsService } from '../../services/core/settings.service';
+import { CommonModule, NgClass } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-settings',
+  standalone: true,
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
+  imports: [NgClass, MatIcon, MatCardModule, CommonModule, ReactiveFormsModule],
 })
 export class SettingsComponent implements OnInit {
   settingsForm: FormGroup;
@@ -18,7 +29,7 @@ export class SettingsComponent implements OnInit {
     'seen',
     'todo',
   ];
-  currentSettings: Settings | undefined;
+  currentSettings: TaskSettings | undefined;
 
   constructor(
     private fb: FormBuilder,
@@ -70,7 +81,7 @@ export class SettingsComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private saveSettings(newFormValues: any): void {
-    const newSettings: Settings = {
+    const newSettings: TaskSettings = {
       ...this.currentSettings,
       ...newFormValues,
     };

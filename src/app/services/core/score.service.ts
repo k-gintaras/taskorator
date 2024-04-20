@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ScoreStrategy } from '../../models/service-strategies/score-strategy.interface copy';
-import { Score, getDefaultScore } from 'src/app/models/score';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
+import { Score, getDefaultScore } from '../../models/score';
 
 @Injectable({
   providedIn: 'root',

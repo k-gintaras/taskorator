@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { TaskService } from './task.service';
-import { ROOT_TASK_ID, Task } from 'src/app/models/taskModelManager';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { EventBusService } from '../core/event-bus.service';
 import { CoreService } from '../core/core.service';
 import { ConfigService } from '../core/config.service';
-import { Settings } from 'src/app/models/settings';
 import { PreviousService } from './previous.service';
 import { ActivatedRoute } from '@angular/router';
+import { Task, ROOT_TASK_ID } from '../../models/taskModelManager';
+import { TaskSettings } from '../../models/settings';
 
 export interface TaskNavigationView {
   taskOverlord: Task;
@@ -47,7 +47,7 @@ export class TaskNavigatorService extends CoreService {
   }
 
   async getPreviousTaskId(
-    settings: Settings,
+    settings: TaskSettings,
     route: ActivatedRoute
   ): Promise<string> {
     if (!settings) {

@@ -1,19 +1,22 @@
 import { Observable } from 'rxjs';
-import { Settings } from 'src/app/models/settings';
+import { TaskSettings } from '../settings';
 
 export interface SettingsStrategy {
-  createSettings(settings: Settings): Promise<Settings | null>;
-  getSettings(): Observable<Settings | null>;
-  updateSettings(settings: Settings): Promise<void>;
+  createSettings(settings: TaskSettings): Promise<TaskSettings | null>;
+  getSettings(): Observable<TaskSettings | null>;
+  updateSettings(settings: TaskSettings): Promise<void>;
 }
 export interface SettingsCacheStrategy {
-  createSettings(settings: Settings): Promise<Settings | null>;
-  getSettings(): Promise<Settings | null>;
-  updateSettings(settings: Settings): Promise<void>;
+  createSettings(settings: TaskSettings): Promise<TaskSettings | null>;
+  getSettings(): Promise<TaskSettings | null>;
+  updateSettings(settings: TaskSettings): Promise<void>;
 }
 
 export interface SettingsApiStrategy {
-  getSettings(userId: string): Promise<Settings | null>;
-  updateSettings(userId: string, settings: Settings): Promise<void>;
-  createSettings(userId: string, settings: Settings): Promise<Settings | null>;
+  getSettings(userId: string): Promise<TaskSettings | null>;
+  updateSettings(userId: string, settings: TaskSettings): Promise<void>;
+  createSettings(
+    userId: string,
+    settings: TaskSettings
+  ): Promise<TaskSettings | null>;
 }

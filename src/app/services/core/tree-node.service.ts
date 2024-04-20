@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Task } from 'src/app/models/taskModelManager';
-import { TaskTree, TaskTreeNode } from 'src/app/models/taskTree';
+import { Task } from '../../models/taskModelManager';
+import { TaskTree, TaskTreeNode } from '../../models/taskTree';
 
 @Injectable({
   providedIn: 'root',

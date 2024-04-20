@@ -1,13 +1,29 @@
-.feedback-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #f4f4f4;
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: start; /* Align links to the start of the navigation bar */
+  gap: 20px; /* Adds space between navigation items */
   padding: 10px;
-  overflow-y: auto;
-  max-height: 150px; /* Adjust as needed */
+  background-color: #f8f9fa; /* Light grey background */
 }
 
-::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items {
-  background-color: white !important;
+.nav-link {
+  text-decoration: none; /* Removes underline from links */
+  color: #007bff; /* Bootstrap primary blue */
+  font-weight: bold;
+}
+
+.nav-link:hover {
+  color: #0056b3; /* Darker blue on hover for better interaction */
+}
+
+.feedback-footer {
+  padding: 20px;
+  background-color: #f0f0f0; /* Light grey background for the footer */
+  text-align: center;
+}
+
+/* Additional styling for testing and feedback text */
+div {
+  margin-bottom: 10px; /* Space below the 'TESTING' div */
 }

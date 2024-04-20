@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { TaskTree } from 'src/app/models/taskTree';
+import { TaskTree } from '../taskTree';
 
 export interface TreeStrategy {
   createTree(taskTree: TaskTree): Promise<TaskTree | null>;

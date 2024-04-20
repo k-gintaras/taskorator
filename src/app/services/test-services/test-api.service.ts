@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Score, getDefaultScore } from 'src/app/models/score';
-import { Settings, getDefaultSettings } from 'src/app/models/settings';
-import { Task } from 'src/app/models/taskModelManager';
-import { TaskTree, getDefaultTree } from 'src/app/models/taskTree';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { RegisterUserResult } from '../../models/service-strategies/register-user';
+import { Score, getDefaultScore } from '../../models/score';
+import { getDefaultSettings, TaskSettings } from '../../models/settings';
+import { Task } from '../../models/taskModelManager';
+import { TaskTree, getDefaultTree } from '../../models/taskTree';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class TestApiService implements ApiStrategy {
     userId: string,
     initialTask: Task,
     additionalTasks: Task[],
-    settings: Settings,
+    settings: TaskSettings,
     score: Score,
     tree: TaskTree
   ): Promise<RegisterUserResult> {
@@ -157,17 +157,17 @@ export class TestApiService implements ApiStrategy {
 
   async createSettings(
     userId: string,
-    settings: Settings
-  ): Promise<Settings | null> {
+    settings: TaskSettings
+  ): Promise<TaskSettings | null> {
     // this.settings = settings;
     return settings;
   }
 
-  async getSettings(userId: string): Promise<Settings | null> {
+  async getSettings(userId: string): Promise<TaskSettings | null> {
     return getDefaultSettings();
   }
 
-  async updateSettings(userId: string, settings: Settings): Promise<void> {
+  async updateSettings(userId: string, settings: TaskSettings): Promise<void> {
     // this.settings = settings;
   }
 

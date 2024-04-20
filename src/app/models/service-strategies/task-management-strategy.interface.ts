@@ -1,4 +1,4 @@
-import { Task } from 'src/app/models/taskModelManager';
+import { Task } from '../taskModelManager';
 
 export interface TaskManagementCacheStrategy {
   createTask(task: Task, from: string): Promise<Task>;

@@ -1,15 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ServiceInitiatorService } from './services/core/service-initiator.service';
 import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
+import { ServiceInitiatorService } from './services/core/service-initiator.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, CommonModule, RouterLink],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'taskorator';
   testing = true;
   authenticated = true;
@@ -37,12 +41,4 @@ export class AppComponent implements OnInit {
     console.log('Authenticated: ' + this.authenticated);
     // Proceed with the login process or other initialization tasks
   }
-
-  // ngOnInit() {
-  //   this.taskLoaderService.loadTasksSlow().subscribe();
-  // }
-
-  // ngOnDestroy(): void {
-  //   this.feedbackSubscription.unsubscribe();
-  // }
 }

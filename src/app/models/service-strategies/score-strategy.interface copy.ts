@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Score } from 'src/app/models/score';
+import { Score } from '../score';
 
 export interface ScoreStrategy {
   createScore(score: Score): Promise<Score | null>;

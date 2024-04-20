@@ -5,16 +5,17 @@ import { TextToTasksService } from '../services/text-to-tasks.service';
 import { CodeToTasksService } from '../services/code-to-tasks.service';
 import { TaskObjectHelperService } from '../services/task-object-helper.service';
 import {
+  Task,
   getDefaultTask,
   ROOT_TASK_ID,
-  Task,
-} from 'src/app/models/taskModelManager';
-import { SelectedOverlordService } from 'src/app/services/task/selected-overlord.service';
+} from '../../../models/taskModelManager';
+import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 /**
  * @deprecated do not use but rewrite for later use
  */
 @Component({
   selector: 'app-input-to-tasks',
+  standalone: true,
   templateUrl: './input-to-tasks.component.html',
   styleUrls: ['./input-to-tasks.component.scss'],
 })

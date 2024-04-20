@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { SettingsStrategy } from '../../models/service-strategies/settings-strategy.interface';
-import { Settings, getDefaultSettings } from 'src/app/models/settings';
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
+import { TaskSettings, getDefaultSettings } from '../../models/settings';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService extends CoreService implements SettingsStrategy {
-  private settingsSubject: BehaviorSubject<Settings | null> =
-    new BehaviorSubject<Settings | null>(null);
+  private settingsSubject: BehaviorSubject<TaskSettings | null> =
+    new BehaviorSubject<TaskSettings | null>(null);
 
   constructor(configService: ConfigService) {
     super(configService);
   }
 
-  async createSettings(settings: Settings): Promise<Settings> {
+  async createSettings(settings: TaskSettings): Promise<TaskSettings> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
@@ -32,7 +32,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
     }
   }
 
-  getSettings(): BehaviorSubject<Settings | null> {
+  getSettings(): BehaviorSubject<TaskSettings | null> {
     if (
       this.settingsSubject.value === null &&
       this.authService.isAuthenticated()
@@ -67,7 +67,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
     }
   }
 
-  async updateSettings(settings: Settings): Promise<void> {
+  async updateSettings(settings: TaskSettings): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {

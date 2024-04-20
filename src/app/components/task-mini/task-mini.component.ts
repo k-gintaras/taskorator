@@ -1,12 +1,16 @@
-/* eslint-disable @typescript-eslint/ban-types */
+  /* eslint-disable @typescript-eslint/ban-types */
 import { Component, Input } from '@angular/core';
-import { completeButtonColorMap } from 'src/app/models/colors';
-import { Task } from 'src/app/models/taskModelManager';
+import { Task } from '../../models/taskModelManager';
+import { completeButtonColorMap } from '../../models/colors';
+import { CommonModule } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-task-mini',
+  standalone: true,
   templateUrl: './task-mini.component.html',
   styleUrls: ['./task-mini.component.scss'],
+  imports: [CommonModule, MatIcon],
 })
 export class TaskMiniComponent {
   @Input() task: Task | undefined;
@@ -31,6 +35,14 @@ export class TaskMiniComponent {
       console.log('hm');
       this.onTaskSelected(this.task);
     }
+  }
+
+  viewDetails(task: Task | undefined) {
+    console.log(task);
+  }
+
+  editTask(task: Task | undefined) {
+    console.log(task);
   }
 
   getStatusColor() {

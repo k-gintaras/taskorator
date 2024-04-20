@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getDefaultTask } from 'src/app/models/taskModelManager';
+import { getDefaultTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

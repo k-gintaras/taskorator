@@ -9,7 +9,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { environment } from 'src/environments/environment';
 
 // firebase
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -31,16 +30,17 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 
 // components
 import { AppComponent } from './app.component';
-import { ParentComponent } from './components/parent/parent.component';
-import { TaskMiniComponent } from './components/task-mini/task-mini.component';
-import { MenuComponent } from './components/menu/menu.component';
-import { SettingsComponent } from './components/settings/settings.component';
-import { AddMoveTaskComponent } from './components/add-move-task/add-move-task.component';
-import { LoginComponent } from './components/login/login.component';
-import { ErrorComponent } from './components/error/error.component';
-import { TaskNavigatorComponent } from './features/task-navigator/task-navigator/task-navigator.component';
-import { TreeViewComponent } from './components/tree-view/tree-view.component';
-import { BaseComponent } from './components/base/base.component';
+import { ParentComponent } from '../components/parent/parent.component';
+import { TaskMiniComponent } from '../components/task-mini/task-mini.component';
+import { MenuComponent } from '../components/menu/menu.component';
+import { SettingsComponent } from '../components/settings/settings.component';
+import { AddMoveTaskComponent } from '../components/add-move-task/add-move-task.component';
+import { LoginComponent } from '../components/login/login.component';
+import { ErrorComponent } from '../components/error/error.component';
+import { TaskNavigatorComponent } from '../features/task-navigator/task-navigator/task-navigator.component';
+import { TreeViewComponent } from '../features/tree-view/tree-view.component';
+import { BaseComponent } from '../components/base/base.component';
+import { environment } from '../../environments/environment';
 
 // export function initializeServices(serviceInitiator: ServiceInitiatorService) {
 //   return (): Promise<void> => serviceInitiator.initApiServices();

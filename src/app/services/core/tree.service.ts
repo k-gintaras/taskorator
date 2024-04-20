@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import { EventBusService } from './event-bus.service';
 import { TreeStrategy } from '../../models/service-strategies/tree-strategy.interface';
 import { ConfigService } from './config.service';
-import { TaskTree, getDefaultTree } from 'src/app/models/taskTree';
 import { TreeNodeService } from './tree-node.service';
-import { Task } from 'src/app/models/taskModelManager';
 import { CoreService } from './core.service';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { Task } from '../../models/taskModelManager';
+import { TaskTree, getDefaultTree } from '../../models/taskTree';
 
 @Injectable({
   providedIn: 'root',
