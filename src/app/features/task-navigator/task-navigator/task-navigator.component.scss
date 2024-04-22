@@ -25,28 +25,15 @@
 
 .task-actions {
   display: flex;
+  align-items: center;
   gap: 5px;
+}
+
+.selected {
+  background-color: grey;
 }
 
 .task-actions .primary-actions,
 .task-actions .navigation-actions {
   display: flex;
 }
-
-button[mat-icon-button] {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-mat-icon {
-  color: #666;
-}
-
-[matTooltip] {
-  position: relative;
-}
-
-/* Add more specific styles if necessary */

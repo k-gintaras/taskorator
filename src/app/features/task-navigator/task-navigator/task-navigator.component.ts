@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { completeButtonColorMap } from '../../../models/colors';
-import {
-  TaskSettings,
-  getDefaultSettings,
-  getButtonName,
-} from '../../../models/settings';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TaskSettings, getDefaultSettings } from '../../../models/settings';
 import { Task } from '../../../models/taskModelManager';
 import { SettingsService } from '../../../services/core/settings.service';
 import { FilterService } from '../../../services/task/filter.service';
@@ -13,15 +8,20 @@ import { PreviousService } from '../../../services/task/previous.service';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
 import { SelectedTaskService } from '../../../services/task/selected-task.service';
 import { SortService } from '../../../services/task/sort.service';
-import { TaskNavigatorService } from '../../../services/task/task-navigator.service';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { TaskNavigatorService } from '../services/task-navigator.service';
 import { TaskObjectHelperService } from '../../input-to-tasks/services/task-object-helper.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { TaskMiniComponent } from '../../../components/task-mini/task-mini.component';
 import { AddMoveTaskComponent } from '../../../components/add-move-task/add-move-task.component';
-
+import { PromoterComponent } from '../../../components/task/promoter/promoter.component';
+import { TaskActionComponent } from '../../../components/task/action/action.component';
+import { SelectedMultipleComponent } from '../../../components/task/selected-multiple/selected-multiple.component';
+import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
+import { UrlHelperService } from '../../../services/task/url-helper.service';
+import { CoreService } from '../../../services/core/core.service';
+import { ConfigService } from '../../../services/core/config.service';
 @Component({
   selector: 'app-task-navigator',
   standalone: true,
@@ -33,17 +33,18 @@ import { AddMoveTaskComponent } from '../../../components/add-move-task/add-move
     CommonModule,
     TaskMiniComponent,
     AddMoveTaskComponent,
+    PromoterComponent,
+    TaskActionComponent,
+    SelectedMultipleComponent,
   ], // Import MatCardModule directly here
 })
-export class TaskNavigatorComponent implements OnInit {
+export class TaskNavigatorComponent extends CoreService implements OnInit {
   tasks: Task[] = [];
   settings: TaskSettings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
 
   constructor(
-    private taskUpdateService: TaskUpdateService,
-    private taskObjectService: TaskObjectHelperService,
     private selectedMultiple: SelectedMultipleService,
     private selected: SelectedTaskService,
     private settingsService: SettingsService,
@@ -51,10 +52,42 @@ export class TaskNavigatorComponent implements OnInit {
     private sortService: SortService,
     private filterService: FilterService,
     private previousService: PreviousService,
-    private taskNavigatorService: TaskNavigatorService
-  ) {}
+    private taskNavigatorService: TaskNavigatorService,
+    private selectedOverlordService: SelectedOverlordService,
+    protected config: ConfigService
+  ) {
+    super(config);
+  }
 
   ngOnInit() {
+    // to let you come back from other components
+    const restoredOverlord = this.selectedOverlordService.getSelectedOverlord();
+    if (restoredOverlord) {
+      this.selectedOverlord = restoredOverlord;
+      this.loadTaskNavigationView(restoredOverlord.taskId);
+    } else {
+      // Fetch new data if no overlord is stored
+      this.fetchInitialData();
+    }
+
+    this.selectedMultiple
+      .getSelectedTasks()
+      .subscribe((selectedTasks: Task[]) => {
+        this.selectedTasks = selectedTasks;
+      });
+
+    this.taskNavigatorService.getTaskNavigationView().subscribe((view) => {
+      if (view) {
+        this.selectedOverlord = view.taskOverlord;
+        // we want to be able to return to the same view
+        this.selectedOverlordService.setSelectedOverlord(view.taskOverlord);
+        this.tasks = view.taskChildren;
+        this.setNewFiltered(this.tasks);
+      }
+    });
+  }
+
+  private fetchInitialData() {
     this.settingsService.getSettings().subscribe((s: TaskSettings | null) => {
       if (s) {
         this.settings = s;
@@ -67,20 +100,6 @@ export class TaskNavigatorComponent implements OnInit {
               console.log('could not load previous task');
             }
           });
-      }
-    });
-
-    this.selectedMultiple
-      .getSelectedTasks()
-      .subscribe((selectedTasks: Task[]) => {
-        this.selectedTasks = selectedTasks;
-      });
-
-    this.taskNavigatorService.getTaskNavigationView().subscribe((view) => {
-      if (view) {
-        this.selectedOverlord = view.taskOverlord;
-        this.tasks = view.taskChildren;
-        this.setNewFiltered(this.tasks);
       }
     });
   }
@@ -126,16 +145,16 @@ export class TaskNavigatorComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   errorNoTaskOrOverlord(task: Task | undefined) {
-    console.log('No task or task overlord defined.');
+    this.log('No task or task overlord defined.');
   }
 
   errorNoChildrenInside() {
-    console.log('No children inside this task.');
+    this.log('No children inside this task.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   errorNoTasksOutside(task: Task | undefined) {
-    console.log('No tasks above this task.');
+    this.log('No tasks above this task.');
   }
 
   onTaskCardClick(task: Task) {
@@ -152,73 +171,5 @@ export class TaskNavigatorComponent implements OnInit {
 
   isSelected(task: Task): boolean {
     return this.selectedTasks.indexOf(task) > -1;
-  }
-
-  getOverlord(task: Task) {
-    if (!this.tasks) return task;
-    return this.taskObjectService.getOverlord(task, this.tasks);
-  }
-
-  complete(task: Task) {
-    if (this.settings) {
-      switch (this.settings.completeButtonAction) {
-        case 'completed':
-          console.log('completed ' + task.name);
-          this.taskUpdateService.complete(task);
-          break;
-        case 'archived':
-          console.log('archived ' + task.name);
-          this.taskUpdateService.archive(task);
-          break;
-        case 'deleted':
-          console.log('deleted ' + task.name);
-          this.taskUpdateService.delete(task);
-          break;
-        case 'todo':
-          console.log('todo ' + task.name);
-          this.taskUpdateService.renew(task);
-          break;
-        case 'seen':
-          console.log('seen ' + task.name);
-          this.taskUpdateService.setAsSeen(task);
-          break;
-        default:
-          break;
-      }
-    } else {
-      console.error('Settings not loaded');
-    }
-  }
-
-  addChild(task: Task) {
-    this.onClickPlus(task);
-  }
-
-  promote(task: Task) {
-    this.taskUpdateService.increasePriority(task);
-  }
-
-  demote(task: Task) {
-    this.taskUpdateService.decreasePriority(task);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onClickPlus(task: Task): void {
-    // const dialogRef = this.dialog.open(CreateSimpleTaskComponent, {
-    //   width: '300px',
-    //   data: { overlord: task },
-    // });
-  }
-
-  getButtonName() {
-    if (!this.settings) return 'Complete';
-    return getButtonName(this.settings.completeButtonAction);
-  }
-
-  getColorBySetting() {
-    if (!this.settings) return 'black';
-    return (
-      completeButtonColorMap[this.settings.completeButtonAction] || 'black'
-    );
   }
 }

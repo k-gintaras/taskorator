@@ -4,12 +4,12 @@ import { Subscription } from 'rxjs';
 import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
-import { CommonModule } from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, RouterLink],
+  imports: [RouterOutlet, RouterLink, NgIf],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

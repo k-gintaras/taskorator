@@ -120,13 +120,14 @@ export function getDefaultTask(): Task {
 }
 
 export const ROOT_TASK_ID = '128';
+export const ROOT_TASK_DESCRIPTION = 'where everything connects';
 
 export function getBaseTask(): Task {
   const defaultTask: Task = {
     taskId: ROOT_TASK_ID,
     name: 'Me',
     todo: '',
-    why: '',
+    why: ROOT_TASK_DESCRIPTION,
     timeCreated: new Date(), // Current date and time
     lastUpdated: new Date(), // Current date and time
     timeEnd: null,

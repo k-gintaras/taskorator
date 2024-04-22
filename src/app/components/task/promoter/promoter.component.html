@@ -1,1 +1,18 @@
-<p>promoter works!</p>
+<div class="promoter">
+  <button
+    class="task-btn add"
+    mat-icon-button
+    aria-label="Increase priority"
+    (click)="promote()"
+  >
+    <mat-icon>expand_less</mat-icon>
+  </button>
+  <button
+    class="task-btn add"
+    mat-icon-button
+    aria-label="Decrease priority"
+    (click)="demote()"
+  >
+    <mat-icon>expand_more</mat-icon>
+  </button>
+</div>

@@ -1,0 +1,14 @@
+<div class="selected-tasks-container">
+  <h2>Selected Tasks</h2>
+  <!-- Check if there are selected tasks and display them -->
+  <div *ngIf="selectedTasks.length > 0; else noTasks">
+    <div *ngFor="let task of selectedTasks" class="task-entry">
+      <app-task-mini [task]="task" (click)="onTaskCardClick(task)">
+      </app-task-mini>
+    </div>
+  </div>
+  <!-- Display when no tasks are selected -->
+  <ng-template #noTasks>
+    <p>No tasks selected.</p>
+  </ng-template>
+</div>

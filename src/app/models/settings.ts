@@ -31,7 +31,7 @@ export type CompleteButtonAction =
   | 'archived'
   | 'deleted'; // refresh will clear the "removed" status
 
-export function getButtonName(actionName: CompleteButtonAction) {
+export function getButtonTextName(actionName: CompleteButtonAction) {
   switch (actionName) {
     case 'completed':
       return 'Complete';
@@ -45,5 +45,22 @@ export function getButtonName(actionName: CompleteButtonAction) {
       return 'Delete';
     default:
       return 'X';
+  }
+}
+
+export function getButtonMatName(actionName: CompleteButtonAction): string {
+  switch (actionName) {
+    case 'completed':
+      return 'check_circle'; // Represents a completed task with a checkmark inside a circle
+    case 'seen':
+      return 'visibility'; // Represents marking a task as seen
+    case 'todo':
+      return 'add_circle_outline'; // Represents adding a task to a todo list
+    case 'archived':
+      return 'archive'; // Represents archiving a task
+    case 'deleted':
+      return 'delete'; // Represents deleting a task
+    default:
+      return 'error_outline'; // Fallback icon indicating an unrecognized action
   }
 }

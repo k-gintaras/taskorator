@@ -9,29 +9,23 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-button.mat-icon-button {
-  padding: 10px; /* Standard padding for all icon buttons */
-  border-radius: 50%; /* Circular buttons */
-  background-color: #f0f0f0; /* Light grey background */
-  border: none; /* Remove borders */
+button.task-btn {
+  background-color: white; /* Flat white background for buttons */
+  border: none;
+  padding: 10px;
+  cursor: pointer;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  border-radius: 4px; /* Consistency in rounding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Minimal shadow for depth */
 }
 
-mat-icon {
-  color: #666; /* Standard icon color */
-  font-size: 24px; /* Standard icon size */
+button.task-btn:hover {
+  background-color: #e0e0e0; /* Light grey background on hover for better interaction feedback */
 }
 
-/* Hover and focus states for better user interaction */
-button.mat-icon-button:hover,
-button.mat-icon-button:focus {
-  background-color: #e0e0e0; /* Slightly darker on hover/focus */
-  outline: none; /* Remove focus outline */
-}
-
-/* Active state for a tactile feel */
-button.mat-icon-button:active {
-  background-color: #d0d0d0; /* Even darker when active */
+::ng-deep mat-icon {
+  font-size: 14px; /* Ensuring icons are adequately sized for interaction */
+  color: #666; /* Subdued icon color for a modern look */
 }

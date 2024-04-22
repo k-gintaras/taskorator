@@ -5,14 +5,14 @@ import { TaskSettings } from '../../models/settings';
 import { Task } from '../../models/taskModelManager';
 import { MenuComponent } from '../menu/menu.component';
 import { TaskNavigatorComponent } from '../../features/task-navigator/task-navigator/task-navigator.component';
-import { CommonModule } from '@angular/common';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-parent',
   standalone: true,
   templateUrl: './parent.component.html',
   styleUrls: ['./parent.component.css'],
-  imports: [MenuComponent, TaskNavigatorComponent, CommonModule], // Directly import the standalone component
+  imports: [MenuComponent, TaskNavigatorComponent, NgFor], // Directly import the standalone component
 })
 export class ParentComponent implements OnInit {
   selectedOverlordId = '0';

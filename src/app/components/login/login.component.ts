@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent extends BaseComponent implements OnInit {
   email = '';

@@ -10,12 +10,34 @@ import {
   ROOT_TASK_ID,
 } from '../../../models/taskModelManager';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
-/**
- * @deprecated do not use but rewrite for later use
- */
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from '@angular/material/card';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @Component({
   selector: 'app-input-to-tasks',
   standalone: true,
+  imports: [
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardContent,
+    MatLabel,
+    MatCheckbox,
+    MatIcon,
+    MatFormField,
+    FormsModule,
+    MatInputModule,
+    BrowserAnimationsModule,
+  ],
   templateUrl: './input-to-tasks.component.html',
   styleUrls: ['./input-to-tasks.component.scss'],
 })
@@ -47,7 +69,7 @@ export class InputToTasksComponent implements OnInit {
     //   }
     // });
     this.overlordService
-      .getSelectedOverlord()
+      .getSelectedOverlordObservable()
       .subscribe((overlord: Task | null) => {
         if (overlord) {
           this.selectedOverlord = overlord;

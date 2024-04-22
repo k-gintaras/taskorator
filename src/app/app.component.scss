@@ -1,29 +1,53 @@
 .navigation {
+  background-color: rgb(
+    65,
+    65,
+    65
+  ); /* Light grey background for the navigation bar */
+  padding: 10px 20px; /* Padding around the navigation content */
   display: flex;
   align-items: center;
-  justify-content: start; /* Align links to the start of the navigation bar */
-  gap: 20px; /* Adds space between navigation items */
-  padding: 10px;
-  background-color: #f8f9fa; /* Light grey background */
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.app-title {
+  font-size: 1.5rem; /* Larger font size for the app title */
+  font-weight: bold;
+  color: grey; /* Dark grey for better readability */
+}
+
+.testing-indicator {
+  color: #ff0000; /* Red color to highlight testing mode */
+  margin-right: 20px;
+}
+
+.feedback-container {
+  color: grey;
+  margin-right: 20px;
+  font-style: italic;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
 }
 
 .nav-link {
-  text-decoration: none; /* Removes underline from links */
-  color: #007bff; /* Bootstrap primary blue */
-  font-weight: bold;
+  color: #00b5e8; /* Bootstrap primary blue for links */
+  margin-left: 15px;
+  text-decoration: none;
+  font-size: 1rem;
 }
 
 .nav-link:hover {
-  color: #0056b3; /* Darker blue on hover for better interaction */
+  text-decoration: underline; /* Underline on hover for better interaction feedback */
 }
 
 .feedback-footer {
-  padding: 20px;
-  background-color: #f0f0f0; /* Light grey background for the footer */
   text-align: center;
-}
-
-/* Additional styling for testing and feedback text */
-div {
-  margin-bottom: 10px; /* Space below the 'TESTING' div */
+  padding: 10px 0;
+  background-color: #f8f9fa;
+  color: #666;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }

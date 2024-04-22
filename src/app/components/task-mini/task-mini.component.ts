@@ -1,4 +1,4 @@
-  /* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/ban-types */
 import { Component, Input } from '@angular/core';
 import { Task } from '../../models/taskModelManager';
 import { completeButtonColorMap } from '../../models/colors';
@@ -30,6 +30,7 @@ export class TaskMiniComponent {
 
     // if(this.action===Acti)
   }
+
   onTaskSelection() {
     if (this.onTaskSelected) {
       console.log('hm');

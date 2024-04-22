@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
-import { TaskService } from '../../../services/task/task.service';
-import { FormsModule } from '@angular/forms';
 import { Task } from '../../../models/taskModelManager';
 import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-promoter',
   standalone: true,
-  imports: [],
+  imports: [MatIconModule],
   templateUrl: './promoter.component.html',
   styleUrl: './promoter.component.scss',
 })

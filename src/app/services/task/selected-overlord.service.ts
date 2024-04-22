@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ExtendedTask } from '../../models/massTaskEditModel';
 import { Task } from '../../models/taskModelManager';
+import { UrlHelperService } from './url-helper.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +10,12 @@ import { Task } from '../../models/taskModelManager';
 export class SelectedOverlordService {
   private selectedOverlord = new BehaviorSubject<Task | null>(null);
 
-  getSelectedOverlord() {
+  getSelectedOverlordObservable(): Observable<Task | null> {
     return this.selectedOverlord.asObservable();
+  }
+
+  getSelectedOverlord(): Task | null {
+    return this.selectedOverlord.value;
   }
 
   setSelectedOverlord(task: Task) {

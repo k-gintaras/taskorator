@@ -1,0 +1,12 @@
+<div class="task-action">
+  <button
+    mat-icon-button
+    class="task-btn"
+    [style.color]="getColorBySetting()"
+    (click)="complete(task)"
+    aria-label="Complete Task"
+  >
+    <mat-icon>{{ getButtonName() }}</mat-icon>
+  </button>
+  <!-- Additional buttons for other actions can be added similarly -->
+</div>

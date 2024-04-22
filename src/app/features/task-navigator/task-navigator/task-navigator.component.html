@@ -1,71 +1,58 @@
 <div class="task-navigator">
   <!-- Header Section with Overlord Name and Add Move Task -->
-  <div class="task-header">
+  <!-- <div class="task-header">
     <h1>
       <b>{{ selectedOverlord?.name }}</b>
     </h1>
-    <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task>
-  </div>
+    <p>{{ selectedOverlord?.why }}</p>
+  </div> -->
+  <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task>
 
   <!-- Message and Back Button When There Are No Tasks -->
   <div *ngIf="tasks?.length === 0" class="no-tasks">
     <p>No tasks yet.</p>
     <button (click)="goBack(selectedOverlord)">
-      <mat-icon>arrow_back</mat-icon> Go Back
+      <mat-icon>arrow_back</mat-icon>
     </button>
   </div>
 
   <!-- Task List -->
   <div
     *ngFor="let task of tasks"
+    (click)="onTaskCardClick(task)"
     class="task-container"
     [class.selected]="isSelected(task)"
   >
-    <app-task-mini
-      (click)="onTaskCardClick(task)"
-      [task]="task"
-      [overlord]="getOverlord(task)"
-    ></app-task-mini>
-
-    <!-- Compact Task Actions -->
     <div class="task-actions">
-      <div class="primary-actions">
-        <button
-          mat-icon-button
-          (click)="complete(task)"
-          matTooltip="Complete Task"
-        >
-          <mat-icon>check_circle</mat-icon>
-        </button>
-        <button
-          mat-icon-button
-          (click)="addChild(task)"
-          matTooltip="Add Child Task"
-        >
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
       <div class="navigation-actions">
-        <button mat-icon-button (click)="onPrevious(task)" matTooltip="Move Up">
-          <mat-icon>arrow_upward</mat-icon>
-        </button>
-        <button mat-icon-button (click)="onNext(task)" matTooltip="Move Down">
-          <mat-icon>arrow_downward</mat-icon>
+        <button
+          class="task-btn"
+          mat-icon-button
+          (click)="onPrevious(task)"
+          matTooltip="Move Up"
+        >
+          <mat-icon>arrow_back</mat-icon>
         </button>
         <button
+          class="task-btn"
           mat-icon-button
-          (click)="promote(task)"
-          matTooltip="Promote Task"
+          (click)="onNext(task)"
+          matTooltip="Move Down"
         >
-          <mat-icon>expand_less</mat-icon>
-        </button>
-        <button mat-icon-button (click)="demote(task)" matTooltip="Demote Task">
-          <mat-icon>expand_more</mat-icon>
-        </button>
-        <button mat-icon-button matTooltip="Enter Task">
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
+      <app-task-mini
+        (click)="onTaskCardClick(task)"
+        [task]="task"
+      ></app-task-mini>
+    </div>
+
+    <div class="task-actions">
+      <app-task-action [task]="task"></app-task-action>
+      <app-promoter [task]="task"></app-promoter>
     </div>
   </div>
 </div>
+
+<!-- <app-selected-multiple></app-selected-multiple> -->
