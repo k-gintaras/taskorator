@@ -8,7 +8,11 @@
 
 .mini-task-details {
   flex-grow: 1;
+  cursor: pointer;
 }
+// .mini-task-details:hover {
+//   color: #999;
+// }
 
 .task-title {
   margin-left: 10px;

@@ -1,4 +1,4 @@
-<div class="mini-task-details">
+<div class="mini-task-details" (click)="onTaskCardClick(task)">
   <!-- Use the safe navigation operator to safely access task properties -->
   <p class="task-title">{{ task?.name }}</p>
   <p class="task-info">

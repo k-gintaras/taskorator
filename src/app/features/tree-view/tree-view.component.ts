@@ -228,7 +228,7 @@ export class TreeViewComponent implements OnInit {
     // Define the zoom behavior with the correct element type
     const zoomBehavior: ZoomBehavior<SVGSVGElement, unknown> = d3
       .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 2]) // Example scale limits
+      .scaleExtent([0.5, 3]) // Example scale limits
       .on('zoom', (event) => {
         // Use svgGroup here within the zoom event handler
         svgGroup.attr('transform', event.transform.toString()); // Ensure transform is applied as a string
@@ -238,7 +238,9 @@ export class TreeViewComponent implements OnInit {
     svgContainer.call(zoomBehavior);
 
     // Optionally, reset the zoom transform to default (identity) if needed
-    svgContainer.call(zoomBehavior.transform, zoomIdentity);
+    // svgContainer.call(zoomBehavior.transform, zoomIdentity);
+    const initialTransform = d3.zoomIdentity.translate(width / 2, 0).scale(0.7);
+    svgContainer.call(zoomBehavior.transform, initialTransform);
 
     return svgGroup; // Return the group element for further manipulation
   }

@@ -10,22 +10,24 @@ body {
 }
 
 button.task-btn {
-  background-color: white; /* Flat white background for buttons */
-  border: none;
-  padding: 10px;
+  background-color: transparent; /* Remove background color for a more minimal look */
+  border: 0px solid #ccc; /* Subtle border to define the button edges */
+  padding: 5px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px; /* Consistency in rounding */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Minimal shadow for depth */
+  border-radius: 50%; /* Circular buttons to minimize visual space */
+  transition: background-color 0.3s, border-color 0.3s; /* Smooth transitions for hover effects */
 }
 
-button.task-btn:hover {
-  background-color: #e0e0e0; /* Light grey background on hover for better interaction feedback */
+button.task-btn:hover,
+button.task-btn:focus {
+  background-color: #f0f0f0; /* Slightly darker background on hover/focus for feedback */
+  border-color: #bbb; /* Darker border on hover to maintain visibility */
 }
 
 ::ng-deep mat-icon {
-  font-size: 14px; /* Ensuring icons are adequately sized for interaction */
-  color: #666; /* Subdued icon color for a modern look */
+  font-size: 12px; /* Adjust icon size for clarity */
+  color: #333; /* Darker color for better visibility */
 }

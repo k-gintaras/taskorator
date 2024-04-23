@@ -13,7 +13,7 @@ import { ErrorHandlingStrategy } from '../../models/service-strategies/error-han
 })
 export class ConfigService implements ConfigStrategy {
   private repairTreeEnabled = true;
-  private testing = true;
+  private testing = false;
 
   private apiService: ApiStrategy | undefined;
   private authService: AuthStrategy | undefined;

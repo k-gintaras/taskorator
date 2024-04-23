@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TaskSettings, getDefaultSettings } from '../../../models/settings';
 import { Task } from '../../../models/taskModelManager';
 import { SettingsService } from '../../../services/core/settings.service';
 import { FilterService } from '../../../services/task/filter.service';
 import { PreviousService } from '../../../services/task/previous.service';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
-import { SelectedTaskService } from '../../../services/task/selected-task.service';
 import { SortService } from '../../../services/task/sort.service';
 import { TaskNavigatorService } from '../services/task-navigator.service';
-import { TaskObjectHelperService } from '../../input-to-tasks/services/task-object-helper.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -19,7 +17,6 @@ import { PromoterComponent } from '../../../components/task/promoter/promoter.co
 import { TaskActionComponent } from '../../../components/task/action/action.component';
 import { SelectedMultipleComponent } from '../../../components/task/selected-multiple/selected-multiple.component';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
-import { UrlHelperService } from '../../../services/task/url-helper.service';
 import { CoreService } from '../../../services/core/core.service';
 import { ConfigService } from '../../../services/core/config.service';
 @Component({
@@ -46,7 +43,6 @@ export class TaskNavigatorComponent extends CoreService implements OnInit {
 
   constructor(
     private selectedMultiple: SelectedMultipleService,
-    private selected: SelectedTaskService,
     private settingsService: SettingsService,
     private route: ActivatedRoute,
     private sortService: SortService,
@@ -155,18 +151,6 @@ export class TaskNavigatorComponent extends CoreService implements OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   errorNoTasksOutside(task: Task | undefined) {
     this.log('No tasks above this task.');
-  }
-
-  onTaskCardClick(task: Task) {
-    if (this.selectedTasks.indexOf(task) > -1) {
-      this.selectedMultiple.removeSelectedTask(task);
-    } else {
-      this.selectedMultiple.addSelectedTask(task);
-    }
-
-    if (task) {
-      this.selected.setSelectedTask(task);
-    }
   }
 
   isSelected(task: Task): boolean {

@@ -4,6 +4,8 @@ import { Task } from '../../models/taskModelManager';
 import { completeButtonColorMap } from '../../models/colors';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
+import { SelectedTaskService } from '../../services/task/selected-task.service';
 
 @Component({
   selector: 'app-task-mini',
@@ -15,28 +17,12 @@ import { MatIcon } from '@angular/material/icon';
 export class TaskMiniComponent {
   @Input() task: Task | undefined;
   @Input() overlord: Task | null | undefined;
-  @Input() actionName: string | undefined;
-  @Input() onButtonClick: Function | undefined;
-  @Input() onTaskSelected: Function | undefined;
   expanded = false;
 
-  doTask(event: Event, task: Task | undefined) {
-    // event.stopPropagation();
-
-    if (this.onButtonClick) {
-      console.log('Doing: ' + this.actionName + ' to: ' + task?.name);
-      this.onButtonClick(task);
-    }
-
-    // if(this.action===Acti)
-  }
-
-  onTaskSelection() {
-    if (this.onTaskSelected) {
-      console.log('hm');
-      this.onTaskSelected(this.task);
-    }
-  }
+  constructor(
+    private selectedMultiple: SelectedMultipleService,
+    private selected: SelectedTaskService
+  ) {}
 
   viewDetails(task: Task | undefined) {
     console.log(task);
@@ -48,5 +34,11 @@ export class TaskMiniComponent {
 
   getStatusColor() {
     return this.task?.stage ? completeButtonColorMap[this.task.stage] : 'black';
+  }
+
+  onTaskCardClick(task: Task | undefined) {
+    if (!task) return;
+    this.selectedMultiple.addRemoveSelectedTask(task);
+    this.selected.setSelectedTask(task);
   }
 }

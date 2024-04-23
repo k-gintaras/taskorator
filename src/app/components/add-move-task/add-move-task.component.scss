@@ -1,7 +1,8 @@
 .create-task-container {
   padding: 20px;
   background-color: #f4f4f4; /* Light grey background */
-  border: 1px solid #ddd; /* Subtle border for definition */
+  // border: 1px solid #ddd; /* Subtle border for definition */
+  max-width: 600px; // Adjust based on content needs
 }
 
 .task-input-group {

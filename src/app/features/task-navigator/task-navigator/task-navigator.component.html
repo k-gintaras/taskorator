@@ -1,17 +1,17 @@
 <div class="task-navigator">
   <!-- Header Section with Overlord Name and Add Move Task -->
-  <!-- <div class="task-header">
+  <div class="task-container">
     <h1>
       <b>{{ selectedOverlord?.name }}</b>
     </h1>
     <p>{{ selectedOverlord?.why }}</p>
-  </div> -->
+  </div>
   <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task>
 
   <!-- Message and Back Button When There Are No Tasks -->
   <div *ngIf="tasks?.length === 0" class="no-tasks">
     <p>No tasks yet.</p>
-    <button (click)="goBack(selectedOverlord)">
+    <button class="task-btn" (click)="goBack(selectedOverlord)">
       <mat-icon>arrow_back</mat-icon>
     </button>
   </div>
@@ -19,40 +19,38 @@
   <!-- Task List -->
   <div
     *ngFor="let task of tasks"
-    (click)="onTaskCardClick(task)"
     class="task-container"
     [class.selected]="isSelected(task)"
   >
     <div class="task-actions">
-      <div class="navigation-actions">
-        <button
-          class="task-btn"
-          mat-icon-button
-          (click)="onPrevious(task)"
-          matTooltip="Move Up"
-        >
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button
-          class="task-btn"
-          mat-icon-button
-          (click)="onNext(task)"
-          matTooltip="Move Down"
-        >
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
+      <!-- Left-aligned items -->
+      <div class="task-mini-container">
+        <div class="navigation-actions">
+          <button
+            class="task-btn"
+            mat-icon-button
+            (click)="onPrevious(task)"
+            matTooltip="Move Up"
+          >
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <button
+            class="task-btn"
+            mat-icon-button
+            (click)="onNext(task)"
+            matTooltip="Move Down"
+          >
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+        <app-task-mini [task]="task"></app-task-mini>
       </div>
-      <app-task-mini
-        (click)="onTaskCardClick(task)"
-        [task]="task"
-      ></app-task-mini>
-    </div>
 
-    <div class="task-actions">
-      <app-task-action [task]="task"></app-task-action>
-      <app-promoter [task]="task"></app-promoter>
+      <!-- Right-aligned items -->
+      <div class="action-items">
+        <app-task-action [task]="task"></app-task-action>
+        <app-promoter [task]="task"></app-promoter>
+      </div>
     </div>
   </div>
 </div>
-
-<!-- <app-selected-multiple></app-selected-multiple> -->
