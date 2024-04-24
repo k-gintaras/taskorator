@@ -1,0 +1,16 @@
+/* In tree-view.component.css */
+
+.node circle,
+.node text {
+  cursor: pointer;
+}
+
+.node:hover circle {
+  fill: #3498db;
+  stroke: #2980b9;
+}
+
+.node:hover text {
+  fill: #2c3e50;
+  font-weight: bold;
+}

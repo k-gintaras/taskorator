@@ -25,9 +25,6 @@ export class TestApiService implements ApiStrategy {
     tree: TaskTree
   ): Promise<RegisterUserResult> {
     this.tasks = [];
-    console.log('additionalTasks--------------------');
-    console.log(additionalTasks);
-
     // Create the initial task with the provided taskId
     await this.createTaskWithCustomId(userId, initialTask, initialTask.taskId);
 
@@ -46,8 +43,6 @@ export class TestApiService implements ApiStrategy {
   }
 
   async createTask(userId: string, task: Task): Promise<Task> {
-    console.log('API TASKS');
-    console.log(this.tasks);
     const newTask = {
       ...task,
       taskId: task.taskId !== '0' ? task.taskId : this.generateTaskId(),
@@ -119,15 +114,18 @@ export class TestApiService implements ApiStrategy {
   }
 
   async createTasks(userId: string, tasks: Task[]): Promise<Task[]> {
-    console.log('createdTasks ');
-    console.log('additionalTasks 222');
-    console.log(tasks);
-    const newTasks = tasks.map((task) => ({
-      ...task,
-      taskId: this.generateTaskId(),
-    }));
-    this.tasks.push(...newTasks);
-    return newTasks;
+    // console.log('createdTasks ');
+    // console.log('additionalTasks 222');
+    // console.log(tasks);
+    // const newTasks = tasks.map((task) => ({
+    //   ...task,
+    //   taskId: this.generateTaskId(),
+    // }));
+    // this.tasks.push(...newTasks);
+    tasks.forEach((task) => {
+      this.createTask(userId, task);
+    });
+    return this.tasks;
   }
 
   async updateTasks(userId: string, tasks: Task[]): Promise<void> {

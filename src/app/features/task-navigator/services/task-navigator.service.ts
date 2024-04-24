@@ -138,13 +138,13 @@ export class TaskNavigatorService extends CoreService {
 
   private async handleTasksCreated(tasks: Task[]): Promise<void> {
     for (const task of tasks) {
-      await this.handleTaskCreated(task);
+      if (task.overlord) await this.handleTaskCreated(task);
     }
   }
 
   private async handleTasksUpdated(tasks: Task[]): Promise<void> {
     for (const task of tasks) {
-      await this.handleTaskUpdated(task);
+      if (task.overlord) await this.handleTaskUpdated(task);
     }
   }
 

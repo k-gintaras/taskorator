@@ -102,9 +102,9 @@ export class RegistrationService extends CoreService {
 
     // must create id for initial tasks, because it is easier to add it all and not wait API to return new ids,
     // in  the api we just create these ids too, and later we just use API ids
-    additionalTasks[0].taskId = '1';
-    additionalTasks[1].taskId = '2';
-    additionalTasks[2].taskId = '3';
+    additionalTasks[0].taskId = '121212';
+    additionalTasks[1].taskId = '212121';
+    additionalTasks[2].taskId = '313131';
 
     additionalTasks.forEach((t: Task) => {
       t.overlord = parent.taskId;

@@ -1,0 +1,29 @@
+<p>admin works!</p>
+Message:
+<p *ngIf="message">message: {{ message }}</p>
+Loading:
+<p *ngIf="loading">loading: {{ loading }}</p>
+Error:
+<p *ngIf="error">error: {{ error }}</p>
+
+<div *ngIf="template">
+  <h2>{{ template.name }}</h2>
+  <p>Author: {{ template.authorName }}</p>
+  <p>Price: {{ template.price ? template.price : "Free" }}</p>
+  <ul>
+    <li *ngFor="let task of template.tasks">
+      {{ task.name }}: {{ task.timeCreated }}
+    </li>
+  </ul>
+</div>
+<!-- <button (click)="loadTemplate()">Load Template</button>
+<button (click)="getTree()">Load Tree</button> -->
+<button (click)="sqliteTest()">Load sql</button>
+
+<!-- YourComponent.html -->
+<div>
+  <h1>Tree Structure</h1>
+  <pre>{{ treeJson }}</pre>
+</div>
+
+<app-tree-view [treeInput]="tree"></app-tree-view>

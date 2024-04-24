@@ -18,6 +18,22 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
     super(configService);
   }
 
+  async createTasksQuietly(tasks: Task[]) {
+    try {
+      const userId = await this.getUserId();
+      if (!userId) {
+        throw new Error('Not logged in');
+      }
+      const createdTasks = await this.apiService.createTasks(userId, tasks);
+      // this.eventBusService.createTasks(createdTasks);
+      this.feedback('Tasks created successfully');
+      return createdTasks;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
   async createTask(task: Task): Promise<Task> {
     try {
       const userId = await this.getUserId();
@@ -95,7 +111,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
 
       let task = await this.cacheService.getTaskById(taskId);
       if (task) {
-        this.log(`Task with ID ${taskId} retrieved from cache`);
+        // this.log(`Task with ID ${taskId} retrieved from cache`);
         return task;
       }
 

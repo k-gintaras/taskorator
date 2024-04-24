@@ -5,6 +5,7 @@ import { TreeViewComponent } from './features/tree-view/tree-view.component';
 import { TaskNavigatorComponent } from './features/task-navigator/task-navigator/task-navigator.component';
 import { canActivate } from './services/core/auth-guard';
 import { SelectedMultipleComponent } from './components/task/selected-multiple/selected-multiple.component';
+import { AdminComponent } from './features/admin/admin/admin.component';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,11 @@ export const routes: Routes = [
   {
     path: 'protected',
     component: TaskNavigatorComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'admin',
+    component: AdminComponent,
     canActivate: [canActivate],
   }, // Login Test
 

@@ -152,6 +152,8 @@ export class CacheService implements CacheStrategy {
   createTasks(tasks: Task[]): Promise<Task[]> {
     return new Promise((resolve) => {
       tasks.forEach((task) => {
+        console.log('creating cache tasks');
+        console.log(task);
         this.addCacheTask(task, 'createTasks');
       });
       resolve(tasks);

@@ -14,6 +14,7 @@ import {
   setDoc,
   getDocs,
   runTransaction,
+  DocumentReference,
 } from '@angular/fire/firestore';
 import { RegisterUserResult } from '../../models/service-strategies/register-user';
 import { Score } from '../../models/score';
@@ -289,23 +290,40 @@ export default class ApiService implements ApiStrategy {
 
     tasks.forEach((task) => {
       if (!task.overlord) {
-        // just set default, let user sort it out themselves later
+        // Set default overlord if not provided
         task.overlord = getDefaultTask().overlord;
       }
 
+      // Prepare a new document reference within the user's tasks collection
       const userTaskCollectionRef = collection(
         this.firestore,
         `users/${userId}/tasks`
       );
-      const taskDocRef = doc(userTaskCollectionRef); // Prepare a new document reference within user's tasks collection
-      const newTask = { ...task, taskId: taskDocRef.id }; // Add taskId to each task
-      batch.set(taskDocRef, newTask); // Add the task with its new taskId to the batch
-      newTasks.push(newTask); // Collect the new task with its taskId for return
+      let taskDocRef: DocumentReference;
+
+      if (task.taskId === '0') {
+        // If taskId is "0", let Firebase generate the document ID
+        taskDocRef = doc(userTaskCollectionRef);
+      } else {
+        // Otherwise, use the provided taskId
+        taskDocRef = doc(userTaskCollectionRef, task.taskId);
+      }
+
+      // Add taskId to each task
+      const newTask = { ...task, taskId: taskDocRef.id };
+
+      // Add the task with its new taskId to the batch
+      batch.set(taskDocRef, newTask);
+
+      // Collect the new task with its taskId for return
+      newTasks.push(newTask);
     });
 
     try {
-      await batch.commit(); // Commit the batch
-      return newTasks; // Return the array of tasks with their new taskIds after successful batch commit
+      // Commit the batch
+      await batch.commit();
+      // Return the array of tasks with their new taskIds after successful batch commit
+      return newTasks;
     } catch (error) {
       console.error('Failed to commit batch creation:', error);
       throw new Error('Batch creation failed'); // Rethrow or handle as appropriate

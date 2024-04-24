@@ -1,3 +1,8 @@
+<!-- In tree-view.component.html -->
+<button (click)="resetTree()">Reset Tree</button>
+<button (click)="toggleFilteredTree()">
+  {{ showFilteredTree ? "Show All Tasks" : "Show Filtered Tasks" }}
+</button>
 <div id="tree-container"></div>
 
 <!-- <input type="text" value="{{ getTreeAsText() }}" /> -->

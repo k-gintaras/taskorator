@@ -1,7 +1,6 @@
 export interface TaskTree {
   root: TaskTreeNode;
 }
-
 export interface TaskTreeNode {
   name: string;
   isCompleted: boolean;
@@ -14,16 +13,16 @@ export interface TaskTreeNode {
 }
 
 export function getDefaultTree(): TaskTree {
-  const tree: TaskTree = {
-    root: {
-      taskId: '',
-      overlord: null,
-      children: [],
-      childrenCount: 0,
-      completedChildrenCount: 0,
-      name: '',
-      isCompleted: false,
-    },
+  const root: TaskTreeNode = {
+    taskId: 'root', // Or a unique identifier if 'root' is too generic
+    overlord: null,
+    children: [],
+    childrenCount: 0,
+    completedChildrenCount: 0,
+    name: 'Root Node',
+    isCompleted: false,
   };
-  return { ...tree }; // Create a new object with the same properties as the default tree
+  return {
+    root,
+  };
 }
