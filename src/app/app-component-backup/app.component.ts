@@ -11,17 +11,23 @@ import { ErrorService } from '../services/core/error.service';
 })
 export class AppComponent implements OnInit {
   title = 'taskorator';
-  testing = true;
+  testing = false;
   authenticated = true;
 
   feedback = ''; // Change feedbacks array to a single string variable
 
   private feedbackSubscription: Subscription;
   // we init services here so their listeners are able to activate when necessary, because these services are kinda updated in background with eventBus
-  constructor(private serviceInitiator: ServiceInitiatorService, private errorService: ErrorService, private config: ConfigService) {
-    this.feedbackSubscription = this.errorService.getFeedback().subscribe((message) => {
-      if (message) this.feedback = message; // Assign the new message to feedback
-    });
+  constructor(
+    private serviceInitiator: ServiceInitiatorService,
+    private errorService: ErrorService,
+    private config: ConfigService
+  ) {
+    this.feedbackSubscription = this.errorService
+      .getFeedback()
+      .subscribe((message) => {
+        if (message) this.feedback = message; // Assign the new message to feedback
+      });
   }
 
   async ngOnInit(): Promise<void> {

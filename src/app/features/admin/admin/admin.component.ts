@@ -16,6 +16,9 @@ import { LocalSqliteService } from '../services/local-sqlite.service';
 import { TreeViewComponent } from '../../tree-view/tree-view.component';
 import { TreeBuilderService } from '../services/tree-builder.service';
 import { take } from 'rxjs';
+import { RegistrationService } from '../../../services/core/registration.service';
+import ApiService from '../../../services/core/api.service';
+import { TaskUserInfo } from '../../../models/service-strategies/user';
 
 @Component({
   selector: 'app-admin',
@@ -40,8 +43,35 @@ export class AdminComponent {
     private treeService: TreeService,
     private treeNodeService: TreeNodeService,
     private localSqlite: LocalSqliteService,
-    private treeBuilderService: TreeBuilderService
+    private treeBuilderService: TreeBuilderService,
+    private registrationService: RegistrationService,
+    private apiService: ApiService
   ) {}
+
+  registerTest() {
+    const userId = 'qqpewpew';
+    this.registrationService.registerUserById(userId);
+  }
+
+  getUserTest() {
+    const userId = 'qqpewpew';
+    // this.registrationService.registerUserById(userId);
+    this.apiService.getDocument(userId, 'userInfos').then((result) => {
+      console.log(result);
+    });
+  }
+
+  addDocTest() {
+    const userId = '';
+    const obj: TaskUserInfo = {
+      allowedTemplates: [],
+      canCreate: true,
+      canUseGpt: true,
+      role: 'admin',
+      registered: true,
+    };
+    this.apiService.createDocument(userId, 'userInfos', obj);
+  }
 
   async migrateTasks() {
     try {
@@ -98,6 +128,30 @@ export class AdminComponent {
 
       // Create tasks for filtered tasks without a root
     });
+  }
+
+  fixMissingTasks() {
+    this.taskService
+      .getOverlordChildren('0')
+      .then((tasks: Task[] | undefined) => {
+        this.taskService
+          .getTaskById('vuLn7N0EOlUcYkz0ObX6')
+          .then((task: Task | undefined) => {
+            if (!tasks) return;
+            if (!task) return;
+            console.log(
+              'task found ++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+            );
+
+            tasks.forEach((t: Task) => {
+              t.overlord = task.taskId;
+            });
+            this.taskService.updateTasks(tasks);
+            console.log(
+              'TASKS FIXED AND UPDATED.................................................'
+            );
+          });
+      });
   }
 
   private cleanTasks() {}

@@ -16,7 +16,10 @@ import {
   runTransaction,
   DocumentReference,
 } from '@angular/fire/firestore';
-import { RegisterUserResult } from '../../models/service-strategies/register-user';
+import {
+  RegisterUserResult,
+  TaskUserInfo,
+} from '../../models/service-strategies/user';
 import { Score } from '../../models/score';
 import { Task, getDefaultTask } from '../../models/taskModelManager';
 import { TaskTree } from '../../models/taskTree';
@@ -31,6 +34,60 @@ import { TaskSettings } from '../../models/settings';
 })
 export default class ApiService implements ApiStrategy {
   constructor(private firestore: Firestore) {}
+
+  async generateApiKey(userId: string): Promise<string | undefined> {
+    try {
+      // Generate a unique API key (you can use any method to generate a key)
+      const apiKey = this.generateUniqueApiKey();
+
+      // Store the API key in a separate collection "apiKeys" indexed by user ID
+      const apiKeyDocRef = doc(this.firestore, 'apiKeys', userId);
+      await setDoc(apiKeyDocRef, { apiKey });
+
+      return apiKey;
+    } catch (error) {
+      console.error('Error generating API key:', error);
+      return undefined;
+    }
+  }
+
+  private generateUniqueApiKey(): string {
+    // Implement your logic to generate a unique API key here
+    // Example: Generate a random alphanumeric string
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const apiKeyLength = 32; // Adjust the length as needed
+    let apiKey = '';
+    for (let i = 0; i < apiKeyLength; i++) {
+      apiKey += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return apiKey;
+  }
+
+  async getUserInfo(userId: string): Promise<TaskUserInfo | undefined> {
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const docRef = doc(this.firestore, this.getUserInfoLocation(userId));
+    try {
+      const snapshot = await getDoc(docRef);
+      if (snapshot.exists()) {
+        return { ...snapshot.data() } as TaskUserInfo;
+      } else {
+        throw new Error('User info not found');
+      }
+    } catch (error) {
+      console.error('Failed to get user info:', error);
+      throw new Error('Failed to retrieve user information');
+    }
+  }
+
+  private getUserInfoLocation(userId: string) {
+    return `users/${userId}/userInfos/${userId}`;
+  }
 
   private getScoreLocation(userId: string) {
     return `users/${userId}/scores/${userId}`;
@@ -48,6 +105,71 @@ export default class ApiService implements ApiStrategy {
     return `users/${userId}/taskTrees/${userId}`;
   }
 
+  // async register(
+  //   userId: string,
+  //   initialTask: Task,
+  //   additionalTasks: Task[],
+  //   settings: TaskSettings,
+  //   score: Score,
+  //   tree: TaskTree
+  // ): Promise<RegisterUserResult> {
+  //   const firestore = this.firestore;
+  //   console.log('registering: ' + userId);
+  //   if (!userId) {
+  //     throw new Error('No user id in user credentials @registerUser()');
+  //   }
+
+  //   try {
+  //     await runTransaction(firestore, async (transaction) => {
+  //       const userBaseRef = doc(firestore, `users/${userId}`);
+  //       const userProfile: TaskUserInfo = {
+  //         canCreate: false,
+  //         allowedTemplates: [], // Initially empty, or predefined IDs could be listed here
+  //         canUseGpt: false,
+  //         role: 'basic',
+  //         registered: true,
+  //       };
+
+  //       // Handling task creation within the transaction
+  //       const userTaskCollectionRef = collection(
+  //         firestore,
+  //         this.getTasksLocation(userId)
+  //       ); // `users/${userId}/tasks`
+  //       const initialTaskDocRef = doc(
+  //         userTaskCollectionRef,
+  //         initialTask.taskId
+  //       );
+  //       transaction.set(initialTaskDocRef, initialTask);
+  //       additionalTasks.forEach((task) => {
+  //         const taskDocRef = doc(userTaskCollectionRef, task.taskId);
+  //         transaction.set(taskDocRef, task);
+  //       });
+
+  //       // user info
+  //       const userInfoDocRef = doc(firestore, this.getUserInfoLocation(userId)); // `users/${userId}/userInfos`
+  //       transaction.set(userInfoDocRef, userProfile);
+  //       // Settings, Score, and TaskTree
+  //       const settingsDocRef = doc(firestore, this.getSettingsLocation(userId)); // `users/${userId}/settings`
+  //       transaction.set(settingsDocRef, settings);
+  //       const scoreDocRef = doc(firestore, this.getScoreLocation(userId)); // `users/${userId}/scores`
+  //       transaction.set(scoreDocRef, score);
+  //       const treeDocRef = doc(firestore, this.getTreeLocation(userId)); // `users/${userId}/taskTrees`
+  //       transaction.set(treeDocRef, tree);
+  //     });
+
+  //     return {
+  //       success: true,
+  //       message: 'User registration successful',
+  //       userId: userId,
+  //     };
+  //   } catch (error) {
+  //     console.error('Registration failed:', error);
+  //     throw {
+  //       success: false,
+  //       message: 'User registration failed',
+  //     };
+  //   }
+  // }
   async register(
     userId: string,
     initialTask: Task,
@@ -64,14 +186,14 @@ export default class ApiService implements ApiStrategy {
 
     try {
       await runTransaction(firestore, async (transaction) => {
-        const userBaseRef = doc(firestore, `users/${userId}`);
-        const userProfile = {
+        doc(firestore, `users/${userId}`);
+        const userProfile: TaskUserInfo = {
           canCreate: false,
           allowedTemplates: [], // Initially empty, or predefined IDs could be listed here
           canUseGpt: false,
           role: 'basic',
+          registered: true,
         };
-        transaction.set(userBaseRef, userProfile);
 
         // Handling task creation within the transaction
         const userTaskCollectionRef = collection(
@@ -88,6 +210,9 @@ export default class ApiService implements ApiStrategy {
           transaction.set(taskDocRef, task);
         });
 
+        // Settings, Score, and TaskTree
+        const userInfoDocRef = doc(firestore, this.getUserInfoLocation(userId));
+        transaction.set(userInfoDocRef, userProfile);
         // Settings, Score, and TaskTree
         const settingsDocRef = doc(firestore, this.getSettingsLocation(userId));
         transaction.set(settingsDocRef, settings);
@@ -108,6 +233,32 @@ export default class ApiService implements ApiStrategy {
         success: false,
         message: 'User registration failed',
       };
+    }
+  }
+
+  async createDocument(userId: string, docName: string, obj: any) {
+    const firestore = this.firestore;
+    if (!userId) {
+      throw new Error('No user id in user credentials @registerUser()');
+    }
+    const url = `users/${userId}/${docName}/${userId}`;
+    const ref = doc(firestore, url);
+    await setDoc(ref, obj);
+  }
+
+  async getDocument(userId: string, docName: string): Promise<any | null> {
+    const url = `users/${userId}/${docName}/${userId}`;
+    const treeDocRef = doc(this.firestore, url);
+    try {
+      const docSnap = await getDoc(treeDocRef);
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Failed to get tree:', error);
+      return null;
     }
   }
 

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
-import { RegisterUserResult } from '../../models/service-strategies/register-user';
+import {
+  RegisterUserResult,
+  TaskUserInfo,
+} from '../../models/service-strategies/user';
 import { Score, getDefaultScore } from '../../models/score';
 import { getDefaultSettings, TaskSettings } from '../../models/settings';
 import { Task } from '../../models/taskModelManager';
@@ -11,6 +14,13 @@ import { TaskTree, getDefaultTree } from '../../models/taskTree';
   providedIn: 'root',
 })
 export class TestApiService implements ApiStrategy {
+  generateApiKey(userId: string): Promise<string | undefined> {
+    throw new Error('Method not implemented.');
+  }
+  getUserInfo(userId: string): Promise<TaskUserInfo | undefined> {
+    throw new Error('Method not implemented.');
+  }
+
   private tasks: Task[] = [];
   // private taskTree: TaskTree | null = null;
   // private settings: Settings | null = null;

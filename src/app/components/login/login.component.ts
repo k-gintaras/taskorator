@@ -7,6 +7,7 @@ import { ErrorService } from '../../services/core/error.service';
 import { RegistrationService } from '../../services/core/registration.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TaskUserInfo } from '../../models/service-strategies/user';
 
 @Component({
   selector: 'app-login',
@@ -45,6 +46,10 @@ export class LoginComponent extends BaseComponent implements OnInit {
     });
   }
 
+  async logout() {
+    this.authService.logOut();
+  }
+
   async loginWithGmail(): Promise<void> {
     try {
       this.cacheService.clearCache();
@@ -57,6 +62,8 @@ export class LoginComponent extends BaseComponent implements OnInit {
       if (loggedInUser.isNewUser) {
         this.log('New user detected.');
         await this.registerNewUserOrDelete(loggedInUser.userId);
+      } else {
+        this.handleGptApiKey(loggedInUser);
       }
 
       this.router.navigate(['/protected']);
@@ -64,6 +71,24 @@ export class LoginComponent extends BaseComponent implements OnInit {
       this.error('Login error:', error);
       this.popup('Login failed. Please try again.');
     }
+  }
+
+  handleGptApiKey(loggedInUser: LoggedInUser) {
+    this.configService
+      .getApiStrategy()
+      .getUserInfo(loggedInUser.userId)
+      .then((user: TaskUserInfo | undefined) => {
+        if (user) {
+          if (user && user.canUseGpt) {
+            this.configService
+              .getApiStrategy()
+              .generateApiKey(loggedInUser.userId)
+              .then(() => {
+                console.log('Api key generated: ');
+              });
+          }
+        }
+      });
   }
 
   async registerNewUserOrDelete(userId: string): Promise<void> {
