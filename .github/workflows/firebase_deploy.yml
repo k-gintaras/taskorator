@@ -3,10 +3,10 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches:
-      - main # Set this to your default branch if it's not 'main'
+      - main # or your default branch
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,15 +21,18 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Install Angular CLI
-        run: npm install -g @angular/cli
+      - name: Build Angular Project
+        run: ng build --prod
 
-      - name: Build
-        run: ng build --configuration=production
+      - name: Setup Google Cloud Credentials
+        run: |
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > ./firebase-key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${PWD}/firebase-key.json" >> $GITHUB_ENV
 
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only hosting
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy to Firebase Hosting
+        run: firebase deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
