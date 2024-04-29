@@ -6,7 +6,7 @@ on:
       - main # Set this to your default branch if it's not 'main'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,13 +16,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20" # Update to Node.js 20
+          node-version: "20"
 
       - name: Install Dependencies
         run: npm install
 
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+
       - name: Build
-        run: ng build --prod
+        run: ng build --configuration=production
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
