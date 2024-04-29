@@ -19,6 +19,8 @@ import { take } from 'rxjs';
 import { RegistrationService } from '../../../services/core/registration.service';
 import ApiService from '../../../services/core/api.service';
 import { TaskUserInfo } from '../../../models/service-strategies/user';
+import { GptRequestService } from '../../gpt/services/gpt-request.service';
+import { AuthService } from '../../../services/core/auth.service';
 
 @Component({
   selector: 'app-admin',
@@ -36,6 +38,7 @@ export class AdminComponent {
   templateId: string = '';
   treeJson = '';
   tree: TaskTree | null = null;
+  joke: string | null = null;
 
   constructor(
     private templateService: AdminService,
@@ -45,9 +48,22 @@ export class AdminComponent {
     private localSqlite: LocalSqliteService,
     private treeBuilderService: TreeBuilderService,
     private registrationService: RegistrationService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private gptService: GptRequestService,
+    private authService: AuthService
   ) {}
 
+  gptTest() {
+    this.authService.getCurrentUserId().then((id) => {
+      console.log(id);
+      if (id) {
+        const request = 'make joke about very big cat';
+        this.gptService.makeGptRequest(request, id).subscribe((result) => {
+          this.joke = JSON.stringify(result, null, 2);
+        });
+      }
+    });
+  }
   registerTest() {
     const userId = 'qqpewpew';
     this.registrationService.registerUserById(userId);

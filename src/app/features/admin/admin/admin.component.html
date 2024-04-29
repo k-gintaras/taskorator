@@ -5,6 +5,8 @@ Loading:
 <p *ngIf="loading">loading: {{ loading }}</p>
 Error:
 <p *ngIf="error">error: {{ error }}</p>
+<p *ngIf="joke">Joke: {{ joke }}</p>
+<pre *ngIf="joke">{{ joke }}</pre>
 
 <div *ngIf="template">
   <h2>{{ template.name }}</h2>
@@ -20,9 +22,11 @@ Error:
 <button (click)="getTree()">Load Tree</button> -->
 <!-- <button (click)="sqliteTest()">Load sql</button> -->
 <!-- <button (click)="fixMissingTasks()">fix missing sql</button> -->
-<button (click)="registerTest()">register Test</button>
+<!-- <button (click)="registerTest()">register Test</button>
 <button (click)="addDocTest()">add doc test</button>
-<button (click)="getUserTest()">get doc test</button>
+<button (click)="getUserTest()">get doc test</button> -->
+
+<button (click)="gptTest()">get GTP test</button>
 
 <!-- YourComponent.html -->
 <div>

@@ -6,6 +6,7 @@ export interface TaskSettings {
   isShowSeen: boolean;
   isShowDeleted: boolean;
   isShowTodo: boolean;
+  isShowMore: boolean;
   completeButtonAction: CompleteButtonAction;
   lastOverlordViewId: string;
   // ... more settings here
@@ -19,7 +20,8 @@ export function getDefaultSettings() {
     isShowDeleted: false,
     isShowTodo: true,
     completeButtonAction: 'completed',
-    lastOverlordViewId: ROOT_TASK_ID, // the base overlord for all tasks forever
+    lastOverlordViewId: ROOT_TASK_ID,
+    isShowMore: false,
   };
   return { ...settings };
 }

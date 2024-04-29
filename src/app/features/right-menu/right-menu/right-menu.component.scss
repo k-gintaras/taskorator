@@ -1,0 +1,21 @@
+/* right-menu.component.css */
+.circle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #007bff; /* Primary blue color */
+  color: white;
+  border: none; /* Remove any default border */
+  width: 50px; /* Set a fixed width */
+  height: 50px; /* Set a fixed height */
+  border-radius: 50%; /* Make it perfectly round */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer; /* Cursor indicates it's clickable */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.circle-button:hover {
+  background-color: #0056b3; /* Darker shade of blue for better visibility on hover */
+}

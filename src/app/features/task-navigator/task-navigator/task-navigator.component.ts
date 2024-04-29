@@ -19,6 +19,8 @@ import { SelectedMultipleComponent } from '../../../components/task/selected-mul
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 import { CoreService } from '../../../services/core/core.service';
 import { ConfigService } from '../../../services/core/config.service';
+import { RightMenuComponent } from '../../right-menu/right-menu/right-menu.component';
+import { RightMenuService } from '../../right-menu/services/right-menu.service';
 @Component({
   selector: 'app-task-navigator',
   standalone: true,
@@ -33,6 +35,7 @@ import { ConfigService } from '../../../services/core/config.service';
     PromoterComponent,
     TaskActionComponent,
     SelectedMultipleComponent,
+    RightMenuComponent,
   ], // Import MatCardModule directly here
 })
 export class TaskNavigatorComponent extends CoreService implements OnInit {
@@ -50,6 +53,7 @@ export class TaskNavigatorComponent extends CoreService implements OnInit {
     private previousService: PreviousService,
     private taskNavigatorService: TaskNavigatorService,
     private selectedOverlordService: SelectedOverlordService,
+    private rightMenuService: RightMenuService,
     protected config: ConfigService
   ) {
     super(config);
@@ -98,6 +102,10 @@ export class TaskNavigatorComponent extends CoreService implements OnInit {
           });
       }
     });
+  }
+
+  isShowMoreEnabled(): boolean {
+    return this.rightMenuService.getIsShowMoreEnabled();
   }
 
   private async loadTaskNavigationView(overlordId: string) {

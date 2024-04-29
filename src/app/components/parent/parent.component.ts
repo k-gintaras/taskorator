@@ -27,6 +27,7 @@ export class ParentComponent implements OnInit {
     isShowTodo: false,
     completeButtonAction: 'todo',
     lastOverlordViewId: '',
+    isShowMore: false,
   }; // Empty settings object
   private subscription: Subscription | undefined;
 

@@ -44,6 +44,8 @@
           </button>
         </div>
         <app-task-mini [task]="task"></app-task-mini>
+        <div *ngIf="isShowMoreEnabled()">{{ task.todo }}</div>
+        <div *ngIf="isShowMoreEnabled()">{{ task.why }}</div>
       </div>
 
       <!-- Right-aligned items -->
@@ -53,4 +55,5 @@
       </div>
     </div>
   </div>
+  <app-right-menu></app-right-menu>
 </div>
