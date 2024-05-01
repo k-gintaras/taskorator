@@ -6,6 +6,7 @@
       type="text"
       id="name"
       [(ngModel)]="newTask.name"
+      (ngModelChange)="onInputChange()"
       required
       aria-label="Task name"
     />
@@ -19,12 +20,14 @@
     >
       <mat-icon>playlist_add</mat-icon>
     </button>
-    <button
+    <app-gpt-create></app-gpt-create>
+
+    <!-- <button
       class="task-btn add"
       (click)="createAndMove()"
       aria-label="edit task dropdown"
     >
       <mat-icon>edit</mat-icon>
-    </button>
+    </button> -->
   </div>
 </div>

@@ -58,7 +58,7 @@ export class AdminComponent {
       console.log(id);
       if (id) {
         const request = 'make joke about very big cat';
-        this.gptService.makeGptRequest(request, id).subscribe((result) => {
+        this.gptService.makeGptRequest(request, id).then((result) => {
           this.joke = JSON.stringify(result, null, 2);
         });
       }

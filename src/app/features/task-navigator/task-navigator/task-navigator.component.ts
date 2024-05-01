@@ -21,6 +21,8 @@ import { CoreService } from '../../../services/core/core.service';
 import { ConfigService } from '../../../services/core/config.service';
 import { RightMenuComponent } from '../../right-menu/right-menu/right-menu.component';
 import { RightMenuService } from '../../right-menu/services/right-menu.service';
+import { GptCreateComponent } from '../../gpt/gpt-create/gpt-create.component';
+import { GptTasksComponent } from '../../gpt/gpt-tasks/gpt-tasks.component';
 @Component({
   selector: 'app-task-navigator',
   standalone: true,
@@ -36,6 +38,8 @@ import { RightMenuService } from '../../right-menu/services/right-menu.service';
     TaskActionComponent,
     SelectedMultipleComponent,
     RightMenuComponent,
+    GptCreateComponent,
+    GptTasksComponent,
   ], // Import MatCardModule directly here
 })
 export class TaskNavigatorComponent extends CoreService implements OnInit {

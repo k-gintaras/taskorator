@@ -1,0 +1,16 @@
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.task-info {
+  flex-grow: 1; /* Allows the task information to take up the available space */
+}
+
+.task-actions {
+  display: flex;
+  flex-wrap: nowrap; /* Prevents buttons from wrapping */
+  gap: 10px; /* Optional: adds space between buttons */
+}

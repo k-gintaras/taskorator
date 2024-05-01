@@ -1,0 +1,16 @@
+/* Add to your component's CSS file */
+.action-container {
+  display: flex;
+  align-items: center; /* Aligns children vertically in the center */
+  justify-content: flex-start; /* Aligns children to the start of the flex container */
+}
+
+.compact-icon {
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center; /* Center the spinner horizontally within its container */
+}

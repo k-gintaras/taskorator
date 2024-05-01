@@ -215,6 +215,23 @@ export class TreeViewComponent implements OnInit, OnChanges {
       }
     });
   }
+
+  filterCompletedTasks(node: TaskTreeNode): TreeNode | null {
+    if (node.isCompleted) {
+      return null; // Exclude this node
+    }
+
+    const treeNode: TreeNode = { ...node }; // Adjust this according to your actual conversion logic if necessary
+
+    if (node.children) {
+      // Recursively filter children, removing nulls
+      treeNode.children = node.children
+        .map(this.filterCompletedTasks)
+        .filter((child) => child !== null) as TreeNode[];
+    }
+
+    return treeNode;
+  }
   // private renderTreeFromCurrentNode(node: TaskTreeNode) {
   //   let renderedNode: TaskTreeNode;
 
@@ -468,6 +485,10 @@ export class TreeViewComponent implements OnInit, OnChanges {
   // }
 
   private createTreeData(root: TaskTreeNode) {
+    // const filteredRoot = this.filterCompletedTasks(root);
+    // if (!filteredRoot) {
+    //   return undefined; // Handle the case where the root itself is 'completed' or has no visible children
+    // }
     const nodes = d3.hierarchy<TreeNode>(
       root as TreeNode,
       (d) => d.children as TreeNode[]

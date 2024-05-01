@@ -7,13 +7,15 @@ import { ErrorService } from '../../services/core/error.service';
 import { MatIcon } from '@angular/material/icon';
 import { FormsModule, NgModel } from '@angular/forms';
 import { MatCard, MatCardContent } from '@angular/material/card';
+import { CurrentInputService } from '../../services/current-input.service';
+import { GptCreateComponent } from '../../features/gpt/gpt-create/gpt-create.component';
 
 @Component({
   selector: 'app-add-move-task',
   templateUrl: './add-move-task.component.html',
   styleUrls: ['./add-move-task.component.scss'],
   standalone: true,
-  imports: [MatIcon, FormsModule, MatCardContent, MatCard],
+  imports: [MatIcon, FormsModule, MatCardContent, MatCard, GptCreateComponent],
 })
 export class AddMoveTaskComponent {
   @Input() overlord: Task | undefined;
@@ -22,8 +24,14 @@ export class AddMoveTaskComponent {
   constructor(
     private taskService: TaskService,
     private selectedService: SelectedMultipleService,
-    private feedbackService: ErrorService
+    private feedbackService: ErrorService,
+    private currentInputService: CurrentInputService
   ) {}
+
+  // we do it so we can reuse this input for gpt request, so we don't have to have multiple different inputs
+  onInputChange() {
+    this.currentInputService.updateCurrentInput(this.newTask.name);
+  }
 
   createTask() {
     const newTask: Task = { ...this.newTask }; // Clone

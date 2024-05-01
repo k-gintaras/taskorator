@@ -1,0 +1,13 @@
+<!-- Component's HTML -->
+<div class="action-container">
+  <button (click)="getSuggestion()" [disabled]="isLoading" class="task-btn">
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="20"
+    ></mat-progress-spinner>
+  </div>
+</div>

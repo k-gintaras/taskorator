@@ -12,6 +12,25 @@ export class TreeNodeService {
     }
   }
 
+  findPathToTask(
+    taskId: string,
+    node: TaskTreeNode,
+    path: TaskTreeNode[] = []
+  ): TaskTreeNode[] | null {
+    path.push(node);
+
+    if (node.taskId === taskId) {
+      return path;
+    }
+
+    for (const child of node.children) {
+      const result = this.findPathToTask(taskId, child, path.slice());
+      if (result) return result;
+    }
+
+    return null; // Return null if the task isn't found
+  }
+
   async createTask(tree: TaskTree, task: Task): Promise<void> {
     const parentNode = task.overlord
       ? this.findNode(tree.root, task.overlord)

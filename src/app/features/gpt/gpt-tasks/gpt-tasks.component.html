@@ -1,0 +1,16 @@
+<!-- task-list.component.html -->
+<div *ngFor="let task of tasks$ | async" class="task-item">
+  <div class="task-info">
+    <span class="task-name">{{ task.name }}</span>
+    <span class="task-todo">{{ task.todo }}</span>
+    <span class="task-why">{{ task.why }}</span>
+  </div>
+  <div class="task-actions">
+    <button mat-button color="primary" (click)="approveTask(task)">
+      <mat-icon>check_circle</mat-icon>
+    </button>
+    <button mat-button color="warn" (click)="removeTask(task)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

@@ -6,6 +6,7 @@ import { TaskNavigatorComponent } from './features/task-navigator/task-navigator
 import { canActivate } from './services/core/auth-guard';
 import { SelectedMultipleComponent } from './components/task/selected-multiple/selected-multiple.component';
 import { AdminComponent } from './features/admin/admin/admin.component';
+import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,11 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'suggestions',
+    component: GptTasksComponent,
     canActivate: [canActivate],
   }, // Login Test
 

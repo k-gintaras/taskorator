@@ -75,6 +75,16 @@ export class TreeService extends CoreService implements TreeStrategy {
     }
   }
 
+  async findPathStringToTask(taskId: string): Promise<string> {
+    const tree = this.treeSubject.getValue();
+    if (!tree || !tree.root) return '';
+
+    const pathNodes = this.treeNodeService.findPathToTask(taskId, tree.root);
+    if (!pathNodes) return '';
+
+    return pathNodes.map((node) => node.name).join(' >>> ');
+  }
+
   private async healTree(tasks: Task[]): Promise<void> {
     const tree = await firstValueFrom(this.getTree());
     if (tree) {
