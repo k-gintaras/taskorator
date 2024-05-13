@@ -18,13 +18,13 @@ export interface TaskNavigationView {
   providedIn: 'root',
 })
 export class TaskNavigatorService extends CoreService {
-  private taskNavigationViewSubject: BehaviorSubject<TaskNavigationView | null> =
+  protected taskNavigationViewSubject: BehaviorSubject<TaskNavigationView | null> =
     new BehaviorSubject<TaskNavigationView | null>(null);
 
   constructor(
-    private taskService: TaskService,
-    private eventBusService: EventBusService,
-    private previousService: PreviousService,
+    protected taskService: TaskService,
+    protected eventBusService: EventBusService,
+    protected previousService: PreviousService,
     configService: ConfigService
   ) {
     super(configService);
@@ -64,7 +64,7 @@ export class TaskNavigatorService extends CoreService {
     return overlordId;
   }
 
-  async loadTaskNavigationView(overlordId: string): Promise<void> {
+  async setTaskNavigationViewFromId(overlordId: string): Promise<void> {
     const overlord: Task | undefined = await this.taskService.getTaskById(
       overlordId
     );
@@ -148,6 +148,9 @@ export class TaskNavigatorService extends CoreService {
     }
   }
 
+  // although we know all the tasks in list have same overlord and we keep it in navigation
+  // it is possible to have a list where all tasks have different overlord
+  // so it is good that we just get the overlord per each task
   async previous(task: Task): Promise<void> {
     if (!task.overlord) {
       this.error('No overlord found for the task.');
@@ -167,6 +170,9 @@ export class TaskNavigatorService extends CoreService {
     }
   }
 
+  // although we know all the tasks in list have same overlord and we keep it in navigation
+  // it is possible to have a list where all tasks have different overlord
+  // so it is good that we just get the overlord per each task
   async back(task: Task): Promise<void> {
     if (!task.overlord) {
       this.error('No overlord found for the task.');
@@ -182,6 +188,9 @@ export class TaskNavigatorService extends CoreService {
     }
   }
 
+  // although we know all the tasks in list have same overlord and we keep it in navigation
+  // it is possible to have a list where all tasks have different overlord
+  // so it is good that we just get the overlord per each task
   async next(task: Task): Promise<void> {
     const tasks = await this.taskService.getOverlordChildren(task.taskId);
     if (tasks) this.setTaskNavigationView(task, tasks);

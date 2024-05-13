@@ -1,0 +1,16 @@
+<mat-form-field appearance="fill">
+  <mat-label>Select an Overlord Task</mat-label>
+  <mat-select (selectionChange)="handleOverlordSelection($event.value)">
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="taskSearchCtrl"
+      ></ngx-mat-select-search>
+    </mat-option>
+    <mat-option
+      *ngFor="let option of filteredTaskOptions | async"
+      [value]="option.taskId"
+    >
+      {{ option.name }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

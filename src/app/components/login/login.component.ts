@@ -66,7 +66,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
         this.handleGptApiKey(loggedInUser);
       }
 
-      this.router.navigate(['/protected']);
+      this.router.navigate(['/navigator']);
     } catch (error) {
       this.error('Login error:', error);
       this.popup('Login failed. Please try again.');

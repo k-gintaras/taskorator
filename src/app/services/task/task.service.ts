@@ -122,7 +122,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
         if (!task) {
           const baseTask = getBaseTask();
           task = await this.apiService.createTask(userId, baseTask);
-          await this.cacheService.createTask(task, 'getTaskById 1');
+          await this.cacheService.createTask(task);
           this.log(
             `Root task with ID ${taskId} was recreated and cached successfully`
           );
@@ -130,7 +130,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
           this.log(`Root task with ID ${taskId} already exists in cache`);
         }
       } else if (task) {
-        await this.cacheService.createTask(task, 'getTaskById 2');
+        await this.cacheService.createTask(task);
         this.log(`Task with ID ${taskId} retrieved from API and cached`);
       } else {
         this.log(`Task with ID ${taskId} not found in API or cache`);
@@ -179,7 +179,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
         if (!task) {
           task = await this.apiService.getSuperOverlord(userId, taskId);
           if (task) {
-            await this.cacheService.createTask(task, 'getSuperOverlord');
+            await this.cacheService.createTask(task);
           }
         }
         if (task) {

@@ -9,7 +9,7 @@ export interface TaskSettings {
   isShowMore: boolean;
   completeButtonAction: CompleteButtonAction;
   lastOverlordViewId: string;
-  // ... more settings here
+  focusTaskIds: string[];
 }
 
 export function getDefaultSettings() {
@@ -22,6 +22,7 @@ export function getDefaultSettings() {
     completeButtonAction: 'completed',
     lastOverlordViewId: ROOT_TASK_ID,
     isShowMore: false,
+    focusTaskIds: [],
   };
   return { ...settings };
 }

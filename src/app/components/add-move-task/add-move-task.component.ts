@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { getDefaultTask, Task } from '../../models/taskModelManager';
 import { TaskService } from '../../services/task/task.service';
@@ -9,6 +9,7 @@ import { FormsModule, NgModel } from '@angular/forms';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { CurrentInputService } from '../../services/current-input.service';
 import { GptCreateComponent } from '../../features/gpt/gpt-create/gpt-create.component';
+import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
 
 @Component({
   selector: 'app-add-move-task',
@@ -17,16 +18,28 @@ import { GptCreateComponent } from '../../features/gpt/gpt-create/gpt-create.com
   standalone: true,
   imports: [MatIcon, FormsModule, MatCardContent, MatCard, GptCreateComponent],
 })
-export class AddMoveTaskComponent {
+export class AddMoveTaskComponent implements OnInit {
   @Input() overlord: Task | undefined;
   newTask: Task = getDefaultTask();
+  selectedOverlord: Task | undefined;
 
   constructor(
     private taskService: TaskService,
     private selectedService: SelectedMultipleService,
     private feedbackService: ErrorService,
-    private currentInputService: CurrentInputService
+    private currentInputService: CurrentInputService,
+    private selectedOverlordService: SelectedOverlordService
   ) {}
+
+  ngOnInit(): void {
+    this.selectedOverlordService
+      .getSelectedOverlordObservable()
+      .subscribe((t: Task | null) => {
+        if (t) {
+          this.selectedOverlord = t;
+        }
+      });
+  }
 
   // we do it so we can reuse this input for gpt request, so we don't have to have multiple different inputs
   onInputChange() {
@@ -41,7 +54,9 @@ export class AddMoveTaskComponent {
     } else {
       newTask.overlord = '128'; // Your default Overlord ID
     }
-    this.taskService.createTask(newTask);
+    this.taskService.createTask(newTask).then((result) => {
+      this.newTask = getDefaultTask();
+    });
   }
 
   async createAndMove() {

@@ -1,0 +1,9 @@
+<ul class="focus-task-list">
+  <li
+    *ngFor="let task of focusTasks"
+    [class.is-focused]="task.isCompleted"
+    (click)="toggleFocus(task.taskId)"
+  >
+    {{ task.name }}
+  </li>
+</ul>

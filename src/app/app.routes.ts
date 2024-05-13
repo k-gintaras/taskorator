@@ -7,6 +7,7 @@ import { canActivate } from './services/core/auth-guard';
 import { SelectedMultipleComponent } from './components/task/selected-multiple/selected-multiple.component';
 import { AdminComponent } from './features/admin/admin/admin.component';
 import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
+import { FocusComponent } from './features/focus/focus/focus.component';
 
 export const routes: Routes = [
   {
@@ -15,7 +16,7 @@ export const routes: Routes = [
     canActivate: [canActivate],
   }, // Vizualizer
   { path: 'parent', component: ParentComponent }, // Task Browser
-  { path: '', redirectTo: '/protected', pathMatch: 'full' }, // Default route
+  { path: '', redirectTo: '/navigator', pathMatch: 'full' }, // Default route
   { path: 'login', component: LoginComponent }, // Login
   {
     path: 'selected',
@@ -23,7 +24,7 @@ export const routes: Routes = [
     canActivate: [canActivate],
   }, // Login
   {
-    path: 'protected',
+    path: 'navigator',
     component: TaskNavigatorComponent,
     canActivate: [canActivate],
   }, // Login Test
@@ -35,6 +36,11 @@ export const routes: Routes = [
   {
     path: 'suggestions',
     component: GptTasksComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'focus',
+    component: FocusComponent,
     canActivate: [canActivate],
   }, // Login Test
 

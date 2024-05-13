@@ -15,12 +15,6 @@ if (environment.production) {
   enableProdMode();
 }
 
-// Initialize Firebase App directly
-// const app: FirebaseApp = initializeApp(environment.firebase);
-
-// Initialize Firebase Authentication
-// const auth: Auth = getAuth(app);
-
 const firebaseJson = environment.firebase;
 
 bootstrapApplication(AppComponent, {
@@ -29,6 +23,7 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(provideFirebaseApp(() => initializeApp(firebaseJson))),
     importProvidersFrom(provideAuth(() => getAuth())),
     importProvidersFrom(provideFirestore(() => getFirestore())),
-    provideHttpClient(), provideAnimationsAsync(),
+    provideHttpClient(),
+    provideAnimationsAsync(),
   ],
 }).catch((err) => console.error(err));

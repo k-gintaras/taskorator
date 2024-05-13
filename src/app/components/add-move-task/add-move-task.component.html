@@ -1,8 +1,12 @@
 <div class="create-task-container">
+  <div class="task-header">
+    <h1>{{ selectedOverlord?.name }}</h1>
+    <p>{{ selectedOverlord?.why }}</p>
+  </div>
   <div class="task-input-group">
     <input
       class="task-input"
-      placeholder="Add to: {{ overlord?.name }} : {{ overlord?.why }}"
+      placeholder="Add to: {{ overlord?.name }}"
       type="text"
       id="name"
       [(ngModel)]="newTask.name"
@@ -10,24 +14,22 @@
       required
       aria-label="Task name"
     />
-    <button class="task-btn save" (click)="createTask()" aria-label="Save task">
-      <mat-icon>save</mat-icon>
-    </button>
-    <button
-      class="task-btn add"
-      (click)="createAndMove()"
-      aria-label="Create and move task"
-    >
-      <mat-icon>playlist_add</mat-icon>
-    </button>
-    <app-gpt-create></app-gpt-create>
-
-    <!-- <button
-      class="task-btn add"
-      (click)="createAndMove()"
-      aria-label="edit task dropdown"
-    >
-      <mat-icon>edit</mat-icon>
-    </button> -->
+    <div class="controls-group">
+      <button
+        class="task-btn save"
+        (click)="createTask()"
+        aria-label="Save task"
+      >
+        <mat-icon>save</mat-icon>
+      </button>
+      <button
+        class="task-btn add"
+        (click)="createAndMove()"
+        aria-label="Create and move task"
+      >
+        <mat-icon>playlist_add</mat-icon>
+      </button>
+      <app-gpt-create></app-gpt-create>
+    </div>
   </div>
 </div>

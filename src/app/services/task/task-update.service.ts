@@ -70,7 +70,13 @@ export class TaskUpdateService extends CoreService {
    * getting rid of tasks
    */
   complete(task: Task) {
-    task.stage = 'completed';
+    // if task is already completed
+    // uncomplete
+    if (task.stage === 'completed') {
+      task.stage = 'todo';
+    } else {
+      task.stage = 'completed';
+    }
     this.update(task);
     this.log('Completed: ' + task.name);
   }

@@ -13,7 +13,9 @@ import { MatButton } from '@angular/material/button';
 export class RightMenuComponent {
   constructor(private rightMenuService: RightMenuService) {}
 
-  toggleShowMore() {
+  toggleShowMore(event: any) {
+    if (event) event.stopPropagation();
+
     this.rightMenuService.toggleShowMore();
   }
 }

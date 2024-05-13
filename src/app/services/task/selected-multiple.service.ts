@@ -20,6 +20,11 @@ export class SelectedMultipleService {
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
   }
 
+  clear() {
+    this.selectedTasks.clear();
+    this.selectedTasksUpdated.next([]);
+  }
+
   addRemoveSelectedTask(task: Task): void {
     if (this.selectedTasks.has(task)) {
       // If the task is already in the set, remove it

@@ -12,6 +12,7 @@ import { ErrorService } from './error.service';
 import ApiService from './api.service';
 import { ConfigService } from './config.service';
 import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,8 @@ import { ErrorHandlingStrategy } from '../../models/service-strategies/error-han
 export class ServiceInitiatorService {
   private isInitialized = false;
   private initializationPromise: Promise<void>;
+  private initializationStatus: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
 
   constructor(
     private treeService: TreeService,
@@ -60,6 +63,12 @@ export class ServiceInitiatorService {
     this.configService.setErrorService(errorService);
 
     this.isInitialized = true;
+    this.initializationStatus.next(this.isInitialized);
+
     console.log('Api initialized:');
+  }
+
+  getInitializationStatus() {
+    return this.initializationStatus.asObservable();
   }
 }

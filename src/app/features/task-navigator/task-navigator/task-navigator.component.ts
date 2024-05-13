@@ -113,7 +113,7 @@ export class TaskNavigatorComponent extends CoreService implements OnInit {
   }
 
   private async loadTaskNavigationView(overlordId: string) {
-    await this.taskNavigatorService.loadTaskNavigationView(overlordId);
+    await this.taskNavigatorService.setTaskNavigationViewFromId(overlordId);
   }
 
   async goBack(task: Task | undefined) {

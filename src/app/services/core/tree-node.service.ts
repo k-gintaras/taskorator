@@ -108,6 +108,33 @@ export class TreeNodeService {
     return null;
   }
 
+  getFlattened(taskTree: TaskTree): TaskTreeNode[] {
+    return this.flattenTaskTree(taskTree.root); // Assuming the tree has a 'root' node
+  }
+
+  private flattenTaskTree(
+    node: TaskTreeNode,
+    array: TaskTreeNode[] = []
+  ): TaskTreeNode[] {
+    // Make sure to include all properties of TaskTreeNode in the object pushed into the array
+    array.push({
+      name: node.name,
+      taskId: node.taskId,
+      children: node.children,
+      isCompleted: node.isCompleted, // Assuming boolean type
+      overlord: node.overlord, // Assuming a string or object type
+      childrenCount: node.childrenCount, // Assuming integer type
+      completedChildrenCount: node.completedChildrenCount, // Assuming integer type
+    });
+
+    // Recursively flatten each child node
+    node.children.forEach((child) => {
+      this.flattenTaskTree(child, array);
+    });
+
+    return array;
+  }
+
   private moveTaskNode(
     tree: TaskTree,
     node: TaskTreeNode,

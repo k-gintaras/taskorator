@@ -5,11 +5,12 @@ import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
 import { NgIf } from '@angular/common';
+import { NavigationComponent } from './components/navigation/navigation.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, NgIf],
+  imports: [RouterOutlet, RouterLink, NgIf, NavigationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

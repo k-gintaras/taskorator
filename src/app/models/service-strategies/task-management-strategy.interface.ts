@@ -1,16 +1,5 @@
 import { Task } from '../taskModelManager';
 
-export interface TaskManagementCacheStrategy {
-  createTask(task: Task, from: string): Promise<Task>;
-  updateTask(task: Task): Promise<void>;
-  getTaskById(taskId: string): Promise<Task | undefined>;
-  getLatestTaskId(): Promise<string | undefined>;
-  getSuperOverlord(taskId: string): Promise<Task | undefined>;
-  getOverlordChildren(overlordId: string): Promise<Task[] | undefined>;
-  getTasks(): Promise<Task[]>;
-  createTasks(tasks: Task[]): Promise<Task[]>;
-  updateTasks(tasks: Task[]): Promise<void>;
-}
 export interface TaskManagementStrategy {
   createTask(task: Task): Promise<Task>;
   updateTask(task: Task): Promise<void>;

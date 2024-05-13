@@ -37,7 +37,7 @@ export class CacheService implements CacheStrategy {
   private subscribeToTaskEvents(): void {
     // tasks
     this.eventBusService.onEvent<any>('createTask').subscribe((task) => {
-      this.createTask(task, 'eventBusService');
+      this.createTask(task);
     });
     this.eventBusService.onEvent<any>('createTasks').subscribe((tasks) => {
       this.createTasks(tasks);
@@ -97,8 +97,8 @@ export class CacheService implements CacheStrategy {
     }
   }
 
-  private addCacheTask(task: Task, from: string): void {
-    console.log(`Adding/Updating task: ${task.taskId}` + 'from: ' + from);
+  private addCacheTask(task: Task): void {
+    console.log(`Adding/Updating task: ${task.taskId}`);
     this.taskMap.set(task.taskId, task);
 
     // Remove task from its previous immediate overlord using the reverse lookup map
@@ -127,11 +127,11 @@ export class CacheService implements CacheStrategy {
     }
   }
 
-  createTask(task: Task, from: string): Promise<Task> {
+  createTask(task: Task): Promise<Task> {
     return new Promise((resolve) => {
       const existingTask = this.taskMap.get(task.taskId);
       if (!existingTask) {
-        this.addCacheTask(task, from);
+        this.addCacheTask(task);
         console.log(`Task ${task.taskId} created in cache.`);
       } else {
         console.log(
@@ -144,7 +144,7 @@ export class CacheService implements CacheStrategy {
 
   updateTask(task: Task): Promise<void> {
     return new Promise((resolve) => {
-      this.addCacheTask(task, 'updateTask');
+      this.addCacheTask(task);
       resolve();
     });
   }
@@ -154,7 +154,7 @@ export class CacheService implements CacheStrategy {
       tasks.forEach((task) => {
         console.log('creating cache tasks');
         console.log(task);
-        this.addCacheTask(task, 'createTasks');
+        this.addCacheTask(task);
       });
       resolve(tasks);
     });
@@ -163,7 +163,7 @@ export class CacheService implements CacheStrategy {
   updateTasks(tasks: Task[]): Promise<void> {
     return new Promise((resolve) => {
       tasks.forEach((task) => {
-        this.addCacheTask(task, 'updateTasks');
+        this.addCacheTask(task);
       });
       resolve();
     });

@@ -28,6 +28,7 @@ export class ParentComponent implements OnInit {
     completeButtonAction: 'todo',
     lastOverlordViewId: '',
     isShowMore: false,
+    focusTaskIds: [],
   }; // Empty settings object
   private subscription: Subscription | undefined;
 
