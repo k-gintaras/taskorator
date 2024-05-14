@@ -40,7 +40,7 @@ export class TaskUpdateService extends CoreService {
   }
 
   create(task: Task) {
-    task.timeCreated = new Date();
+    task.timeCreated = Date.now();
     this.taskService.createTask(task).then((createdTask: Task) => {
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
     });
@@ -52,7 +52,7 @@ export class TaskUpdateService extends CoreService {
   }
 
   update(task: Task) {
-    task.lastUpdated = new Date();
+    task.lastUpdated = Date.now();
     this.taskService.updateTask(task).then(() => {
       this.log('Updated: ' + task.name);
     });
@@ -237,7 +237,7 @@ export class TaskUpdateService extends CoreService {
     this.log('Updated repeat: ' + task.name);
   }
 
-  setTimeEnd(task: Task, timeEnd: Date) {
+  setTimeEnd(task: Task, timeEnd: number) {
     task.timeEnd = timeEnd;
     this.update(task);
     this.log('Updated time end: ' + task.name);

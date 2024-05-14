@@ -81,4 +81,25 @@ export class SettingsService extends CoreService implements SettingsStrategy {
       throw error;
     }
   }
+
+  // New method to get settings once from cache or API
+  async getSettingsOnce(): Promise<TaskSettings | null> {
+    try {
+      let settings = await this.cacheService.getSettings();
+      if (!settings) {
+        const userId = await this.authService.getCurrentUserId();
+        if (!userId) return null;
+
+        settings = await this.apiService.getSettings(userId);
+        if (!settings) return null;
+
+        // Optionally update the cache with the fetched settings
+        await this.cacheService.updateSettings(settings);
+      }
+      return settings;
+    } catch (error) {
+      this.error(error);
+      return null;
+    }
+  }
 }

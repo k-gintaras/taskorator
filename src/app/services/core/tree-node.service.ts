@@ -135,6 +135,39 @@ export class TreeNodeService {
     return array;
   }
 
+  /**
+   * Determines if a task has many descendants.
+   * @param taskTreeNode - The task to check.
+   * @param threshold - The number of descendants that qualifies a task to be split.
+   * @returns True if the task has more descendants than the threshold.
+   */
+  hasManyDescendants(taskTreeNode: TaskTreeNode, threshold: number): boolean {
+    let count = 0;
+
+    const countDescendants = (task: TaskTreeNode) => {
+      count += task.children.length;
+      task.children.forEach(countDescendants);
+    };
+
+    countDescendants(taskTreeNode);
+    return count >= threshold;
+  }
+
+  /**
+   * Determines if a task is deeply nested within the tree.
+   * @param taskTreeNode - The task to check.
+   * @param depthThreshold - The depth beyond which a task is considered deeply nested.
+   * @returns True if the task's depth exceeds the threshold.
+   */
+  isDeeplyNested(taskTreeNode: TaskTreeNode, depthThreshold: number): boolean {
+    const getDepth = (task: TaskTreeNode): number => {
+      if (!task.children.length) return 0;
+      return 1 + Math.max(...task.children.map(getDepth));
+    };
+
+    return getDepth(taskTreeNode) > depthThreshold;
+  }
+
   private moveTaskNode(
     tree: TaskTree,
     node: TaskTreeNode,

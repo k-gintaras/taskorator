@@ -3,9 +3,9 @@ export interface Task {
   name: string;
   todo: string;
   why: string;
-  timeCreated: Date | null; // Creation time of the task (JavaScript Date object)
-  lastUpdated: Date | null;
-  timeEnd: Date | null; // Completion time of the task (JavaScript Date object or null if not completed)
+  timeCreated: number; // UNIX timestamp in milliseconds
+  lastUpdated: number; // UNIX timestamp in milliseconds
+  timeEnd: number | null; // UNIX timestamp in milliseconds
   duration: number; // Estimated time to complete the task in minutes or hours
   overlord: string | null; // taskId of the parent task if it's part of a hierarchy
   repeat: RepeatOptions;
@@ -91,17 +91,21 @@ export type TaskSubtype =
   | 'text'
   | 'list';
 
+export const ROOT_TASK_ID = '128';
+export const ROOT_TASK_DESCRIPTION = 'where everything connects';
+
 export function getDefaultTask(): Task {
-  const defaultTask: Task = {
+  const now = Date.now(); // Current time in milliseconds
+  return {
     taskId: '0',
     name: '',
     todo: '',
     why: '',
-    timeCreated: new Date(), // Current date and time
-    lastUpdated: new Date(), // Current date and time
+    timeCreated: now,
+    lastUpdated: now,
     timeEnd: null,
     duration: 0,
-    overlord: ROOT_TASK_ID, // todo is the overlord 128, overlord is overlord 129
+    overlord: ROOT_TASK_ID,
     repeat: 'once',
     status: 'active',
     stage: 'todo',
@@ -109,30 +113,26 @@ export function getDefaultTask(): Task {
     subtype: 'list',
     size: 'do now',
     owner: '',
-    priority: 5, // mid, downgrade possible instead of max, decide if there should be limit 10
+    priority: 5,
     backupLink: '',
     imageUrl: '',
     imageDataUrl: '',
     tags: [],
   };
-
-  return { ...defaultTask };
 }
 
-export const ROOT_TASK_ID = '128';
-export const ROOT_TASK_DESCRIPTION = 'where everything connects';
-
 export function getBaseTask(): Task {
-  const defaultTask: Task = {
+  const now = Date.now(); // Current time in milliseconds
+  return {
     taskId: ROOT_TASK_ID,
     name: 'Me',
     todo: '',
     why: ROOT_TASK_DESCRIPTION,
-    timeCreated: new Date(), // Current date and time
-    lastUpdated: new Date(), // Current date and time
+    timeCreated: now,
+    lastUpdated: now,
     timeEnd: null,
     duration: 0,
-    overlord: null, // todo is the overlord 128, overlord is overlord 129
+    overlord: null,
     repeat: 'once',
     status: 'active',
     stage: 'todo',
@@ -140,12 +140,10 @@ export function getBaseTask(): Task {
     subtype: 'list',
     size: 'do now',
     owner: '',
-    priority: 5, // mid, downgrade possible instead of max, decide if there should be limit 10
+    priority: 5,
     backupLink: '',
     imageUrl: '',
     imageDataUrl: '',
     tags: [],
   };
-
-  return { ...defaultTask };
 }

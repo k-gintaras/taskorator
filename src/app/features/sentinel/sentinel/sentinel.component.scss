@@ -1,0 +1,19 @@
+/* sentinel.component.css */
+.button-group {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+mat-list-item {
+  border-bottom: 1px solid #ccc;
+}
+
+mat-icon {
+  color: #1976d2;
+}
+
+mat-progress-spinner {
+  display: block;
+  margin: 20px auto;
+}

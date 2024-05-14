@@ -21,7 +21,24 @@ import ApiService from '../../../services/core/api.service';
 import { TaskUserInfo } from '../../../models/service-strategies/user';
 import { GptRequestService } from '../../gpt/services/gpt-request.service';
 import { AuthService } from '../../../services/core/auth.service';
-
+import {
+  Firestore,
+  collection,
+  doc,
+  updateDoc,
+  writeBatch,
+  query,
+  where,
+  limit,
+  orderBy,
+  getDoc,
+  setDoc,
+  getDocs,
+  runTransaction,
+  DocumentReference,
+  Timestamp,
+  CollectionReference,
+} from '@angular/fire/firestore';
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -50,7 +67,8 @@ export class AdminComponent {
     private registrationService: RegistrationService,
     private apiService: ApiService,
     private gptService: GptRequestService,
-    private authService: AuthService
+    private authService: AuthService,
+    private firestore: Firestore
   ) {}
 
   gptTest() {
@@ -107,6 +125,67 @@ export class AdminComponent {
       this.message = 'Failed to migrate tasks';
       console.error('Failed to migrate tasks:', error);
     }
+  }
+
+  parseDate(date: any): number | null {
+    if (date === null) {
+      return null;
+    } else if (date instanceof Timestamp) {
+      return date.toMillis(); // Firestore Timestamp
+    } else if (typeof date === 'number') {
+      return date; // Already in milliseconds
+    } else if (typeof date === 'string') {
+      if (!isNaN(Date.parse(date))) {
+        return new Date(date).getTime(); // ISO 8601 or human-readable string
+      } else if (!isNaN(Number(date))) {
+        return Number(date); // String milliseconds
+      } else {
+        // Attempt to parse human-readable format, adjust format if needed
+        return Date.parse(date.replace(' at', ''));
+      }
+    } else if (date instanceof Date) {
+      return date.getTime(); // JavaScript Date object
+    } else {
+      throw new Error(`Unsupported date format: ${date}`);
+    }
+  }
+
+  async migrateTaskDates(userId: string): Promise<void> {
+    const tasksCollection = collection(
+      this.firestore,
+      `users/${userId}/tasks`
+    ) as CollectionReference;
+    const querySnapshot = await getDocs(tasksCollection);
+
+    querySnapshot.forEach(async (doc) => {
+      const data = doc.data();
+      const updatedData = {
+        ...data,
+        timeCreated: this.parseDate(data['timeCreated']),
+        lastUpdated: this.parseDate(data['lastUpdated']),
+        timeEnd: this.parseDate(data['timeEnd']),
+      };
+
+      await setDoc(doc.ref, updatedData);
+    });
+  }
+
+  migrateDatesFix(): void {
+    this.authService
+      .getCurrentUserId()
+      .then((id) => {
+        if (!id) throw new Error('no user');
+        this.migrateTaskDates(id)
+          .then(() => {
+            console.log('Migration completed successfully.');
+          })
+          .catch((error) => {
+            console.error('Error migrating dates:', error);
+          });
+      })
+      .catch((error) => {
+        console.error('Error getting user ID:', error);
+      });
   }
 
   sqliteTest() {

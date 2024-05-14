@@ -8,6 +8,7 @@ import { SelectedMultipleComponent } from './components/task/selected-multiple/s
 import { AdminComponent } from './features/admin/admin/admin.component';
 import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
 import { FocusComponent } from './features/focus/focus/focus.component';
+import { SentinelComponent } from './features/sentinel/sentinel/sentinel.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,11 @@ export const routes: Routes = [
   {
     path: 'focus',
     component: FocusComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'sentinel',
+    component: SentinelComponent,
     canActivate: [canActivate],
   }, // Login Test
 

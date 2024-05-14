@@ -64,11 +64,9 @@ export class RegistrationService extends CoreService {
       );
 
       if (registrationResult.success) {
-        await this.cacheService.createTask(initialTask, 'registerUserById');
+        await this.cacheService.createTask(initialTask);
         await Promise.all(
-          additionalTasks.map((task) =>
-            this.cacheService.createTask(task, 'registerUserById')
-          )
+          additionalTasks.map((task) => this.cacheService.createTask(task))
         );
         await this.cacheService.createSettings(settings);
         await this.cacheService.createScore(score);

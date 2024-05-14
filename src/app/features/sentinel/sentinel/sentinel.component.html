@@ -1,0 +1,25 @@
+<div class="button-group">
+  <button mat-button (click)="loadLatestTasks()">Latest Tasks</button>
+  <button mat-button (click)="loadOverlordTasks()">Overlord Tasks</button>
+  <button mat-button (click)="loadDailyTasks()">Daily Tasks</button>
+  <button mat-button (click)="loadWeeklyTasks()">Weekly Tasks</button>
+  <button mat-button (click)="loadCrushTasks()">To Crush Tasks</button>
+  <button mat-button (click)="loadSplitTasks()">To Split Tasks</button>
+  <button mat-button (click)="loadFocusTasks()">Focus Tasks</button>
+</div>
+
+<div *ngIf="tasks !== null; else loading">
+  <mat-list>
+    <mat-list-item *ngFor="let task of tasks">
+      <mat-icon matListIcon>task</mat-icon>
+      <h3 matLine>{{ task.name }}</h3>
+      <p matLine>{{ task.why }}</p>
+    </mat-list-item>
+  </mat-list>
+</div>
+
+<ng-template #loading>
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  <p *ngIf="!errorMessage">Loading tasks...</p>
+  <p *ngIf="errorMessage">{{ errorMessage }}</p>
+</ng-template>

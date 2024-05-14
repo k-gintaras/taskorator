@@ -192,4 +192,23 @@ export class TreeService extends CoreService implements TreeStrategy {
       throw error;
     }
   }
+
+  async getTreeOnce(): Promise<TaskTree | null> {
+    try {
+      let tree = await this.cacheService.getTree();
+      if (!tree) {
+        const userId = await this.authService.getCurrentUserId();
+        if (!userId) return null;
+
+        tree = await this.apiService.getTree(userId);
+        if (!tree) return null;
+
+        await this.cacheService.updateTree(tree);
+      }
+      return tree;
+    } catch (error) {
+      this.error(error);
+      return null;
+    }
+  }
 }
