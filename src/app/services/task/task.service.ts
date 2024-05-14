@@ -179,7 +179,7 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
         if (!task) {
           task = await this.apiService.getSuperOverlord(userId, taskId);
           if (task) {
-            await this.cacheService.createTask(task);
+            // await this.cacheService.createTask(task);
           }
         }
         if (task) {

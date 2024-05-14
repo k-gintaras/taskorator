@@ -1,0 +1,41 @@
+<div class="task-navigator">
+  <!-- Header Section with Overlord Name, Description, and Add/Move Task Component -->
+
+  <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task>
+
+  <!-- Message and Back Button When There Are No Tasks -->
+  <div *ngIf="tasks?.length === 0" class="no-tasks">
+    <p>No tasks yet.</p>
+    <button class="task-btn" (click)="goBack(selectedOverlord)">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </div>
+
+  <!-- Task List -->
+  <div
+    *ngFor="let task of tasks"
+    class="task-container"
+    [class.selected]="isSelected(task)"
+  >
+    <div class="left-section">
+      <div class="navigation-actions">
+        <button class="task-btn" (click)="onPrevious(task)">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <button class="task-btn" (click)="onNext(task)">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+      <app-task-mini [task]="task"></app-task-mini>
+      <div *ngIf="isShowMoreEnabled()" class="show-more">
+        {{ task.why }} - {{ task.todo }}
+      </div>
+    </div>
+    <div class="right-section">
+      <app-task-action [task]="task"></app-task-action>
+      <app-promoter [task]="task"></app-promoter>
+    </div>
+  </div>
+  <app-right-menu></app-right-menu>
+  <!-- This remains fixed as per your note -->
+</div>

@@ -8,18 +8,4 @@
   <button mat-button (click)="loadFocusTasks()">Focus Tasks</button>
 </div>
 
-<div *ngIf="tasks !== null; else loading">
-  <mat-list>
-    <mat-list-item *ngFor="let task of tasks">
-      <mat-icon matListIcon>task</mat-icon>
-      <h3 matLine>{{ task.name }}</h3>
-      <p matLine>{{ task.why }}</p>
-    </mat-list-item>
-  </mat-list>
-</div>
-
-<ng-template #loading>
-  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-  <p *ngIf="!errorMessage">Loading tasks...</p>
-  <p *ngIf="errorMessage">{{ errorMessage }}</p>
-</ng-template>
+<app-simple-navigator></app-simple-navigator>

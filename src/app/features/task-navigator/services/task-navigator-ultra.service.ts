@@ -15,9 +15,12 @@ import { Observable } from 'rxjs/internal/Observable';
   providedIn: 'root',
 })
 export class TaskNavigatorUltraService extends TaskNavigatorService {
-  private initialTasksSubject: BehaviorSubject<Task[]> = new BehaviorSubject<
-    Task[]
-  >([]);
+  // private initialTasksSubject: BehaviorSubject<Task[]> = new BehaviorSubject<
+  //   Task[]
+  // >([]);
+
+  protected initialTasksSubject: BehaviorSubject<TaskNavigationView | null> =
+    new BehaviorSubject<TaskNavigationView | null>(null);
 
   constructor(
     taskService: TaskService,
@@ -28,15 +31,21 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
     super(taskService, eventBusService, previousService, configService);
   }
 
-  setInitialTasks(tasks: Task[]): void {
-    this.initialTasksSubject.next(tasks);
+  setInitialTasks(overlord: Task, tasks: Task[]): void {
+    this.initialTasksSubject.next({
+      taskOverlord: overlord,
+      taskChildren: tasks,
+    });
   }
 
   override async previous(task: Task): Promise<void> {
     if (!task.overlord) {
       const initialTasks = this.initialTasksSubject.value;
-      if (initialTasks.length > 0) {
-        this.setTaskNavigationView(null, initialTasks);
+      if (initialTasks && initialTasks.taskChildren.length > 0) {
+        this.setTaskNavigationView(
+          initialTasks.taskOverlord,
+          initialTasks.taskChildren
+        );
       } else {
         this.error('No overlord found for the task and no initial tasks set.');
       }
@@ -50,11 +59,16 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
       const tasks = await this.taskService.getOverlordChildren(
         superOverlord.taskId
       );
-      if (tasks) this.setTaskNavigationView(superOverlord, tasks);
+      if (tasks) {
+        this.setTaskNavigationView(superOverlord, tasks);
+      }
     } else {
       const initialTasks = this.initialTasksSubject.value;
-      if (initialTasks.length > 0) {
-        this.setTaskNavigationView(null, initialTasks);
+      if (initialTasks && initialTasks.taskChildren.length > 0) {
+        this.setTaskNavigationView(
+          initialTasks.taskOverlord,
+          initialTasks.taskChildren
+        );
       } else {
         this.error(
           'No super overlord found for the task and no initial tasks set.'
@@ -67,7 +81,7 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
     taskOverlord: Task | null,
     taskChildren: Task[]
   ): void {
-    this.log('Setting new view:');
+    this.log('Setting new view in ultra:');
     this.log(taskOverlord);
     this.log(taskChildren);
     if (!taskOverlord) {
@@ -80,7 +94,7 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
     this.taskNavigationViewSubject.next(view);
   }
 
-  getInitialTasks(): Observable<Task[]> {
+  getInitialTasks(): Observable<TaskNavigationView | null> {
     return this.initialTasksSubject.asObservable();
   }
 }

@@ -79,7 +79,7 @@ export class TaskNavigatorService extends CoreService {
 
   private async handleTaskCreated(task: Task): Promise<void> {
     const currentView = this.taskNavigationViewSubject.value;
-    if (currentView) {
+    if (currentView && currentView.taskOverlord) {
       if (task.overlord === currentView.taskOverlord.taskId) {
         const updatedChildren = [...currentView.taskChildren, task];
         this.setTaskNavigationView(currentView.taskOverlord, updatedChildren);
@@ -106,7 +106,7 @@ export class TaskNavigatorService extends CoreService {
 
   private async handleTaskUpdated(task: Task): Promise<void> {
     const currentView = this.taskNavigationViewSubject.value;
-    if (currentView) {
+    if (currentView && currentView.taskOverlord) {
       if (task.overlord === currentView.taskOverlord.taskId) {
         const updatedChildren = currentView.taskChildren.map((child) =>
           child.taskId === task.taskId ? task : child
@@ -193,6 +193,8 @@ export class TaskNavigatorService extends CoreService {
   // so it is good that we just get the overlord per each task
   async next(task: Task): Promise<void> {
     const tasks = await this.taskService.getOverlordChildren(task.taskId);
+    console.log('tasks from NEXT...');
+    console.log(tasks);
     if (tasks) this.setTaskNavigationView(task, tasks);
     if (!tasks) this.setTaskNavigationView(task, []);
   }
