@@ -1,0 +1,70 @@
+.task-session {
+  padding: 20px;
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .create-session {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+
+    input {
+      margin-right: 10px;
+      padding: 5px;
+    }
+
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      border-radius: 3px;
+    }
+  }
+
+  .sessions-list {
+    .session-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+
+      span {
+        margin-right: 10px;
+      }
+
+      mat-icon {
+        cursor: pointer;
+        color: red;
+      }
+
+      &.selected-session {
+        background-color: #e0f7fa;
+        border-left: 5px solid #00796b;
+      }
+    }
+  }
+
+  .session-timer {
+    margin-top: 20px;
+    h3 {
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.2em;
+    }
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+    }
+  }
+}

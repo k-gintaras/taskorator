@@ -54,7 +54,7 @@ export class TaskUpdateService extends CoreService {
   update(task: Task) {
     task.lastUpdated = Date.now();
     this.taskService.updateTask(task).then(() => {
-      this.log('Updated: ' + task.name);
+      this.log('Updated: ' + task.name + ' at ' + task.lastUpdated);
     });
   }
 

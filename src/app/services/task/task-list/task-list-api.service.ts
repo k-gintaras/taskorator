@@ -113,44 +113,28 @@ export class TaskListApiService implements TaskListApiStrategy {
     userId: string,
     filterCompleted: boolean = false
   ): Promise<Task[] | null> {
-    return this.taskListAssistant.getRepeatingTasks(
-      userId,
-      'daily',
-      filterCompleted
-    );
+    return this.taskListAssistant.getRepeatingTasks(userId, 'daily');
   }
 
   async getWeeklyTasks(
     userId: string,
     filterCompleted: boolean = false
   ): Promise<Task[] | null> {
-    return this.taskListAssistant.getRepeatingTasks(
-      userId,
-      'weekly',
-      filterCompleted
-    );
+    return this.taskListAssistant.getRepeatingTasks(userId, 'weekly');
   }
 
   async getMonthlyTasks(
     userId: string,
     filterCompleted: boolean = false
   ): Promise<Task[] | null> {
-    return this.taskListAssistant.getRepeatingTasks(
-      userId,
-      'monthly',
-      filterCompleted
-    );
+    return this.taskListAssistant.getRepeatingTasks(userId, 'monthly');
   }
 
   async getYearlyTasks(
     userId: string,
     filterCompleted: boolean = false
   ): Promise<Task[] | null> {
-    return this.taskListAssistant.getRepeatingTasks(
-      userId,
-      'yearly',
-      filterCompleted
-    );
+    return this.taskListAssistant.getRepeatingTasks(userId, 'yearly');
   }
 
   async getFocusTasks(userId: string): Promise<Task[] | null> {

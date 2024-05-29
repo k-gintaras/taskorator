@@ -9,6 +9,8 @@ import { AdminComponent } from './features/admin/admin/admin.component';
 import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
 import { FocusComponent } from './features/focus/focus/focus.component';
 import { SentinelComponent } from './features/sentinel/sentinel/sentinel.component';
+import { SessionComponent } from './features/session/session/session.component';
+import { TemplateHandlerComponent } from './features/template/template-handler/template-handler.component';
 
 export const routes: Routes = [
   {
@@ -47,6 +49,16 @@ export const routes: Routes = [
   {
     path: 'sentinel',
     component: SentinelComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'session',
+    component: SessionComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'template',
+    component: TemplateHandlerComponent,
     canActivate: [canActivate],
   }, // Login Test
 

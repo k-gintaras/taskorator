@@ -41,9 +41,18 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
         console.log('Redirecting because already logged in');
-        // this.router.navigate(['/protected']);
+        if (this.configService.isTesting()) {
+          this.delay(1000).then(() => {
+            this.router.navigate(['/sentinel']);
+          });
+        }
+        this.router.navigate(['/sentinel']);
       }
     });
+  }
+
+  delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async logout() {

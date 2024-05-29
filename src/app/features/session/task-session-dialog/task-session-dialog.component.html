@@ -1,0 +1,26 @@
+<!-- task-sessions/task-session-dialog/task-session-dialog.component.html -->
+<h1 mat-dialog-title>
+  {{ data.id ? "Edit Task Session" : "Create Task Session" }}
+</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="data.name" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Task IDs (comma separated)</mat-label>
+    <input
+      matInput
+      [(ngModel)]="data.taskIds"
+      [ngModelOptions]="{ standalone: true }"
+    />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Duration (minutes)</mat-label>
+    <input matInput type="number" [(ngModel)]="data.duration" />
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Save</button>
+</div>

@@ -1,11 +1,21 @@
-<div class="button-group">
-  <button mat-button (click)="loadLatestTasks()">Latest Tasks</button>
-  <button mat-button (click)="loadOverlordTasks()">Overlord Tasks</button>
-  <button mat-button (click)="loadDailyTasks()">Daily Tasks</button>
-  <button mat-button (click)="loadWeeklyTasks()">Weekly Tasks</button>
-  <button mat-button (click)="loadCrushTasks()">To Crush Tasks</button>
-  <button mat-button (click)="loadSplitTasks()">To Split Tasks</button>
-  <button mat-button (click)="loadFocusTasks()">Focus Tasks</button>
+<div class="secondary-navigation">
+  <mat-chip-set>
+    <mat-chip (click)="loadLatestTasks()" clickable>Latest Tasks</mat-chip>
+    <mat-chip (click)="loadOverlordTasks()" clickable>Overlord Tasks</mat-chip>
+    <mat-chip (click)="loadDailyFilteredTasks()" clickable
+      >Daily Tasks</mat-chip
+    >
+    <mat-chip (click)="loadWeeklyTasks()" clickable>Weekly Tasks</mat-chip>
+    <mat-chip (click)="loadCrushTasks()" clickable>To Crush Tasks</mat-chip>
+    <mat-chip (click)="loadSplitTasks()" clickable>To Split Tasks</mat-chip>
+    <mat-chip (click)="loadFocusTasks()" clickable>Focus Tasks</mat-chip>
+  </mat-chip-set>
+</div>
+<div class="center-horizontal">
+  <h1>{{ title }}</h1>
 </div>
 
+<div class="center-horizontal">
+  <div class="task-form-container"><app-create-task></app-create-task></div>
+</div>
 <app-simple-navigator></app-simple-navigator>

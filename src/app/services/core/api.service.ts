@@ -23,7 +23,7 @@ import {
 import { Score } from '../../models/score';
 import { Task, getDefaultTask } from '../../models/taskModelManager';
 import { TaskTree } from '../../models/taskTree';
-import { TaskSettings } from '../../models/settings';
+import { getDefaultSettings, TaskSettings } from '../../models/settings';
 
 /**
  * @todo
@@ -520,13 +520,16 @@ export default class ApiService implements ApiStrategy {
       const docSnap = await getDoc(settingsDocRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        return JSON.parse(JSON.stringify(data));
+        return {
+          ...getDefaultSettings(), // Start with default settings
+          ...data, // Override with data from the database
+        };
       } else {
-        return null;
+        return getDefaultSettings(); // Return default settings if none exist
       }
     } catch (error) {
       console.error('Failed to get settings:', error);
-      return null;
+      return getDefaultSettings(); // Return default settings in case of error
     }
   }
 

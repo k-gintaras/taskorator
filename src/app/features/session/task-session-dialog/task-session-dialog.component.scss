@@ -1,0 +1,19 @@
+/* task-sessions/task-sessions.component.scss */
+.task-sessions {
+  .mat-toolbar {
+    margin-bottom: 20px;
+  }
+
+  .mat-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+/* task-sessions/task-session-dialog/task-session-dialog.component.scss */
+/* Add any necessary styles for dialog component */

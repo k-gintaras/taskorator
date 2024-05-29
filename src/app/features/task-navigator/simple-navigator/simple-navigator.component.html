@@ -1,7 +1,8 @@
 <div class="task-navigator">
   <!-- Header Section with Overlord Name, Description, and Add/Move Task Component -->
 
-  <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task>
+  <!-- you can't add to an overlord that is of a tasks that have many overlords like latest tasks...  -->
+  <!-- <app-add-move-task [overlord]="selectedOverlord"></app-add-move-task> -->
 
   <!-- Message and Back Button When There Are No Tasks -->
   <div *ngIf="tasks?.length === 0" class="no-tasks">
@@ -33,7 +34,7 @@
     </div>
     <div class="right-section">
       <app-task-action [task]="task"></app-task-action>
-      <app-promoter [task]="task"></app-promoter>
+      <!-- <app-promoter [task]="task"></app-promoter> -->
     </div>
   </div>
   <app-right-menu></app-right-menu>

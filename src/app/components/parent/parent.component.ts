@@ -1,7 +1,7 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { TaskSettings } from '../../models/settings';
+import { getDefaultSettings, TaskSettings } from '../../models/settings';
 import { Task } from '../../models/taskModelManager';
 import { MenuComponent } from '../menu/menu.component';
 import { TaskNavigatorComponent } from '../../features/task-navigator/task-navigator/task-navigator.component';
@@ -19,17 +19,7 @@ export class ParentComponent implements OnInit {
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
   private isInitialized = false;
-  settings: TaskSettings = {
-    isShowArchived: false,
-    isShowCompleted: false,
-    isShowSeen: false,
-    isShowDeleted: false,
-    isShowTodo: false,
-    completeButtonAction: 'todo',
-    lastOverlordViewId: '',
-    isShowMore: false,
-    focusTaskIds: [],
-  }; // Empty settings object
+  settings: TaskSettings = getDefaultSettings();
   private subscription: Subscription | undefined;
 
   ngOnInit() {

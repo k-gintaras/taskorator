@@ -71,70 +71,89 @@ export class TaskListAssistantService {
   // task repetition:
   async getRepeatingTasks(
     userId: string,
-    repeatInterval: string,
-    filterCompleted: boolean = false
+    repeatInterval: string
   ): Promise<Task[] | null> {
     const queryConstraints: QueryConstraint[] = [
       where('repeat', '==', repeatInterval),
       limit(TASK_LIST_LIMIT),
     ];
-
-    // Apply filter for completed tasks if needed
-    this.addCompletedFilterConstraints(
-      queryConstraints,
-      filterCompleted,
-      repeatInterval
-    );
-
     return this.getTasksWithConstraints(userId, queryConstraints);
   }
 
-  private addCompletedFilterConstraints(
-    constraints: QueryConstraint[],
+  private calculatePeriodTimes(repeatInterval: string): {
+    startTime: number;
+    endTime: number;
+  } {
+    let startTime: number;
+    let endTime: number;
+    const currentDate = new Date();
+
+    switch (repeatInterval) {
+      case 'daily':
+        currentDate.setHours(0, 0, 0, 0);
+        startTime = currentDate.getTime();
+        endTime = startTime + 24 * 60 * 60 * 1000; // Next day start
+        break;
+      case 'weekly':
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        startTime = startOfWeek.getTime();
+        endTime = startTime + 7 * 24 * 60 * 60 * 1000; // Next week start
+        break;
+      case 'monthly':
+        const startOfMonth = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+        startOfMonth.setHours(0, 0, 0, 0);
+        startTime = startOfMonth.getTime();
+        const nextMonth = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() + 1,
+          1
+        );
+        endTime = nextMonth.getTime(); // Next month start
+        break;
+      case 'yearly':
+        const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+        startOfYear.setHours(0, 0, 0, 0);
+        startTime = startOfYear.getTime();
+        const nextYear = new Date(currentDate.getFullYear() + 1, 0, 1);
+        endTime = nextYear.getTime(); // Next year start
+        break;
+      default:
+        currentDate.setHours(0, 0, 0, 0);
+        startTime = currentDate.getTime();
+        endTime = startTime + 24 * 60 * 60 * 1000; // Default to daily
+        break;
+    }
+
+    return { startTime, endTime };
+  }
+
+  public filterTasks(
+    tasks: Task[],
     filterCompleted: boolean,
     repeatInterval: string
-  ): void {
-    if (filterCompleted) {
-      const now = Date.now();
-      let startTime: number;
-
-      switch (repeatInterval) {
-        case 'daily':
-          const startOfDay = new Date();
-          startOfDay.setHours(0, 0, 0, 0);
-          startTime = startOfDay.getTime();
-          break;
-        case 'weekly':
-          const startOfWeek = new Date();
-          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-          startOfWeek.setHours(0, 0, 0, 0);
-          startTime = startOfWeek.getTime();
-          break;
-        case 'monthly':
-          const startOfMonth = new Date();
-          startOfMonth.setFullYear(
-            startOfMonth.getFullYear(),
-            startOfMonth.getMonth(),
-            1
-          );
-          startOfMonth.setHours(0, 0, 0, 0);
-          startTime = startOfMonth.getTime();
-          break;
-        case 'yearly':
-          const startOfYear = new Date();
-          startOfYear.setFullYear(startOfYear.getFullYear(), 0, 1);
-          startOfYear.setHours(0, 0, 0, 0);
-          startTime = startOfYear.getTime();
-          break;
-        default:
-          const defaultStartOfDay = new Date();
-          defaultStartOfDay.setHours(0, 0, 0, 0);
-          startTime = defaultStartOfDay.getTime();
-          break;
-      }
-
-      constraints.push(where('timeCompleted', '<', startTime));
+  ): Task[] {
+    if (!filterCompleted) {
+      return tasks;
     }
+
+    const { startTime, endTime } = this.calculatePeriodTimes(repeatInterval);
+
+    const filteredTasks = tasks.filter((task) => {
+      const isOutsideCurrentPeriod =
+        task.lastUpdated < startTime || task.lastUpdated >= endTime;
+      console.log(
+        `Task ${task.taskId} lastUpdated: ${task.lastUpdated}, startTime: ${startTime}, endTime: ${endTime}, isOutsideCurrentPeriod: ${isOutsideCurrentPeriod}`
+      );
+      return isOutsideCurrentPeriod;
+    });
+
+    return filteredTasks;
   }
 
   async getTasksWithConstraints(

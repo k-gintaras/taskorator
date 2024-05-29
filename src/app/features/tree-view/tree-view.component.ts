@@ -32,6 +32,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
 
   maxTasksToShow = 5;
   showFilteredTree = true;
+  showCompletedTasks = false;
   originalTree: TaskTree | undefined;
 
   constructor(private treeService: TreeService) {}
@@ -65,14 +66,23 @@ export class TreeViewComponent implements OnInit, OnChanges {
 
     let renderedTree: TaskTree;
 
-    if (this.showFilteredTree) {
-      renderedTree = {
-        ...tree,
-        root: this.filterTree(tree.root),
-      };
-    } else {
-      renderedTree = tree;
-    }
+    // if (this.showFilteredTree) {
+    renderedTree = {
+      ...tree,
+      root: this.filterTree(tree.root),
+    };
+    // } else {
+    //   //filterCompletedTasks
+    //   const filtered = this.filterCompletedTasks(tree.root);
+    //   if (filtered) {
+    //     renderedTree = {
+    //       ...tree,
+    //       root: filtered,
+    //     };
+    //   } else {
+    //     renderedTree = tree;
+    //   }
+    // }
 
     const nodeCount = this.countNodes(renderedTree.root);
     const margin = { top: 20, right: 220, bottom: 30, left: 220 };
@@ -117,12 +127,12 @@ export class TreeViewComponent implements OnInit, OnChanges {
       this.originalNode = originalNode;
       this.currentNode = originalNode;
 
-      if (this.showFilteredTree) {
-        const filteredNode = this.filterTree(originalNode);
-        this.renderTreeFromCurrentNode(filteredNode);
-      } else {
-        this.renderTreeFromCurrentNode(originalNode);
-      }
+      // if (this.showFilteredTree) {
+      const filteredNode = this.filterTree(originalNode);
+      this.renderTreeFromCurrentNode(filteredNode);
+      // } else {
+      //   this.renderTreeFromCurrentNode(originalNode);
+      // }
     }
     // }
   }
@@ -130,12 +140,24 @@ export class TreeViewComponent implements OnInit, OnChanges {
   toggleFilteredTree() {
     this.showFilteredTree = !this.showFilteredTree;
     if (this.originalNode) {
-      if (this.showFilteredTree) {
-        const filteredNode = this.filterTree(this.originalNode);
-        this.renderTreeFromCurrentNode(filteredNode);
-      } else {
-        this.renderTreeFromCurrentNode(this.originalNode);
-      }
+      // if (this.showFilteredTree) {
+      const filteredNode = this.filterTree(this.originalNode);
+      this.renderTreeFromCurrentNode(filteredNode);
+      // } else {
+      //   this.renderTreeFromCurrentNode(this.originalNode);
+      // }
+    }
+  }
+
+  toggleFilteredCompletedTree() {
+    this.showCompletedTasks = !this.showCompletedTasks;
+    if (this.originalNode) {
+      // if (this.showFilteredTree) {
+      const filteredNode = this.filterTree(this.originalNode);
+      this.renderTreeFromCurrentNode(filteredNode);
+      // } else {
+      //   this.renderTreeFromCurrentNode(this.originalNode);
+      // }
     }
   }
 
@@ -270,11 +292,11 @@ export class TreeViewComponent implements OnInit, OnChanges {
   private renderTreeFromCurrentNode(node: TaskTreeNode) {
     let renderedNode: TaskTreeNode;
 
-    if (this.showFilteredTree) {
-      renderedNode = this.filterTree(node);
-    } else {
-      renderedNode = node;
-    }
+    // if (this.showFilteredTree) {
+    renderedNode = this.filterTree(node);
+    // } else {
+    //   renderedNode = node;
+    // }
 
     this.currentNode = renderedNode;
 
@@ -342,32 +364,94 @@ export class TreeViewComponent implements OnInit, OnChanges {
   }
 
   private filterTree(node: TaskTreeNode): TaskTreeNode {
+    // Start with a copy of the current node, but clear its children to be populated later
     const filteredNode: TaskTreeNode = {
       ...node,
       children: [],
     };
 
     if (node.children) {
-      const childrenWithChildren = node.children.filter(
-        (child) => child.children && child.children.length > 0
-      );
-      const childrenWithoutChildren = node.children.filter(
-        (child) => !child.children || child.children.length === 0
+      // Filter children based on whether they are completed and showCompletedTasks flag
+      const filteredChildren = node.children.filter(
+        (child) => this.showCompletedTasks || !child.isCompleted
       );
 
-      filteredNode.children = childrenWithChildren.map((child) =>
+      // Recursively filter the remaining children
+      filteredNode.children = filteredChildren.map((child) =>
         this.filterTree(child)
       );
 
-      const limitedChildrenWithoutChildren = childrenWithoutChildren.slice(
-        0,
-        this.maxTasksToShow
-      );
-      filteredNode.children.push(...limitedChildrenWithoutChildren);
+      // If showing a filtered tree, limit the number of children
+      if (this.showFilteredTree) {
+        filteredNode.children = filteredNode.children.slice(
+          0,
+          this.maxTasksToShow
+        );
+      }
     }
 
     return filteredNode;
   }
+
+  // private filterTree(node: TaskTreeNode): TaskTreeNode {
+  //   // this.showCompletedTasks:boolean
+  //   // this.showFilteredTree:boolean
+  //   const filteredNode: TaskTreeNode = {
+  //     ...node,
+  //     children: [],
+  //   };
+
+  //   if (node.children) {
+  //     const childrenWithChildren = node.children.filter(
+  //       (child) =>
+  //         child.children && child.children.length > 0 && !child.isCompleted
+  //     );
+  //     const childrenWithoutChildren = node.children.filter(
+  //       (child) =>
+  //         (!child.children || child.children.length === 0) && !child.isCompleted
+  //     );
+
+  //     filteredNode.children = childrenWithChildren.map((child) =>
+  //       this.filterTree(child)
+  //     );
+
+  //     const limitedChildrenWithoutChildren = childrenWithoutChildren.slice(
+  //       0,
+  //       this.maxTasksToShow
+  //     );
+  //     filteredNode.children.push(...limitedChildrenWithoutChildren);
+  //   }
+
+  //   return filteredNode;
+  // }
+
+  // private filterTree(node: TaskTreeNode): TaskTreeNode {
+  //   const filteredNode: TaskTreeNode = {
+  //     ...node,
+  //     children: [],
+  //   };
+
+  //   if (node.children) {
+  //     const childrenWithChildren = node.children.filter(
+  //       (child) => child.children && child.children.length > 0
+  //     );
+  //     const childrenWithoutChildren = node.children.filter(
+  //       (child) => !child.children || child.children.length === 0
+  //     );
+
+  //     filteredNode.children = childrenWithChildren.map((child) =>
+  //       this.filterTree(child)
+  //     );
+
+  //     const limitedChildrenWithoutChildren = childrenWithoutChildren.slice(
+  //       0,
+  //       this.maxTasksToShow
+  //     );
+  //     filteredNode.children.push(...limitedChildrenWithoutChildren);
+  //   }
+
+  //   return filteredNode;
+  // }
   // private renderTree(tree: TaskTree) {
   //   let renderedTree: TaskTree;
   //   this.currentNode = tree.root;

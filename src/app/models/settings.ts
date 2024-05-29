@@ -5,8 +5,9 @@ export interface TaskSettings {
   isShowCompleted: boolean;
   isShowSeen: boolean;
   isShowDeleted: boolean;
-  isShowTodo: boolean;
-  isShowMore: boolean;
+  isShowTodo: boolean; // same as below for now...
+  isShowMore: boolean; // task list will show tasks with more details, more than just a name
+  isShowCompletedRepeating: boolean; // i.e. if daily task is completed, shall we still show every day
   completeButtonAction: CompleteButtonAction;
   lastOverlordViewId: string;
   focusTaskIds: string[];
@@ -23,6 +24,7 @@ export function getDefaultSettings() {
     lastOverlordViewId: ROOT_TASK_ID,
     isShowMore: false,
     focusTaskIds: [],
+    isShowCompletedRepeating: true,
   };
   return { ...settings };
 }
@@ -54,7 +56,7 @@ export function getButtonTextName(actionName: CompleteButtonAction) {
 export function getButtonMatName(actionName: CompleteButtonAction): string {
   switch (actionName) {
     case 'completed':
-      return 'check_circle'; // Represents a completed task with a checkmark inside a circle
+      return 'check'; // Represents a completed task with a checkmark inside a circle
     case 'seen':
       return 'visibility'; // Represents marking a task as seen
     case 'todo':

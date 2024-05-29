@@ -3,6 +3,13 @@
 <button (click)="toggleFilteredTree()">
   {{ showFilteredTree ? "Show All Tasks" : "Show Filtered Tasks" }}
 </button>
+<button (click)="toggleFilteredCompletedTree()">
+  {{
+    showCompletedTasks
+      ? "Show Completed Tasks"
+      : "Show Filtered Completed Tasks"
+  }}
+</button>
 <div id="tree-container"></div>
 
 <!-- <input type="text" value="{{ getTreeAsText() }}" /> -->

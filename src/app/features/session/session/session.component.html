@@ -1,0 +1,23 @@
+<div class="task-session">
+  <h2>Task Sessions</h2>
+  <div class="create-session">
+    <input type="text" placeholder="Session Name" #sessionName />
+    <input type="number" placeholder="Duration (seconds)" #sessionDuration />
+    <button (click)="createSession(sessionName.value, sessionDuration.value)">
+      Create Session
+    </button>
+  </div>
+  <div class="sessions-list">
+    <div *ngFor="let session of sessions" class="session-item" [ngClass]="{ 'selected-session': session.id === selectedSession?.id }">
+      <span (click)="setNavigator(session)">{{ session.name }}</span>
+      <span>{{ session.duration }}s</span>
+      <mat-icon (click)="deleteSession(session.id)">delete</mat-icon>
+    </div>
+  </div>
+  <div *ngIf="selectedSession" class="session-timer">
+    <h3>{{ selectedSession.name }}</h3>
+    <p>Time Remaining: {{ remainingTime }}s</p>
+    <button (click)="startSession()">Start Session</button>
+  </div>
+</div>
+<app-simple-navigator></app-simple-navigator>

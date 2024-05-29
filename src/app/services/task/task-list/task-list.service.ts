@@ -12,6 +12,10 @@ import { SettingsService } from '../../core/settings.service';
 import { TreeService } from '../../core/tree.service';
 import { TaskListAssistantService } from './task-list-assistant.service';
 import { TaskTreeNode } from '../../../models/taskTree';
+import { CoreService } from '../../core/core.service';
+import { ConfigService } from '../../core/config.service';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Observable } from 'rxjs/internal/Observable';
 
 /**
  * TaskListService provides an abstracted interface to manage different types of task lists,
@@ -22,15 +26,32 @@ import { TaskTreeNode } from '../../../models/taskTree';
 @Injectable({
   providedIn: 'root',
 })
-export class TaskListService implements TaskListStrategy {
+export class TaskListService extends CoreService implements TaskListStrategy {
+  private title = new BehaviorSubject<string | null>(null);
+
   constructor(
+    configService: ConfigService,
     private taskListCacheService: TaskListCacheService,
     private taskListApiService: TaskListApiService,
-    private authService: AuthService,
     private settingsService: SettingsService,
     private taskTreeService: TreeService,
     private taskListAssistant: TaskListAssistantService
-  ) {}
+  ) {
+    super(configService);
+  }
+
+  getSelectedTitleObservable(): Observable<string | null> {
+    return this.title.asObservable();
+  }
+
+  getSelectedTitle(): string | null {
+    return this.title.value;
+  }
+
+  setSelectedTitle(t: string) {
+    console.log(t);
+    this.title.next(t);
+  }
 
   private async getUserId(): Promise<string | undefined> {
     try {
@@ -99,6 +120,32 @@ export class TaskListService implements TaskListStrategy {
       return null;
     } catch (error) {
       console.error('Error in getDailyTasks:', error);
+      throw error;
+    }
+  }
+
+  async getDailyTasksFiltered(): Promise<Task[] | null> {
+    try {
+      const userId = await this.getUserId();
+      if (userId) {
+        let tasks = await this.taskListCacheService.getDailyTasks();
+        if (!tasks) {
+          tasks = await this.taskListApiService.getDailyTasks(userId, true);
+          if (tasks) {
+            await this.taskListCacheService.createTaskList('daily', tasks);
+          }
+        }
+
+        // Apply filtering if tasks are retrieved from cache
+        if (tasks) {
+          tasks = this.taskListAssistant.filterTasks(tasks, true, 'daily');
+        }
+
+        return tasks;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in getDailyTasksFiltered:', error);
       throw error;
     }
   }
@@ -230,7 +277,29 @@ export class TaskListService implements TaskListStrategy {
     throw new Error('Method not implemented.');
   }
 
-  getTasksFromIds(taskIds: string[]): Promise<Task[] | null> {
-    throw new Error('Method not implemented.');
+  async getTasksFromIds(taskIds: string[]): Promise<Task[] | null> {
+    try {
+      const userId = await this.getUserId();
+      if (userId) {
+        // Attempt to get tasks from cache
+        let tasks = await this.taskListCacheService.getTasksFromIds(taskIds);
+        if (!tasks) {
+          // If not in cache, fetch from API
+          tasks = await this.taskListApiService.getTasksFromIds(
+            userId,
+            taskIds
+          );
+          if (tasks) {
+            // Cache the fetched tasks
+            await this.taskListCacheService.createLooseTasks(tasks);
+          }
+        }
+        return tasks;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in getTasksFromIds:', error);
+      throw error;
+    }
   }
 }

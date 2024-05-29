@@ -117,6 +117,8 @@ export class SimpleNavigatorComponent {
 
   setNewFiltered(arr: Task[]) {
     this.tasks = arr;
+    // daily tasks fail to show...
+
     if (this.settings) {
       this.tasks = this.filterService.filterBySettings(
         this.tasks,

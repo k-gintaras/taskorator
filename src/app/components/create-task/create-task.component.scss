@@ -1,0 +1,25 @@
+.task-form {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    width: auto;
+  }
+
+  .full-width {
+    flex: 1;
+  }
+
+  .button-group {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+
+    button {
+      margin-left: 4px;
+    }
+  }
+}
