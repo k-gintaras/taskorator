@@ -69,18 +69,6 @@ export class TaskActionComponent implements OnInit {
     }
   }
 
-  addChild(task: Task) {
-    this.onClickPlus(task);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onClickPlus(task: Task): void {
-    // const dialogRef = this.dialog.open(CreateSimpleTaskComponent, {
-    //   width: '300px',
-    //   data: { overlord: task },
-    // });
-  }
-
   getButtonName() {
     return getButtonMatName(this.settings.completeButtonAction);
   }

@@ -11,6 +11,8 @@ import { FocusComponent } from './features/focus/focus/focus.component';
 import { SentinelComponent } from './features/sentinel/sentinel/sentinel.component';
 import { SessionComponent } from './features/session/session/session.component';
 import { TemplateHandlerComponent } from './features/template/template-handler/template-handler.component';
+import { FrogTaskComponent } from './features/frog/frog-task/frog-task.component';
+import { FavoriteTaskComponent } from './features/favorite/favorite-task/favorite-task.component';
 
 export const routes: Routes = [
   {
@@ -59,6 +61,21 @@ export const routes: Routes = [
   {
     path: 'template',
     component: TemplateHandlerComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'frog',
+    component: FrogTaskComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'favorite',
+    component: FavoriteTaskComponent,
+    canActivate: [canActivate],
+  }, // Login Test
+  {
+    path: 'test',
+    component: FavoriteTaskComponent,
     canActivate: [canActivate],
   }, // Login Test
 

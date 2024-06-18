@@ -22,32 +22,6 @@ export interface Task {
   tags: string[]; // Array of tags associated with the task
 }
 export const maxPriority = 10;
-export const taskTableName = 'tasks_table';
-export const sqlCreateTable = `CREATE TABLE ${taskTableName} (
-  taskId INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  todo TEXT NOT NULL,
-  why TEXT NOT NULL,
-  timeCreated TIMESTAMP NOT NULL,
-  timeEnd TIMESTAMP,
-  lastUpdated TIMESTAMP,
-  duration INTEGER NOT NULL,
-  overlord INTEGER,
-  repeat TEXT NOT NULL,
-  status TEXT NOT NULL,
-  stage TEXT NOT NULL,
-  type TEXT NOT NULL,
-  subtype TEXT NOT NULL,
-  size TEXT NOT NULL,
-  owner TEXT NOT NULL,
-  priority INTEGER NOT NULL,
-  backupLink TEXT NOT NULL,
-  imageUrl TEXT,
-  imageDataUrl TEXT,
-  tags TEXT NOT NULL
-);
-`;
-
 export type TaskSize = 'do now' | 'split' | 'delegate';
 export type TaskStage = 'seen' | 'completed' | 'todo' | 'archived' | 'deleted';
 export type TaskStatus = 'active' | 'inactive';
@@ -147,3 +121,29 @@ export function getBaseTask(): Task {
     tags: [],
   };
 }
+
+export const taskTableName = 'tasks_table';
+export const sqlCreateTable = `CREATE TABLE ${taskTableName} (
+  taskId INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  todo TEXT NOT NULL,
+  why TEXT NOT NULL,
+  timeCreated TIMESTAMP NOT NULL,
+  timeEnd TIMESTAMP,
+  lastUpdated TIMESTAMP,
+  duration INTEGER NOT NULL,
+  overlord INTEGER,
+  repeat TEXT NOT NULL,
+  status TEXT NOT NULL,
+  stage TEXT NOT NULL,
+  type TEXT NOT NULL,
+  subtype TEXT NOT NULL,
+  size TEXT NOT NULL,
+  owner TEXT NOT NULL,
+  priority INTEGER NOT NULL,
+  backupLink TEXT NOT NULL,
+  imageUrl TEXT,
+  imageDataUrl TEXT,
+  tags TEXT NOT NULL
+);
+`;

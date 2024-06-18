@@ -10,6 +10,8 @@ import { SimpleNavigatorComponent } from '../../task-navigator/simple-navigator/
 import { MatButton } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { CreateTaskComponent } from '../../../components/create-task/create-task.component';
+import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
+import { ArtificerComponent } from '../../../components/artificer/artificer.component';
 
 @Component({
   selector: 'app-sentinel',
@@ -25,6 +27,7 @@ import { CreateTaskComponent } from '../../../components/create-task/create-task
     SimpleNavigatorComponent,
     CreateTaskComponent,
     MatChipsModule,
+    ArtificerComponent,
   ],
   templateUrl: './sentinel.component.html',
   styleUrl: './sentinel.component.scss',
@@ -33,17 +36,26 @@ export class SentinelComponent {
   tasks: Task[] | null = null;
   errorMessage: string | null = null;
   title = '';
+  selectedOverlord: Task | undefined;
   description =
     'Decision maker, decision helper, pick what kind of tasks you want to see and do.';
 
   constructor(
     private taskListService: TaskListService,
-    private navigatorService: TaskNavigatorUltraService
+    private navigatorService: TaskNavigatorUltraService,
+    private selectedOverlordService: SelectedOverlordService
   ) {}
 
   async ngOnInit() {
     await this.loadLatestTasks();
     this.loadTitle();
+    this.selectedOverlordService
+      .getSelectedOverlordObservable()
+      .subscribe((t: Task | null) => {
+        if (t) {
+          this.selectedOverlord = t;
+        }
+      });
   }
 
   async loadLatestTasks() {

@@ -10,6 +10,7 @@ import { TaskService } from '../../../services/task/task.service';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { getBaseTask, Task } from '../../../models/taskModelManager';
 import { Observable } from 'rxjs/internal/Observable';
+import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
     new BehaviorSubject<TaskNavigationView | null>(null);
 
   constructor(
+    private selectedOverlordService: SelectedOverlordService,
     taskService: TaskService,
     eventBusService: EventBusService,
     previousService: PreviousService,
@@ -81,9 +83,6 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
     taskOverlord: Task | null,
     taskChildren: Task[]
   ): void {
-    this.log('Setting new view in ultra:');
-    this.log(taskOverlord);
-    this.log(taskChildren);
     if (!taskOverlord) {
       taskOverlord = getBaseTask(); // just let it be base task, which is root task
     }
@@ -92,6 +91,7 @@ export class TaskNavigatorUltraService extends TaskNavigatorService {
       taskChildren,
     };
     this.taskNavigationViewSubject.next(view);
+    this.selectedOverlordService.setSelectedOverlord(taskOverlord);
   }
 
   getInitialTasks(): Observable<TaskNavigationView | null> {

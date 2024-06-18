@@ -19,6 +19,7 @@ import { SettingsService } from '../../../services/core/settings.service';
 import { TaskSettings } from '../../../models/settings';
 import { SearchOverlordComponent } from '../../search-overlord/search-overlord.component';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
+import { TaskPriorityService } from '../../../services/task/task-priority.service';
 
 @Component({
   selector: 'app-selected-multiple',
@@ -41,19 +42,15 @@ import { SelectedOverlordService } from '../../../services/task/selected-overlor
 export class SelectedMultipleComponent implements OnInit {
   selectedTasks: Task[] = [];
   selectedOverlord: Task | undefined;
-
-  // taskOptions: TaskTreeNode[] = [];
   settings: TaskSettings | undefined = undefined;
-
-  filteredTaskOptions: Observable<TaskTreeNode[]> | undefined;
-  // taskSearchCtrl: FormControl = new FormControl();
-  // selectedOverlordTask: any;
+  filteredTaskOptions: Observable<Task[]> | undefined;
 
   constructor(
     private selectedMultiple: SelectedMultipleService,
     private taskService: TaskService,
     private settingsService: SettingsService,
-    private selectedOverlordService: SelectedOverlordService
+    private selectedOverlordService: SelectedOverlordService,
+    private taskPriorityService: TaskPriorityService
   ) {}
 
   ngOnInit() {
@@ -83,8 +80,7 @@ export class SelectedMultipleComponent implements OnInit {
     this.selectedTasks = [];
   }
 
-  setFocus() {
-    // Check if settings and selectedTasks are available
+  async setFocus(reset: boolean = true) {
     if (
       !this.settings ||
       !this.selectedTasks ||
@@ -93,10 +89,56 @@ export class SelectedMultipleComponent implements OnInit {
       console.error('Settings are not initialized or no tasks are selected.');
       return;
     }
-    this.settings.focusTaskIds = this.selectedTasks.map((task) => task.taskId);
-    this.settingsService.updateSettings(this.settings).then(() => {
-      console.log('focus updated');
-    });
+    if (reset) {
+      this.settings.focusTaskIds = this.selectedTasks.map(
+        (task) => task.taskId
+      );
+      await this.settingsService.updateSettings(this.settings);
+    } else {
+      for (const task of this.selectedTasks) {
+        await this.taskPriorityService.addTaskToFocus(task);
+      }
+    }
+  }
+
+  async setFrogs(reset: boolean = true) {
+    if (
+      !this.settings ||
+      !this.selectedTasks ||
+      this.selectedTasks.length === 0
+    ) {
+      console.error('Settings are not initialized or no tasks are selected.');
+      return;
+    }
+    if (reset) {
+      this.settings.frogTaskIds = this.selectedTasks.map((task) => task.taskId);
+      await this.settingsService.updateSettings(this.settings);
+    } else {
+      for (const task of this.selectedTasks) {
+        await this.taskPriorityService.addTaskToFrogs(task);
+      }
+    }
+  }
+
+  async setFavorites(reset: boolean = true) {
+    if (
+      !this.settings ||
+      !this.selectedTasks ||
+      this.selectedTasks.length === 0
+    ) {
+      console.error('Settings are not initialized or no tasks are selected.');
+      return;
+    }
+    if (reset) {
+      this.settings.favoriteTaskIds = this.selectedTasks.map(
+        (task) => task.taskId
+      );
+      await this.settingsService.updateSettings(this.settings);
+    } else {
+      for (const task of this.selectedTasks) {
+        await this.taskPriorityService.addTaskToFavorites(task);
+      }
+    }
   }
 
   onTaskCardClick(task: Task) {
@@ -113,9 +155,14 @@ export class SelectedMultipleComponent implements OnInit {
       alert('Please select an overlord from the list.');
       return;
     }
+
     this.selectedTasks.forEach((task) => {
       task.overlord = o.taskId;
-      this.taskService.updateTask(task); // Assume updateTask returns a promise
+      this.taskService.updateTask(task).then(() => {
+        console.log(
+          `Task ${task.taskId} updated with new overlord ${o.taskId}`
+        );
+      });
     });
   }
 }

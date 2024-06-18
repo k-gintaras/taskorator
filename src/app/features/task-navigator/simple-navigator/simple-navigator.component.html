@@ -13,8 +13,12 @@
   </div>
 
   <!-- Task List -->
+
+  <!-- Task Content Here -->
+
   <div
     *ngFor="let task of tasks"
+    [@highlightTask]="isTaskFresh(task.taskId) ? 'highlighted' : 'normal'"
     class="task-container"
     [class.selected]="isSelected(task)"
   >
@@ -34,6 +38,7 @@
     </div>
     <div class="right-section">
       <app-task-action [task]="task"></app-task-action>
+      <app-artificer-action [task]="task"></app-artificer-action>
       <!-- <app-promoter [task]="task"></app-promoter> -->
     </div>
   </div>

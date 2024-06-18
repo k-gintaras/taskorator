@@ -23,6 +23,15 @@ import { GptCreateComponent } from '../../gpt/gpt-create/gpt-create.component';
 import { GptTasksComponent } from '../../gpt/gpt-tasks/gpt-tasks.component';
 import { RightMenuComponent } from '../../right-menu/right-menu/right-menu.component';
 import { TaskNavigatorUltraService } from '../services/task-navigator-ultra.service';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { FreshTaskService } from '../../../services/task/fresh-task.service';
+import { ArtificerActionComponent } from '../../../components/task/artificer-action/artificer-action.component';
 
 @Component({
   selector: 'app-simple-navigator',
@@ -39,15 +48,34 @@ import { TaskNavigatorUltraService } from '../services/task-navigator-ultra.serv
     RightMenuComponent,
     GptCreateComponent,
     GptTasksComponent,
+    ArtificerActionComponent,
   ],
   templateUrl: './simple-navigator.component.html',
   styleUrl: './simple-navigator.component.scss',
+  animations: [
+    trigger('highlightTask', [
+      state(
+        'normal',
+        style({
+          backgroundColor: 'transparent',
+        })
+      ),
+      state(
+        'highlighted',
+        style({
+          backgroundColor: '#FFFF99', // Highlight color, adjust as needed
+        })
+      ),
+      transition('normal <=> highlighted', [animate('1.5s')]),
+    ]),
+  ],
 })
 export class SimpleNavigatorComponent {
   tasks: Task[] = [];
   settings: TaskSettings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
+  freshTasks = new Map<string, boolean>();
 
   constructor(
     private selectedMultiple: SelectedMultipleService,
@@ -57,6 +85,7 @@ export class SimpleNavigatorComponent {
     private selectedOverlordService: SelectedOverlordService,
     private rightMenuService: RightMenuService,
     private settingsService: SettingsService,
+    private freshTaskService: FreshTaskService,
 
     protected config: ConfigService
   ) {}
@@ -85,10 +114,18 @@ export class SimpleNavigatorComponent {
         this.settings = s;
       }
     });
+
+    this.freshTaskService.getFreshTasks().subscribe((freshTasks) => {
+      this.freshTasks = freshTasks;
+    });
   }
 
   isShowMoreEnabled(): boolean {
     return this.rightMenuService.getIsShowMoreEnabled();
+  }
+
+  isTaskFresh(taskId: string): boolean {
+    return this.freshTasks.get(taskId) || false;
   }
 
   async goBack(task: Task | undefined) {

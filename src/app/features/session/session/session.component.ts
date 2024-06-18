@@ -1,10 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TaskSession } from '../task-session.model';
-import { TaskSessionDialogComponent } from '../task-session-dialog/task-session-dialog.component';
-import { MatListModule } from '@angular/material/list';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TaskSessionService } from '../services/task-session.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Observable } from 'rxjs/internal/Observable';
@@ -15,6 +10,13 @@ import { SimpleNavigatorComponent } from '../../task-navigator/simple-navigator/
 import { TaskNavigatorUltraService } from '../../task-navigator/services/task-navigator-ultra.service';
 import { getBaseTask, Task } from '../../../models/taskModelManager';
 import { TaskListService } from '../../../services/task/task-list/task-list.service';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-session',
@@ -27,7 +29,10 @@ import { TaskListService } from '../../../services/task/task-list/task-list.serv
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    FormsModule,
     SimpleNavigatorComponent,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './session.component.html',
   styleUrl: './session.component.scss',
@@ -39,6 +44,11 @@ export class SessionComponent implements OnInit, OnDestroy {
   remainingTime = 0;
   private timerInterval: any;
   private timerWorker: Worker | undefined;
+
+  // Variables to collect hours, minutes, and seconds
+  hours: number = 0;
+  minutes: number = 0;
+  seconds: number = 0;
 
   constructor(
     private taskSessionService: TaskSessionService,
@@ -129,14 +139,19 @@ export class SessionComponent implements OnInit, OnDestroy {
     this.sessions = await this.taskSessionService.getSessions();
   }
 
-  async createSession(name: string, durationString: string) {
-    let duration = 0;
-    try {
-      duration = parseInt(durationString);
-    } catch (error) {
-      console.log('Session duration must be a number.');
+  async createSession(
+    name: string,
+    hours: number,
+    minutes: number,
+    seconds: number
+  ) {
+    if (!name || (!hours && !minutes && !seconds)) {
+      alert('Please provide a session name and duration.');
       return;
     }
+
+    // Calculate the total duration in seconds
+    const duration = hours * 3600 + minutes * 60 + seconds;
 
     if (this.selectedTaskIds.length < 1) {
       console.log("Can't create empty session.");
@@ -165,5 +180,20 @@ export class SessionComponent implements OnInit, OnDestroy {
   async updateSession(session: TaskSession) {
     await this.taskSessionService.updateSession(session);
     this.loadSessions();
+  }
+
+  convertSecondsToTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
+    } else if (remainingMinutes > 0) {
+      return `${remainingMinutes}m ${remainingSeconds}s`;
+    } else {
+      return `${remainingSeconds}s`;
+    }
   }
 }

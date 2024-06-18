@@ -1,3 +1,5 @@
+<app-artificer></app-artificer>
+
 <div class="secondary-navigation">
   <mat-chip-set>
     <mat-chip (click)="loadLatestTasks()" clickable>Latest Tasks</mat-chip>
@@ -12,7 +14,7 @@
   </mat-chip-set>
 </div>
 <div class="center-horizontal">
-  <h1>{{ title }}</h1>
+  <h1>{{ title }}: {{ selectedOverlord?.name }}</h1>
 </div>
 
 <div class="center-horizontal">

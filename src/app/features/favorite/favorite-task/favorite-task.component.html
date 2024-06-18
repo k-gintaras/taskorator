@@ -1,0 +1,13 @@
+<div class="favorite-task-container">
+  <div *ngIf="favoriteTasks?.length; else noTasks">
+    <ul>
+      <li *ngFor="let task of favoriteTasks">
+        {{ task.name }}
+        <button (click)="removeFavoriteTask(task.taskId)">Remove</button>
+      </li>
+    </ul>
+  </div>
+  <ng-template #noTasks>
+    <p>No Favorite Tasks added yet.</p>
+  </ng-template>
+</div>

@@ -1,28 +1,43 @@
 .selected-tasks-container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 8px;
-}
-
-.selected-tasks-container h2 {
   margin-bottom: 20px;
-}
-
-.mat-form-field {
-  width: 100%;
-}
-
-.task-entry {
-  margin-top: 10px;
   padding: 10px;
-  background-color: #fff;
+  border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
 
-.task-entry:hover {
-  background-color: #eaeaea;
+  h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #333;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    button {
+      margin-right: 10px;
+    }
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+
+    .toggle-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+
+      button {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .task-entry {
+    margin-bottom: 10px;
+  }
 }

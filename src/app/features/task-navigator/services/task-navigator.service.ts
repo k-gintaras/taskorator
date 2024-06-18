@@ -8,6 +8,7 @@ import { PreviousService } from '../../../services/task/previous.service';
 import { ActivatedRoute } from '@angular/router';
 import { Task, ROOT_TASK_ID } from '../../../models/taskModelManager';
 import { TaskSettings } from '../../../models/settings';
+import { TaskListService } from '../../../services/task/task-list/task-list.service';
 
 export interface TaskNavigationView {
   taskOverlord: Task;
@@ -193,16 +194,11 @@ export class TaskNavigatorService extends CoreService {
   // so it is good that we just get the overlord per each task
   async next(task: Task): Promise<void> {
     const tasks = await this.taskService.getOverlordChildren(task.taskId);
-    console.log('tasks from NEXT...');
-    console.log(tasks);
     if (tasks) this.setTaskNavigationView(task, tasks);
     if (!tasks) this.setTaskNavigationView(task, []);
   }
 
   setTaskNavigationView(taskOverlord: Task, taskChildren: Task[]): void {
-    this.log('Setting new view:');
-    this.log(taskOverlord);
-    this.log(taskChildren);
     const view: TaskNavigationView = {
       taskOverlord,
       taskChildren,

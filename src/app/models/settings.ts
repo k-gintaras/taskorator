@@ -11,6 +11,8 @@ export interface TaskSettings {
   completeButtonAction: CompleteButtonAction;
   lastOverlordViewId: string;
   focusTaskIds: string[];
+  frogTaskIds: string[];
+  favoriteTaskIds: string[];
 }
 
 export function getDefaultSettings() {
@@ -25,6 +27,8 @@ export function getDefaultSettings() {
     isShowMore: false,
     focusTaskIds: [],
     isShowCompletedRepeating: true,
+    frogTaskIds: [],
+    favoriteTaskIds: [],
   };
   return { ...settings };
 }

@@ -1,1 +1,10 @@
-<p>artificer works!</p>
+<div class="action-menu">
+  <div
+    *ngFor="let action of actions"
+    (click)="selectAction(action)"
+    [ngClass]="{ selected: action === currentAction }"
+  >
+    <mat-icon>{{ action.icon }}</mat-icon>
+    <span>{{ action.action }}</span>
+  </div>
+</div>

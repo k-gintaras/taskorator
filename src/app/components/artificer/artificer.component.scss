@@ -1,0 +1,9 @@
+.action-menu {
+  position: fixed;
+  left: 0;
+  top: 50px; // Adjust accordingly
+  .selected {
+    font-weight: bold;
+  }
+  // Add other styles as needed
+}
