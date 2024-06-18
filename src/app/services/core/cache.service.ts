@@ -98,6 +98,26 @@ export class CacheService implements CacheStrategy {
   }
 
   private addCacheTask(task: Task): void {
+    if (task.stage === 'deleted') {
+      console.log(`Deleting task: ${task.taskId}`);
+      this.taskMap.delete(task.taskId);
+      this.currentOverlordMap.delete(task.taskId);
+
+      // Remove task from its immediate overlord's children set
+      const currentOverlord = this.currentOverlordMap.get(task.taskId);
+      if (currentOverlord) {
+        const childrenIds = this.immediateChildrenMap.get(currentOverlord);
+        if (childrenIds && childrenIds.has(task.taskId)) {
+          console.log(
+            `Removing task ${task.taskId} from overlord ${currentOverlord}`
+          );
+          childrenIds.delete(task.taskId);
+        }
+      }
+
+      return; // Exit the function since the task is deleted
+    }
+
     console.log(`Adding/Updating task: ${task.taskId}`);
     this.taskMap.set(task.taskId, task);
 

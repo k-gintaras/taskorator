@@ -1,16 +1,13 @@
 import { Component, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { TaskSettings, getDefaultSettings } from '../../../models/settings';
 import { Task } from '../../../models/taskModelManager';
 import { ConfigService } from '../../../services/core/config.service';
 import { SettingsService } from '../../../services/core/settings.service';
 import { FilterService } from '../../../services/task/filter.service';
-import { PreviousService } from '../../../services/task/previous.service';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 import { SortService } from '../../../services/task/sort.service';
 import { RightMenuService } from '../../right-menu/services/right-menu.service';
-import { TaskNavigatorService } from '../services/task-navigator.service';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -32,6 +29,7 @@ import {
 } from '@angular/animations';
 import { FreshTaskService } from '../../../services/task/fresh-task.service';
 import { ArtificerActionComponent } from '../../../components/task/artificer-action/artificer-action.component';
+import { highlightRecentlyModifiedTask } from '../../../app.animations';
 
 @Component({
   selector: 'app-simple-navigator',
@@ -52,26 +50,10 @@ import { ArtificerActionComponent } from '../../../components/task/artificer-act
   ],
   templateUrl: './simple-navigator.component.html',
   styleUrl: './simple-navigator.component.scss',
-  animations: [
-    trigger('highlightTask', [
-      state(
-        'normal',
-        style({
-          backgroundColor: 'transparent',
-        })
-      ),
-      state(
-        'highlighted',
-        style({
-          backgroundColor: '#FFFF99', // Highlight color, adjust as needed
-        })
-      ),
-      transition('normal <=> highlighted', [animate('1.5s')]),
-    ]),
-  ],
+  animations: [highlightRecentlyModifiedTask],
 })
 export class SimpleNavigatorComponent {
-  tasks: Task[] = [];
+  @Input() tasks: Task[] = [];
   settings: TaskSettings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
@@ -98,13 +80,10 @@ export class SimpleNavigatorComponent {
       });
 
     this.taskNavigatorService.getTaskNavigationView().subscribe((view) => {
-      console.log('view changed');
       if (view) {
         this.selectedOverlord = view.taskOverlord;
         // we want to be able to return to the same view
         this.selectedOverlordService.setSelectedOverlord(view.taskOverlord);
-        console.log('view.taskChildren');
-        console.log(view.taskChildren);
         this.setNewFiltered(view.taskChildren);
       }
     });

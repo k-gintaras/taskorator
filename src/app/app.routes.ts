@@ -32,52 +32,52 @@ export const routes: Routes = [
     path: 'navigator',
     component: TaskNavigatorComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'admin',
     component: AdminComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'suggestions',
     component: GptTasksComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'focus',
     component: FocusComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'sentinel',
     component: SentinelComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'session',
     component: SessionComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'template',
     component: TemplateHandlerComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'frog',
     component: FrogTaskComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'favorite',
     component: FavoriteTaskComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
   {
     path: 'test',
     component: FavoriteTaskComponent,
     canActivate: [canActivate],
-  }, // Login Test
+  },
 
   // { path: 'task-filter', component: TaskFilterComponent }, // Mass Editor, Filter
   // { path: 'overlord-browser', component: OverlordBrowserComponent }, // Various Lists

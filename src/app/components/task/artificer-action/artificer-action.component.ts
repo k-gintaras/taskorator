@@ -3,13 +3,13 @@ import { Task } from '../../../models/taskModelManager';
 import { TaskUpdateService } from '../../../services/task/task-update.service';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
-import { NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-artificer-action',
   standalone: true,
-  imports: [NgStyle, MatIcon],
+  imports: [NgClass, MatIcon],
   templateUrl: './artificer-action.component.html',
   styleUrl: './artificer-action.component.scss',
 })

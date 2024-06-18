@@ -6,6 +6,9 @@ import { Task } from '../../models/taskModelManager';
   providedIn: 'root',
 })
 export class EventBusService {
+  deleteTask(task: Task) {
+    throw new Error('Method not implemented.');
+  }
   // eslint-disable-next-line @typescript-eslint/ban-types
   private listeners = new Map<string, Function[]>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

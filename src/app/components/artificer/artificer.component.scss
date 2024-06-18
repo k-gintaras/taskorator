@@ -1,9 +1,13 @@
 .action-menu {
   position: fixed;
   left: 0;
-  top: 50px; // Adjust accordingly
-  .selected {
-    font-weight: bold;
-  }
-  // Add other styles as needed
+  top: 50%; /* Move to the middle of the viewport */
+  transform: translateY(-50%); /* Adjust to center vertically */
+  background-color: white;
+  border-radius: 0 5% 5% 0;
+  /* Add other styles as needed */
+}
+
+.action-menu .selected {
+  font-weight: bold;
 }

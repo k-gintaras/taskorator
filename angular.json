@@ -15,12 +15,12 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "webWorkerTsConfig": "tsconfig.worker.json",
             "outputPath": "dist/taskorator",
             "index": "src/index.html",
-            "browser": "src/main.ts",
+            "main": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -45,12 +45,20 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "index": "src/index.html"
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "index": "src/index.html"
+            },
+            "test": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "index": "src/index-test.html"
             }
           },
           "defaultConfiguration": "production"
@@ -63,6 +71,9 @@
             },
             "development": {
               "buildTarget": "taskorator:build:development"
+            },
+            "test": {
+              "buildTarget": "taskorator:build:test"
             }
           },
           "defaultConfiguration": "development"

@@ -23,11 +23,11 @@ export interface Artificer {
 export interface ArtificerDetails {
   action: string;
   icon: string;
-  color: string;
+  colorClass: string;
 }
 
 export const artificerDetailList: ArtificerDetails[] = [
-  { action: 'delete', icon: 'delete', color: 'red' },
-  { action: 'complete', icon: 'check', color: 'green' },
-  { action: 'refresh', icon: 'refresh', color: 'blue' },
+  { action: 'complete', icon: 'check', colorClass: 'complete-icon-color' },
+  { action: 'delete', icon: 'delete', colorClass: 'delete-icon-color' },
+  { action: 'refresh', icon: 'refresh', colorClass: 'refresh-icon-color' },
 ];

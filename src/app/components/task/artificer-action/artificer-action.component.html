@@ -1,6 +1,6 @@
 <button
   class="task-btn"
-  [ngStyle]="{ 'background-color': currentAction.color }"
+  [ngClass]="currentAction.colorClass"
   (click)="performAction()"
 >
   <mat-icon>{{ currentAction.icon }}</mat-icon>

@@ -15,6 +15,7 @@ import {
   getDocs,
   runTransaction,
   DocumentReference,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import {
   RegisterUserResult,
@@ -254,6 +255,17 @@ export default class ApiService implements ApiStrategy {
     }
     if (!task.overlord) {
       throw new Error('Missing task overlord');
+    }
+    if (task.stage === 'deleted') {
+      const taskDocRef = doc(
+        this.firestore,
+        `users/${userId}/tasks`,
+        task.taskId
+      );
+
+      console.log(`Deleting task: ${task.taskId}`);
+      await deleteDoc(taskDocRef);
+      return;
     }
     const taskDocRef = doc(
       this.firestore,

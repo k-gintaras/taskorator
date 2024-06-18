@@ -1,0 +1,5 @@
+ng serve --configuration=test
+index-test.ts where there is component of choice...
+main.ts choose component to test
+environment set testing to true
+

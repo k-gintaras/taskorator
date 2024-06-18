@@ -89,11 +89,9 @@ export class TaskUpdateService extends CoreService {
 
   delete(task: Task) {
     task.stage = 'deleted';
-    // TODO: ADD ACTUAL DELETE...
-
-    // this.taskService.deleteTask(task).then(() => {
-    //   this.log('Deleted: ' + task.name + ' at ' + task.lastUpdated);
-    // });
+    this.taskService.updateTask(task).then(() => {
+      this.log('Deleted: ' + task.name + ' at ' + task.lastUpdated);
+    });
   }
 
   renew(task: Task) {

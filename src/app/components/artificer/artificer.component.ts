@@ -35,4 +35,11 @@ export class ArtificerComponent {
   selectAction(action: ArtificerDetails): void {
     this.artificerService.setCurrentAction(action);
   }
+
+  getActionClasses(action: ArtificerDetails) {
+    return {
+      selected: action === this.currentAction,
+      [action.colorClass]: true,
+    };
+  }
 }

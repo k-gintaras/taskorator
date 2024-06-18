@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  isTesting: false,
   firebase: {
     projectId: 'taskorator',
     appId: '1:799643180199:web:3a44fe3dcb6b8b5aeecf82',
