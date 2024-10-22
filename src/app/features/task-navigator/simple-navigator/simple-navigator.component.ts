@@ -11,7 +11,6 @@ import { RightMenuService } from '../../right-menu/services/right-menu.service';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
-import { AddMoveTaskComponent } from '../../../components/add-move-task/add-move-task.component';
 import { TaskMiniComponent } from '../../../components/task-mini/task-mini.component';
 import { TaskActionComponent } from '../../../components/task/action/action.component';
 import { PromoterComponent } from '../../../components/task/promoter/promoter.component';
@@ -29,7 +28,10 @@ import {
 } from '@angular/animations';
 import { FreshTaskService } from '../../../services/task/fresh-task.service';
 import { ArtificerActionComponent } from '../../../components/task/artificer-action/artificer-action.component';
-import { highlightRecentlyModifiedTask } from '../../../app.animations';
+import { TaskTree, TaskTreeNodeData } from '../../../models/taskTree';
+import { TreeService } from '../../../services/core/tree.service';
+import { highlightRecentlyModifiedTask } from '../../../test-files/other-files/app.animations';
+import { ArtificerComponent } from '../../../components/artificer/artificer.component';
 
 @Component({
   selector: 'app-simple-navigator',
@@ -39,7 +41,6 @@ import { highlightRecentlyModifiedTask } from '../../../app.animations';
     MatIcon,
     CommonModule,
     TaskMiniComponent,
-    AddMoveTaskComponent,
     PromoterComponent,
     TaskActionComponent,
     SelectedMultipleComponent,
@@ -47,6 +48,7 @@ import { highlightRecentlyModifiedTask } from '../../../app.animations';
     GptCreateComponent,
     GptTasksComponent,
     ArtificerActionComponent,
+    ArtificerComponent,
   ],
   templateUrl: './simple-navigator.component.html',
   styleUrl: './simple-navigator.component.scss',
@@ -54,10 +56,12 @@ import { highlightRecentlyModifiedTask } from '../../../app.animations';
 })
 export class SimpleNavigatorComponent {
   @Input() tasks: Task[] = [];
+  @Input() showArtificer: boolean = false;
   settings: TaskSettings = getDefaultSettings();
   selectedOverlord: Task | undefined;
   selectedTasks: Task[] = [];
   freshTasks = new Map<string, boolean>();
+  taskTree: TaskTree | undefined;
 
   constructor(
     private selectedMultiple: SelectedMultipleService,
@@ -68,7 +72,7 @@ export class SimpleNavigatorComponent {
     private rightMenuService: RightMenuService,
     private settingsService: SettingsService,
     private freshTaskService: FreshTaskService,
-
+    private treeService: TreeService,
     protected config: ConfigService
   ) {}
 
@@ -97,6 +101,15 @@ export class SimpleNavigatorComponent {
     this.freshTaskService.getFreshTasks().subscribe((freshTasks) => {
       this.freshTasks = freshTasks;
     });
+
+    this.treeService.getTreeOnce().then((tree: TaskTree | null) => {
+      if (!tree) return;
+      this.taskTree = tree;
+    });
+  }
+
+  getTreeNodeData(task: Task): TaskTreeNodeData | undefined {
+    return this.treeService.getTaskTreeData(task.taskId);
   }
 
   isShowMoreEnabled(): boolean {

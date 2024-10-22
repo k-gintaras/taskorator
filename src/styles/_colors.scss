@@ -1,3 +1,4 @@
+// extra buttons
 .delete-icon-color {
   color: #c0392b; /* Dark Red */
 }
@@ -8,4 +9,30 @@
 
 .refresh-icon-color {
   color: #2980b9; /* Deep Sky Blue */
+}
+
+// complete button
+.complete-icon-color-parent {
+  color: #c0392b; /* When task has kids, complete is warning. */
+}
+
+.complete-icon-color-child {
+  color: #27ae60; /* When task has no children, complete is simple. */
+}
+
+.complete-icon-color-checklist {
+  color: grey; /* It will disappear but show next day. */
+}
+
+// next button
+.next-icon-color-child {
+  color: grey; /* Nothing inside the task. */
+}
+
+.next-icon-color-parent-completed {
+  color: #27ae60; /* Parent that has kids completed. */
+}
+
+.next-icon-color-parent-todo {
+  color: yellow; /* Parent that has kids incompleted. */
 }

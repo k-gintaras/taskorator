@@ -1,6 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 @import "./styles/colors";
 
+.noisy-button {
+  background: linear-gradient(
+    135deg,
+    rgba(240, 240, 240, 1) 0%,
+    rgba(245, 245, 245, 1) 100%
+  );
+  background-image: url("/assets/images/noise.png");
+  background-blend-mode: overlay;
+}
+
 html,
 body {
   height: 100%;

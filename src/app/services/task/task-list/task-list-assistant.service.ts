@@ -147,9 +147,9 @@ export class TaskListAssistantService {
     const filteredTasks = tasks.filter((task) => {
       const isOutsideCurrentPeriod =
         task.lastUpdated < startTime || task.lastUpdated >= endTime;
-      console.log(
-        `Task ${task.taskId} lastUpdated: ${task.lastUpdated}, startTime: ${startTime}, endTime: ${endTime}, isOutsideCurrentPeriod: ${isOutsideCurrentPeriod}`
-      );
+      // console.log(
+      //   `Task ${task.taskId} lastUpdated: ${task.lastUpdated}, startTime: ${startTime}, endTime: ${endTime}, isOutsideCurrentPeriod: ${isOutsideCurrentPeriod}`
+      // );
       return isOutsideCurrentPeriod;
     });
 

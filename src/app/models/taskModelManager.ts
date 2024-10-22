@@ -39,18 +39,27 @@ export type RepeatOptions =
   | 'half-yearly'
   | 'yearly';
 
+/**
+ * task type guesser:
+ * if "Task name caps"- project
+ * "task name" - todo
+ * if TASK NAME -???
+ */
 export type TaskType =
   | ''
   | 'code'
   | 'idea'
   | 'note'
   | 'todo'
+  | 'checklist'
+  | 'tree' // decision tree
+  | 'flowchart'
   | 'task'
   | 'next'
   | 'job'
   | 'feature'
   | 'schedule'
-  | 'project';
+  | 'project'; // never ends, can be considered completed if all inside completed, buy maybe not
 export type TaskSubtype =
   | ''
   | 'js'

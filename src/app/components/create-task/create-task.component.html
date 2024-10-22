@@ -1,8 +1,10 @@
 <div *ngIf="selectedOverlordName">
   <form [formGroup]="taskForm" (ngSubmit)="createTask()" class="task-form">
     <div class="input-group">
+      <!-- Button to toggle additional fields -->
       <button
         mat-icon-button
+        type="button"
         (click)="toggleAdditionalFields()"
         aria-label="Toggle Additional Fields"
       >
@@ -10,6 +12,8 @@
           {{ showAdditionalFields ? "expand_less" : "expand_more" }}
         </mat-icon>
       </button>
+
+      <!-- Task Name Input -->
       <mat-form-field class="full-width">
         <input
           matInput
@@ -18,6 +22,8 @@
           placeholder="to: {{ selectedOverlordName }}"
         />
       </mat-form-field>
+
+      <!-- Save Button: only submit form when this button is clicked -->
       <button
         mat-icon-button
         type="submit"
@@ -29,6 +35,7 @@
       </button>
     </div>
 
+    <!-- Additional Fields -->
     <div *ngIf="showAdditionalFields">
       <mat-form-field class="full-width">
         <mat-label>To Do</mat-label>
@@ -51,6 +58,8 @@
     </div>
   </form>
 </div>
+
+<!-- If no overlord is selected, show the search component -->
 <div *ngIf="!selectedOverlordName">
   <app-search-overlord></app-search-overlord>
 </div>

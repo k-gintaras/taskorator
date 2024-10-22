@@ -11,6 +11,10 @@ import { CurrentInputService } from '../../services/current-input.service';
 import { GptCreateComponent } from '../../features/gpt/gpt-create/gpt-create.component';
 import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
 
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ * will be split into, CREATE templates and browse templates with ability to add...
+ */
 @Component({
   selector: 'app-add-move-task',
   templateUrl: './add-move-task.component.html',

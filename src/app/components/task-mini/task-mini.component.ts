@@ -41,4 +41,9 @@ export class TaskMiniComponent {
     this.selectedMultiple.addRemoveSelectedTask(task);
     this.selected.setSelectedTask(task);
   }
+
+  isSelected(task: Task | undefined): boolean {
+    if (!task) return false;
+    return this.selectedMultiple.isSelected(task);
+  }
 }

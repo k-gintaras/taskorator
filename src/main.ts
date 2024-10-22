@@ -11,9 +11,16 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 // Import main app component and test component
 import { AppComponent } from './app/app.component';
+import { CORE_ROUTES } from './app/app.routing.models';
+
 import { routes } from './app/app.routes';
-import { SimpleNavigatorComponent } from './app/features/task-navigator/simple-navigator/simple-navigator.component';
-import { TestComponent } from './app/test-files/test/test.component';
+import { TestAppComponent } from './app/test-files/test-app.component';
+import { AuthService } from './app/services/core/auth.service';
+import { TestAuthService } from './app/services/test-services/test-auth.service';
+// import { testRoutes } from './app/test-files/test-app.routes';
+// import { SimpleNavigatorComponent } from './app/features/task-navigator/simple-navigator/simple-navigator.component';
+// import { TestAppComponent } from './app/test-files/test-app.component';
+// import { TestComponent } from './app/test-files/test/test.component';
 
 if (environment.production) {
   enableProdMode();
@@ -23,9 +30,13 @@ const firebaseJson = environment.firebase;
 const isTesting = environment.isTesting; // Add this to your environment configuration
 
 if (isTesting) {
-  bootstrapApplication(TestComponent, {
+  bootstrapApplication(TestAppComponent, {
     providers: [
-      importProvidersFrom(BrowserAnimationsModule),
+      importProvidersFrom(
+        BrowserAnimationsModule,
+        RouterModule.forRoot(CORE_ROUTES)
+      ),
+
       provideAnimationsAsync(),
       provideHttpClient(),
     ],
@@ -35,7 +46,8 @@ if (isTesting) {
     providers: [
       importProvidersFrom(
         BrowserAnimationsModule,
-        RouterModule.forRoot(routes)
+        // RouterModule.forRoot(routes)
+        RouterModule.forRoot(CORE_ROUTES)
       ),
       importProvidersFrom(
         provideFirebaseApp(() => initializeApp(firebaseJson))

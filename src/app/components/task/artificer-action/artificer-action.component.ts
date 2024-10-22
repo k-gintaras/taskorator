@@ -5,6 +5,8 @@ import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { TaskTreeNodeData } from '../../../models/taskTree';
+import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
 
 @Component({
   selector: 'app-artificer-action',
@@ -16,14 +18,38 @@ import { MatIcon } from '@angular/material/icon';
 export class ArtificerActionComponent {
   @Input() task: Task | undefined;
   currentAction!: ArtificerDetails;
+  @Input() treeNode: TaskTreeNodeData | undefined;
 
   constructor(
     private taskUpdateService: TaskUpdateService,
-    private artificerService: ArtificerService
+    private artificerService: ArtificerService,
+    private selectedService: SelectedMultipleService
   ) {
     this.artificerService.currentAction$.subscribe((action) => {
       this.currentAction = action;
     });
+  }
+
+  getColor() {
+    if (!this.treeNode) return;
+    // it is checklist and reappear whenever it repeats... daily, weekly
+    const isRepeatingTask =
+      this.task?.repeat !== 'never' && this.task?.repeat !== 'once';
+    if (isRepeatingTask) return 'complete-icon-color-checklist';
+
+    // show color based on what kind of task it is
+    if (this.treeNode.childrenCount > 0) {
+      // task has children
+      if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount) {
+        // task has incomplete children
+        return 'complete-icon-color-parent';
+      }
+    } else {
+      // task has no children
+      return 'complete-icon-color-child';
+    }
+
+    return 'complete-icon-color-child';
   }
 
   performAction(): void {
@@ -41,9 +67,38 @@ export class ArtificerActionComponent {
       case 'refresh':
         this.taskUpdateService.renew(task);
         break;
+      case 'move':
+        this.taskUpdateService.move(task);
+        break;
+      case 'promote':
+        this.taskUpdateService.increasePriority(task);
+        break;
+      case 'demote':
+        this.taskUpdateService.decreasePriority(task);
+        break;
+      case 'edit':
+        // display edit popup ?
+        break;
+      case 'select':
+        this.selectedService.addRemoveSelectedTask(task);
+        break;
+      case 'suggest':
+        break;
       // Add more cases as needed...
       default:
         break;
     }
+  }
+
+  isSelected() {
+    if (!this.task) return false;
+    return this.selectedService.isSelected(this.task);
+  }
+
+  getIcon(): string {
+    if (this.currentAction.action === 'select') {
+      return this.isSelected() ? 'check_box' : 'check_box_outline_blank';
+    }
+    return this.currentAction.icon;
   }
 }

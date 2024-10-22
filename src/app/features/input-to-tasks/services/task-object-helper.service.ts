@@ -7,8 +7,7 @@ import { Task } from '../../../models/taskModelManager';
 export class TaskObjectHelperService {
   getMostRecentTask(tasks: Task[] | undefined): Task | undefined {
     return tasks?.sort(
-      (a, b) =>
-        (b.timeCreated?.getTime() || 0) - (a.timeCreated?.getTime() || 0)
+      (a, b) => (b.timeCreated || 0) - (a.timeCreated || 0)
     )[0];
   }
 
@@ -46,10 +45,6 @@ export class TaskObjectHelperService {
     );
   }
 
-  // getTasksByOverlordIdName(overlordName: string, tasks: Task[]): Task[] {
-  //   return tasks.filter((task) => task.overlord === overlordName);
-  // }
-
   getTasksByOverlordName(overlordName: string, tasks: Task[]): Task[] {
     const overlordTask = this.getTaskByName(overlordName, tasks);
     if (overlordTask) {
@@ -64,7 +59,7 @@ export class TaskObjectHelperService {
 
   getTasksWithInvalidOverlord(tasks: Task[]): Task[] {
     return tasks.filter(
-      (task) => typeof task.overlord !== 'number' || task.overlord === null
+      (task) => typeof task.overlord !== 'string' || task.overlord === null
     );
   }
 
@@ -72,12 +67,10 @@ export class TaskObjectHelperService {
     return tasks.filter((task) => !task.todo || task.todo.trim() === '');
   }
 
-  // Function to get Task[] sorted by timeCreated
   getTasksSortedByTimeCreated(tasks: Task[]): Task[] {
-    // Sort the tasks array based on the timeCreated property
-    return tasks?.slice().sort((a, b) => {
-      return (a.timeCreated?.getTime() || 0) - (b.timeCreated?.getTime() || 0);
-    });
+    return tasks
+      ?.slice()
+      .sort((a, b) => (a.timeCreated || 0) - (b.timeCreated || 0));
   }
 
   getTasksSortedByPriority(tasks: Task[]): Task[] {

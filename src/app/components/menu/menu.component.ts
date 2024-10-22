@@ -7,7 +7,6 @@ import {
 } from '@angular/material/sidenav';
 import { SettingsComponent } from '../settings/settings.component';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-menu',
@@ -21,7 +20,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SettingsComponent,
     MatDrawerContainer,
     CommonModule,
-    BrowserAnimationsModule,
   ],
 })
 export class MenuComponent {

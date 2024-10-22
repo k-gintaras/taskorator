@@ -1,0 +1,50 @@
+<!-- Toolbar with FAB and Title -->
+<mat-toolbar class="toolbar">
+  <!-- Floating Button for Mobile -->
+  <button
+    mat-fab
+    color="primary"
+    class="nav-fab"
+    *ngIf="isHandset"
+    (click)="toggleDrawer()"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <!-- App Title -->
+  <span class="app-title">Taskorator</span>
+</mat-toolbar>
+
+<!-- Main Sidenav Container for both desktop and mobile -->
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    [mode]="isHandset ? 'over' : 'side'"
+    [opened]="!isHandset || drawer.opened"
+    class="sidenav"
+  >
+    <ul class="nav-list">
+      <li
+        *ngFor="let item of currentNavItems"
+        [class.selected]="isSelected(item.path)"
+        (click)="onNavItemClick(item)"
+      >
+        <mat-icon>{{ item.metadata.icon }}</mat-icon>
+        <span class="nav-text">{{ item.metadata.title }}</span>
+      </li>
+    </ul>
+    <button
+      *ngIf="canGoBack()"
+      mat-button
+      class="back-button"
+      (click)="onBackClick()"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      <span>Back</span>
+    </button>
+  </mat-sidenav>
+
+  <!-- Main Content Area -->
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

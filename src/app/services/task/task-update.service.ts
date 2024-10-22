@@ -11,6 +11,9 @@ import {
 } from '../../models/taskModelManager';
 import { CoreService } from '../core/core.service';
 import { ConfigService } from '../core/config.service';
+import { SelectedTaskService } from './selected-task.service';
+import { SelectedMultipleService } from './selected-multiple.service';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 
 @Injectable({
   providedIn: 'root',
@@ -18,9 +21,28 @@ import { ConfigService } from '../core/config.service';
 export class TaskUpdateService extends CoreService {
   constructor(
     private taskService: TaskService,
+    private selectedService: SelectedMultipleService,
     protected config: ConfigService
   ) {
     super(config);
+  }
+
+  move(targetTask: Task) {
+    firstValueFrom(this.selectedService.getSelectedTasks()).then(
+      (selectedTasks) => {
+        if (selectedTasks && targetTask.taskId) {
+          for (const task of selectedTasks) {
+            task.overlord = targetTask.taskId;
+          }
+          this.taskService.updateTasks(selectedTasks);
+          this.feedback('Updated multiple tasks.');
+        } else {
+          this.error(
+            "Can't update empty tasks or failed to create new overlord."
+          );
+        }
+      }
+    );
   }
 
   split(task: Task, taskOne: Task, taskTwo: Task) {

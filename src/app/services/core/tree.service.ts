@@ -7,7 +7,11 @@ import { TreeNodeService } from './tree-node.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { Task } from '../../models/taskModelManager';
-import { TaskTree, getDefaultTree } from '../../models/taskTree';
+import {
+  TaskTree,
+  TaskTreeNodeData,
+  getDefaultTree,
+} from '../../models/taskTree';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +27,49 @@ export class TreeService extends CoreService implements TreeStrategy {
   ) {
     super(configService);
     this.subscribeToTaskEvents();
+  }
+
+  // Method to check if task name is unique
+  isNameUnique(taskName: string): boolean {
+    const taskTree = this.treeSubject.getValue();
+    if (!taskTree) return true; // If no tree, name is unique by default
+    return !this.treeNodeService.findNodeByName(taskTree.root, taskName);
+  }
+
+  // Method to check if a task has children
+  hasChildren(taskId: string): boolean {
+    const taskTree = this.treeSubject.getValue();
+    if (!taskTree) return false;
+    return this.treeNodeService.hasChildren(taskTree, taskId);
+  }
+
+  // Method to check if a task has incomplete children
+  hasIncompleteChildren(taskId: string): boolean {
+    const taskTree = this.treeSubject.getValue();
+    if (!taskTree) return false;
+    return this.treeNodeService.hasIncompleteChildren(taskTree, taskId);
+  }
+
+  getTaskTreeData(taskId: string): TaskTreeNodeData | undefined {
+    // Get the latest tree state from treeSubject
+    const taskTree = this.treeSubject.getValue();
+
+    // Check if taskTree is available
+    if (!taskTree) return undefined;
+
+    // Find the node for the given taskId
+    const node = this.treeNodeService.findNodeById(taskTree.root, taskId);
+    if (!node) return undefined;
+
+    // Extract and return relevant data
+    const data: TaskTreeNodeData = {
+      isCompleted: node.isCompleted,
+      overlord: node.overlord,
+      childrenCount: node.childrenCount,
+      completedChildrenCount: node.completedChildrenCount,
+    };
+
+    return data;
   }
 
   private subscribeToTaskEvents(): void {

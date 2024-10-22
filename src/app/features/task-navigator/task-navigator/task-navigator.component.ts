@@ -23,6 +23,9 @@ import { RightMenuComponent } from '../../right-menu/right-menu/right-menu.compo
 import { RightMenuService } from '../../right-menu/services/right-menu.service';
 import { GptCreateComponent } from '../../gpt/gpt-create/gpt-create.component';
 import { GptTasksComponent } from '../../gpt/gpt-tasks/gpt-tasks.component';
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ */
 @Component({
   selector: 'app-task-navigator',
   standalone: true,

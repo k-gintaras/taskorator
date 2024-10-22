@@ -37,6 +37,10 @@ export class SelectedMultipleService {
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
   }
 
+  isSelected(task: Task): boolean {
+    return this.selectedTasks.has(task);
+  }
+
   /**
    * Remove a task from the selected set and notify subscribers
    * @param task Task to remove

@@ -1,34 +1,46 @@
-.task-navigator {
-  max-width: 600px;
-  width: auto; // Adjusts based on content size
-  margin: 10px auto;
+.task-navigator-layout {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; /* Vertically center the artificer with the task list */
+  width: 100%;
+  padding: 10px; /* Add padding for breathing room */
+}
+
+.task-content-wrapper {
+  display: flex;
+  flex-direction: row; /* Ensure artificer and task list are side by side */
+  align-items: center; /* Vertically center items in both artificer and list */
+  flex-grow: 1;
+  padding-top: 20px; /* Adjust padding based on your layout */
+}
+
+.task-list {
+  flex-grow: 1; /* Allow task list to take up the remaining space */
+  padding: 10px;
+  min-width: 400px; /* Task list has a fixed width when there's enough room */
+  max-width: 400px; /* Task list has a fixed width when there's enough room */
   background-color: #fafafa;
   border-radius: 8px;
-  padding: 5px;
+  overflow-wrap: break-word; /* Ensure text wraps when the space is narrow */
 }
 
-.task-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: #eceff1;
-  border-radius: 8px;
-}
-
-.no-tasks {
-  text-align: center;
-  padding: 10px;
-  background-color: #eceff1;
-  border-radius: 8px;
+.app-artificer {
+  position: relative;
+  flex-shrink: 0; /* Ensure artificer doesn't shrink */
+  width: 60px; /* Fixed width for the artificer */
+  margin-right: 20px; /* Space between artificer and task list */
 }
 
 .task-container {
-  display: flex;
-  justify-content: space-between;
+  display: flex; /* Use flexbox to align items horizontally */
+  justify-content: space-between; /* Spread out elements inside the container */
   align-items: center;
-  padding: 5px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 10px;
   border-bottom: 1px solid #ddd;
+  flex-wrap: wrap; /* Allow content to wrap if space gets tight */
 }
 
 .left-section,
@@ -39,63 +51,61 @@
 
 .left-section {
   display: flex;
-  align-items: center;
+  align-items: center; /* Ensure content is centered */
 }
 
 .right-section {
-  align-items: center;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px; /* Ensures spacing between action and promoter components */
-}
-
-.show-more {
-  max-width: 100%; /* Ensures it does not push container width */
-  overflow: hidden; /* Prevents text overflow */
-  text-overflow: ellipsis; /* Adds an ellipsis if text is too long */
-  white-space: nowrap; /* Keeps text on a single line */
+  justify-content: flex-end; /* Align elements to the right */
+  align-items: center;
+  gap: 10px; /* Ensure spacing between action and promoter components */
 }
 
 .navigation-actions {
   display: flex;
-  margin-right: 10px; // Space between navigation buttons and task mini
+  margin-right: 10px; /* Space between navigation buttons and task mini */
 }
 
+/* Task buttons aligned properly */
 .task-btn {
-  background-color: transparent;
-  color: #868686;
-  border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 5px;
+  width: 40px; /* Smaller button size */
+  height: 40px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-right: 5px; /* Horizontal margin between buttons */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .task-btn:hover {
-  background-color: #e8eaf6;
+  background-color: #d0d0d0;
 }
 
 .selected {
   background-color: #7490a3;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
-  .task-navigator {
-    padding: 0px;
+  .task-content-wrapper {
+    flex-direction: row; /* Keep artificer and task-list side by side */
   }
 
-  .task-container {
-    flex-direction: row; // Ensures horizontal layout
-    padding: 2px;
+  .task-list {
+    max-width: calc(
+      100% - 70px
+    ); /* Shrink task list to accommodate artificer */
+    flex-grow: 1;
+    word-wrap: break-word; /* Break words when space is tight */
   }
 
-  .task-header {
-    flex-direction: column;
-    align-items: start;
-    padding: 5px;
-  }
-
-  .navigation-actions {
-    margin-right: 5px; // Tighter spacing for smaller screens
+  .app-artificer {
+    position: relative;
+    width: 60px; /* Keep artificer fixed width */
+    height: auto; /* Let buttons stack vertically */
   }
 }

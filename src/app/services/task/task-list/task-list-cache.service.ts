@@ -39,6 +39,10 @@ export class TaskListCacheService implements TaskListStrategy {
     return this.getTaskList('latest');
   }
 
+  async getLatestUpdatedTasks(): Promise<Task[] | null> {
+    return this.getTaskList('latestUpdated');
+  }
+
   async getOverlordTasks(taskId: string): Promise<Task[] | null> {
     const tasks = this.overlordTasksMap.get(taskId);
     if (tasks) {

@@ -1,0 +1,21 @@
+import { Component, OnInit } from '@angular/core';
+import { Task } from '../../../../../models/taskModelManager';
+import { TaskListService } from '../../../../../services/task/task-list/task-list.service';
+import { TaskListComponent } from '../../task-list/task-list.component';
+
+@Component({
+  selector: 'app-latest-created-task-list',
+  standalone: true,
+  imports: [TaskListComponent],
+  templateUrl: './latest-created-task-list.component.html',
+  styleUrl: './latest-created-task-list.component.scss',
+})
+export class LatestCreatedTaskListComponent implements OnInit {
+  tasks: Task[] | null = null;
+
+  constructor(private taskListService: TaskListService) {}
+
+  async ngOnInit() {
+    this.tasks = await this.taskListService.getLatestTasks();
+  }
+}

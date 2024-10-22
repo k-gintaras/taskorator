@@ -12,6 +12,10 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LowerCasePipe } from '@angular/common';
 
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ * using artificer-action
+ */
 @Component({
   selector: 'app-task-action',
   standalone: true,
@@ -73,6 +77,9 @@ export class TaskActionComponent implements OnInit {
     return getButtonMatName(this.settings.completeButtonAction);
   }
 
+  /**
+   * @deprecated complete will be entirely new button, use <artificer-action>
+   */
   getColorBySetting() {
     if (!this.settings) return 'black';
     return (

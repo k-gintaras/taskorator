@@ -5,7 +5,6 @@ import { NgFor, NgIf } from '@angular/common';
 import { TaskService } from '../../../services/task/task.service';
 import { TreeService } from '../../../services/core/tree.service';
 import { TreeNodeService } from '../../../services/core/tree-node.service';
-import { testTemplate } from '../../../test-files/testTemplate';
 import {
   getBaseTask,
   getDefaultTask,
@@ -39,6 +38,10 @@ import {
   Timestamp,
   CollectionReference,
 } from '@angular/fire/firestore';
+import { testTemplate } from '../../../test-files/other-files/testTemplate';
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ */
 @Component({
   selector: 'app-admin',
   standalone: true,

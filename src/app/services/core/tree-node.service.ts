@@ -33,10 +33,10 @@ export class TreeNodeService {
 
   async createTask(tree: TaskTree, task: Task): Promise<void> {
     const parentNode = task.overlord
-      ? this.findNode(tree.root, task.overlord)
+      ? this.findNodeById(tree.root, task.overlord)
       : tree.root;
     if (parentNode) {
-      const existingNode = this.findNode(parentNode, task.taskId);
+      const existingNode = this.findNodeById(parentNode, task.taskId);
       if (existingNode) {
         // Update the existing node's properties
         existingNode.name = task.name;
@@ -71,7 +71,7 @@ export class TreeNodeService {
   async healTree(tree: TaskTree, tasks: Task[]): Promise<boolean> {
     if (tree) {
       const missingTasks = tasks.filter(
-        (task) => !this.findNode(tree.root, task.taskId)
+        (task) => !this.findNodeById(tree.root, task.taskId)
       );
       if (missingTasks.length > 0) {
         await this.createTasks(tree, missingTasks);
@@ -82,7 +82,7 @@ export class TreeNodeService {
   }
 
   async updateTask(tree: TaskTree, task: Task): Promise<void> {
-    const currentNode = this.findNode(tree.root, task.taskId);
+    const currentNode = this.findNodeById(tree.root, task.taskId);
     if (currentNode && currentNode.overlord !== task.overlord) {
       this.moveTaskNode(tree, currentNode, task.overlord);
     }
@@ -99,10 +99,32 @@ export class TreeNodeService {
     }
   }
 
-  private findNode(node: TaskTreeNode, taskId: string): TaskTreeNode | null {
+  // Checks if a node has incomplete children
+  hasIncompleteChildren(tree: TaskTree, taskId: string): boolean {
+    const node = this.findNodeById(tree.root, taskId);
+    if (!node) return false;
+    return node.children.some((child) => !child.isCompleted);
+  }
+
+  // Checks if a node has any children
+  hasChildren(tree: TaskTree, taskId: string): boolean {
+    const node = this.findNodeById(tree.root, taskId);
+    return node ? node.children.length > 0 : false;
+  }
+
+  findNodeById(node: TaskTreeNode, taskId: string): TaskTreeNode | null {
     if (node.taskId === taskId) return node;
     for (const child of node.children) {
-      const found = this.findNode(child, taskId);
+      const found = this.findNodeById(child, taskId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  findNodeByName(node: TaskTreeNode, taskName: string): TaskTreeNode | null {
+    if (node.name === taskName) return node;
+    for (const child of node.children) {
+      const found = this.findNodeById(child, taskName);
       if (found) return found;
     }
     return null;
@@ -174,10 +196,10 @@ export class TreeNodeService {
     newOverlordId: string | null
   ): void {
     const oldParentNode = node.overlord
-      ? this.findNode(tree.root, node.overlord)
+      ? this.findNodeById(tree.root, node.overlord)
       : tree.root;
     const newParentNode = newOverlordId
-      ? this.findNode(tree.root, newOverlordId)
+      ? this.findNodeById(tree.root, newOverlordId)
       : tree.root;
     if (oldParentNode && newParentNode) {
       oldParentNode.children = oldParentNode.children.filter(
@@ -203,7 +225,7 @@ export class TreeNodeService {
         (child) => child.isCompleted
       ).length;
       currentNode = currentNode.overlord
-        ? this.findNode(tree.root, currentNode.overlord)
+        ? this.findNodeById(tree.root, currentNode.overlord)
         : null;
     }
   }

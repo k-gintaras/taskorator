@@ -4,19 +4,24 @@ import { Subscription } from 'rxjs';
 import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
-import { NgIf } from '@angular/common';
 import { NavigationComponent } from './components/navigation/navigation.component';
+import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, NgIf, NavigationComponent],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    NavigationComponent,
+    HorizontalNavigationComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   title = 'taskorator';
-  testing = true;
+  testing = false;
   authenticated = true;
 
   feedback = ''; // Change feedbacks array to a single string variable

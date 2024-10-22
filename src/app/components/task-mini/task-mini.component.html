@@ -1,37 +1,18 @@
-<div class="mini-task-details" (click)="onTaskCardClick(task)">
+<div
+  class="mini-task-details"
+  [ngClass]="{ 'selected-task': isSelected(task) }"
+  (click)="onTaskCardClick(task)"
+>
   <!-- Use the safe navigation operator to safely access task properties -->
   <p class="task-title">{{ task?.name }}</p>
   <p class="task-info">
     <!-- Display date only if timeEnd is available -->
-    <span class="task-due-date" *ngIf="task?.timeEnd">{{
-      task?.timeEnd | date : "mediumDate"
-    }}</span>
+    <!-- <span class="task-due-date" *ngIf="task?.timeEnd">
+      {{ task?.timeEnd | date : "mediumDate" }}
+    </span> -->
     <!-- Display duration only if it is available -->
-    <span class="task-duration" *ngIf="task?.duration"
-      >{{ task?.duration }} min</span
-    >
-    <!-- Display priority only if it is available and apply class conditionally -->
-    <!-- <span class="task-priority" *ngIf="task?.priority">
-      Priority: {{ task?.priority }}
-      <span [class.high-priority]="task?.priority > 7"></span>
+    <!-- <span class="task-duration" *ngIf="task?.duration">
+      {{ task?.duration }} min
     </span> -->
   </p>
 </div>
-<!-- <div class="task-actions">
-  <button
-    mat-icon-button
-    (click)="editTask(task)"
-    matTooltip="Edit Task"
-    *ngIf="task"
-  >
-    <mat-icon>edit</mat-icon>
-  </button>
-  <button
-    mat-icon-button
-    (click)="viewDetails(task)"
-    matTooltip="View Details"
-    *ngIf="task"
-  >
-    <mat-icon>visibility</mat-icon>
-  </button>
-</div> -->

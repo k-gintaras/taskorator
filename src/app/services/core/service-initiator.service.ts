@@ -45,7 +45,6 @@ export class ServiceInitiatorService {
     if (this.isInitialized) {
       return;
     }
-
     let apiService: ApiStrategy = this.apiService;
     let authService: AuthStrategy = this.authService;
     const errorService: ErrorHandlingStrategy = this.errorService;

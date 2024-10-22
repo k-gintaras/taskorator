@@ -58,7 +58,13 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "index": "src/index-test.html"
+              "index": "src/app/test-files/test-index.html",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

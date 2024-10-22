@@ -12,6 +12,15 @@ export interface TaskTreeNode {
   // You can add more properties to TaskTreeNode as needed, e.g., task title, description, etc.
 }
 
+// just has no children nodes;
+export interface TaskTreeNodeData {
+  isCompleted: boolean;
+  overlord: string | null; // The ID of the parent task, or null for the root
+  childrenCount: number; // The total number of direct children of this node
+  completedChildrenCount: number; // The number of completed tasks among the children
+  // You can add more properties to TaskTreeNode as needed, e.g., task title, description, etc.
+}
+
 export function getDefaultTree(): TaskTree {
   const root: TaskTreeNode = {
     taskId: 'root', // Or a unique identifier if 'root' is too generic

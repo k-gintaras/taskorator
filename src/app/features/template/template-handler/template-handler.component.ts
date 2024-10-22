@@ -5,7 +5,10 @@ import { TemplateService } from '../services/template.service';
 import { TaskService } from '../../../services/task/task.service';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ * will be split into, CREATE templates and browse templates with ability to add...
+ */
 @Component({
   selector: 'app-template-handler',
   standalone: true,

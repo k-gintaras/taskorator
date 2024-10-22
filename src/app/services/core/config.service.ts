@@ -28,6 +28,10 @@ export class ConfigService implements ConfigStrategy {
     private apiServiceDefault: TestApiService
   ) {}
 
+  setTesting(testing: boolean) {
+    this.testing = testing;
+  }
+
   setApiService(service: ApiStrategy) {
     this.apiService = service;
   }

@@ -10,6 +10,7 @@ import { Task } from '../taskModelManager';
 export const TASK_LIST_LIMIT = 10;
 export type TaskListType =
   | 'latest'
+  | 'latestUpdated'
   | 'daily'
   | 'weekly'
   | 'focus'
@@ -18,6 +19,7 @@ export type TaskListType =
 
 export interface TaskListStrategy {
   getLatestTasks(): Promise<Task[] | null>;
+  getLatestUpdatedTasks(): Promise<Task[] | null>;
   getOverlordTasks(taskId: string): Promise<Task[] | null>; // same as overlord tasks but we move here for cleanliness
   getDailyTasks(): Promise<Task[] | null>;
   getWeeklyTasks(): Promise<Task[] | null>;
@@ -29,7 +31,7 @@ export interface TaskListStrategy {
 }
 
 export interface TaskListApiStrategy {
-  getLatestTasks(userId: string): Promise<Task[] | null>;
+  getLatestUpdatedTasks(userId: string): Promise<Task[] | null>;
   getOverlordTasks(userId: string, taskId: string): Promise<Task[] | null>; // same as overlord tasks but we move here for cleanliness
   getDailyTasks(userId: string): Promise<Task[] | null>;
   getWeeklyTasks(userId: string): Promise<Task[] | null>;

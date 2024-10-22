@@ -1,0 +1,114 @@
+/* Toolbar for App Title and Floating Button */
+.toolbar {
+  background-color: #6200ea;
+  color: white;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 16px;
+
+  .nav-fab {
+    margin-right: 16px; // Ensure space between the FAB and the title
+  }
+
+  .app-title {
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+/* Ensure the sidenav container takes full height */
+.sidenav-container {
+  height: calc(
+    100vh - 64px
+  ); // Adjust to take full viewport minus toolbar height
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidenav Styling */
+.sidenav {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column; // Flexbox layout for consistent spacing
+}
+
+/* Navigation list */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; // Ensure the list expands to fill available space
+  overflow-y: auto; // Allow scrolling if items overflow
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    mat-icon {
+      margin-right: 16px;
+      font-size: 24px;
+    }
+
+    &:hover {
+      background-color: #eceff1;
+    }
+
+    &.selected {
+      background-color: #6200ea;
+      color: white;
+
+      mat-icon {
+        color: white;
+      }
+    }
+
+    .nav-text {
+      flex-grow: 1;
+    }
+  }
+}
+
+/* Back Button */
+.back-button {
+  width: 100%;
+  text-align: left;
+  margin-top: 16px;
+  color: #6200ea;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+/* Floating Button for Mobile */
+.nav-fab {
+  display: none; // Hidden by default (shown only on mobile)
+}
+
+@media (max-width: 600px) {
+  .nav-fab {
+    display: inline-flex; // Show the floating button on mobile
+  }
+
+  /* Ensure the navigation text remains visible on mobile */
+  .nav-list .nav-text {
+    display: block; // Show the text for nav items on mobile
+  }
+
+  /* Sidenav width for mobile */
+  .sidenav {
+    width: 250px; // Keep the same width on mobile
+  }
+}
+
+@media (min-width: 600px) {
+  .nav-fab {
+    display: none; // Hide the floating button on larger screens
+  }
+}

@@ -6,7 +6,9 @@ import { Task } from '../../models/taskModelManager';
 import { MenuComponent } from '../menu/menu.component';
 import { TaskNavigatorComponent } from '../../features/task-navigator/task-navigator/task-navigator.component';
 import { NgFor } from '@angular/common';
-
+/**
+ * @deprecated This component/service is deprecated and will be removed in future releases.
+ */
 @Component({
   selector: 'app-parent',
   standalone: true,

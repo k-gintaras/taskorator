@@ -18,6 +18,8 @@ export interface Artificer {
   edit(task: Task): void; // opens edit menu?
   promote(task: Task): void;
   demote(task: Task): void;
+  select(task: Task): void;
+  suggest(task: Task): void;
 }
 
 export interface ArtificerDetails {
@@ -30,4 +32,10 @@ export const artificerDetailList: ArtificerDetails[] = [
   { action: 'complete', icon: 'check', colorClass: 'complete-icon-color' },
   { action: 'delete', icon: 'delete', colorClass: 'delete-icon-color' },
   { action: 'refresh', icon: 'refresh', colorClass: 'refresh-icon-color' },
+  { action: 'move', icon: 'move_to_inbox', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'edit', icon: 'edit', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'select', icon: 'check_box', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'suggest', icon: 'search', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'promote', icon: 'expand_less', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'demote', icon: 'expand_more', colorClass: 'refresh-icon-color' }, // create color for it ?
 ];

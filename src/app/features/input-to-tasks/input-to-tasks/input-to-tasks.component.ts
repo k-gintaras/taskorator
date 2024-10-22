@@ -21,11 +21,12 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgFor } from '@angular/common';
 @Component({
   selector: 'app-input-to-tasks',
   standalone: true,
   imports: [
+    NgFor,
     MatCard,
     MatCardHeader,
     MatCardTitle,
@@ -36,7 +37,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatFormField,
     FormsModule,
     MatInputModule,
-    BrowserAnimationsModule,
   ],
   templateUrl: './input-to-tasks.component.html',
   styleUrls: ['./input-to-tasks.component.scss'],

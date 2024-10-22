@@ -81,6 +81,29 @@ export class TaskListService extends CoreService implements TaskListStrategy {
     }
   }
 
+  async getLatestUpdatedTasks(): Promise<Task[] | null> {
+    try {
+      const userId = await this.getUserId();
+      if (userId) {
+        let tasks = await this.taskListCacheService.getLatestUpdatedTasks();
+        if (!tasks) {
+          tasks = await this.taskListApiService.getLatestUpdatedTasks(userId);
+          if (tasks) {
+            await this.taskListCacheService.createTaskList(
+              'latestUpdated',
+              tasks
+            );
+          }
+        }
+        return tasks;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error in getLatestUpdatedTasks:', error);
+      throw error;
+    }
+  }
+
   async getOverlordTasks(taskId: string): Promise<Task[] | null> {
     try {
       const userId = await this.getUserId();
