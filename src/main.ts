@@ -11,7 +11,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 // Import main app component and test component
 import { AppComponent } from './app/app.component';
-import { CORE_ROUTES } from './app/app.routing.models';
+import { CORE_ROUTES, getRoutes } from './app/app.routing.models';
 
 import { routes } from './app/app.routes';
 import { TestAppComponent } from './app/test-files/test-app.component';
@@ -34,7 +34,7 @@ if (isTesting) {
     providers: [
       importProvidersFrom(
         BrowserAnimationsModule,
-        RouterModule.forRoot(CORE_ROUTES)
+        RouterModule.forRoot(getRoutes())
       ),
 
       provideAnimationsAsync(),
@@ -47,7 +47,7 @@ if (isTesting) {
       importProvidersFrom(
         BrowserAnimationsModule,
         // RouterModule.forRoot(routes)
-        RouterModule.forRoot(CORE_ROUTES)
+        RouterModule.forRoot(getRoutes())
       ),
       importProvidersFrom(
         provideFirebaseApp(() => initializeApp(firebaseJson))

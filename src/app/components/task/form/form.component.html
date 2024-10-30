@@ -1,0 +1,18 @@
+<form [formGroup]="taskForm" class="task-form">
+  <mat-form-field class="full-width">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" placeholder="Task name" />
+  </mat-form-field>
+
+  <mat-form-field class="full-width">
+    <mat-label>To Do</mat-label>
+    <input matInput formControlName="todo" placeholder="Task to-do details" />
+  </mat-form-field>
+
+  <mat-form-field class="full-width">
+    <mat-label>Why</mat-label>
+    <input matInput formControlName="why" placeholder="Purpose or reason" />
+  </mat-form-field>
+
+  <!-- Additional fields can be added here as needed -->
+</form>

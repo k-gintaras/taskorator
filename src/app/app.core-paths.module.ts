@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Route } from '@angular/router';
+import { canActivate, canActivateChild } from './services/core/auth-guard';
 
 export interface AppRoute extends Route {
   path: string; // Ensure path is required
@@ -29,10 +30,13 @@ export const CORE_APP_PATHS: AppRouteMap = {
       'Creative hub focused on crafting, managing, and refining tasks. Includes tools for task creation and specialization.',
     icon: 'build',
     altName: 'Creator',
+
     loadChildren: () =>
       import('./features/core/dreamforge/dreamforge.module').then(
         (m) => m.DreamforgeModule
       ),
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     // Comment: Dreamforge is where users create and refine their tasks, using creative and specialized tools.
   },
   sentinel: {
@@ -46,6 +50,8 @@ export const CORE_APP_PATHS: AppRouteMap = {
       import('./features/core/sentinel/sentinel.module').then(
         (m) => m.SentinelModule
       ),
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     // Comment: Sentinel acts as the strategic hub, providing an overview of tasks and helping prioritize them effectively.
   },
   nexus: {
@@ -57,6 +63,8 @@ export const CORE_APP_PATHS: AppRouteMap = {
     altName: 'Task Hub',
     loadChildren: () =>
       import('./features/core/nexus/nexus.module').then((m) => m.NexusModule),
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     // Comment: Nexus is the planning center, where users can manage workflows and organize tasks over time.
   },
   vortex: {
@@ -70,6 +78,8 @@ export const CORE_APP_PATHS: AppRouteMap = {
       import('./features/core/vortex/vortex.module').then(
         (m) => m.VortexModule
       ),
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     // Comment: Vortex provides a visual, interactive way to represent and manage tasks, making it easier to understand their relationships and progress.
   },
   crucible: {
@@ -79,6 +89,8 @@ export const CORE_APP_PATHS: AppRouteMap = {
       'A focused area for refining and executing group actions on selected tasks.',
     icon: 'filter_list',
     altName: 'Task Batch',
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     loadChildren: () =>
       import('./features/core/crucible/crucible.module').then(
         (m) => m.CrucibleModule
@@ -92,6 +104,8 @@ export const CORE_APP_PATHS: AppRouteMap = {
       'Fortified hub for essential task management utilities, such as cleaning and importing/exporting tasks.',
     icon: 'shield',
     altName: 'Utilities',
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     loadChildren: () =>
       import('./features/core/citadel/citadel.module').then(
         (m) => m.CitadelModule

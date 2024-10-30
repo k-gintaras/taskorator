@@ -20,10 +20,22 @@ export function generateAngularRoutes(appRoutes: AppRouteMap): Routes {
     component: route.component,
     loadChildren: route.loadChildren,
     canActivate: route.canActivate,
+    canActivateChild: route.canActivateChild,
     children: route.children
       ? generateAngularRoutes(createAppRouteMap(route.children))
       : undefined,
   }));
+}
+
+export function getRoutes(): Routes {
+  return [
+    {
+      path: '',
+      redirectTo: CORE_APP_PATHS['sentinel'].path, // Redirect to your default path
+      pathMatch: 'full',
+    },
+    ...generateAngularRoutes(CORE_APP_PATHS),
+  ];
 }
 
 // Helper function to convert an array of AppRoutes into an AppRouteMap

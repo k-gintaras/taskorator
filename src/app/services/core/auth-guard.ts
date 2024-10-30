@@ -13,9 +13,11 @@ export const canActivate: CanActivateFn = (): Observable<boolean | UrlTree> => {
   const isAuthenticated$ = of(authService.isAuthenticated());
 
   return isAuthenticated$.pipe(
-    map((isAuthenticated) => {
-      return isAuthenticated ? true : router.createUrlTree(['/login']);
-    }),
+    map((isAuthenticated) =>
+      isAuthenticated || router.url.includes('gateway')
+        ? true
+        : router.createUrlTree(['/gateway/login'])
+    ),
     catchError(() => of(router.createUrlTree(['/error'])))
   );
 };

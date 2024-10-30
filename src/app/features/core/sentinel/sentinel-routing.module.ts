@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SentinelComponent } from './sentinel/sentinel.component';
 import { ALL_APP_PATHS } from '../../../app.all-paths.module';
+import {
+  canActivate,
+  canActivateChild,
+} from '../../../services/core/auth-guard';
 
 // "Command Center"
 // "Task Overview"
@@ -12,6 +16,7 @@ const routes: Routes = [
   {
     path: '',
     component: SentinelComponent,
+
     children: [
       {
         path: '', // Empty path, to handle default navigation to one of the child routes

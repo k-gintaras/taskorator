@@ -1,0 +1,52 @@
+import { Component, Input } from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { Task } from '../../../models/taskModelManager';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+
+@Component({
+  selector: 'app-form',
+  standalone: true,
+  imports: [MatFormField, MatLabel, ReactiveFormsModule],
+  templateUrl: './form.component.html',
+  styleUrl: './form.component.scss',
+})
+export class FormComponent {
+  @Input() taskToClone?: Task; // Optional task to initialize form with
+  taskForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.taskForm = this.fb.group({
+      name: ['', Validators.required],
+      todo: [''],
+      why: [''],
+      // Other fields can be added here as needed
+    });
+  }
+
+  ngOnInit(): void {
+    // Populate form with task details if `taskToClone` is provided
+    if (this.taskToClone) {
+      this.initializeFormWithTask(this.taskToClone);
+    }
+  }
+
+  // Populate form fields based on the given task
+  initializeFormWithTask(task: Task): void {
+    this.taskForm.patchValue({
+      name: '', // Keep name empty for user to specify a unique name
+      todo: task.todo || '',
+      why: task.why || '',
+      // Add other fields as needed
+    });
+  }
+
+  // Get the form values to create or update a task
+  getTaskDetails(): Partial<Task> {
+    return this.taskForm.value;
+  }
+}

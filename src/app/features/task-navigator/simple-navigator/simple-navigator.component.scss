@@ -1,82 +1,86 @@
 .task-navigator-layout {
   display: flex;
   justify-content: flex-start;
-  align-items: center; /* Vertically center the artificer with the task list */
+  align-items: flex-start;
   width: 100%;
-  padding: 10px; /* Add padding for breathing room */
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .task-content-wrapper {
   display: flex;
-  flex-direction: row; /* Ensure artificer and task list are side by side */
-  align-items: center; /* Vertically center items in both artificer and list */
+  flex-direction: row;
+  align-items: flex-start;
   flex-grow: 1;
-  padding-top: 20px; /* Adjust padding based on your layout */
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .task-list {
-  flex-grow: 1; /* Allow task list to take up the remaining space */
+  flex-grow: 1;
   padding: 10px;
-  min-width: 400px; /* Task list has a fixed width when there's enough room */
-  max-width: 400px; /* Task list has a fixed width when there's enough room */
   background-color: #fafafa;
   border-radius: 8px;
-  overflow-wrap: break-word; /* Ensure text wraps when the space is narrow */
+  overflow-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .app-artificer {
-  position: relative;
-  flex-shrink: 0; /* Ensure artificer doesn't shrink */
-  width: 60px; /* Fixed width for the artificer */
-  margin-right: 20px; /* Space between artificer and task list */
+  flex-shrink: 0;
+  width: 60px;
+  margin-right: 10px;
+  position: sticky;
+  top: 0;
 }
 
 .task-container {
-  display: flex; /* Use flexbox to align items horizontally */
-  justify-content: space-between; /* Spread out elements inside the container */
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   background-color: #f9f9f9;
   border-radius: 4px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  flex-wrap: wrap; /* Allow content to wrap if space gets tight */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .left-section,
 .right-section {
   flex: 1 1 auto;
-  overflow: hidden; /* Prevents elements from causing overflow */
+  overflow: hidden;
 }
 
 .left-section {
   display: flex;
-  align-items: center; /* Ensure content is centered */
+  align-items: center;
 }
 
 .right-section {
   display: flex;
-  justify-content: flex-end; /* Align elements to the right */
+  justify-content: flex-end;
   align-items: center;
-  gap: 10px; /* Ensure spacing between action and promoter components */
+  gap: 10px;
 }
 
 .navigation-actions {
   display: flex;
-  margin-right: 10px; /* Space between navigation buttons and task mini */
+  flex-direction: row;
+  margin-right: 10px;
 }
 
-/* Task buttons aligned properly */
 .task-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5px;
-  width: 40px; /* Smaller button size */
+  width: 40px;
   height: 40px;
   background-color: #e0e0e0;
   border-radius: 4px;
-  margin-right: 5px; /* Horizontal margin between buttons */
+  margin-right: 5px;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
@@ -89,23 +93,136 @@
   background-color: #7490a3;
 }
 
-/* Responsive Design */
+/* Mini Task Styles */
+.mini-task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mini-task-details {
+  flex-grow: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-title {
+  margin-left: 10px;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.task-info {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile Adjustments */
 @media (max-width: 768px) {
+  .task-navigator-layout {
+    padding: 5px;
+    overflow-x: hidden;
+  }
+
   .task-content-wrapper {
-    flex-direction: row; /* Keep artificer and task-list side by side */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
 
   .task-list {
-    max-width: calc(
-      100% - 70px
-    ); /* Shrink task list to accommodate artificer */
-    flex-grow: 1;
-    word-wrap: break-word; /* Break words when space is tight */
+    padding: 5px;
+    max-width: calc(100% - 70px);
+    flex-basis: 0;
+    overflow-wrap: break-word;
   }
 
   .app-artificer {
     position: relative;
-    width: 60px; /* Keep artificer fixed width */
-    height: auto; /* Let buttons stack vertically */
+    width: 60px;
+    height: auto;
+  }
+
+  .task-container {
+    flex-direction: row;
+    width: 100%;
+    padding: 8px; /* Reduce padding for a more compact look */
+  }
+
+  .navigation-actions {
+    flex-direction: row;
+  }
+
+  .mini-task-details {
+    font-size: 0.9rem; /* Slightly smaller text for the mini task */
+  }
+
+  .task-title {
+    font-size: 0.9rem; /* Slightly smaller task title */
+  }
+
+  .task-info {
+    font-size: 0.75rem; /* Smaller text for task info */
+  }
+
+  .task-btn {
+    width: 35px; /* Smaller button width */
+    height: 35px; /* Smaller button height */
+    padding: 4px; /* Reduce padding */
+  }
+}
+
+@media (max-width: 480px) {
+  .task-content-wrapper {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .task-list {
+    padding: 5px;
+    max-width: calc(100% - 70px);
+    flex-grow: 1;
+  }
+
+  .app-artificer {
+    width: 60px;
+  }
+
+  .task-container {
+    flex-direction: row;
+    width: 100%;
+    padding: 6px; /* Further reduce padding for very small screens */
+  }
+
+  .mini-task-details {
+    font-size: 0.8rem; /* Smaller text size for very small screens */
+  }
+
+  .task-title {
+    font-size: 0.8rem;
+  }
+
+  .task-info {
+    font-size: 0.7rem; /* Even smaller for very small screens */
+  }
+
+  .task-btn {
+    width: 30px; /* Even smaller button size */
+    height: 30px;
+    padding: 3px;
   }
 }

@@ -33,13 +33,13 @@ export class SentinelComponent implements OnInit {
   async ngOnInit() {
     this.loadTitle();
 
-    // Subscribe to router events, such as NavigationEnd, to detect route changes
+    // Subscribe to route data to capture route changes, including initial navigation
+    this.route.data.subscribe(() => this.loadTasksFromRoute());
+
+    // Subscribe to router events to detect explicit navigations to child routes
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        console.log('log: ' + 'data from router');
-        this.loadTasksFromRoute();
-      });
+      .subscribe(() => this.loadTasksFromRoute());
 
     // Set up selected overlord subscription
     this.selectedOverlordService
@@ -50,23 +50,20 @@ export class SentinelComponent implements OnInit {
         }
       });
 
-    // Initial task loading based on the current route
-    this.loadTasksFromRoute(); // In case user lands directly on this component
+    // Initial load of tasks based on current route
+    this.loadTasksFromRoute();
   }
 
   // Dynamically load tasks based on the current route
   async loadTasksFromRoute() {
-    const childRoute = this.route.firstChild?.snapshot.routeConfig?.path;
+    const routePath =
+      this.route.firstChild?.snapshot?.routeConfig?.path ||
+      this.router.url.split('/').pop();
 
-    // Fallback to URL if no child route is found (e.g., direct navigation)
-    const currentUrl = this.router.url;
-
-    const routePath = childRoute || currentUrl.split('/').pop();
-    console.log('log: ' + routePath);
-
+    console.log('Detected route path:', routePath);
     if (!routePath) return;
 
-    // Compare the routePath with the paths in ALL_APP_PATHS
+    // Match routePath to the predefined routes in ALL_APP_PATHS
     switch (routePath) {
       case ALL_APP_PATHS['latestUpdated'].path:
         await this.loadLatestUpdatedTasks();
@@ -138,8 +135,8 @@ export class SentinelComponent implements OnInit {
   // Helper method to set the base task and update the title
   private setOverlordAndTitle(title: string) {
     if (!this.tasks) return;
-    const overlord = getBaseTask(); // Use base task as the root
-    overlord.name = 'Root'; // Set the overlord task name to 'Root'
+    const overlord = getBaseTask();
+    overlord.name = 'Root';
     this.setSelectedTitle(title);
 
     this.navigatorService.setInitialTasks(overlord, this.tasks);
