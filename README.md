@@ -16,11 +16,20 @@ Taskorator provides an intuitive platform for organizing tasks in hierarchical s
 - **Firebase Integration**: Real-time database capabilities
 - **Responsive Design**: Consistent experience across devices
 
-![logo](/readme-resources/navigating.gif)
-![logo](/readme-resources/move-task.gif)
-![logo](/readme-resources/promote-demote.gif)
-![logo](/readme-resources/tree-view.gif)
-![logo](/readme-resources/create-task-and-children.gif)
+- **Navigating**:
+  ![navigating tasks](/readme-resources/navigating.gif)
+
+- **Creating tasks and subtasks**:
+  ![create tasks and subtasks](/readme-resources/create-task-and-children.gif)
+
+- **Moving tasks**:
+  ![move tasks](/readme-resources/move-task.gif)
+
+- **Promoting demoting tasks**:
+  ![promote demote](/readme-resources/promote-demote.gif)
+
+- **Tree view**:
+  ![tree view](/readme-resources/tree-view.gif)
 
 ## Core Modules
 
