@@ -175,7 +175,19 @@ export class TaskService extends CoreService implements TaskManagementStrategy {
     try {
       const userId = await this.getUserId();
       if (userId) {
-        let task = await this.cacheService.getSuperOverlord(taskId);
+        /**
+         * TODO: cache singular task, but when getting overlordChildren, it should not just get this task, just because it was fetched as 1 task
+         *
+         * when going back it doesnt give full list of children, because single child from those children was fetched
+         * that single child was super overlord
+         * but it can also be a child of another overlord that has many children
+         * now that overlord has just 1 child...
+         * anywya...
+         * complicated
+         * we just fetch from server task by task
+         */
+        let task = null; // cache will wrongly return this one task if we ask for tasks of this task parent...
+        // let task = await this.cacheService.getSuperOverlord(taskId);
         if (!task) {
           task = await this.apiService.getSuperOverlord(userId, taskId);
           if (task) {

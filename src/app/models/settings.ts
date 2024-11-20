@@ -1,6 +1,7 @@
 import { ROOT_TASK_ID } from './taskModelManager';
 
 export interface TaskSettings {
+  moveTasksOnce: boolean;
   isShowArchived: boolean;
   isShowCompleted: boolean;
   isShowSeen: boolean;
@@ -29,6 +30,7 @@ export function getDefaultSettings() {
     isShowCompletedRepeating: true,
     frogTaskIds: [],
     favoriteTaskIds: [],
+    moveTasksOnce: true,
   };
   return { ...settings };
 }

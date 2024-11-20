@@ -5,8 +5,7 @@ import { TaskService } from '../../services/task/task.service';
 import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
 import { ErrorService } from '../../services/core/error.service';
 import { MatIcon } from '@angular/material/icon';
-import { FormsModule, NgModel } from '@angular/forms';
-import { MatCard, MatCardContent } from '@angular/material/card';
+import { FormsModule } from '@angular/forms';
 import { CurrentInputService } from '../../services/current-input.service';
 import { GptCreateComponent } from '../../features/gpt/gpt-create/gpt-create.component';
 import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
@@ -20,7 +19,7 @@ import { SelectedOverlordService } from '../../services/task/selected-overlord.s
   templateUrl: './add-move-task.component.html',
   styleUrls: ['./add-move-task.component.scss'],
   standalone: true,
-  imports: [MatIcon, FormsModule, MatCardContent, MatCard, GptCreateComponent],
+  imports: [MatIcon, FormsModule, GptCreateComponent],
 })
 export class AddMoveTaskComponent implements OnInit {
   @Input() overlord: Task | undefined;

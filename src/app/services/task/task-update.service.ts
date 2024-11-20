@@ -14,6 +14,8 @@ import { ConfigService } from '../core/config.service';
 import { SelectedTaskService } from './selected-task.service';
 import { SelectedMultipleService } from './selected-multiple.service';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { SettingsService } from '../core/settings.service';
+import { TaskSettings } from '../../models/settings';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +24,7 @@ export class TaskUpdateService extends CoreService {
   constructor(
     private taskService: TaskService,
     private selectedService: SelectedMultipleService,
+    private settingsService: SettingsService,
     protected config: ConfigService
   ) {
     super(config);
@@ -35,6 +38,7 @@ export class TaskUpdateService extends CoreService {
             task.overlord = targetTask.taskId;
           }
           this.taskService.updateTasks(selectedTasks);
+          this.clearSelectedTasks();
           this.feedback('Updated multiple tasks.');
         } else {
           this.error(
@@ -43,6 +47,16 @@ export class TaskUpdateService extends CoreService {
         }
       }
     );
+  }
+
+  private clearSelectedTasks() {
+    this.settingsService.getSettingsOnce().then((s: TaskSettings | null) => {
+      if (s) {
+        if (s.moveTasksOnce) {
+          this.selectedService.clear();
+        }
+      }
+    });
   }
 
   split(task: Task, taskOne: Task, taskTwo: Task) {
@@ -94,6 +108,9 @@ export class TaskUpdateService extends CoreService {
   complete(task: Task) {
     // if task is already completed
     // uncomplete
+    console.log('task');
+    console.log(task.stage);
+
     if (task.stage === 'completed') {
       task.stage = 'todo';
     } else {

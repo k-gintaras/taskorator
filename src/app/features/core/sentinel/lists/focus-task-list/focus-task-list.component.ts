@@ -1,21 +1,43 @@
 import { Component, OnInit } from '@angular/core';
-import { Task } from '../../../../../models/taskModelManager';
+import { getBaseTask, Task } from '../../../../../models/taskModelManager';
 import { TaskListService } from '../../../../../services/task/task-list/task-list.service';
-import { TaskListComponent } from '../../task-list/task-list.component';
+import { CreateTaskComponent } from '../../../../../components/create-task/create-task.component';
+import { RandomNavigatorService } from '../../../../task-navigator/services/random-navigator.service';
+import { RandomNavigatorComponent } from '../../../../task-navigator/random-navigator/random-navigator.component';
 
 @Component({
   selector: 'app-focus-task-list',
   standalone: true,
-  imports: [TaskListComponent],
+  imports: [CreateTaskComponent, RandomNavigatorComponent],
   templateUrl: './focus-task-list.component.html',
   styleUrl: './focus-task-list.component.scss',
 })
 export class FocusTaskListComponent implements OnInit {
   tasks: Task[] | null = null;
+  errorMessage: string = '';
 
-  constructor(private taskListService: TaskListService) {}
+  constructor(
+    private taskListService: TaskListService,
+    private navigatorService: RandomNavigatorService
+  ) {}
 
   async ngOnInit() {
-    this.tasks = await this.taskListService.getFocusTasks();
+    await this.loadDailyTasks();
+  }
+
+  private async loadDailyTasks() {
+    try {
+      this.tasks = await this.taskListService.getFocusTasks();
+      const overlord = getBaseTask(); // Set up the root task
+      overlord.name = 'Root';
+      if (!this.tasks) return;
+      this.navigatorService.setInitialTasks(overlord, this.tasks);
+      this.navigatorService.setTaskNavigationView(overlord, this.tasks);
+      this.errorMessage = '';
+    } catch (error) {
+      this.tasks = null;
+      this.errorMessage = 'Failed to load daily tasks.';
+      console.error(error);
+    }
   }
 }

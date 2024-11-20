@@ -1,40 +1,26 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { TaskSettings, getDefaultSettings } from '../../../models/settings';
+import { MatCardModule } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { ArtificerComponent } from '../../../components/artificer/artificer.component';
+import { TaskMiniComponent } from '../../../components/task-mini/task-mini.component';
+import { ArtificerActionComponent } from '../../../components/task/artificer-action/artificer-action.component';
+import { getDefaultSettings, TaskSettings } from '../../../models/settings';
 import { Task } from '../../../models/taskModelManager';
+import { TaskTree, TaskTreeNodeData } from '../../../models/taskTree';
 import { ConfigService } from '../../../services/core/config.service';
 import { SettingsService } from '../../../services/core/settings.service';
+import { TreeService } from '../../../services/core/tree.service';
 import { FilterService } from '../../../services/task/filter.service';
+import { FreshTaskService } from '../../../services/task/fresh-task.service';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 import { SortService } from '../../../services/task/sort.service';
 import { RightMenuService } from '../../right-menu/services/right-menu.service';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { TaskMiniComponent } from '../../../components/task-mini/task-mini.component';
-import { TaskActionComponent } from '../../../components/task/action/action.component';
-import { PromoterComponent } from '../../../components/task/promoter/promoter.component';
-import { SelectedMultipleComponent } from '../../../components/task/selected-multiple/selected-multiple.component';
-import { GptCreateComponent } from '../../gpt/gpt-create/gpt-create.component';
-import { GptTasksComponent } from '../../gpt/gpt-tasks/gpt-tasks.component';
-import { RightMenuComponent } from '../../right-menu/right-menu/right-menu.component';
-import { TaskNavigatorUltraService } from '../services/task-navigator-ultra.service';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-import { FreshTaskService } from '../../../services/task/fresh-task.service';
-import { ArtificerActionComponent } from '../../../components/task/artificer-action/artificer-action.component';
-import { TaskTree, TaskTreeNodeData } from '../../../models/taskTree';
-import { TreeService } from '../../../services/core/tree.service';
-import { highlightRecentlyModifiedTask } from '../../../test-files/other-files/app.animations';
-import { ArtificerComponent } from '../../../components/artificer/artificer.component';
+import { RandomNavigatorService } from '../services/random-navigator.service';
 
 @Component({
-  selector: 'app-simple-navigator',
+  selector: 'app-random-navigator',
   standalone: true,
   imports: [
     MatCardModule,
@@ -44,11 +30,10 @@ import { ArtificerComponent } from '../../../components/artificer/artificer.comp
     ArtificerActionComponent,
     ArtificerComponent,
   ],
-  templateUrl: './simple-navigator.component.html',
-  styleUrl: './simple-navigator.component.scss',
-  animations: [highlightRecentlyModifiedTask],
+  templateUrl: './random-navigator.component.html',
+  styleUrl: './random-navigator.component.scss',
 })
-export class SimpleNavigatorComponent implements OnInit {
+export class RandomNavigatorComponent implements OnInit {
   @Input() tasks: Task[] = [];
   @Input() showArtificer: boolean = false;
   settings: TaskSettings = getDefaultSettings();
@@ -61,7 +46,7 @@ export class SimpleNavigatorComponent implements OnInit {
     private selectedMultiple: SelectedMultipleService,
     private sortService: SortService,
     private filterService: FilterService,
-    private taskNavigatorService: TaskNavigatorUltraService,
+    private taskNavigatorService: RandomNavigatorService,
     private selectedOverlordService: SelectedOverlordService,
     private rightMenuService: RightMenuService,
     private settingsService: SettingsService,
@@ -100,6 +85,9 @@ export class SimpleNavigatorComponent implements OnInit {
       if (!tree) return;
       this.taskTree = tree;
     });
+
+    console.log('log: ' + 'this');
+    console.log(this.tasks);
   }
 
   getTreeNodeData(task: Task): TaskTreeNodeData | undefined {

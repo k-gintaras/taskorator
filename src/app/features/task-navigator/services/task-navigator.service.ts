@@ -105,7 +105,7 @@ export class TaskNavigatorService extends CoreService {
     }
   }
 
-  private async handleTaskUpdated(task: Task): Promise<void> {
+  async handleTaskUpdated(task: Task): Promise<void> {
     const currentView = this.taskNavigationViewSubject.value;
     if (currentView && currentView.taskOverlord) {
       if (task.overlord === currentView.taskOverlord.taskId) {

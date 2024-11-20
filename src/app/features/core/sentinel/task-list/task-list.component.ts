@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { MatList, MatListItem } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
@@ -31,7 +31,7 @@ import { SelectedOverlordService } from '../../../../services/task/selected-over
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss'],
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
   @Input() tasks: Task[] | null = null;
   @Input() title: string = 'Tasks';
   selectedOverlordName = '';
@@ -58,6 +58,8 @@ export class TaskListComponent {
     const overlord = getBaseTask(); // Set up the root task
     overlord.name = 'Root';
 
+    console.log('this');
+    console.log(this.tasks);
     this.navigatorService.setInitialTasks(overlord, this.tasks);
     this.navigatorService.setTaskNavigationView(overlord, this.tasks);
   }

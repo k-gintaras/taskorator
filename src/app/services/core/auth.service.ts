@@ -83,7 +83,7 @@ export class AuthService implements AuthStrategy {
 
   async getCurrentUserId(): Promise<string | undefined> {
     const user = this.auth.currentUser;
-    console.log('user: ' + user?.uid);
+    // console.log('user: ' + user?.uid);
     return user ? user.uid : undefined;
   }
 
