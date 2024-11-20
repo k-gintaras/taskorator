@@ -40,6 +40,7 @@ import { FocusTaskListComponent } from './features/core/sentinel/lists/focus-tas
 import { RootTaskListComponent } from './features/core/sentinel/lists/root-task-list/root-task-list.component';
 import { TaskListComponent } from './features/core/sentinel/task-list/task-list.component';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
+import { CreateRepetitiveTaskComponent } from './features/core/dreamforge/create-repetitive-task/create-repetitive-task.component';
 
 export const ALL_APP_PATHS: AppRouteMap = {
   // SENTINEL
@@ -101,6 +102,15 @@ export const ALL_APP_PATHS: AppRouteMap = {
   // create templates
   // task tagger
   // dreamForge: CORE_APP_PATHS['forge'],// don't... double import loop import children from here
+  createRepetitive: {
+    path: 'repetitive',
+    title: 'Repetitive',
+    component: CreateRepetitiveTaskComponent,
+    canActivate: [canActivate],
+    description: '',
+    icon: '',
+    altName: '',
+  },
   focus: {
     path: 'focus',
     title: 'Focus',

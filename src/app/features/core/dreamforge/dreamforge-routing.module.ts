@@ -21,6 +21,7 @@ const routes: Routes = [
       ALL_APP_PATHS['focus'],
       ALL_APP_PATHS['frog'],
       ALL_APP_PATHS['favorite'],
+      ALL_APP_PATHS['createRepetitive'],
     ],
     // create task tagger
     //

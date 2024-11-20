@@ -160,9 +160,9 @@ export class TaskListService extends CoreService implements TaskListStrategy {
         }
 
         // Apply filtering if tasks are retrieved from cache
-        if (tasks) {
-          tasks = this.taskListAssistant.filterTasks(tasks, true, 'daily');
-        }
+        // if (tasks) {
+        //   tasks = this.taskListAssistant.filterTasks(tasks, true, 'daily');
+        // }
 
         return tasks;
       }

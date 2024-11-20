@@ -4,6 +4,7 @@ import { TaskListService } from '../../../../../services/task/task-list/task-lis
 import { CreateTaskComponent } from '../../../../../components/create-task/create-task.component';
 import { RandomNavigatorService } from '../../../../task-navigator/services/random-navigator.service';
 import { RandomNavigatorComponent } from '../../../../task-navigator/random-navigator/random-navigator.component';
+import { WeeklyListService } from '../../services/weekly-list.service';
 
 @Component({
   selector: 'app-weekly-task-list',
@@ -17,27 +18,32 @@ export class WeeklyTaskListComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private taskListService: TaskListService,
+    private taskListService: WeeklyListService,
     private navigatorService: RandomNavigatorService
   ) {}
 
   async ngOnInit() {
-    await this.loadDailyTasks();
+    await this.loadWeeklyTasks();
   }
 
-  private async loadDailyTasks() {
-    try {
-      this.tasks = await this.taskListService.getWeeklyTasks();
-      const overlord = getBaseTask(); // Set up the root task
-      overlord.name = 'Root';
-      if (!this.tasks) this.tasks = [];
-      this.navigatorService.setInitialTasks(overlord, this.tasks);
-      this.navigatorService.setTaskNavigationView(overlord, this.tasks);
-      this.errorMessage = '';
-    } catch (error) {
-      this.tasks = null;
-      this.errorMessage = 'Failed to load daily tasks.';
-      console.error(error);
-    }
+  private async loadWeeklyTasks() {
+    this.taskListService.getTasks().subscribe({
+      next: (tasks) => {
+        this.tasks = tasks;
+
+        // Set up the root task for navigation
+        const overlord = { ...getBaseTask(), name: 'Root' }; // Root task for the navigator
+        if (this.tasks && this.tasks.length > 0) {
+          this.navigatorService.setInitialTasks(overlord, this.tasks);
+          this.navigatorService.setTaskNavigationView(overlord, this.tasks);
+        }
+        this.errorMessage = '';
+      },
+      error: (error) => {
+        this.tasks = null;
+        this.errorMessage = 'Failed to load daily tasks.';
+        console.error(error);
+      },
+    });
   }
 }
