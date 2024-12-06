@@ -26,6 +26,8 @@ export abstract class RepeatListService {
   // Fetch and load tasks (implemented by child classes)
   protected async loadTasks(): Promise<void> {
     const tasks = await this.fetchTasks();
+    console.log('!FETCHED');
+    console.log(tasks);
     if (!tasks) return;
     const filteredTasks = this.taskListAssistant.filterTasks(
       tasks,

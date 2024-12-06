@@ -33,10 +33,11 @@ export class WeeklyTaskListComponent implements OnInit {
 
         // Set up the root task for navigation
         const overlord = { ...getBaseTask(), name: 'Root' }; // Root task for the navigator
-        if (this.tasks && this.tasks.length > 0) {
-          this.navigatorService.setInitialTasks(overlord, this.tasks);
-          this.navigatorService.setTaskNavigationView(overlord, this.tasks);
-        }
+        // if (!this.tasks || this.tasks.length < 1) {
+        //   this.tasks = [];
+        // }
+        this.navigatorService.setInitialTasks(overlord, this.tasks);
+        this.navigatorService.setTaskNavigationView(overlord, this.tasks);
         this.errorMessage = '';
       },
       error: (error) => {

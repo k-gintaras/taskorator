@@ -7,7 +7,7 @@ import { Task } from '../taskModelManager';
 // {cacheService.getTasks(taskListType:TaskListTypes)...
 // apiService.getTasks(userId:string,taskListType:TaskListTypes)...}
 
-export const TASK_LIST_LIMIT = 20;
+export const TASK_LIST_LIMIT = 30;
 export type TaskListType =
   | 'latest'
   | 'latestUpdated'
