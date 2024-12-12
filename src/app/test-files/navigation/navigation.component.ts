@@ -1,18 +1,13 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule, MatFabButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import {
-  getPathMap,
-  getRouteMetadata,
-  PathItem,
-} from '../../app.routing.models';
-import { RouteMetadata } from '../../app.core-paths.module';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { RouteMetadata } from '../../app.routes-models';
+import { CORE_APP_METADATA } from '../../app.routes-metadata';
 
 @Component({
   selector: 'app-navigation',
@@ -26,14 +21,12 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     MatButtonModule,
     MatToolbarModule,
     RouterOutlet,
-    MatFabButton,
   ],
 })
 export class NavigationComponent implements OnInit {
   currentNavItems: { path: string; metadata: RouteMetadata }[] = [];
   navStack: { path: string; metadata: RouteMetadata }[][] = [];
-  pathMap: { [key: string]: PathItem } = getPathMap();
-  lastCorePath: PathItem | undefined;
+  lastCorePath: string | null = null;
   viewingParent = true;
   isHandset: boolean = false;
 
@@ -45,7 +38,7 @@ export class NavigationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.updateNavItems(this.pathMap); // Start at the top level
+    this.updateNavItems(); // Start at the top level
     this.breakpointObserver
       .observe([Breakpoints.Handset])
       .subscribe((result) => {
@@ -54,56 +47,41 @@ export class NavigationComponent implements OnInit {
   }
 
   onNavItemClick(item: { path: string; metadata: RouteMetadata }) {
-    const selectedItem = this.currentNavItems.find(
-      (navItem) => navItem.path === item.path
-    );
-    if (selectedItem) {
-      const currentCorePath = this.pathMap[selectedItem.path];
-
-      if (currentCorePath) {
-        // Core item clicked, show child items but keep drawer open
-        this.viewingParent = true;
-        this.lastCorePath = currentCorePath;
-        const children = currentCorePath.children;
-
-        if (children?.length) {
-          this.updateMenu(children); // Show child items
-        }
-        this.router.navigate([item.path]);
-      } else {
-        // Child item clicked, close the drawer
-        const subPath = `${this.lastCorePath?.path}/${item.path}`;
-        this.router.navigate([subPath]);
+    if (item.path === this.lastCorePath) {
+      // Handle clicks on parent (core) path
+      this.viewingParent = true;
+      this.updateNavItems(); // Show top-level items
+    } else {
+      const children = this.getChildrenPaths(item.path);
+      if (children?.length) {
+        // If the route has children, update the menu to show them
         this.viewingParent = false;
-
-        // Close the drawer on mobile when navigating a child
-        if (this.isHandset && this.drawer) {
-          this.drawer.toggle();
-        }
+        this.lastCorePath = item.path;
+        this.updateMenu(children);
+      } else {
+        // Otherwise, navigate to the child route
+        this.router.navigate([item.path]);
+        this.closeDrawerOnMobile();
       }
     }
   }
 
   onBackClick() {
     if (this.lastCorePath) {
-      this.updateNavItems(this.pathMap); // Go back to the top-level (core) items
-      this.router.navigate([this.lastCorePath.path]); // Navigate back to the core path
-      this.viewingParent = true; // Reset to viewing the parent (core) level
-
-      // Keep the drawer open when clicking back on mobile
-      if (this.isHandset && this.drawer) {
-        this.drawer.open();
-      }
+      this.updateNavItems(); // Go back to the top-level
+      this.router.navigate([this.lastCorePath]); // Navigate back to the parent path
+      this.viewingParent = true;
     }
   }
 
-  updateNavItems(pathMap: { [key: string]: PathItem }) {
-    this.currentNavItems = this.convertPathsToNavItems(Object.keys(pathMap));
+  updateNavItems() {
+    // Update to show top-level navigation items
+    this.currentNavItems = this.getTopLevelPaths().map(this.toNavItem);
   }
 
   updateMenu(children: string[]) {
-    this.currentNavItems = this.convertPathsToNavItems(children);
-    this.viewingParent = false; // Indicate that we're viewing children
+    // Update to show child navigation items
+    this.currentNavItems = children.map(this.toNavItem);
   }
 
   toggleDrawer() {
@@ -120,17 +98,32 @@ export class NavigationComponent implements OnInit {
     return this.router.url.includes(path);
   }
 
-  convertPathsToNavItems(
-    paths: string[]
-  ): { path: string; metadata: RouteMetadata }[] {
-    return paths.map((path) => {
-      const metadata = getRouteMetadata(path) || {
-        title: 'Unnamed Route',
-        altName: 'Unnamed Route',
-        icon: 'extension',
-        description: '',
-      };
-      return { path, metadata };
-    });
+  closeDrawerOnMobile() {
+    if (this.isHandset && this.drawer) {
+      this.drawer.toggle();
+    }
+  }
+
+  toNavItem = (path: string): { path: string; metadata: RouteMetadata } => {
+    const metadata = CORE_APP_METADATA[path] || {
+      title: 'Unnamed Route',
+      description: '',
+      icon: 'extension',
+    };
+    return { path, metadata };
+  };
+
+  getTopLevelPaths(): string[] {
+    // Mock function to get top-level paths; replace with actual implementation
+    return ['forge', 'sentinel', 'nexus', 'vortex', 'crucible', 'citadel'];
+  }
+
+  getChildrenPaths(path: string): string[] | undefined {
+    // Mock function to get child paths for a route; replace with actual implementation
+    const childMap: Record<string, string[]> = {
+      forge: ['subforge1', 'subforge2'],
+      sentinel: ['subsentinel1', 'subsentinel2'],
+    };
+    return childMap[path];
   }
 }

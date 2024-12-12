@@ -7,9 +7,9 @@ export interface ScoreStrategy {
   updateScore(score: Score): Promise<void>;
 }
 export interface ScoreCacheStrategy {
-  createScore(score: Score): Promise<Score | null>;
-  getScore(): Promise<Score | null>;
-  updateScore(score: Score): Promise<void>;
+  createScore(score: Score): void;
+  getScore(): Promise<Score | null> | Score | null;
+  updateScore(score: Score): void;
 }
 export interface ScoreApiStrategy {
   createScore(userId: string, score: Score): Promise<Score | null>;

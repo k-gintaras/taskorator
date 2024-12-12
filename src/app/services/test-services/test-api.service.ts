@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import {
   RegisterUserResult,
   TaskUserInfo,
 } from '../../models/service-strategies/user';
 import { Score, getDefaultScore } from '../../models/score';
-import { getDefaultSettings, TaskSettings } from '../../models/settings';
+import { getDefaultTaskSettings, TaskSettings } from '../../models/settings';
 import { Task } from '../../models/taskModelManager';
 import { TaskTree, getDefaultTree } from '../../models/taskTree';
 
@@ -79,43 +78,38 @@ export class TestApiService implements ApiStrategy {
     return newTask;
   }
 
-  async updateTask(userId: string, task: Task): Promise<void> {
+  async updateTask(userId: string, task: Task): Promise<boolean> {
     const index = this.tasks.findIndex((t) => t.taskId === task.taskId);
     if (index !== -1) {
       this.tasks[index] = task;
     }
+    return true;
   }
 
-  async getTaskById(userId: string, taskId: string): Promise<Task | undefined> {
+  async getTaskById(userId: string, taskId: string): Promise<Task | null> {
     const task = this.tasks.find((t) => t.taskId === taskId);
-    return task;
+    return task || null;
   }
 
-  async getLatestTaskId(userId: string): Promise<string | undefined> {
+  async getLatestTaskId(userId: string): Promise<string | null> {
     const latestTask = this.tasks[this.tasks.length - 1];
     return latestTask?.taskId;
   }
 
-  async getSuperOverlord(
-    userId: string,
-    taskId: string
-  ): Promise<Task | undefined> {
+  async getSuperOverlord(userId: string, taskId: string): Promise<Task | null> {
     const task = this.tasks.find((t) => t.taskId === taskId);
     if (task && task.overlord) {
       const superOverlord = this.tasks.find((t) => t.taskId === task.overlord);
-      return superOverlord;
+      return superOverlord || null;
     }
-    return undefined;
+    return null;
   }
 
   async getOverlordChildren(
     userId: string,
     overlordId: string
-  ): Promise<Task[] | undefined> {
+  ): Promise<Task[] | null> {
     const children = this.tasks.filter((t) => t.overlord === overlordId);
-
-    console.log('children GGGGGGGGGGGGGGGGGGGGG');
-    console.log(children);
     return children;
   }
 
@@ -138,13 +132,14 @@ export class TestApiService implements ApiStrategy {
     return this.tasks;
   }
 
-  async updateTasks(userId: string, tasks: Task[]): Promise<void> {
+  async updateTasks(userId: string, tasks: Task[]): Promise<boolean> {
     tasks.forEach((task) => {
       const index = this.tasks.findIndex((t) => t.taskId === task.taskId);
       if (index !== -1) {
         this.tasks[index] = task;
       }
     });
+    return true;
   }
 
   async createTree(
@@ -172,7 +167,7 @@ export class TestApiService implements ApiStrategy {
   }
 
   async getSettings(userId: string): Promise<TaskSettings | null> {
-    return getDefaultSettings();
+    return getDefaultTaskSettings();
   }
 
   async updateSettings(userId: string, settings: TaskSettings): Promise<void> {

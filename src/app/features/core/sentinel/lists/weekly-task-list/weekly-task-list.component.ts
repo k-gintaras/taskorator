@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { getBaseTask, Task } from '../../../../../models/taskModelManager';
-import { TaskListService } from '../../../../../services/task/task-list/task-list.service';
-import { CreateTaskComponent } from '../../../../../components/create-task/create-task.component';
-import { RandomNavigatorService } from '../../../../task-navigator/services/random-navigator.service';
-import { RandomNavigatorComponent } from '../../../../task-navigator/random-navigator/random-navigator.component';
-import { WeeklyListService } from '../../services/weekly-list.service';
+import { Task } from '../../../../../models/taskModelManager';
+import { CreateTaskComponent } from '../../../../../components/task/create-task/create-task.component';
+import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
+import { TaskListService } from '../../../../../services/tasks/task-list.service';
+import { TaskTransmutationService } from '../../../../../services/tasks/task-transmutation.service';
 
 @Component({
   selector: 'app-weekly-task-list',
   standalone: true,
-  imports: [CreateTaskComponent, RandomNavigatorComponent],
+  imports: [CreateTaskComponent, TaskNavigatorComponent],
   templateUrl: './weekly-task-list.component.html',
   styleUrl: './weekly-task-list.component.scss',
 })
@@ -18,33 +18,26 @@ export class WeeklyTaskListComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private taskListService: WeeklyListService,
-    private navigatorService: RandomNavigatorService
+    private taskListService: TaskListService,
+    private navigatorService: TaskNavigatorUltraService,
+    private transmutatorServive: TaskTransmutationService
   ) {}
 
   async ngOnInit() {
-    await this.loadWeeklyTasks();
+    await this.loadTasks();
   }
 
-  private async loadWeeklyTasks() {
-    this.taskListService.getTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = tasks;
-
-        // Set up the root task for navigation
-        const overlord = { ...getBaseTask(), name: 'Root' }; // Root task for the navigator
-        // if (!this.tasks || this.tasks.length < 1) {
-        //   this.tasks = [];
-        // }
-        this.navigatorService.setInitialTasks(overlord, this.tasks);
-        this.navigatorService.setTaskNavigationView(overlord, this.tasks);
-        this.errorMessage = '';
-      },
-      error: (error) => {
-        this.tasks = null;
-        this.errorMessage = 'Failed to load daily tasks.';
-        console.error(error);
-      },
-    });
+  private async loadTasks() {
+    try {
+      this.tasks = await this.taskListService.getWeeklyTasks();
+      if (!this.tasks) return;
+      const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
+      this.navigatorService.loadAndInitializeTasks(extended, '');
+      this.errorMessage = '';
+    } catch (error) {
+      this.tasks = null;
+      this.errorMessage = 'Failed to load daily tasks.';
+      console.error(error);
+    }
   }
 }

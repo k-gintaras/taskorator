@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
+import { CORE_APP_METADATA } from '../../../../app.routes-metadata';
 
 @Component({
   selector: 'app-gateway',
@@ -10,5 +10,5 @@ import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
   styleUrl: './gateway.component.scss',
 })
 export class GatewayComponent {
-  data = CORE_APP_PATHS['gateway'];
+  data = CORE_APP_METADATA['gateway'];
 }

@@ -7,9 +7,9 @@ export interface SettingsStrategy {
   updateSettings(settings: TaskSettings): Promise<void>;
 }
 export interface SettingsCacheStrategy {
-  createSettings(settings: TaskSettings): Promise<TaskSettings | null>;
-  getSettings(): Promise<TaskSettings | null>;
-  updateSettings(settings: TaskSettings): Promise<void>;
+  createSettings(settings: TaskSettings): void;
+  getSettings(): Promise<TaskSettings | null> | TaskSettings | null;
+  updateSettings(settings: TaskSettings): void;
 }
 
 export interface SettingsApiStrategy {

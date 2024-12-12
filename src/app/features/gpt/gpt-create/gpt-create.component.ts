@@ -4,7 +4,6 @@ import { TaskTree } from '../../../models/taskTree';
 import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
 import { TreeService } from '../../../services/core/tree.service';
 import { CurrentInputService } from '../../../services/current-input.service';
-import { TaskService } from '../../../services/task/task.service';
 import { GptRequestService } from '../services/gpt-request.service';
 import { NgFor, NgIf } from '@angular/common';
 import { ConfigService } from '../../../services/core/config.service';
@@ -12,16 +11,18 @@ import { GptTasksService } from '../services/gpt-tasks.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TaskService } from '../../../services/tasks/task.service';
+import { TaskListService } from '../../../services/tasks/task-list.service';
 
 @Component({
   selector: 'app-gpt-create',
   standalone: true,
-  imports: [NgIf, NgFor, MatButtonModule, MatIcon, MatProgressSpinnerModule],
+  imports: [NgIf, MatButtonModule, MatIcon, MatProgressSpinnerModule],
   templateUrl: './gpt-create.component.html',
   styleUrl: './gpt-create.component.scss',
 })
 export class GptCreateComponent implements OnInit {
-  currentOverlord: Task | undefined;
+  currentOverlord: string | undefined;
   taskTree: TaskTree | undefined;
   prompt: string | undefined;
   mainPrompt =
@@ -35,6 +36,7 @@ export class GptCreateComponent implements OnInit {
     private treeService: TreeService,
     private currentInputService: CurrentInputService,
     private taskService: TaskService,
+    private taskListService: TaskListService,
     private gptService: GptRequestService,
     private gptTasksService: GptTasksService,
     private configService: ConfigService
@@ -43,7 +45,7 @@ export class GptCreateComponent implements OnInit {
   ngOnInit(): void {
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((t: Task | null) => {
+      .subscribe((t: string | null) => {
         if (!t) return;
         this.currentOverlord = t;
       });
@@ -78,24 +80,22 @@ export class GptCreateComponent implements OnInit {
     this.isLoading = true;
 
     try {
-      const treeChain = await this.getTreeChain(overlord, tree);
-      const tasks = await this.getOverlordChildren(overlord);
-      const currentInput = this.prompt || '';
-
-      const request = this.generatePromptRequest(
-        treeChain,
-        tasks,
-        currentInput,
-        overlord
-      );
-      console.log('GPT REQUEST: ', request);
-
-      const response = await this.gptService.makeGptRequest(request, userId);
-      this.result = response.text.split('\n');
-      this.result?.forEach((t: string) => {
-        const task = this.getTaskFromResponse(t, overlord);
-        this.gptTasksService.addTask(task);
-      });
+      // const treeChain = await this.getTreeChain(overlord, tree);
+      // const tasks = await this.getOverlordChildren(overlord);
+      // const currentInput = this.prompt || '';
+      // const request = this.generatePromptRequest(
+      //   treeChain,
+      //   tasks,
+      //   currentInput,
+      //   overlord
+      // );
+      // console.log('GPT REQUEST: ', request);
+      // const response = await this.gptService.makeGptRequest(request, userId);
+      // this.result = response.text.split('\n');
+      // this.result?.forEach((t: string) => {
+      //   const task = this.getTaskFromResponse(t, overlord);
+      //   this.gptTasksService.addTask(task);
+      // });
     } catch (error) {
       console.error('Error in getSuggestion():', error);
     } finally {
@@ -180,7 +180,7 @@ export class GptCreateComponent implements OnInit {
     if (!overlord) {
       return [];
     }
-    const tasks = await this.taskService.getOverlordChildren(overlord.taskId);
+    const tasks = await this.taskListService.getOverlordTasks(overlord.taskId);
     const filtered = tasks?.filter((t) => {
       t.stage !== 'completed';
     });

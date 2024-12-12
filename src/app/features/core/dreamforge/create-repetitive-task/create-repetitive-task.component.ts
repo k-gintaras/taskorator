@@ -15,7 +15,8 @@ import { MatOption } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { TaskService } from '../../../../services/task/task.service';
+import { TaskService } from '../../../../services/tasks/task.service';
+import { TaskUpdateService } from '../../../../services/task/task-update.service';
 
 @Component({
   selector: 'app-create-repetitive-task',
@@ -46,14 +47,14 @@ export class CreateRepetitiveTaskComponent {
     'yearly',
   ];
 
-  constructor(private taskService: TaskService) {}
+  constructor(private taskService: TaskUpdateService) {}
 
   saveTask(): void {
     // Here, you'd integrate this with your service or event bus.
     console.log('Task created:', this.task);
     alert(`Repetitive Task "${this.task.name}" created successfully.`);
     this.task.lastUpdated = 0;
-    this.taskService.createTask(this.task);
+    this.taskService.create(this.task);
   }
 
   resetForm(): void {

@@ -4,7 +4,7 @@ import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { TreeNodeService } from './tree-node.service';
 import { getDefaultScore } from '../../models/score';
-import { getDefaultSettings, TaskSettings } from '../../models/settings';
+import { getDefaultTaskSettings, TaskSettings } from '../../models/settings';
 import {
   Task,
   getBaseTask,
@@ -112,7 +112,7 @@ export class RegistrationService extends CoreService {
   }
 
   private getBaseSettings(initialTaskId: string): TaskSettings {
-    const baseSettings = getDefaultSettings();
+    const baseSettings = getDefaultTaskSettings();
     baseSettings.lastOverlordViewId = initialTaskId;
 
     return baseSettings;

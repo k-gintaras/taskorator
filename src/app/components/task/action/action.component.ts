@@ -4,7 +4,7 @@ import { TaskUpdateService } from '../../../services/task/task-update.service';
 import { SettingsService } from '../../../services/core/settings.service';
 import {
   getButtonMatName,
-  getDefaultSettings,
+  getDefaultTaskSettings,
   TaskSettings,
 } from '../../../models/settings';
 import { completeButtonColorMap } from '../../../models/colors';
@@ -25,7 +25,7 @@ import { LowerCasePipe } from '@angular/common';
 })
 export class TaskActionComponent implements OnInit {
   @Input() task: Task | undefined;
-  settings: TaskSettings = getDefaultSettings();
+  settings: TaskSettings = getDefaultTaskSettings();
 
   constructor(
     private taskUpdateService: TaskUpdateService,

@@ -1,8 +1,16 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
 
-import { routes } from './app.routes';
-
+// we kinda import them elsewhere in main
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes)],
+  providers: [],
+  // providers: [provideRouter(routes)],
+};
+
+export const SENSITIVE_CONFIG = {
+  gptServiceUrl: 'https://gpt-web-service.onrender.com',
+};
+
+export const TASK_CONFIG = {
+  TASK_LIST_LIMIT: 30,
+  CACHE_EXPIRATION_MS: 5 * 60 * 1000, // 5 minutes for example
 };

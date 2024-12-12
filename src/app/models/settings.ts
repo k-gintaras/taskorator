@@ -16,7 +16,7 @@ export interface TaskSettings {
   favoriteTaskIds: string[];
 }
 
-export function getDefaultSettings() {
+export function getDefaultTaskSettings() {
   const settings: TaskSettings = {
     isShowArchived: false,
     isShowCompleted: false,

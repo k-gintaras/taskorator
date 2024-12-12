@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { GptTasksService } from '../services/gpt-tasks.service';
 import { Task } from '../../../models/taskModelManager';
-import { TaskService } from '../../../services/task/task.service';
 import { CommonModule, NgFor } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
+import { TaskService } from '../../../services/tasks/task.service';
 
 @Component({
   selector: 'app-gpt-tasks',

@@ -1,9 +1,10 @@
 import { Component, NgModule, OnInit } from '@angular/core';
 import { getDefaultTask, Task } from '../../models/taskModelManager';
-import { TaskService } from '../../services/task/task.service';
-import { TaskListService } from '../../services/task/task-list/task-list.service';
 import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
+import { TaskService } from '../../services/tasks/task.service';
+import { TaskListService } from '../../services/tasks/task-list.service';
+import { TaskUpdateService } from '../../services/task/task-update.service';
 
 @Component({
   selector: 'app-next-task-manager',
@@ -17,7 +18,7 @@ export class NextTaskManagerComponent implements OnInit {
   latestNextTasks: Task[] = [];
 
   constructor(
-    private taskService: TaskService,
+    private taskService: TaskUpdateService,
     private taskListService: TaskListService
   ) {}
 
@@ -30,9 +31,11 @@ export class NextTaskManagerComponent implements OnInit {
 
     (newTask.name = this.newTaskName),
       (newTask.type = 'next'),
-      this.taskService.createTask(newTask).then(() => {
-        this.newTaskName = ''; // Reset input field
-      });
+      this.taskService.create(newTask);
+    this.newTaskName = '';
+    // this.taskService.createTask(newTask).then(() => {
+    //   this.newTaskName = ''; // Reset input field
+    // });
   }
 
   fetchLatestNextTasks(): void {

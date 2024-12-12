@@ -7,9 +7,9 @@ export interface TreeStrategy {
   updateTree(taskTree: TaskTree): Promise<void>;
 }
 export interface TreeCacheStrategy {
-  createTree(taskTree: TaskTree): Promise<TaskTree | null>;
-  getTree(): Promise<TaskTree | null>;
-  updateTree(taskTree: TaskTree): Promise<void>;
+  createTree(taskTree: TaskTree): void;
+  getTree(): Promise<TaskTree | null> | TaskTree | null;
+  updateTree(taskTree: TaskTree): void;
 }
 export interface TreeApiStrategy {
   getTree(userId: string): Promise<TaskTree | null>;

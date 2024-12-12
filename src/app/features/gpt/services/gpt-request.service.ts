@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
+import { SENSITIVE_CONFIG } from '../../../app.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GptRequestService {
-  private apiUrl = 'https://gpt-web-service.onrender.com';
+  private apiUrl = SENSITIVE_CONFIG.gptServiceUrl;
 
   constructor(private http: HttpClient) {}
 

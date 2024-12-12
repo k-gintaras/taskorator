@@ -11,12 +11,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 // Import main app component and test component
 import { AppComponent } from './app/app.component';
-import { CORE_ROUTES, getRoutes } from './app/app.routing.models';
 
 import { routes } from './app/app.routes';
 import { TestAppComponent } from './app/test-files/test-app.component';
-import { AuthService } from './app/services/core/auth.service';
-import { TestAuthService } from './app/services/test-services/test-auth.service';
+// import { AuthService } from './app/services/core/auth.service';
+// import { TestAuthService } from './app/services/test-services/test-auth.service';
 // import { testRoutes } from './app/test-files/test-app.routes';
 // import { SimpleNavigatorComponent } from './app/features/task-navigator/simple-navigator/simple-navigator.component';
 // import { TestAppComponent } from './app/test-files/test-app.component';
@@ -34,7 +33,7 @@ if (isTesting) {
     providers: [
       importProvidersFrom(
         BrowserAnimationsModule,
-        RouterModule.forRoot(getRoutes())
+        RouterModule.forRoot(routes)
       ),
 
       provideAnimationsAsync(),
@@ -47,7 +46,7 @@ if (isTesting) {
       importProvidersFrom(
         BrowserAnimationsModule,
         // RouterModule.forRoot(routes)
-        RouterModule.forRoot(getRoutes())
+        RouterModule.forRoot(routes)
       ),
       importProvidersFrom(
         provideFirebaseApp(() => initializeApp(firebaseJson))

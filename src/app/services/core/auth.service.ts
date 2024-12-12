@@ -14,7 +14,7 @@ import {
 } from '@angular/fire/auth';
 import { RegistrationService } from './registration.service';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 /**
  * @remarks
  * various ways to login and register with injected `RegistrationService` to help with with creation of data
@@ -93,6 +93,12 @@ export class AuthService implements AuthStrategy {
 
   isAuthenticated(): boolean {
     return !!this.currentUserSubject.getValue();
+  }
+
+  isAuthenticatedObservable(): Observable<boolean> {
+    return this.getCurrentUser().pipe(
+      map((user) => !!user) // Map the user object to a boolean (true if user exists, false otherwise)
+    );
   }
 
   async logOut(): Promise<void> {

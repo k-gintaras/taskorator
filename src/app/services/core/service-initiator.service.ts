@@ -7,12 +7,12 @@ import { AuthStrategy } from '../../models/service-strategies/auth-strategy.inte
 import { TestApiService } from '../test-services/test-api.service';
 import { TestAuthService } from '../test-services/test-auth.service';
 import { AuthService } from './auth.service';
-import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
-import ApiService from './api.service';
 import { ConfigService } from './config.service';
 import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { ApiFirebaseService } from './api-firebase.service';
+import { CacheOrchestratorService } from './cache-orchestrator.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,8 +27,8 @@ export class ServiceInitiatorService {
     private treeService: TreeService,
     private scoreService: ScoreService,
     private authService: AuthService,
-    private cacheService: CacheService,
-    private apiService: ApiService,
+    private cacheService: CacheOrchestratorService,
+    private apiService: ApiFirebaseService,
     private errorService: ErrorService,
     private testAuthService: TestAuthService,
     private testApiService: TestApiService,

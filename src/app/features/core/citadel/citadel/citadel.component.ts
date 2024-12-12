@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
+import { CORE_APP_METADATA } from '../../../../app.routes-metadata';
 
 @Component({
   selector: 'app-citadel',
@@ -10,5 +10,5 @@ import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
   styleUrl: './citadel.component.scss',
 })
 export class CitadelComponent {
-  data = CORE_APP_PATHS['citadel'];
+  data = CORE_APP_METADATA['citadel'];
 }

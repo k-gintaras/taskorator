@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Task } from '../../models/taskModelManager';
-
+/**
+ * @fix or @deprecated use ExtendedTask for ui... or extend task to have "selected" property
+ */
 @Injectable({
   providedIn: 'root',
 })

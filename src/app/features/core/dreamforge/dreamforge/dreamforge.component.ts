@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
+import { CORE_APP_METADATA } from '../../../../app.routes-metadata';
 
 @Component({
   selector: 'app-dreamforge',
@@ -10,5 +10,5 @@ import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
   styleUrl: './dreamforge.component.scss',
 })
 export class DreamforgeComponent {
-  data = CORE_APP_PATHS['forge'];
+  data = CORE_APP_METADATA['dreamforge'];
 }

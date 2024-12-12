@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from '../../models/taskModelManager';
-
+/**
+ * @fix @deprecated use SelectedMultipleService and just get last selected task or not?
+ */
 @Injectable({
   providedIn: 'root',
 })

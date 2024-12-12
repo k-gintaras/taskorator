@@ -21,6 +21,42 @@ export interface Task {
   imageDataUrl: string | null; // Base64 representation of the image
   tags: string[]; // Array of tags associated with the task
 }
+
+export const TASK_ACTIONS = [
+  'created',
+  'updated',
+  'completed',
+  'archived',
+  'deleted',
+  'renewed',
+  'seen',
+  'activated',
+  'moved',
+  'split',
+  'priorityIncreased',
+  'priorityDecreased',
+  'nameUpdated',
+  'todoUpdated',
+  'whyUpdated',
+  'tagAdded',
+  'tagRemoved',
+  'imageUpdated',
+  'backupLinkUpdated',
+  'repeatUpdated',
+  'timeEndUpdated',
+  'durationUpdated',
+  'statusUpdated',
+  'typeUpdated',
+  'subtypeUpdated',
+  'sizeUpdated',
+];
+
+// so the UI can react to task updates a bit better
+export interface ExtendedTask extends Task {
+  isVisible: boolean; // For filtering visible tasks
+  animationState: 'highlighted' | 'normal' | 'removed'; // For UI animations
+}
+
 export const maxPriority = 10;
 export type TaskSize = 'do now' | 'split' | 'delegate';
 export type TaskStage = 'seen' | 'completed' | 'todo' | 'archived' | 'deleted';

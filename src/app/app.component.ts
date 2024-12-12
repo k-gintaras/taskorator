@@ -1,21 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
-import { NavigationComponent } from './components/navigation/navigation.component';
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    NavigationComponent,
-    HorizontalNavigationComponent,
-  ],
+  imports: [RouterOutlet, HorizontalNavigationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

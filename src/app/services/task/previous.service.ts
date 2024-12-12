@@ -4,6 +4,10 @@ import { take } from 'rxjs';
 import { TaskSettings } from '../../models/settings';
 import { ROOT_TASK_ID } from '../../models/taskModelManager';
 import { SelectedOverlordService } from './selected-overlord.service';
+
+/**
+ * @deprecated use something else or rewrite, currently URL doesnt have task in it
+ */
 @Injectable({
   providedIn: 'root',
 })

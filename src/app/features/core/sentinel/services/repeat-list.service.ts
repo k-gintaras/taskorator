@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from '../../../../models/taskModelManager';
 import { EventBusService } from '../../../../services/core/event-bus.service';
-import { TaskListAssistantService } from '../../../../services/task/task-list/task-list-assistant.service';
+import { TaskListAssistantApiService } from '../../../../services/api/task-list-assistant-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ export abstract class RepeatListService {
   private tasks$ = new BehaviorSubject<Task[]>([]);
 
   constructor(
-    protected taskListAssistant: TaskListAssistantService,
+    protected taskListAssistant: TaskListAssistantApiService,
     protected eventBus: EventBusService
   ) {
     this.loadTasks();

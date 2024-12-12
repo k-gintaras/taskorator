@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ConfigStrategy } from '../../models/service-strategies/strategy-config.interface';
-import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
 import { TestAuthService } from '../test-services/test-auth.service';
 import { TestApiService } from '../test-services/test-api.service';
@@ -8,6 +7,7 @@ import { AuthStrategy } from '../../models/service-strategies/auth-strategy.inte
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
 import { ErrorHandlingStrategy } from '../../models/service-strategies/error-handling-strategy.interface';
+import { CacheOrchestratorService } from './cache-orchestrator.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +23,7 @@ export class ConfigService implements ConfigStrategy {
   // to return either default or whatever we set it to in service initiator, which initiated in app.component
   constructor(
     private errorServiceDefault: ErrorService,
-    private cacheServiceDefault: CacheService,
+    private cacheServiceDefault: CacheOrchestratorService,
     private authServiceDefault: TestAuthService,
     private apiServiceDefault: TestApiService
   ) {}

@@ -3,8 +3,10 @@ import { SettingsStrategy } from '../../models/service-strategies/settings-strat
 import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
-import { TaskSettings, getDefaultSettings } from '../../models/settings';
-
+import { TaskSettings, getDefaultTaskSettings } from '../../models/settings';
+/**
+ * @deprecated
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -52,7 +54,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
         settings = await this.apiService.getSettings(userId);
         if (!settings) {
           // Settings not found or error occurred
-          const defaultSettings = getDefaultSettings(); // Assume some default settings exist
+          const defaultSettings = getDefaultTaskSettings(); // Assume some default settings exist
           this.log('recreating settings:');
 
           await this.createSettings(defaultSettings);

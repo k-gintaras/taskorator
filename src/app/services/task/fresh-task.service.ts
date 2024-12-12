@@ -3,7 +3,9 @@ import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { EventBusService } from '../core/event-bus.service';
 import { Task } from '../../models/taskModelManager';
 import { Observable } from 'rxjs/internal/Observable';
-
+/**
+ * @deprecated Use TaskViewService from /tasks instead.
+ */
 @Injectable({
   providedIn: 'root',
 })

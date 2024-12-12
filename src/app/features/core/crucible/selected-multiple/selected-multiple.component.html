@@ -1,0 +1,53 @@
+<div class="center-horizontal">
+  <div class="width-task fill-width">
+    <div class="selected-tasks-container">
+      <h2>Selected Overlord</h2>
+      <div *ngIf="selectedOverlord">{{ selectedOverlordName }}</div>
+    </div>
+
+    <div class="selected-tasks-container">
+      <app-search-overlord></app-search-overlord>
+      <div class="toolbar">
+        <button mat-button (click)="setNewOverlordForSelectedTasks()">
+          Set New Overlord
+        </button>
+        <button mat-button (click)="clear()">Clear Selection</button>
+      </div>
+    </div>
+
+    <div class="selected-tasks-container">
+      <h2>Manage Focus, Frog, and Favorite Tasks</h2>
+      <div class="button-group">
+        <div mat-button-toggle-group class="toggle-group">
+          <button mat-button (click)="setFocus(true)">Reset Focus</button>
+          <button mat-button (click)="setFocus(false)">Add to Focus</button>
+        </div>
+        <div mat-button-toggle-group class="toggle-group">
+          <button mat-button (click)="setFrogs(true)">Reset Frogs</button>
+          <button mat-button (click)="setFrogs(false)">Add to Frogs</button>
+        </div>
+        <div mat-button-toggle-group class="toggle-group">
+          <button mat-button (click)="setFavorites(true)">
+            Reset Favorites
+          </button>
+          <button mat-button (click)="setFavorites(false)">
+            Add to Favorites
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="selected-tasks-container">
+      <h2>Selected Tasks</h2>
+      <div *ngIf="selectedTasks.length > 0; else noTasks">
+        <div *ngFor="let task of selectedTasks" class="task-entry">
+          <app-task-mini [task]="task" (click)="onTaskCardClick(task)">
+          </app-task-mini>
+        </div>
+      </div>
+      <ng-template #noTasks>
+        <p>No tasks selected.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

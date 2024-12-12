@@ -1,0 +1,48 @@
+<div class="task-navigator-layout">
+  <div class="task-content-wrapper">
+    <!-- Conditionally Render Artificer -->
+    <ng-container *ngIf="showArtificer">
+      <app-artificer></app-artificer>
+    </ng-container>
+
+    <!-- Task List -->
+    <div class="task-list">
+      <div *ngIf="tasks?.length === 0" class="no-tasks">
+        <p>No tasks yet.</p>
+        <button class="task-btn" (click)="goBack(selectedOverlord)">
+          <mat-icon>keyboard_double_arrow_left</mat-icon>
+        </button>
+        <button class="task-btn" (click)="goBackPrevious(selectedOverlord)">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+
+      <div
+        *ngFor="let task of tasks"
+        class="task-container"
+        [class.selected]="isSelected(task)"
+      >
+        <div class="left-section">
+          <div class="navigation-actions">
+            <button class="task-btn" (click)="onPrevious(task)">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button class="task-btn" (click)="onNext(task)">
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+          <app-task-mini [task]="task"></app-task-mini>
+          <div *ngIf="isShowMoreEnabled()" class="show-more">
+            {{ task.why }} - {{ task.todo }}
+          </div>
+        </div>
+        <div class="right-section">
+          <app-artificer-action
+            [treeNode]="getTreeNodeData(task)"
+            [task]="task"
+          ></app-artificer-action>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

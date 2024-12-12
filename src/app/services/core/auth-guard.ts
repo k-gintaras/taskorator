@@ -1,25 +1,31 @@
-import { CanActivateFn, UrlTree, CanActivateChildFn } from '@angular/router';
+import {
+  CanActivateFn,
+  UrlTree,
+  CanActivateChildFn,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 
-export const canActivate: CanActivateFn = (): Observable<boolean | UrlTree> => {
+export const canActivate: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+): boolean | UrlTree => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Convert boolean to Observable if isAuthenticated returns a boolean
-  const isAuthenticated$ = of(authService.isAuthenticated());
+  const isAuthenticated = authService.isAuthenticated();
 
-  return isAuthenticated$.pipe(
-    map((isAuthenticated) =>
-      isAuthenticated || router.url.includes('gateway')
-        ? true
-        : router.createUrlTree(['/gateway/login'])
-    ),
-    catchError(() => of(router.createUrlTree(['/error'])))
-  );
+  // Handle navigation logic
+  if (isAuthenticated || state.url.includes('gateway')) {
+    return true;
+  } else {
+    return router.createUrlTree(['/gateway/login']);
+  }
 };
 
 export const canActivateChild: CanActivateChildFn = canActivate;

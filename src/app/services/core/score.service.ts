@@ -4,7 +4,9 @@ import { ConfigService } from './config.service';
 import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
 import { Score, getDefaultScore } from '../../models/score';
-
+/**
+ * @deprecated
+ */
 @Injectable({
   providedIn: 'root',
 })

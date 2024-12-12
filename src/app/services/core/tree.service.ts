@@ -12,7 +12,9 @@ import {
   TaskTreeNodeData,
   getDefaultTree,
 } from '../../models/taskTree';
-
+/**
+ * @deprecated
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -192,8 +194,8 @@ export class TreeService extends CoreService implements TreeStrategy {
   }
 
   getTree(): BehaviorSubject<TaskTree | null> {
-    if (this.treeSubject.value === null && this.authService.isAuthenticated()) {
-      this.fetchTree();
+    if (!this.treeSubject.value && this.authService.isAuthenticated()) {
+      this.fetchTree(); // Initiate the fetch if the tree is null or empty
     }
     return this.treeSubject;
   }
@@ -202,28 +204,26 @@ export class TreeService extends CoreService implements TreeStrategy {
     try {
       const userId = await this.authService.getCurrentUserId();
       if (!userId) {
-        throw new Error('Not logged in');
+        console.warn('User is not logged in; cannot fetch tree.');
+        return;
       }
 
       let tree = await this.cacheService.getTree();
       if (!tree) {
         tree = await this.apiService.getTree(userId);
         if (!tree) {
-          // Assume a default tree structure; define it as appropriate for your application
-          const defaultTree = getDefaultTree(); // Example: an empty tree, adjust as necessary
-          this.log('recreating tree');
-          await this.createTree(defaultTree); // Assuming createTree method exists
-          tree = defaultTree;
+          console.log('Tree not found, initializing default tree.');
+          tree = getDefaultTree(); // Initialize a default tree if none exists
+          await this.createTree(tree);
         }
-        this.cacheService.updateTree(tree);
       }
-      this.treeSubject.next(tree);
+
+      this.treeSubject.next(tree); // Only emit the tree after it is ready
     } catch (error) {
-      this.error(error);
-      throw error;
+      console.error('Error fetching tree:', error);
+      this.treeSubject.next(null); // Ensure we emit null explicitly if an error occurs
     }
   }
-
   async updateTree(taskTree: TaskTree): Promise<void> {
     try {
       const userId = await this.authService.getCurrentUserId();

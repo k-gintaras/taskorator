@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
+import { CORE_APP_METADATA } from '../../../../app.routes-metadata';
 
 @Component({
   selector: 'app-crucible',
@@ -10,5 +10,5 @@ import { CORE_APP_PATHS } from '../../../../app.core-paths.module';
   styleUrl: './crucible.component.scss',
 })
 export class CrucibleComponent {
-  data = CORE_APP_PATHS['crucible'];
+  data = CORE_APP_METADATA['crucible'];
 }

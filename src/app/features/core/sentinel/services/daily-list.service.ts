@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { RepeatListService } from './repeat-list.service';
 import { Task } from '../../../../models/taskModelManager';
 import { EventBusService } from '../../../../services/core/event-bus.service';
-import { TaskListAssistantService } from '../../../../services/task/task-list/task-list-assistant.service';
-import { TaskListService } from '../../../../services/task/task-list/task-list.service';
+import { TaskListService } from '../../../../services/tasks/task-list.service';
+import { TaskListAssistantApiService } from '../../../../services/api/task-list-assistant-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ import { TaskListService } from '../../../../services/task/task-list/task-list.s
 export class DailyListService extends RepeatListService {
   constructor(
     private taskListService: TaskListService,
-    taskListAssistant: TaskListAssistantService,
+    taskListAssistant: TaskListAssistantApiService,
     eventBus: EventBusService
   ) {
     super(taskListAssistant, eventBus);
@@ -20,7 +20,7 @@ export class DailyListService extends RepeatListService {
   protected override fetchTasks(): Promise<Task[] | null> {
     if (!this.taskListService) return Promise.resolve(null);
 
-    return this.taskListService.getDailyTasksFiltered();
+    return this.taskListService.getDailyTasks();
   }
   protected override getRepeatType(): string {
     return 'daily';

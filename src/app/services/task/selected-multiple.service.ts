@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from '../../models/taskModelManager';
 
+/**
+ * @fix @warn use ExtendedTask for ui... or extend task to have "selected" property
+ */
 @Injectable({
   providedIn: 'root',
 })

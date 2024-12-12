@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { getBaseTask, Task } from '../../../../../models/taskModelManager';
-import { TaskListService } from '../../../../../services/task/task-list/task-list.service';
-import { CreateTaskComponent } from '../../../../../components/create-task/create-task.component';
-import { RandomNavigatorService } from '../../../../task-navigator/services/random-navigator.service';
-import { RandomNavigatorComponent } from '../../../../task-navigator/random-navigator/random-navigator.component';
+import { Task } from '../../../../../models/taskModelManager';
+import { CreateTaskComponent } from '../../../../../components/task/create-task/create-task.component';
+import {
+  TaskListKey,
+  TaskListService,
+} from '../../../../../services/tasks/task-list.service';
+import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
+import { TaskTransmutationService } from '../../../../../services/tasks/task-transmutation.service';
+import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 
 @Component({
   selector: 'app-latest-updated-task-list',
   standalone: true,
-  imports: [CreateTaskComponent, RandomNavigatorComponent],
+  imports: [CreateTaskComponent, TaskNavigatorComponent],
   templateUrl: './latest-updated-task-list.component.html',
   styleUrl: './latest-updated-task-list.component.scss',
 })
@@ -18,21 +22,23 @@ export class LatestUpdatedTaskListComponent implements OnInit {
 
   constructor(
     private taskListService: TaskListService,
-    private navigatorService: RandomNavigatorService
+    private navigatorService: TaskNavigatorUltraService,
+    private transmutatorServive: TaskTransmutationService
   ) {}
 
   async ngOnInit() {
-    await this.loadDailyTasks();
+    await this.loadTasks();
   }
 
-  private async loadDailyTasks() {
+  private async loadTasks() {
     try {
       this.tasks = await this.taskListService.getLatestUpdatedTasks();
-      const overlord = getBaseTask(); // Set up the root task
-      overlord.name = 'Root';
       if (!this.tasks) return;
-      this.navigatorService.setInitialTasks(overlord, this.tasks);
-      this.navigatorService.setTaskNavigationView(overlord, this.tasks);
+      const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
+      this.navigatorService.loadAndInitializeTasks(
+        extended,
+        TaskListKey.UPDATED
+      );
       this.errorMessage = '';
     } catch (error) {
       this.tasks = null;

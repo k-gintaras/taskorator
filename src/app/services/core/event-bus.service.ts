@@ -1,21 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { Task } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventBusService {
-  deleteTask(task: Task) {
-    throw new Error('Method not implemented.');
-  }
-  // eslint-disable-next-line @typescript-eslint/ban-types
   private listeners = new Map<string, Function[]>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private subjects = new Map<string, Subject<any>>();
 
   constructor() {
-    // Initialize all event subjects
     const events = [
       'createTask',
       'updateTask',
@@ -27,18 +20,14 @@ export class EventBusService {
       'createTasks',
       'updateTasks',
     ];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     events.forEach((event) => this.subjects.set(event, new Subject<any>()));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, payload: any): void {
     this.listeners.get(event)?.forEach((listener) => listener(payload));
     this.subjects.get(event)?.next(payload);
   }
 
-  // Listen to events - traditional way
-  // eslint-disable-next-line @typescript-eslint/ban-types
   on(event: string, listener: Function): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
@@ -46,45 +35,44 @@ export class EventBusService {
     this.listeners.get(event)?.push(listener);
   }
 
-  // Observable way to listen to events
   onEvent<T>(event: string): Observable<T> {
     return this.subjects.get(event)?.asObservable() ?? new Observable();
   }
 
-  // Task-related operations
-  createTask(task: Task): void {
-    this.emit('createTask', task);
+  getTaskById(taskId: string): void {
+    this.emit('getTaskById', taskId);
   }
 
-  updateTask(task: Task): void {
-    this.emit('updateTask', task);
+  getLatestTaskId(taskId: string): void {
+    this.emit('getLatestTaskId', taskId);
   }
 
-  getTaskById(taskReceived: Task): void {
-    this.emit('getTaskById', taskReceived);
+  getSuperOverlord(taskId: string): void {
+    this.emit('getSuperOverlord', taskId);
   }
 
-  getLatestTaskId(taskIdReceived: string): void {
-    this.emit('getLatestTaskId', taskIdReceived);
-  }
-
-  getSuperOverlord(taskReceived: Task): void {
-    this.emit('getSuperOverlord', taskReceived);
-  }
-
-  getOverlordChildren(tasksReceived: Task[]): void {
-    this.emit('getOverlordChildren', tasksReceived);
+  getOverlordChildren(taskIds: string[]): void {
+    this.emit('getOverlordChildren', taskIds);
   }
 
   getTasks(userId: string): void {
     this.emit('getTasks', userId);
   }
 
-  createTasks(tasks: Task[]): void {
-    this.emit('createTasks', tasks);
+  // Emit just IDs or arrays of IDs instead of full objects
+  createTask(taskId: string): void {
+    this.emit('createTask', taskId);
   }
 
-  updateTasks(tasks: Task[]): void {
-    this.emit('updateTasks', tasks);
+  updateTask(taskId: string): void {
+    this.emit('updateTask', taskId);
+  }
+
+  createTasks(taskIds: string[]): void {
+    this.emit('createTasks', taskIds);
+  }
+
+  updateTasks(taskIds: string[]): void {
+    this.emit('updateTasks', taskIds);
   }
 }

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { getBaseTemplate, TaskTemplate } from '../models/template';
 import { AdminService } from '../services/admin.service';
 import { NgFor, NgIf } from '@angular/common';
-import { TaskService } from '../../../services/task/task.service';
 import { TreeService } from '../../../services/core/tree.service';
 import { TreeNodeService } from '../../../services/core/tree-node.service';
 import {
@@ -12,11 +11,9 @@ import {
 } from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
 import { LocalSqliteService } from '../services/local-sqlite.service';
-import { TreeViewComponent } from '../../tree-view/tree-view.component';
 import { TreeBuilderService } from '../services/tree-builder.service';
 import { take } from 'rxjs';
 import { RegistrationService } from '../../../services/core/registration.service';
-import ApiService from '../../../services/core/api.service';
 import { TaskUserInfo } from '../../../models/service-strategies/user';
 import { GptRequestService } from '../../gpt/services/gpt-request.service';
 import { AuthService } from '../../../services/core/auth.service';
@@ -39,6 +36,13 @@ import {
   CollectionReference,
 } from '@angular/fire/firestore';
 import { testTemplate } from '../../../test-files/other-files/testTemplate';
+import { TreeViewComponent } from '../../core/vortex/tree-view/tree-view.component';
+import { TaskService } from '../../../services/tasks/task.service';
+import { ApiFirebaseService } from '../../../services/core/api-firebase.service';
+import { GeneralApiService } from '../../../services/api/general-api.service';
+import { TaskListService } from '../../../services/tasks/task-list.service';
+import { TaskBatchService } from '../../../services/tasks/task-batch.service';
+import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
 /**
  * @deprecated This component/service is deprecated and will be removed in future releases.
  */
@@ -63,12 +67,15 @@ export class AdminComponent {
   constructor(
     private templateService: AdminService,
     private taskService: TaskService,
+    private taskListService: TaskListService,
+    private taskBatchService: TaskBatchService,
     private treeService: TreeService,
     private treeNodeService: TreeNodeService,
     private localSqlite: LocalSqliteService,
     private treeBuilderService: TreeBuilderService,
     private registrationService: RegistrationService,
-    private apiService: ApiService,
+    private apiService: ApiFirebaseService,
+    private apiBaseService: GeneralApiService,
     private gptService: GptRequestService,
     private authService: AuthService,
     private firestore: Firestore
@@ -93,7 +100,7 @@ export class AdminComponent {
   getUserTest() {
     const userId = 'qqpewpew';
     // this.registrationService.registerUserById(userId);
-    this.apiService.getDocument(userId, 'userInfos').then((result) => {
+    this.apiBaseService.getDocument(userId, 'userInfos').then((result: any) => {
       console.log(result);
     });
   }
@@ -107,7 +114,7 @@ export class AdminComponent {
       role: 'admin',
       registered: true,
     };
-    this.apiService.createDocument(userId, 'userInfos', obj);
+    this.apiBaseService.createDocument(userId, 'userInfos', obj);
   }
 
   async migrateTasks() {
@@ -217,11 +224,13 @@ export class AdminComponent {
           // Update the tree with the new tasks
           this.treeService.updateTree(oldTree).then();
           const noRootTasks = filteredTasks.filter((t) => t.taskId !== '128');
-          this.taskService.createTasks(noRootTasks).then();
-          this.taskService.getOverlordChildren('128').then((result) => {
-            console.log('WHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT');
-            console.log(result);
-          });
+          this.taskBatchService.createTaskBatch(noRootTasks).then();
+          this.taskListService
+            .getOverlordTasks('128')
+            .then((result: Task[] | null) => {
+              console.log('WHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT');
+              console.log(result);
+            });
         });
 
       // Create tasks for filtered tasks without a root
@@ -229,27 +238,25 @@ export class AdminComponent {
   }
 
   fixMissingTasks() {
-    this.taskService
-      .getOverlordChildren('0')
-      .then((tasks: Task[] | undefined) => {
-        this.taskService
-          .getTaskById('vuLn7N0EOlUcYkz0ObX6')
-          .then((task: Task | undefined) => {
-            if (!tasks) return;
-            if (!task) return;
-            console.log(
-              'task found ++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            );
+    this.taskListService.getOverlordTasks('0').then((tasks: Task[] | null) => {
+      this.taskService
+        .getTaskById('vuLn7N0EOlUcYkz0ObX6')
+        .then((task: Task | null) => {
+          if (!tasks) return;
+          if (!task) return;
+          console.log(
+            'task found ++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+          );
 
-            tasks.forEach((t: Task) => {
-              t.overlord = task.taskId;
-            });
-            this.taskService.updateTasks(tasks);
-            console.log(
-              'TASKS FIXED AND UPDATED.................................................'
-            );
+          tasks.forEach((t: Task) => {
+            t.overlord = task.taskId;
           });
-      });
+          this.taskBatchService.updateTaskBatch(tasks, TaskActions.MOVED);
+          console.log(
+            'TASKS FIXED AND UPDATED.................................................'
+          );
+        });
+    });
   }
 
   private cleanTasks() {}
@@ -354,7 +361,7 @@ export class AdminComponent {
     const template = await this.templateService.getTemplate(this.templateId);
     if (template) {
       const tasks = template.tasks.filter((task) => task.taskId !== '128');
-      await this.taskService.createTasks(tasks);
+      await this.taskBatchService.createTaskBatch(tasks);
       this.message = 'Tasks copied successfully, except the root task.';
     } else {
       this.message = 'Template not found.';

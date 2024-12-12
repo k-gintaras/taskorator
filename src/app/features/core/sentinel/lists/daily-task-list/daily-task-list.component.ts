@@ -1,74 +1,46 @@
 import { Component, OnInit } from '@angular/core';
-import { getBaseTask, Task } from '../../../../../models/taskModelManager';
-import { TaskListService } from '../../../../../services/task/task-list/task-list.service';
-import { CreateTaskComponent } from '../../../../../components/create-task/create-task.component';
-import { RandomNavigatorComponent } from '../../../../task-navigator/random-navigator/random-navigator.component';
-import { RandomNavigatorService } from '../../../../task-navigator/services/random-navigator.service';
-import { TaskListAssistantService } from '../../../../../services/task/task-list/task-list-assistant.service';
-import { DailyListService } from '../../services/daily-list.service';
+import { Task } from '../../../../../models/taskModelManager';
+import { CreateTaskComponent } from '../../../../../components/task/create-task/create-task.component';
+import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
+import {
+  TaskListKey,
+  TaskListService,
+} from '../../../../../services/tasks/task-list.service';
+import { TaskTransmutationService } from '../../../../../services/tasks/task-transmutation.service';
 
 @Component({
   selector: 'app-daily-task-list',
   standalone: true,
-  imports: [CreateTaskComponent, RandomNavigatorComponent],
+  imports: [CreateTaskComponent, TaskNavigatorComponent],
   templateUrl: './daily-task-list.component.html',
   styleUrl: './daily-task-list.component.scss',
 })
 export class DailyTaskListComponent implements OnInit {
   tasks: Task[] | null = null;
-  errorMessage: string | null = null;
+  errorMessage: string = '';
 
   constructor(
     private taskListService: TaskListService,
-    private navigatorService: RandomNavigatorService,
-    private taskListAssistant: TaskListAssistantService,
-    private dailyTasksService: DailyListService
+    private navigatorService: TaskNavigatorUltraService,
+    private transmutatorServive: TaskTransmutationService
   ) {}
 
   async ngOnInit() {
-    await this.loadDailyTasks();
+    await this.loadTasks();
   }
 
-  private async loadDailyTasks() {
-    this.dailyTasksService.getTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = tasks;
-        console.log('tttttttttttt');
-        console.log(tasks);
-
-        // Set up the root task for navigation
-        const overlord = { ...getBaseTask(), name: 'Root' }; // Root task for the navigator
-        // if (!this.tasks || this.tasks.length < 1) {
-        //   this.tasks = [];
-        // }
-        this.navigatorService.setInitialTasks(overlord, this.tasks);
-        this.navigatorService.setTaskNavigationView(overlord, this.tasks);
-        this.errorMessage = null;
-      },
-      error: (error) => {
-        this.tasks = null;
-        this.errorMessage = 'Failed to load daily tasks.';
-        console.error(error);
-      },
-    });
-    // try {
-    //   // this.tasks = await this.taskListService.getDailyTasks();
-    //   this.tasks = await this.taskListService.getDailyTasksFiltered();
-
-    //   // if (tasks) {
-    //   //   tasks = this.taskListAssistant.filterTasks(tasks, true, 'daily');
-    //   // }
-
-    //   const overlord = getBaseTask(); // Set up the root task
-    //   overlord.name = 'Root';
-    //   if (!this.tasks) return;
-    //   this.navigatorService.setInitialTasks(overlord, this.tasks);
-    //   this.navigatorService.setTaskNavigationView(overlord, this.tasks);
-    //   this.errorMessage = null;
-    // } catch (error) {
-    //   this.tasks = null;
-    //   this.errorMessage = 'Failed to load daily tasks.';
-    //   console.error(error);
-    // }
+  private async loadTasks() {
+    try {
+      this.tasks = await this.taskListService.getDailyTasks();
+      if (!this.tasks) return;
+      const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
+      this.navigatorService.loadAndInitializeTasks(extended, TaskListKey.DAILY);
+      this.errorMessage = '';
+    } catch (error) {
+      this.tasks = null;
+      this.errorMessage = 'Failed to load daily tasks.';
+      console.error(error);
+    }
   }
 }
