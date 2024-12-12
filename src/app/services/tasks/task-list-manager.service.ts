@@ -1,37 +1,23 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { TaskList, ListRules } from '../../models/task-list';
+import { TaskList, ListRules, defaultTaskLists } from '../../models/task-list';
 import { ExtendedTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskListManagerService {
-  constructor() {}
   private lists: Map<string, TaskList> = new Map();
   private listsSubject = new BehaviorSubject<TaskList[]>([]);
 
   lists$ = this.listsSubject.asObservable();
 
-  createList(
-    id: string,
-    title: string,
-    tasks: string[],
-    rules?: ListRules,
-    type?: string,
-    parent?: string,
-    description?: string
-  ): void {
-    const newList: TaskList = {
-      id,
-      title,
-      tasks,
-      rules,
-      type,
-      parent,
-      description,
-    };
-    this.lists.set(id, newList);
+  constructor() {
+    this.initializeDefaultLists();
+  }
+
+  private initializeDefaultLists(): void {
+    defaultTaskLists.forEach((list) => this.lists.set(list.id, { ...list }));
     this.updateListsSubject();
   }
 

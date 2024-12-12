@@ -95,6 +95,11 @@ export class TaskBatchService {
             const currentGroup = this.taskIdCache.getTaskGroup(task.taskId);
             if (currentGroup) {
               // THE ISSUE WAS wrong overlord key... but we need to still allow other keys...
+              // we assume subAction will be overlord.taskId the new owner of the tasks...
+              // what if it is not? well i guess we save it to a list we can never access? somewhere in memory :D
+              // do not worry as API will just have tasks with new overlord... and later we can just get them from that overlord
+              // if we know which overlord now owns them :D
+              // what if we forget? search in a tree?
               this.taskIdCache.moveTask(
                 task.taskId,
                 currentGroup,
