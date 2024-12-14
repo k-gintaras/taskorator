@@ -8,7 +8,7 @@ import { Task } from '../taskModelManager';
 // apiService.getTasks(userId:string,taskListType:TaskListTypes)...}
 
 export const TASK_LIST_LIMIT = 30;
-export type TaskListType =
+export type TaskListTypeOld =
   | 'latest'
   | 'latestUpdated'
   | 'daily'
@@ -26,7 +26,7 @@ export interface TaskListStrategy {
   getFocusTasks(): Promise<Task[] | null>; // or getTasksFromArray(focusTasks:string[])... api allow access it maybe as we can read tree...
   getTasksToSplit(): Promise<Task[] | null>; // big tasks, tasks that are not deep in tree? figure it out... to make tasks more doable to make project progress
   getTasksToCrush(): Promise<Task[] | null>; // small tasks, tasks that are many in 1 parent use tree to find, to make lists and tasks more organized
-  getTasks(taskListType: TaskListType): Promise<Task[] | null>;
+  getTasks(taskListType: TaskListTypeOld): Promise<Task[] | null>;
   getTasksFromIds(taskIds: string[]): Promise<Task[] | null>;
 }
 
@@ -38,6 +38,9 @@ export interface TaskListApiStrategy {
   getFocusTasks(userId: string): Promise<Task[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
   getTasksToSplit(userId: string): Promise<Task[] | null>; // big tasks, tasks that are not deep in tree? figure it out... to make tasks more doable to make project progress
   getTasksToCrush(userId: string): Promise<Task[] | null>; // small tasks, tasks that are many in 1 parent use tree to find, to make lists and tasks more organized
-  getTasks(userId: string, taskListType: TaskListType): Promise<Task[] | null>;
+  getTasks(
+    userId: string,
+    taskListType: TaskListTypeOld
+  ): Promise<Task[] | null>;
   getTasksFromIds(userId: string, taskIds: string[]): Promise<Task[] | null>;
 }

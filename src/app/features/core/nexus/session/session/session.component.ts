@@ -13,12 +13,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Task } from '../../../../../models/taskModelManager';
 import { SelectedMultipleService } from '../../../../../services/task/selected-multiple.service';
-import {
-  TaskListKey,
-  TaskListService,
-} from '../../../../../services/tasks/task-list.service';
+import { TaskListService } from '../../../../../services/tasks/task-list.service';
 import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
+import {
+  TaskListKey,
+  TaskListType,
+} from '../../../../../models/task-list-model';
 
 @Component({
   selector: 'app-session',
@@ -128,10 +129,11 @@ export class SessionComponent implements OnInit, OnDestroy {
       .getTasks(session.taskIds)
       .then((tasks: Task[] | null) => {
         if (!tasks) return;
-        this.navigatorService.loadAndInitializeTasks(
-          tasks,
-          TaskListKey.SESSION + session.name
-        );
+        const taskListKey: TaskListKey = {
+          type: TaskListType.SESSION,
+          data: session.name,
+        };
+        this.navigatorService.loadAndInitializeTasks(tasks, taskListKey);
       });
   }
 

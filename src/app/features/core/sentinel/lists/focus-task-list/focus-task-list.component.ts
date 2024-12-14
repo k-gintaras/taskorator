@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Task } from '../../../../../models/taskModelManager';
 import { CreateTaskComponent } from '../../../../../components/task/create-task/create-task.component';
-import {
-  TaskListKey,
-  TaskListService,
-} from '../../../../../services/tasks/task-list.service';
+import { TaskListService } from '../../../../../services/tasks/task-list.service';
 import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
 import { TaskTransmutationService } from '../../../../../services/tasks/task-transmutation.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
+import {
+  TaskListRules,
+  TaskListKey,
+  TaskListType,
+  TaskListSubtype,
+} from '../../../../../models/task-list-model';
+import { TaskListRulesService } from '../../../../../services/tasks/task-list-rules.service';
 
 @Component({
   selector: 'app-focus-task-list',
@@ -19,11 +23,13 @@ import { TaskNavigatorComponent } from '../../../../../components/task-navigator
 export class FocusTaskListComponent implements OnInit {
   tasks: Task[] | null = null;
   errorMessage: string = '';
+  taskListRules: TaskListRules | null = null;
 
   constructor(
     private taskListService: TaskListService,
     private navigatorService: TaskNavigatorUltraService,
-    private transmutatorServive: TaskTransmutationService
+    private transmutatorServive: TaskTransmutationService,
+    private taskListRulesService: TaskListRulesService
   ) {}
 
   async ngOnInit() {
@@ -35,7 +41,12 @@ export class FocusTaskListComponent implements OnInit {
       this.tasks = await this.taskListService.getFocusTasks();
       if (!this.tasks) return;
       const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
-      this.navigatorService.loadAndInitializeTasks(extended, TaskListKey.FOCUS);
+      const taskListKey: TaskListKey = {
+        type: TaskListType.FOCUS,
+        data: TaskListSubtype.SETTINGS,
+      };
+      this.taskListRules = this.taskListRulesService.getList(taskListKey);
+      this.navigatorService.loadAndInitializeTasks(extended, taskListKey);
       this.errorMessage = '';
     } catch (error) {
       this.tasks = null;

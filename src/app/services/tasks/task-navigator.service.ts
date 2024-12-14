@@ -9,6 +9,7 @@ import { TaskService } from './task.service';
 import { TaskListService } from './task-list.service';
 import { TaskTransmutationService } from './task-transmutation.service';
 import { TaskViewService } from './task-view.service';
+import { TaskUsageService } from './task-usage.service';
 
 /**
  * it simply lets us have next tasks and forward tasks based on task passed
@@ -23,7 +24,8 @@ export class TaskNavigatorService {
     private taskListService: TaskListService,
     private transmutationService: TaskTransmutationService,
     private viewService: TaskViewService,
-    private taskService: TaskService
+    private taskService: TaskService,
+    private taskUsageService: TaskUsageService
   ) {}
 
   initialize(taskIds: string[]): void {

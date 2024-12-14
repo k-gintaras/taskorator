@@ -1,13 +1,53 @@
 import { ExtendedTask } from './taskModelManager';
 
-export interface TaskList {
+export interface TaskListRules {
   id: string; // Unique identifier for the list
   title: string; // Display name of the list
-  type: string; // Optional type, e.g., 'daily', 'latest'
+  type: TaskListType; // Optional type, e.g., 'daily', 'latest'
   parent: string; // Optional parent ID, for hierarchical lists
   description: string; // Optional description for the list
-  tasks: string[]; // Array of task IDs
+  // tasks: string[]; // Array of task IDs // we don't really want to make this list into an angular app wich its own cache and stuffs
   rules: ListRules; // Optional rules for this list
+}
+
+export enum TaskListType {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+  LATEST_UPDATED = 'latestUpdated',
+  LATEST_CREATED = 'latestCreated',
+  FOCUS = 'focus',
+  FROG = 'frog',
+  FAVORITE = 'favorite',
+  OVERLORD = 'overlord',
+  SESSION = 'session',
+}
+
+export enum TaskListSubtype {
+  SETTINGS = 'settings',
+  SESSION = 'session',
+  REPEATING = 'repeating',
+  API = 'api',
+}
+
+// export enum TaskListKey {
+//   OVERLORD = 'overlord_',
+//   FOCUS = 'settings_focus',
+//   FROG = 'settings_frog',
+//   FAVORITE = 'settings_favorite',
+//   DAILY = 'repeating_daily',
+//   WEEKLY = 'repeating_weekly',
+//   MONTHLY = 'repeating_monthly',
+//   YEALRY = 'repeating_yearly',
+//   CREATED = 'latest_created',
+//   UPDATED = 'latest_updated',
+//   SESSION = 'session_',
+// }
+
+export interface TaskListKey {
+  type: TaskListType;
+  data: TaskListSubtype | string; // task id, session name ...
 }
 
 export interface ListRules {
@@ -23,19 +63,25 @@ export interface ListPermissions {
   canComplete: boolean;
 }
 
-export const defaultTaskLists: TaskList[] = [
+export function getIdFromKey(key: TaskListKey): string {
+  // if (key.type === TaskListType.OVERLORD || key.type === TaskListType.SESSION) {
+  //   return `${key.type}_${key.data}`;
+  // }
+  return `${key.type}_${key.data}`; // For static lists
+}
+
+export const defaultTaskLists: TaskListRules[] = [
   {
     id: 'daily',
     title: 'Daily Tasks',
-    type: 'daily',
+    type: TaskListType.DAILY,
     description: 'Recurring daily tasks',
-    tasks: [], // Will be populated by getDailyTasks()
     rules: {
       filter: (task) => {
-        if (task.repeat !== 'daily') return false;
-
+        if (task.repeat !== 'daily') {
+          return false;
+        }
         const { startTime, endTime } = calculatePeriodTimes('daily');
-        // Check if the task falls outside the current daily period
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -51,15 +97,15 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'weekly',
     title: 'Weekly Tasks',
-    type: 'weekly',
+    type: TaskListType.WEEKLY,
     description: 'Recurring weekly tasks',
-    tasks: [], // Will be populated by getWeeklyTasks()
     rules: {
       filter: (task) => {
         if (task.repeat !== 'weekly') return false;
 
         const { startTime, endTime } = calculatePeriodTimes('weekly');
         // Check if the task falls outside the current daily period
+
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -75,9 +121,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'monthly',
     title: 'Monthly Tasks',
-    type: 'monthly',
+    type: TaskListType.MONTHLY,
     description: 'Recurring monthly tasks',
-    tasks: [], // Will be populated by getMonthlyTasks()
     rules: {
       filter: (task) => {
         if (task.repeat !== 'monthly') return false;
@@ -99,9 +144,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'yearly',
     title: 'Yearly Tasks',
-    type: 'yearly',
+    type: TaskListType.YEARLY,
     description: 'Recurring yearly tasks',
-    tasks: [], // Will be populated by getYearlyTasks()
     rules: {
       filter: (task) => {
         if (task.repeat !== 'yearly') return false;
@@ -123,9 +167,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'focus',
     title: 'Focus Tasks',
-    type: 'settings',
+    type: TaskListType.FOCUS,
     description: 'Tasks set as focus tasks',
-    tasks: [], // Will be populated by getFocusTasks()
     rules: {
       filter: (task) => task.stage === 'todo',
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -141,9 +184,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'frog',
     title: 'Frog Tasks',
-    type: 'settings',
+    type: TaskListType.FROG,
     description: 'Tasks set as "eat the frog" tasks',
-    tasks: [], // Will be populated by getFrogTasks()
     rules: {
       filter: (task) => task.stage === 'todo',
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -159,9 +201,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'favorites',
     title: 'Favorite Tasks',
-    type: 'settings',
+    type: TaskListType.FAVORITE,
     description: 'Tasks marked as favorites',
-    tasks: [], // Will be populated by getFavoriteTasks()
     rules: {
       filter: (task) => task.stage === 'todo',
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -177,9 +218,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'latestCreated',
     title: 'Latest Created Tasks',
-    type: 'latest',
+    type: TaskListType.LATEST_CREATED,
     description: 'Most recently created or updated tasks',
-    tasks: [], // Will be populated by getLatestTasks() or getLatestUpdatedTasks()
     rules: {
       filter: () => true, // Include all tasks
       sorter: (a, b) => (b.timeCreated || 0) - (a.timeCreated || 0), // Most recent first
@@ -195,9 +235,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'latestUpdated',
     title: 'Latest Updated Tasks',
-    type: 'latest',
+    type: TaskListType.LATEST_UPDATED,
     description: 'Most recently created or updated tasks',
-    tasks: [], // Will be populated by getLatestTasks() or getLatestUpdatedTasks()
     rules: {
       filter: () => true, // Include all tasks
       sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
@@ -213,9 +252,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'overlord_*', // The * indicates this is a dynamic ID pattern
     title: 'Overlord Tasks',
-    type: 'overlord',
+    type: TaskListType.OVERLORD,
     description: 'Tasks associated with a specific overlord',
-    tasks: [], // Will be populated by getOverlordTasks(overlordId)
     rules: {
       filter: (task) => task.stage === 'todo', // Filter tasks that have an overlord
       sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
@@ -231,9 +269,8 @@ export const defaultTaskLists: TaskList[] = [
   {
     id: 'session_*', // The * indicates this is a dynamic ID pattern
     title: 'Session Tasks',
-    type: 'session',
+    type: TaskListType.SESSION,
     description: 'Tasks specific to a particular session',
-    tasks: [], // No direct method for session tasks in the provided service, it is handled some other component...
     rules: {
       filter: (task) => task.stage === 'todo', // Filter tasks that have a session ID
       sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
@@ -260,9 +297,6 @@ function filterTasks(
   return tasks.filter((task) => {
     const isOutsideCurrentPeriod =
       task.lastUpdated < startTime || task.lastUpdated >= endTime;
-    console.log(
-      `Task ${task.taskId} lastUpdated: ${task.lastUpdated}, startTime: ${startTime}, endTime: ${endTime}, excluded: ${isOutsideCurrentPeriod}`
-    );
     return isOutsideCurrentPeriod;
   });
 }
@@ -280,17 +314,17 @@ function calculatePeriodTimes(repeatInterval: string): {
 
   switch (repeatInterval) {
     case 'daily':
-      currentDate.setHours(0, 0, 0, 0);
+      currentDate.setHours(0, 0, 0, 0); // Start of the day
       startTime = currentDate.getTime();
-      endTime = startTime + 24 * 60 * 60 * 1000 - bufferMs; // Add buffer
+      endTime = startTime + 24 * 60 * 60 * 1000; // Start of the next day
       break;
 
     case 'weekly':
       const startOfWeek = new Date(currentDate);
       startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-      startOfWeek.setHours(0, 0, 0, 0);
+      startOfWeek.setHours(0, 0, 0, 0); // Start of the week
       startTime = startOfWeek.getTime();
-      endTime = startTime + 7 * 24 * 60 * 60 * 1000 - bufferMs;
+      endTime = startTime + 7 * 24 * 60 * 60 * 1000; // Start of the next week
       break;
 
     case 'monthly':
@@ -305,23 +339,25 @@ function calculatePeriodTimes(repeatInterval: string): {
         currentDate.getMonth() + 1,
         1
       );
-      endTime = nextMonth.getTime() - bufferMs;
+      endTime = nextMonth.getTime(); // Start of the next month
       break;
 
     case 'yearly':
       const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
-      startOfYear.setHours(0, 0, 0, 0);
       startTime = startOfYear.getTime();
       const nextYear = new Date(currentDate.getFullYear() + 1, 0, 1);
-      endTime = nextYear.getTime() - bufferMs;
+      endTime = nextYear.getTime(); // Start of the next year
       break;
 
     default:
-      currentDate.setHours(0, 0, 0, 0);
+      currentDate.setHours(0, 0, 0, 0); // Start of the day
       startTime = currentDate.getTime();
-      endTime = startTime + 24 * 60 * 60 * 1000 - bufferMs;
+      endTime = startTime + 24 * 60 * 60 * 1000; // Start of the next day
       break;
   }
+
+  // Apply buffer only to the next period
+  endTime += bufferMs;
 
   return { startTime, endTime };
 }

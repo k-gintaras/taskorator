@@ -5,6 +5,13 @@ import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-na
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 import { TaskListService } from '../../../../../services/tasks/task-list.service';
 import { TaskTransmutationService } from '../../../../../services/tasks/task-transmutation.service';
+import {
+  TaskListKey,
+  TaskListRules,
+  TaskListSubtype,
+  TaskListType,
+} from '../../../../../models/task-list-model';
+import { TaskListRulesService } from '../../../../../services/tasks/task-list-rules.service';
 
 @Component({
   selector: 'app-weekly-task-list',
@@ -16,11 +23,13 @@ import { TaskTransmutationService } from '../../../../../services/tasks/task-tra
 export class WeeklyTaskListComponent implements OnInit {
   tasks: Task[] | null = null;
   errorMessage: string = '';
+  taskListRules: TaskListRules | null = null;
 
   constructor(
     private taskListService: TaskListService,
     private navigatorService: TaskNavigatorUltraService,
-    private transmutatorServive: TaskTransmutationService
+    private transmutatorServive: TaskTransmutationService,
+    private taskListRulesService: TaskListRulesService
   ) {}
 
   async ngOnInit() {
@@ -32,7 +41,12 @@ export class WeeklyTaskListComponent implements OnInit {
       this.tasks = await this.taskListService.getWeeklyTasks();
       if (!this.tasks) return;
       const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
-      this.navigatorService.loadAndInitializeTasks(extended, '');
+      const taskListKey: TaskListKey = {
+        type: TaskListType.WEEKLY,
+        data: TaskListSubtype.REPEATING,
+      };
+      this.taskListRules = this.taskListRulesService.getList(taskListKey);
+      this.navigatorService.loadAndInitializeTasks(extended, taskListKey);
       this.errorMessage = '';
     } catch (error) {
       this.tasks = null;

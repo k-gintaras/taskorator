@@ -7,22 +7,15 @@ import { SettingsService } from '../core/settings.service';
 import { TaskSettings } from '../../models/settings';
 import { ExtendedTask, Task } from '../../models/taskModelManager';
 import { TaskTransmutationService } from './task-transmutation.service';
+import {
+  getIdFromKey,
+  TaskListKey,
+  TaskListSubtype,
+  TaskListType,
+} from '../../models/task-list-model';
 
 type RepeatType = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type SettingsType = 'focus' | 'frog' | 'favorite';
-export enum TaskListKey {
-  OVERLORD = 'overlord_',
-  FOCUS = 'settings_focus',
-  FROG = 'settings_frog',
-  FAVORITE = 'settings_favorite',
-  DAILY = 'repeating_daily',
-  WEEKLY = 'repeating_weekly',
-  MONTHLY = 'repeating_monthly',
-  YEALRY = 'repeating_yearly',
-  CREATED = 'latest_created',
-  UPDATED = 'latest_updated',
-  SESSION = 'session_',
-}
 
 @Injectable({
   providedIn: 'root',
@@ -44,11 +37,11 @@ export class TaskListService {
    * and falls back to the API for any missing tasks.
    */
   private async getTaskGroupWithCache(
-    tasksGroupName: string,
+    taskListKey: TaskListKey,
     fetchFn: () => Promise<Task[] | null>
   ): Promise<ExtendedTask[] | null> {
     // Retrieve cached task IDs for the group
-    const cachedTaskIds = this.getCachedTaskIds(tasksGroupName);
+    const cachedTaskIds = this.getCachedTaskIds(taskListKey);
 
     // If there are no cached task IDs, we must fetch all tasks
     if (cachedTaskIds.length === 0) {
@@ -56,11 +49,7 @@ export class TaskListService {
       if (fetchedTasks) {
         const extendedTasks =
           this.transmutatorService.toExtendedTasks(fetchedTasks);
-        return this.updateCacheAndReturnTasks(
-          tasksGroupName,
-          extendedTasks,
-          []
-        );
+        return this.updateCacheAndReturnTasks(taskListKey, extendedTasks, []);
       }
       return null; // Fetch failed
     }
@@ -77,7 +66,7 @@ export class TaskListService {
     const fetchedTasks = await this.fetchMissingTasks(missingTaskIds, fetchFn);
     if (fetchedTasks) {
       return this.updateCacheAndReturnTasks(
-        tasksGroupName,
+        taskListKey,
         fetchedTasks,
         cachedTaskIds
       );
@@ -86,8 +75,9 @@ export class TaskListService {
     return null; // Fetch failed
   }
 
-  private getCachedTaskIds(tasksGroupName: string): string[] {
-    return this.taskIdCache.getGroupTaskIds(tasksGroupName);
+  private getCachedTaskIds(taskListKey: TaskListKey): string[] {
+    const groupName = getIdFromKey(taskListKey);
+    return this.taskIdCache.getGroupTaskIds(groupName);
   }
   private getMissingTaskIds(taskIds: string[]): string[] {
     return taskIds.filter((id) => !this.taskCache.getTask(id));
@@ -111,11 +101,12 @@ export class TaskListService {
   }
 
   private updateCacheAndReturnTasks(
-    groupName: string,
+    taskListKey: TaskListKey,
     fetchedTasks: ExtendedTask[],
     cachedTaskIds: string[]
   ): ExtendedTask[] {
     // Add fetched tasks to the specified group
+    const groupName = getIdFromKey(taskListKey);
     this.taskIdCache.addTasks(fetchedTasks, groupName);
 
     // Combine cached and fetched tasks
@@ -126,7 +117,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(TaskListKey.UPDATED, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.LATEST_UPDATED,
+      data: TaskListSubtype.API,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.taskListApi.getLatestUpdatedTasks(userId)
     );
   }
@@ -135,7 +130,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(TaskListKey.CREATED, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.LATEST_CREATED,
+      data: TaskListSubtype.API,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.taskListApi.getLatestTasks(userId)
     );
   }
@@ -147,7 +146,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(`overlord_${overlordId}`, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.OVERLORD,
+      data: overlordId,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.taskListApi.getOverlordTasks(userId, overlordId)
     );
   }
@@ -179,7 +182,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(TaskListKey.FOCUS, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FOCUS,
+      data: TaskListSubtype.SETTINGS,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.getSettingsTasks('focus')
     );
     // return this.getSettingsTasks('focus');
@@ -189,7 +196,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(TaskListKey.FROG, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FROG,
+      data: TaskListSubtype.SETTINGS,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.getSettingsTasks('frog')
     );
     // return this.getSettingsTasks('frog');
@@ -199,7 +210,11 @@ export class TaskListService {
     const userId = await this.getUserId();
     if (!userId) return [];
 
-    return this.getTaskGroupWithCache(TaskListKey.FAVORITE, () =>
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FAVORITE,
+      data: TaskListSubtype.SETTINGS,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
       this.getSettingsTasks('focus')
     );
     // return this.getSettingsTasks('favorite');
@@ -213,8 +228,26 @@ export class TaskListService {
   ): Promise<ExtendedTask[] | null> {
     const userId = await this.getUserId();
     if (!userId) return null;
+    const taskListKey: TaskListKey = {
+      type: TaskListType.DAILY,
+      data: TaskListSubtype.REPEATING,
+    };
+    switch (type) {
+      case 'daily':
+        taskListKey.type = TaskListType.DAILY;
+        break;
+      case 'weekly':
+        taskListKey.type = TaskListType.WEEKLY;
+        break;
+      case 'monthly':
+        taskListKey.type = TaskListType.MONTHLY;
+        break;
+      case 'yearly':
+        taskListKey.type = TaskListType.YEARLY;
+        break;
+    }
 
-    return this.getTaskGroupWithCache(`repeating_${type}`, () => {
+    return this.getTaskGroupWithCache(taskListKey, () => {
       const apiMethodMap = {
         daily: this.taskListApi.getDailyTasks.bind(this.taskListApi),
         weekly: this.taskListApi.getWeeklyTasks.bind(this.taskListApi),

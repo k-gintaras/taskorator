@@ -69,8 +69,7 @@ export class TaskService {
         ); // Notify TaskIdCache of deletion
       } else {
         this.taskIdCache.addTasks([extendedTask]); // Notify TaskIdCache of update
-
-        // this.taskCache.addTask(extendedTask); // Update the cache
+        this.taskCache.addTask(extendedTask); // Update the cache
         this.eventBusService.updateTask(extendedTask.taskId);
       }
     } catch (error) {

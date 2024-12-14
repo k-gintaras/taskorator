@@ -2,27 +2,30 @@ import { Injectable } from '@angular/core';
 import { TaskService } from './task.service';
 import { TaskViewService } from './task-view.service';
 import { TaskTransmutationService } from './task-transmutation.service';
-import { TaskListKey, TaskListService } from './task-list.service';
+import { TaskListService } from './task-list.service';
 import {
   ExtendedTask,
   ROOT_TASK_ID,
   Task,
 } from '../../models/taskModelManager';
 import { SelectedOverlordService } from '../task/selected-overlord.service';
+import { TaskListKey, TaskListType } from '../../models/task-list-model';
+import { TaskUsageService } from './task-usage.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskNavigatorUltraService {
   private originalTaskIds: string[] | null = null; // Store the original list of task IDs
-  private originalListGroup: string | null = null; // Store the original list group name
+  private originalListGroup: TaskListKey | null = null; // Store the original list group name
 
   constructor(
     private taskListService: TaskListService,
     private transmutationService: TaskTransmutationService,
     private viewService: TaskViewService,
     private taskService: TaskService,
-    private selectedOverlord: SelectedOverlordService
+    private selectedOverlord: SelectedOverlordService,
+    private taskUsageService: TaskUsageService
   ) {}
 
   /**
@@ -30,7 +33,7 @@ export class TaskNavigatorUltraService {
    */
   async loadAndInitializeTasks(
     tasks: Task[],
-    originalListGroup: string
+    originalListGroup: TaskListKey
   ): Promise<void> {
     try {
       this.selectedOverlord.setSelectedOverlord(ROOT_TASK_ID);
@@ -65,8 +68,15 @@ export class TaskNavigatorUltraService {
       );
       this.selectedOverlord.setSelectedOverlord(superOverlord.overlord);
 
-      if (overlordTasks)
-        this.updateView(TaskListKey.OVERLORD + superOverlord.overlord);
+      if (overlordTasks) {
+        const taskListKey: TaskListKey = {
+          type: TaskListType.OVERLORD,
+          data: superOverlord.overlord,
+        };
+        // TaskListKey.OVERLORD + superOverlord.overlord;
+        this.updateView(taskListKey);
+        this.taskUsageService.incrementTaskView(superOverlord.overlord);
+      }
       return overlordTasks;
     } catch (error) {
       console.error('Failed to fetch previous tasks:', error);
@@ -84,7 +94,14 @@ export class TaskNavigatorUltraService {
       );
       this.selectedOverlord.setSelectedOverlord(task.taskId);
 
-      this.updateView(TaskListKey.OVERLORD + task.taskId);
+      const taskListKey: TaskListKey = {
+        type: TaskListType.OVERLORD,
+        data: task.taskId,
+      };
+
+      this.updateView(taskListKey);
+      this.taskUsageService.incrementTaskView(task.taskId);
+
       return overlordTasks;
     } catch (error) {
       console.error('Failed to fetch next tasks:', error);
@@ -107,7 +124,14 @@ export class TaskNavigatorUltraService {
         const rootTasks = await this.taskListService.getOverlordTasks(
           ROOT_TASK_ID
         );
-        if (rootTasks) this.updateView(TaskListKey.OVERLORD + ROOT_TASK_ID);
+        if (rootTasks) {
+          const taskListKey: TaskListKey = {
+            type: TaskListType.OVERLORD,
+            data: ROOT_TASK_ID,
+          };
+          this.updateView(taskListKey);
+        }
+
         return rootTasks;
       }
     } catch (error) {
@@ -140,7 +164,13 @@ export class TaskNavigatorUltraService {
       );
       this.selectedOverlord.setSelectedOverlord(superOverlord.overlord);
 
-      if (tasks) this.updateView(TaskListKey.OVERLORD + superOverlord.overlord);
+      if (tasks) {
+        const taskListKey: TaskListKey = {
+          type: TaskListType.OVERLORD,
+          data: superOverlord.overlord,
+        };
+        this.updateView(taskListKey);
+      }
       return tasks;
     } catch (error) {
       console.error('Failed to navigate to previous overlord:', error);
@@ -151,7 +181,7 @@ export class TaskNavigatorUltraService {
   /**
    * Notify the TaskViewService to update the view with the current task list group.
    */
-  private updateView(taskListGroup: string): void {
+  private updateView(taskListGroup: TaskListKey): void {
     this.viewService.setTasksListGroup(taskListGroup);
   }
 }

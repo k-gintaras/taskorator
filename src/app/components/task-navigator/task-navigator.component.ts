@@ -11,7 +11,6 @@ import { TaskTreeNodeData } from '../../models/taskTree';
 import { TreeService } from '../../services/core/tree.service';
 import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
-import { TaskListKey } from '../../services/tasks/task-list.service';
 
 @Component({
   standalone: true,
@@ -29,8 +28,7 @@ import { TaskListKey } from '../../services/tasks/task-list.service';
 })
 export class TaskNavigatorComponent implements OnInit {
   @Input() showArtificer: boolean = false;
-  @Input() tasks: ExtendedTask[] | null = null; // Support any list of tasks
-  @Input() taskGroupName: string = TaskListKey.CREATED; // Optional title for the list
+  tasks: ExtendedTask[] | null = null; // Support any list of tasks
   selectedOverlord: ExtendedTask | undefined;
   errorMessage: string | null = null;
   selectedTasks: Task[] = [];
@@ -44,14 +42,14 @@ export class TaskNavigatorComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to TaskViewService for task updates
-    if (this.tasks && this.taskGroupName) {
-      // in case tasks are passed, we can initialize them to simplify the caller job, it will only have to get data and pass that data
-      // otherwise it just has to get data, give to tasknavigatorultra to init
-      this.navigatorService.loadAndInitializeTasks(
-        this.tasks,
-        this.taskGroupName
-      );
-    }
+    // if (this.tasks && this.taskGroupName) {
+    //   // in case tasks are passed, we can initialize them to simplify the caller job, it will only have to get data and pass that data
+    //   // otherwise it just has to get data, give to tasknavigatorultra to init
+    //   this.navigatorService.loadAndInitializeTasks(
+    //     this.tasks,
+    //     this.taskGroupName
+    //   );
+    // }
     this.viewService.tasks$.subscribe({
       next: (tasks) => {
         this.tasks = tasks;
