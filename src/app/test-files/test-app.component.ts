@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { NavigationComponent } from './navigation/navigation.component';
 import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ConfigService } from '../services/core/config.service';
 import { ErrorService } from '../services/core/error.service';
 import { ServiceInitiatorService } from '../services/core/service-initiator.service';
 import { ArtificerComponent } from '../components/artificer/artificer.component';
+import { HorizontalNavigationComponent } from '../components/horizontal-navigation/horizontal-navigation.component';
 
 @Component({
-  imports: [RouterOutlet, NavigationComponent, ArtificerComponent],
+  imports: [RouterOutlet, HorizontalNavigationComponent, ArtificerComponent],
   standalone: true,
   selector: 'app-test-root',
   templateUrl: './test-app.component.html',
@@ -25,8 +25,7 @@ export class TestAppComponent {
   // we init services here so their listeners are able to activate when necessary, because these services are kinda updated in background with eventBus
   constructor(
     // private serviceInitiator: ServiceInitiatorService,
-    private errorService: ErrorService,
-    private config: ConfigService
+    private errorService: ErrorService
   ) {
     this.feedbackSubscription = this.errorService
       .getFeedback()

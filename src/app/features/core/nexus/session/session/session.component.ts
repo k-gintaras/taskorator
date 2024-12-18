@@ -125,16 +125,16 @@ export class SessionComponent implements OnInit, OnDestroy {
   setNavigator(session: TaskSession) {
     this.selectedSession = session; // Set the selected session
 
-    this.taskListService
-      .getTasks(session.taskIds)
-      .then((tasks: Task[] | null) => {
-        if (!tasks) return;
-        const taskListKey: TaskListKey = {
-          type: TaskListType.SESSION,
-          data: session.name,
-        };
-        this.navigatorService.loadAndInitializeTasks(tasks, taskListKey);
-      });
+    // this.taskListService
+    //   .getTasks(session.taskIds)
+    //   .then((tasks: Task[] | null) => {
+    //     if (!tasks) return;
+    //     const taskListKey: TaskListKey = {
+    //       type: TaskListType.SESSION,
+    //       data: session.name,
+    //     };
+    //     this.navigatorService.loadAndInitializeTasks(tasks, taskListKey);
+    //   });
   }
 
   async loadSessions() {

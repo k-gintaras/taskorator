@@ -79,6 +79,20 @@ export class TaskCacheService {
   }
 
   /**
+   * Check if a task exists and is not expired.
+   */
+  hasTask(taskId: string): boolean {
+    const cachedTask = this.cache.get(taskId);
+    if (!cachedTask) return false;
+
+    if (Date.now() - cachedTask.timestamp > TASK_CONFIG.CACHE_EXPIRATION_MS) {
+      this.cache.delete(taskId); // Remove expired task
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Find IDs of tasks that are missing in the cache.
    */
   getMissingTaskIds(taskIds: string[]): string[] {

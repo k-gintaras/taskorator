@@ -53,12 +53,13 @@ export class TaskNavigatorService {
    * Navigate back to the original task list or to the root task if the original list is unavailable.
    */
   async backToStart(): Promise<ExtendedTask[] | null> {
-    if (this.originalTaskIds) {
-      const tasks = this.taskListService.getTasks(this.originalTaskIds);
-      return Promise.resolve(tasks);
-    } else {
-      // Fallback to the root task's children
-      return await this.taskListService.getOverlordTasks(ROOT_TASK_ID);
-    }
+    // if (this.originalTaskIds) {
+    //   const tasks = this.taskListService.getTasks(this.originalTaskIds);
+    //   return Promise.resolve(tasks);
+    // } else {
+    //   // Fallback to the root task's children
+    //   return await this.taskListService.getOverlordTasks(ROOT_TASK_ID);
+    // }
+    throw new Error("don't use this, use navigator ultra service");
   }
 }

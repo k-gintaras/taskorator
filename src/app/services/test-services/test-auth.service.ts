@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class TestAuthService implements AuthStrategy {
+export class AuthServiceTesting implements AuthStrategy {
   private readonly USER_ID_KEY = 'test_user_id';
 
   private currentUserSubject = new BehaviorSubject<unknown | null>(null);

@@ -7,11 +7,12 @@ import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { TaskTreeNodeData } from '../../../models/taskTree';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
+import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
 
 @Component({
   selector: 'app-artificer-action',
   standalone: true,
-  imports: [NgClass, MatIcon],
+  imports: [NgClass, MatIcon, NgStyle],
   templateUrl: './artificer-action.component.html',
   styleUrl: './artificer-action.component.scss',
 })
@@ -23,7 +24,8 @@ export class ArtificerActionComponent {
   constructor(
     private taskUpdateService: TaskUpdateService,
     private artificerService: ArtificerService,
-    private selectedService: SelectedMultipleService
+    private selectedService: SelectedMultipleService,
+    private gptHelper: GptSuggestService
   ) {
     this.artificerService.currentAction$.subscribe((action) => {
       this.currentAction = action;
@@ -52,24 +54,35 @@ export class ArtificerActionComponent {
     return 'complete-icon-color-child';
   }
 
+  hasIncompleteChildren() {
+    if (!this.treeNode) return false;
+    if (this.treeNode.childrenCount < 1) return false;
+    if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount)
+      return true;
+
+    return false;
+  }
+
+  getButtonStyle() {
+    const action = this.currentAction.action;
+    return this.isActionRestricted(action)
+      ? { visibility: 'hidden', pointerEvents: 'none' }
+      : {};
+  }
+
+  isActionRestricted(action: string): boolean {
+    return (
+      this.hasIncompleteChildren() &&
+      ['delete', 'complete', 'move'].includes(action)
+    );
+  }
+
   performAction(): void {
     const task = this.task;
     if (!task) return;
     const action = this.currentAction.action;
 
     switch (action) {
-      case 'delete':
-        this.taskUpdateService.delete(task);
-        break;
-      case 'complete':
-        this.taskUpdateService.complete(task);
-        break;
-      case 'refresh':
-        this.taskUpdateService.renew(task);
-        break;
-      case 'move':
-        this.taskUpdateService.move(task);
-        break;
       case 'promote':
         this.taskUpdateService.increasePriority(task);
         break;
@@ -83,7 +96,22 @@ export class ArtificerActionComponent {
         this.selectedService.addRemoveSelectedTask(task);
         break;
       case 'suggest':
+        this.gptHelper.suggestTasksForTask(task);
         break;
+
+      case 'delete':
+        this.taskUpdateService.delete(task);
+        break;
+      case 'complete':
+        this.taskUpdateService.complete(task);
+        break;
+      case 'move':
+        this.taskUpdateService.move(task);
+        break;
+      case 'refresh':
+        this.taskUpdateService.renew(task);
+        break;
+
       // Add more cases as needed...
       default:
         break;

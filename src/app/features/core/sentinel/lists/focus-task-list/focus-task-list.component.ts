@@ -39,6 +39,7 @@ export class FocusTaskListComponent implements OnInit {
   private async loadTasks() {
     try {
       this.tasks = await this.taskListService.getFocusTasks();
+      console.log('could not get tasks');
       if (!this.tasks) return;
       const extended = this.transmutatorServive.toExtendedTasks(this.tasks);
       const taskListKey: TaskListKey = {

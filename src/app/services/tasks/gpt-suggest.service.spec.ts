@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AuthServiceTesting } from './test-auth.service';
+import { GptSuggestService } from './gpt-suggest.service';
 
-describe('TestAuthService', () => {
-  let service: AuthServiceTesting;
+describe('GptSuggestService', () => {
+  let service: GptSuggestService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AuthServiceTesting);
+    service = TestBed.inject(GptSuggestService);
   });
 
   it('should be created', () => {

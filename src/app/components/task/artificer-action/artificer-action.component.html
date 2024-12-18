@@ -1,11 +1,8 @@
-<!-- <div>Children: {{ treeNode?.childrenCount }}</div>
-<div>Completed Children: {{ treeNode?.completedChildrenCount }}</div>
-<div>Is repeating Task: {{ task?.repeat }}</div> -->
-<!-- <button class="task-btn" [ngClass]="getColor()" (click)="performAction()">
-  <mat-icon>{{ currentAction.icon }}</mat-icon>
-</button> -->
-
-<button class="task-btn" [ngClass]="getColor()" (click)="performAction()">
-  <!-- Dynamically set the icon based on currentAction.action and isSelected() -->
+<button
+  class="task-btn"
+  [ngClass]="getColor()"
+  [ngStyle]="getButtonStyle()"
+  (click)="performAction()"
+>
   <mat-icon>{{ getIcon() }}</mat-icon>
 </button>

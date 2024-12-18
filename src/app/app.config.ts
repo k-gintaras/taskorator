@@ -7,10 +7,10 @@ export const appConfig: ApplicationConfig = {
 };
 
 export const SENSITIVE_CONFIG = {
-  gptServiceUrl: 'https://gpt-web-service.onrender.com',
+  gptServiceUrl: 'http://192.168.1.182:3000',
 };
 
 export const TASK_CONFIG = {
   TASK_LIST_LIMIT: 30,
-  CACHE_EXPIRATION_MS: 5 * 60 * 1000, // 5 minutes for example
+  CACHE_EXPIRATION_MS: 60 * 60 * 1000, // 60 minutes for example
 };

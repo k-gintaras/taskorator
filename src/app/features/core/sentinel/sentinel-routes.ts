@@ -18,11 +18,11 @@ const routes: Routes = [
     path: '',
     component: SentinelComponent,
     children: [
-      {
-        path: '',
-        redirectTo: 'latestCreated',
-        pathMatch: 'full',
-      },
+      // {
+      //   path: '',
+      //   redirectTo: 'latestCreated',
+      //   pathMatch: 'full',
+      // },
       {
         path: 'latestCreated',
         component: LatestCreatedTaskListComponent, // Replace with your actual component

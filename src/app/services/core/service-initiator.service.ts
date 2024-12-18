@@ -5,7 +5,7 @@ import { ApiStrategy } from '../../models/service-strategies/api-strategy.interf
 import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
 // import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
 import { TestApiService } from '../test-services/test-api.service';
-import { TestAuthService } from '../test-services/test-auth.service';
+import { AuthServiceTesting } from '../test-services/test-auth.service';
 import { AuthService } from './auth.service';
 import { ErrorService } from './error.service';
 import { ConfigService } from './config.service';
@@ -30,7 +30,7 @@ export class ServiceInitiatorService {
     private cacheService: CacheOrchestratorService,
     private apiService: ApiFirebaseService,
     private errorService: ErrorService,
-    private testAuthService: TestAuthService,
+    private testAuthService: AuthServiceTesting,
     private testApiService: TestApiService,
     private configService: ConfigService
   ) {

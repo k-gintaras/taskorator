@@ -11,6 +11,7 @@ import { TaskTreeNodeData } from '../../models/taskTree';
 import { TreeService } from '../../services/core/tree.service';
 import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 
 @Component({
   standalone: true,
@@ -21,6 +22,7 @@ import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-u
     TaskMiniComponent,
     ArtificerActionComponent,
     ArtificerComponent,
+    OverlordNavigatorComponent,
   ],
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.html',
@@ -71,21 +73,21 @@ export class TaskNavigatorComponent implements OnInit {
   /**
    * Navigate to the previous set of tasks for a given task.
    */
-  async onPrevious(task: ExtendedTask): Promise<void> {
-    try {
-      await this.navigatorService.previous(task);
-    } catch (error) {
-      console.error('Error navigating to previous tasks:', error);
-      this.errorMessage = 'Failed to navigate to previous tasks.';
-    }
-  }
+  // async onPrevious(task: ExtendedTask): Promise<void> {
+  //   try {
+  //     await this.navigatorService.previous(task);
+  //   } catch (error) {
+  //     console.error('Error navigating to previous tasks:', error);
+  //     this.errorMessage = 'Failed to navigate to previous tasks.';
+  //   }
+  // }
 
   /**
    * Navigate to the next set of tasks for a given task.
    */
   async onNext(task: ExtendedTask): Promise<void> {
     try {
-      await this.navigatorService.next(task);
+      await this.navigatorService.next(task.taskId);
     } catch (error) {
       console.error('Error navigating to next tasks:', error);
       this.errorMessage = 'Failed to navigate to next tasks.';

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConfigStrategy } from '../../models/service-strategies/strategy-config.interface';
 import { ErrorService } from './error.service';
-import { TestAuthService } from '../test-services/test-auth.service';
+import { AuthServiceTesting } from '../test-services/test-auth.service';
 import { TestApiService } from '../test-services/test-api.service';
 import { AuthStrategy } from '../../models/service-strategies/auth-strategy.interface';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
@@ -24,7 +24,7 @@ export class ConfigService implements ConfigStrategy {
   constructor(
     private errorServiceDefault: ErrorService,
     private cacheServiceDefault: CacheOrchestratorService,
-    private authServiceDefault: TestAuthService,
+    private authServiceDefault: AuthServiceTesting,
     private apiServiceDefault: TestApiService
   ) {}
 

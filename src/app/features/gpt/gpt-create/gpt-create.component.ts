@@ -22,7 +22,7 @@ import { TaskListService } from '../../../services/tasks/task-list.service';
   styleUrl: './gpt-create.component.scss',
 })
 export class GptCreateComponent implements OnInit {
-  currentOverlord: string | undefined;
+  currentOverlordId: string | undefined;
   taskTree: TaskTree | undefined;
   prompt: string | undefined;
   mainPrompt =
@@ -47,7 +47,7 @@ export class GptCreateComponent implements OnInit {
       .getSelectedOverlordObservable()
       .subscribe((t: string | null) => {
         if (!t) return;
-        this.currentOverlord = t;
+        this.currentOverlordId = t;
       });
 
     this.treeService.getTree().subscribe((tree) => {
@@ -64,8 +64,8 @@ export class GptCreateComponent implements OnInit {
     const userId = await this.configService
       .getAuthStrategy()
       .getCurrentUserId();
-    const overlord = this.currentOverlord;
-    if (!userId || !overlord) {
+    const overlordId = this.currentOverlordId;
+    if (!userId || !overlordId) {
       console.log('Missing userId or selectedOverlord.');
       return;
     }
@@ -80,22 +80,28 @@ export class GptCreateComponent implements OnInit {
     this.isLoading = true;
 
     try {
-      // const treeChain = await this.getTreeChain(overlord, tree);
-      // const tasks = await this.getOverlordChildren(overlord);
-      // const currentInput = this.prompt || '';
-      // const request = this.generatePromptRequest(
-      //   treeChain,
-      //   tasks,
-      //   currentInput,
-      //   overlord
-      // );
-      // console.log('GPT REQUEST: ', request);
-      // const response = await this.gptService.makeGptRequest(request, userId);
-      // this.result = response.text.split('\n');
-      // this.result?.forEach((t: string) => {
-      //   const task = this.getTaskFromResponse(t, overlord);
-      //   this.gptTasksService.addTask(task);
-      // });
+      if (!this.currentOverlordId) return;
+      const overlord = await this.taskService.getTaskById(
+        this.currentOverlordId
+      );
+      if (!overlord) return;
+
+      const treeChain = await this.getTreeChain(overlord, tree);
+      const tasks = await this.getOverlordChildren(overlord);
+      const currentInput = this.prompt || '';
+      const request = this.generatePromptRequest(
+        treeChain,
+        tasks,
+        currentInput,
+        overlord
+      );
+      console.log('GPT REQUEST: ', request);
+      const response = await this.gptService.makeGptRequest(request, userId);
+      this.result = response.text.split('\n');
+      this.result?.forEach((t: string) => {
+        const task = this.getTaskFromResponse(t, overlord);
+        this.gptTasksService.addTask(task);
+      });
     } catch (error) {
       console.error('Error in getSuggestion():', error);
     } finally {

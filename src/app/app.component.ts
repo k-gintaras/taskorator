@@ -5,11 +5,18 @@ import { ConfigService } from './services/core/config.service';
 import { ErrorService } from './services/core/error.service';
 import { ServiceInitiatorService } from './services/core/service-initiator.service';
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
+import { GptCreateComponent } from './features/gpt/gpt-create/gpt-create.component';
+import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HorizontalNavigationComponent],
+  imports: [
+    RouterOutlet,
+    HorizontalNavigationComponent,
+    GptCreateComponent,
+    GptTasksComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

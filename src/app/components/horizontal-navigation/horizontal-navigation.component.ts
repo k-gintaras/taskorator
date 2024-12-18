@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouteMetadata } from '../../app.routes-models';
+import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -19,6 +20,7 @@ import { RouteMetadata } from '../../app.routes-models';
     MatIconModule,
     MatToolbarModule,
     RouterOutlet,
+    OverlordNavigatorComponent,
   ],
   templateUrl: './horizontal-navigation.component.html',
   styleUrls: ['./horizontal-navigation.component.scss'],

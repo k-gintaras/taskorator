@@ -40,45 +40,87 @@ export class TaskListService {
     taskListKey: TaskListKey,
     fetchFn: () => Promise<Task[] | null>
   ): Promise<ExtendedTask[] | null> {
-    // Retrieve cached task IDs for the group
-    const cachedTaskIds = this.getCachedTaskIds(taskListKey);
-
-    // If there are no cached task IDs, we must fetch all tasks
-    if (cachedTaskIds.length === 0) {
-      const fetchedTasks = await fetchFn();
-      if (fetchedTasks) {
-        const extendedTasks =
-          this.transmutatorService.toExtendedTasks(fetchedTasks);
-        return this.updateCacheAndReturnTasks(taskListKey, extendedTasks, []);
-      }
-      return null; // Fetch failed
-    }
-
-    // Check for missing task IDs
-    const missingTaskIds = this.getMissingTaskIds(cachedTaskIds);
-
-    // If all tasks are present in the cache, return them directly
-    if (missingTaskIds.length === 0) {
-      return this.getCachedTasks(cachedTaskIds);
-    }
-
-    // Fetch only missing tasks
-    const fetchedTasks = await this.fetchMissingTasks(missingTaskIds, fetchFn);
-    if (fetchedTasks) {
-      return this.updateCacheAndReturnTasks(
-        taskListKey,
-        fetchedTasks,
-        cachedTaskIds
-      );
-    }
-
-    return null; // Fetch failed
-  }
-
-  private getCachedTaskIds(taskListKey: TaskListKey): string[] {
     const groupName = getIdFromKey(taskListKey);
-    return this.taskIdCache.getGroupTaskIds(groupName);
+    const cacheState = this.taskIdCache.getListCacheState(groupName);
+
+    console.log('cacheState');
+    console.log(cacheState);
+
+    if (cacheState?.hasGroupAndEmptyTasks) {
+      console.log(
+        'getTaskGroupWithCache: cached and empty' +
+          taskListKey.type +
+          taskListKey.data
+      );
+      return []; // Known to be empty, no need to fetch
+    }
+
+    if (cacheState?.hasGroupAndCachedTasks) {
+      console.log(
+        'getTaskGroupWithCache: fully cached' +
+          taskListKey.type +
+          taskListKey.data
+      );
+
+      return cacheState.tasksWithData; // Return fully cached tasks
+    }
+
+    // not cached as a list
+    if (!cacheState) {
+      console.log(
+        'getTaskGroupWithCache: no group not cached' +
+          taskListKey.type +
+          taskListKey.data
+      );
+      const fetchAll = (await fetchFn()) || [];
+      const converted = this.transmutatorService.toExtendedTasks(fetchAll);
+      this.taskIdCache.addTasks(converted, groupName);
+
+      return converted;
+    }
+
+    // not cached as a list
+    if (cacheState.hasGroupAndNotCachedTasks) {
+      console.log(
+        'getTaskGroupWithCache: has group but not cached tasks' +
+          taskListKey.type +
+          taskListKey.data
+      );
+      const fetchAll = (await fetchFn()) || [];
+      const converted = this.transmutatorService.toExtendedTasks(fetchAll);
+      this.taskIdCache.addTasks(converted, groupName);
+
+      return converted;
+    }
+
+    // partially cached, fetch missing, add and return
+    if (cacheState?.hasGroupAndSomeCachedTasks) {
+      const userId = await this.getUserId();
+      if (!userId) return null;
+      // Fetch missing tasks from API
+      const missingTasks =
+        cacheState.taskIdsWithoutData.length > 0
+          ? await this.taskListApi.getTasksFromIds(
+              userId,
+              cacheState.taskIdsWithoutData
+            )
+          : [];
+
+      // Combine cached and fetched tasks
+      if (!missingTasks) return null;
+      const extendedTasks =
+        this.transmutatorService.toExtendedTasks(missingTasks);
+      this.taskIdCache.addTasks(extendedTasks, groupName);
+
+      return [...cacheState.tasksWithData, ...extendedTasks];
+    }
+    return null;
   }
+
+  // private getCachedTaskIds(taskListKey: TaskListKey): string[] {
+  //   const groupName = getIdFromKey(taskListKey);
+  //   return this.taskIdCache.getGroupTaskIds(groupName);
+  // }
   private getMissingTaskIds(taskIds: string[]): string[] {
     return taskIds.filter((id) => !this.taskCache.getTask(id));
   }
@@ -126,7 +168,7 @@ export class TaskListService {
     );
   }
 
-  async getLatestTasks(): Promise<Task[] | null> {
+  async getLatestTasks(): Promise<ExtendedTask[] | null> {
     const userId = await this.getUserId();
     if (!userId) return [];
 
@@ -275,9 +317,10 @@ export class TaskListService {
   }
 
   /**
+   * @warn do not use, it is ambiguous, what is this list name, what if part of it is missing? how you know if tasks are loose?
    * Get tasks by IDs, dynamically fetching any missing ones.
    */
-  async getTasks(ids: string[]): Promise<ExtendedTask[] | null> {
+  private async getTasks(ids: string[]): Promise<ExtendedTask[] | null> {
     const userId = await this.getUserId();
     if (!userId) return null;
 

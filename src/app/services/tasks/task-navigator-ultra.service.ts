@@ -51,15 +51,15 @@ export class TaskNavigatorUltraService {
   /**
    * Fetch and display the previous set of tasks for a given task.
    */
-  async previous(task: ExtendedTask): Promise<ExtendedTask[] | null> {
+  async previous(taskOverlordId: string): Promise<ExtendedTask[] | null> {
     try {
-      if (!task.overlord) {
+      if (!taskOverlordId) {
         console.error('No overlord found for the task.');
         return null;
       }
 
       const superOverlord = await this.taskService.getSuperOverlord(
-        task.overlord
+        taskOverlordId
       );
       if (!superOverlord || !superOverlord.overlord) return null;
 
@@ -87,20 +87,18 @@ export class TaskNavigatorUltraService {
   /**
    * Fetch and display the next set of tasks for a given task.
    */
-  async next(task: ExtendedTask): Promise<ExtendedTask[] | null> {
+  async next(taskId: string): Promise<ExtendedTask[] | null> {
     try {
-      const overlordTasks = await this.taskListService.getOverlordTasks(
-        task.taskId
-      );
-      this.selectedOverlord.setSelectedOverlord(task.taskId);
+      const overlordTasks = await this.taskListService.getOverlordTasks(taskId);
+      this.selectedOverlord.setSelectedOverlord(taskId);
 
       const taskListKey: TaskListKey = {
         type: TaskListType.OVERLORD,
-        data: task.taskId,
+        data: taskId,
       };
 
       this.updateView(taskListKey);
-      this.taskUsageService.incrementTaskView(task.taskId);
+      this.taskUsageService.incrementTaskView(taskId);
 
       return overlordTasks;
     } catch (error) {
@@ -113,31 +111,36 @@ export class TaskNavigatorUltraService {
    * Navigate back to the original task list or to the root task if unavailable.
    */
   async backToStart(): Promise<ExtendedTask[] | null> {
-    try {
-      if (this.originalTaskIds && this.originalListGroup) {
-        const tasks = await this.taskListService.getTasks(this.originalTaskIds);
-        if (!tasks) return null;
+    // try {
+    //   if (this.originalTaskIds && this.originalListGroup) {
+    //     const tasks = await this.taskListService.getTasks(this.originalTaskIds);
+    //     if (!tasks) return null;
 
-        this.updateView(this.originalListGroup);
-        return this.transmutationService.toExtendedTasks(tasks);
-      } else {
-        const rootTasks = await this.taskListService.getOverlordTasks(
-          ROOT_TASK_ID
-        );
-        if (rootTasks) {
-          const taskListKey: TaskListKey = {
-            type: TaskListType.OVERLORD,
-            data: ROOT_TASK_ID,
-          };
-          this.updateView(taskListKey);
-        }
+    //     this.updateView(this.originalListGroup);
+    //     return this.transmutationService.toExtendedTasks(tasks);
+    //   } else {
+    //     const rootTasks = await this.taskListService.getOverlordTasks(
+    //       ROOT_TASK_ID
+    //     );
+    //     if (rootTasks) {
+    //       const taskListKey: TaskListKey = {
+    //         type: TaskListType.OVERLORD,
+    //         data: ROOT_TASK_ID,
+    //       };
+    //       this.updateView(taskListKey);
+    //     }
 
-        return rootTasks;
-      }
-    } catch (error) {
-      console.error('Failed to navigate back to start:', error);
-      throw error;
-    }
+    //     return rootTasks;
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to navigate back to start:', error);
+    //   throw error;
+    // }
+    if (!this.originalListGroup) return null;
+    this.viewService.setTasksListGroup(this.originalListGroup);
+    // in case we go back and selected overlord is last clicked task... going home just resets to root
+    this.selectedOverlord.setSelectedOverlord(ROOT_TASK_ID);
+    return null;
   }
 
   /**

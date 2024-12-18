@@ -12,7 +12,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 // Import main app component and test component
 import { AppComponent } from './app/app.component';
 
-import { routes } from './app/app.routes';
+import { routes, routesTesting } from './app/app.routes';
 import { TestAppComponent } from './app/test-files/test-app.component';
 // import { AuthService } from './app/services/core/auth.service';
 // import { TestAuthService } from './app/services/test-services/test-auth.service';
@@ -29,11 +29,12 @@ const firebaseJson = environment.firebase;
 const isTesting = environment.isTesting; // Add this to your environment configuration
 
 if (isTesting) {
+  console.warn('TESTING enabled:');
   bootstrapApplication(TestAppComponent, {
     providers: [
       importProvidersFrom(
         BrowserAnimationsModule,
-        RouterModule.forRoot(routes)
+        RouterModule.forRoot(routesTesting)
       ),
 
       provideAnimationsAsync(),

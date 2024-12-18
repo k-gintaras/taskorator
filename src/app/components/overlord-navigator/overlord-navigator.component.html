@@ -1,0 +1,30 @@
+<div class="overlord-navigator-container">
+  <!-- Overlord Name with Icon -->
+  <div class="overlord-title">
+    <mat-icon class="overlord-icon">account_tree</mat-icon>
+    <span class="overlord-name">{{ selectedList?.title }}</span>
+    <span class="overlord-name">/</span>
+
+    <span class="overlord-name">{{ selectedOverlord?.name }}</span>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="overlord-navigator">
+    <button mat-icon-button class="task-btn" (click)="goToSuperParent()">
+      <mat-icon>arrow_upward</mat-icon>
+    </button>
+    <button mat-icon-button class="task-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <button mat-icon-button class="task-btn" (click)="goToRoot()">
+      <mat-icon>home</mat-icon>
+    </button>
+    <!-- <button mat-icon-button class="task-btn" (click)="goToOverlord()">
+      <mat-icon>arrow_forward</mat-icon>
+    </button> -->
+    <!-- TODO: really just make it go to- in search overlord instead of here... -->
+  </div>
+
+  <!-- Search Overlord Component -->
+  <!-- <app-search-overlord></app-search-overlord> -->
+</div>

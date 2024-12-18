@@ -10,7 +10,7 @@ import { TreeService } from '../../services/core/tree.service';
 import { TreeNodeService } from '../../services/core/tree-node.service';
 import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
 import { Task } from '../../models/taskModelManager';
-import { AsyncPipe, NgForOf } from '@angular/common';
+import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
 import { TaskService } from '../../services/tasks/task.service';
 import { AuthService } from '../../services/core/auth.service';
 
@@ -22,10 +22,12 @@ import { AuthService } from '../../services/core/auth.service';
     AsyncPipe,
     MatFormField,
     MatLabel,
+    SlicePipe,
     MatSelect,
     MatOption,
     ReactiveFormsModule,
     NgxMatSelectSearchModule,
+    NgIf,
   ],
   templateUrl: './search-overlord.component.html',
   styleUrl: './search-overlord.component.scss',

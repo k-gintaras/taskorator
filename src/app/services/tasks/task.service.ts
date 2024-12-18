@@ -64,8 +64,9 @@ export class TaskService {
       const extendedTask = this.transmutatorService.toExtendedTask(task);
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
-        this.taskIdCache.clearGroup(
-          this.taskIdCache.getTaskGroup(extendedTask.taskId)!
+        this.taskIdCache.deleteTask(
+          `overlord_${task.overlord}`,
+          extendedTask.taskId
         ); // Notify TaskIdCache of deletion
       } else {
         this.taskIdCache.addTasks([extendedTask]); // Notify TaskIdCache of update
