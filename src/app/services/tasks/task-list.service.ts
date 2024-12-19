@@ -43,9 +43,6 @@ export class TaskListService {
     const groupName = getIdFromKey(taskListKey);
     const cacheState = this.taskIdCache.getListCacheState(groupName);
 
-    console.log('cacheState');
-    console.log(cacheState);
-
     if (cacheState?.hasGroupAndEmptyTasks) {
       console.log(
         'getTaskGroupWithCache: cached and empty' +
@@ -74,7 +71,7 @@ export class TaskListService {
       );
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toExtendedTasks(fetchAll);
-      this.taskIdCache.addTasks(converted, groupName);
+      this.taskIdCache.createNewGroup(converted, groupName);
 
       return converted;
     }
@@ -88,13 +85,18 @@ export class TaskListService {
       );
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toExtendedTasks(fetchAll);
-      this.taskIdCache.addTasks(converted, groupName);
+      this.taskIdCache.createNewGroup(converted, groupName);
 
       return converted;
     }
 
     // partially cached, fetch missing, add and return
     if (cacheState?.hasGroupAndSomeCachedTasks) {
+      console.log(
+        'getTaskGroupWithCache: has group and some cached tasks' +
+          taskListKey.type +
+          taskListKey.data
+      );
       const userId = await this.getUserId();
       if (!userId) return null;
       // Fetch missing tasks from API
@@ -110,8 +112,7 @@ export class TaskListService {
       if (!missingTasks) return null;
       const extendedTasks =
         this.transmutatorService.toExtendedTasks(missingTasks);
-      this.taskIdCache.addTasks(extendedTasks, groupName);
-
+      this.taskIdCache.addTasksWithGroup(extendedTasks, groupName);
       return [...cacheState.tasksWithData, ...extendedTasks];
     }
     return null;
@@ -149,7 +150,7 @@ export class TaskListService {
   ): ExtendedTask[] {
     // Add fetched tasks to the specified group
     const groupName = getIdFromKey(taskListKey);
-    this.taskIdCache.addTasks(fetchedTasks, groupName);
+    this.taskIdCache.addTasksWithGroup(fetchedTasks, groupName);
 
     // Combine cached and fetched tasks
     return [...this.getCachedTasks(cachedTaskIds), ...fetchedTasks];
@@ -212,11 +213,21 @@ export class TaskListService {
       frog: settings.frogTaskIds,
       favorite: settings.favoriteTaskIds,
     };
+    const typeMap = {
+      focus: TaskListType.FOCUS,
+      frog: TaskListType.FROG,
+      favorite: TaskListType.FAVORITE,
+    };
 
     const ids = idMap[key];
-    if (!ids) return null;
+    const type = typeMap[key];
+    if (!ids || !type) return null;
 
-    const tasks = await this.getTasks(ids);
+    const taskListKey: TaskListKey = {
+      type: type,
+      data: TaskListSubtype.SETTINGS,
+    };
+    const tasks = await this.getTasks(ids, taskListKey);
     return tasks ? this.transmutatorService.toExtendedTasks(tasks) : null;
   }
 
@@ -320,14 +331,18 @@ export class TaskListService {
    * @warn do not use, it is ambiguous, what is this list name, what if part of it is missing? how you know if tasks are loose?
    * Get tasks by IDs, dynamically fetching any missing ones.
    */
-  private async getTasks(ids: string[]): Promise<ExtendedTask[] | null> {
+  private async getTasks(
+    ids: string[],
+    taskListKey: TaskListKey
+  ): Promise<ExtendedTask[] | null> {
     const userId = await this.getUserId();
     if (!userId) return null;
+    const groupName = getIdFromKey(taskListKey);
 
     // Retrieve tasks from cache
     const cachedTasks = this.taskIdCache.getTasksByIds(ids);
     const missingIds = ids.filter(
-      (id) => !cachedTasks.find((task) => task.taskId === id)
+      (id) => !cachedTasks.find((task: ExtendedTask) => task.taskId === id)
     );
 
     if (missingIds.length > 0) {
@@ -341,7 +356,7 @@ export class TaskListService {
           this.transmutatorService.toExtendedTasks(fetchedTasks);
 
         // Add fetched tasks to the cache
-        this.taskIdCache.addTasks(extendedFetchedTasks);
+        this.taskIdCache.addTasksWithGroup(extendedFetchedTasks, groupName);
 
         return [...cachedTasks, ...extendedFetchedTasks];
       }

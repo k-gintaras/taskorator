@@ -95,7 +95,6 @@ export class GptCreateComponent implements OnInit {
         currentInput,
         overlord
       );
-      console.log('GPT REQUEST: ', request);
       const response = await this.gptService.makeGptRequest(request, userId);
       this.result = response.text.split('\n');
       this.result?.forEach((t: string) => {

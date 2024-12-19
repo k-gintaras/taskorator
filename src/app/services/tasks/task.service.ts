@@ -40,7 +40,10 @@ export class TaskService {
 
       const extendedTask = this.transmutatorService.toExtendedTask(createdTask);
       // this.taskCache.addTask(extendedTask); // Cache the new task
-      this.taskIdCache.addTasks([extendedTask], `overlord_${task.overlord}`); // Notify TaskIdCache of update
+      this.taskIdCache.addTasksWithGroup(
+        [extendedTask],
+        `overlord_${task.overlord}`
+      ); // Notify TaskIdCache of update
 
       this.eventBusService.createTask(extendedTask.taskId);
       return extendedTask;
@@ -64,13 +67,10 @@ export class TaskService {
       const extendedTask = this.transmutatorService.toExtendedTask(task);
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
-        this.taskIdCache.deleteTask(
-          `overlord_${task.overlord}`,
-          extendedTask.taskId
-        ); // Notify TaskIdCache of deletion
+        this.taskIdCache.deleteTask(extendedTask.taskId); // Notify TaskIdCache of deletion
       } else {
-        this.taskIdCache.addTasks([extendedTask]); // Notify TaskIdCache of update
-        this.taskCache.addTask(extendedTask); // Update the cache
+        this.taskIdCache.updateTasks([extendedTask]); // Notify TaskIdCache of update
+        // this.taskCache.addTask(extendedTask); // Update the cache
         this.eventBusService.updateTask(extendedTask.taskId);
       }
     } catch (error) {

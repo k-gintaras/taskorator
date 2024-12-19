@@ -12,7 +12,6 @@ import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component'
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
     HorizontalNavigationComponent,
     GptCreateComponent,
     GptTasksComponent,

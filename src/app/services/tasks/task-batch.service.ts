@@ -28,7 +28,7 @@ export class TaskBatchService {
    */
   async createTaskBatch(
     tasks: Task[],
-    groupName?: string
+    groupName: string
   ): Promise<ExtendedTask[] | null> {
     try {
       // if (!this.validatorService.isTaskValid(task)) {
@@ -50,7 +50,7 @@ export class TaskBatchService {
       // Convert and cache created tasks
       const extendedTasks =
         this.transmutatorService.toExtendedTasks(createdTasks);
-      this.taskIdCache.addTasks(extendedTasks, groupName); // Notify TaskIdCache of addition
+      this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition
       const ids = this.transmutatorService.getIds(extendedTasks);
 
       // Notify other services
@@ -112,12 +112,12 @@ export class TaskBatchService {
           extendedTasks.forEach((task) => {
             const groupName = this.taskIdCache.getTaskGroup(task.taskId);
             if (groupName) {
-              this.taskIdCache.removeTaskFromGroup(groupName, task.taskId);
+              this.taskIdCache.deleteTask(task.taskId);
             }
           });
           break;
         case TaskActions.UPDATED:
-          this.taskIdCache.addTasks(extendedTasks); // Just refresh cache with updated tasks
+          this.taskIdCache.updateTasks(extendedTasks); // Just refresh cache with updated tasks
           break;
       }
 

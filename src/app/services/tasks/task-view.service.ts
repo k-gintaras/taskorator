@@ -11,6 +11,7 @@ import {
   getIdFromKey,
   TaskListKey,
   TaskListRules,
+  TaskListType,
 } from '../../models/task-list-model';
 import { TaskListRulesService } from './task-list-rules.service';
 import { SelectedListService } from './selected-list.service';
@@ -43,9 +44,6 @@ export class TaskViewService {
    * @param taskListGroup - The group name of the task list.
    */
   setTasksListGroup(taskListKey: TaskListKey): void {
-    console.log('setting task list: taskListKey');
-    console.log(taskListKey);
-
     this.currentTaskListKey = taskListKey;
     this.selectedList.setSelectedListKey(taskListKey);
     this.updateCurrentList();
@@ -55,7 +53,6 @@ export class TaskViewService {
    * Refresh the current task list from the cache and apply rules.
    */
   private async updateCurrentList(): Promise<void> {
-    console.log(this.currentTaskListKey);
     if (!this.currentTaskListKey) {
       this.tasks = [];
       this.tasksSubject.next(this.tasks);
