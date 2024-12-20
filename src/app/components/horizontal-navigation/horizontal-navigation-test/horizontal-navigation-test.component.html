@@ -1,20 +1,19 @@
-<!-- Toolbar with FAB and Title -->
 <mat-toolbar class="toolbar">
   <!-- Floating Button for Mobile -->
-  <button
-    mat-fab
-    color="primary"
-    class="nav-fab"
-    *ngIf="isHandset"
-    (click)="toggleDrawer()"
-  >
+  <button mat-fab color="primary" (click)="toggleDrawer()">
     <mat-icon>menu</mat-icon>
   </button>
+
   <!-- App Title -->
   <span class="app-title">Taskorator</span>
+
+  <!-- Overlord Navigator -->
+  <!-- <div class="overlord-navigator-wrapper" *ngIf="!isHandset">
+    <app-overlord-navigator></app-overlord-navigator>
+  </div> -->
 </mat-toolbar>
 
-<!-- Main Sidenav Container for both desktop and mobile -->
+<!-- Main Sidenav Container -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
     #drawer
@@ -23,8 +22,11 @@
     class="sidenav"
   >
     <ul class="nav-list">
+      <li>
+        <!-- <app-overlord-navigator></app-overlord-navigator> -->
+      </li>
       <li
-        *ngFor="let item of currentNavItems"
+        *ngFor="let item of navItems"
         [class.selected]="isSelected(item.path)"
         (click)="onNavItemClick(item)"
       >
@@ -45,6 +47,10 @@
 
   <!-- Main Content Area -->
   <mat-sidenav-content>
-    <router-outlet></router-outlet>
+    <!-- <div *ngIf="isHandset" class="mobile-overlord-navigator">
+      <app-overlord-navigator></app-overlord-navigator>
+    </div> -->
+    <!-- <router-outlet></router-outlet> -->
+    <app-task-navigator-test [showArtificer]="true"></app-task-navigator-test>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -2,13 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NavigationBuilderService } from '../../services/navigation-builder.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouteMetadata } from '../../app.routes-models';
-import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
+import { RouteMetadata } from '../../../app.routes-models';
+import { NavigationBuilderService } from '../../../services/navigation-builder.service';
+import { TaskNavigatorTestComponent } from '../../task-navigator/task-navigator-test/task-navigator-test.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -20,12 +20,12 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
     MatIconModule,
     MatToolbarModule,
     RouterOutlet,
-    OverlordNavigatorComponent,
+    TaskNavigatorTestComponent,
   ],
-  templateUrl: './horizontal-navigation.component.html',
-  styleUrls: ['./horizontal-navigation.component.scss'],
+  templateUrl: './horizontal-navigation-test.component.html',
+  styleUrls: ['../horizontal-navigation.component.scss'],
 })
-export class HorizontalNavigationComponent implements OnInit {
+export class HorizontalNavigationComponentTest implements OnInit {
   navItems: { path: string; metadata: RouteMetadata }[] = [];
   viewingChildren = false;
   isHandset = false;

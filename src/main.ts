@@ -12,7 +12,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 // Import main app component and test component
 import { AppComponent } from './app/app.component';
 
-import { routes, routesTesting } from './app/app.routes';
+import { routes } from './app/app.routes';
 import { TestAppComponent } from './app/test-files/test-app.component';
 // import { AuthService } from './app/services/core/auth.service';
 // import { TestAuthService } from './app/services/test-services/test-auth.service';
@@ -34,7 +34,7 @@ if (isTesting) {
     providers: [
       importProvidersFrom(
         BrowserAnimationsModule,
-        RouterModule.forRoot(routesTesting)
+        RouterModule.forRoot(routes)
       ),
 
       provideAnimationsAsync(),

@@ -27119,6 +27119,212 @@
             "templateData": "<button\r\n  class=\"task-btn\"\r\n  [ngClass]=\"getColor()\"\r\n  [ngStyle]=\"getButtonStyle()\"\r\n  (click)=\"performAction()\"\r\n>\r\n  <mat-icon>{{ getIcon() }}</mat-icon>\r\n</button>\r\n"
         },
         {
+            "name": "ArtificerActionComponentTest",
+            "id": "component-ArtificerActionComponentTest-908f5e0af971222688d3a1e4d306b7cbaf585773903ee9a241b945cb4e26646cd7e61b651198b3c3654c16ae20be7285459e183dc57d3ca863f479d4d6a49160",
+            "file": "src/app/components/task/artificer-action/artificer-action-test.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-artificer-action-test",
+            "styleUrls": [],
+            "styles": [],
+            "templateUrl": [
+                "./artificer-action.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [
+                {
+                    "name": "task",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 19,
+                    "type": "Task | undefined",
+                    "decorators": []
+                },
+                {
+                    "name": "treeNode",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 21,
+                    "type": "TaskTreeNodeData | undefined",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "currentAction",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ArtificerDetails",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 20
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "getButtonStyle",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "{ visibility: string; pointerEvents: string; } | { visibility?: undefined; pointerEvents?: undefined; }",
+                    "typeParameters": [],
+                    "line": 63,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "getColor",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "\"complete-icon-color-checklist\" | \"complete-icon-color-parent\" | \"complete-icon-color-child\"",
+                    "typeParameters": [],
+                    "line": 32,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "getIcon",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "string",
+                    "typeParameters": [],
+                    "line": 125,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "hasIncompleteChildren",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "boolean",
+                    "typeParameters": [],
+                    "line": 54,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "isActionRestricted",
+                    "args": [
+                        {
+                            "name": "action",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "boolean",
+                    "typeParameters": [],
+                    "line": 70,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "action",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "isSelected",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 120,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "performAction",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 77,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "NgClass"
+                },
+                {
+                    "name": "MatIcon"
+                },
+                {
+                    "name": "NgStyle"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, Input } from '@angular/core';\r\nimport { Task } from '../../../models/taskModelManager';\r\nimport { ArtificerDetails } from '../../artificer/artificer.interface';\r\nimport { ArtificerService } from '../../artificer/artificer.service';\r\nimport { NgClass, NgStyle } from '@angular/common';\r\nimport { MatIcon } from '@angular/material/icon';\r\nimport { TaskTreeNodeData } from '../../../models/taskTree';\r\nimport { SelectedMultipleService } from '../../../services/task/selected-multiple.service';\r\nimport { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';\r\n\r\n@Component({\r\n  selector: 'app-artificer-action-test',\r\n  standalone: true,\r\n  imports: [NgClass, MatIcon, NgStyle],\r\n  templateUrl: './artificer-action.component.html',\r\n  styleUrl: './artificer-action.component.scss',\r\n})\r\nexport class ArtificerActionComponentTest {\r\n  @Input() task: Task | undefined;\r\n  currentAction!: ArtificerDetails;\r\n  @Input() treeNode: TaskTreeNodeData | undefined;\r\n\r\n  constructor(\r\n    private artificerService: ArtificerService,\r\n    private selectedService: SelectedMultipleService\r\n  ) {\r\n    this.artificerService.currentAction$.subscribe((action) => {\r\n      this.currentAction = action;\r\n    });\r\n  }\r\n\r\n  getColor() {\r\n    if (!this.treeNode) return;\r\n    // it is checklist and reappear whenever it repeats... daily, weekly\r\n    const isRepeatingTask =\r\n      this.task?.repeat !== 'never' && this.task?.repeat !== 'once';\r\n    if (isRepeatingTask) return 'complete-icon-color-checklist';\r\n\r\n    // show color based on what kind of task it is\r\n    if (this.treeNode.childrenCount > 0) {\r\n      // task has children\r\n      if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount) {\r\n        // task has incomplete children\r\n        return 'complete-icon-color-parent';\r\n      }\r\n    } else {\r\n      // task has no children\r\n      return 'complete-icon-color-child';\r\n    }\r\n\r\n    return 'complete-icon-color-child';\r\n  }\r\n\r\n  hasIncompleteChildren() {\r\n    if (!this.treeNode) return false;\r\n    if (this.treeNode.childrenCount < 1) return false;\r\n    if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount)\r\n      return true;\r\n\r\n    return false;\r\n  }\r\n\r\n  getButtonStyle() {\r\n    const action = this.currentAction.action;\r\n    return this.isActionRestricted(action)\r\n      ? { visibility: 'hidden', pointerEvents: 'none' }\r\n      : {};\r\n  }\r\n\r\n  isActionRestricted(action: string): boolean {\r\n    return (\r\n      this.hasIncompleteChildren() &&\r\n      ['delete', 'complete', 'move'].includes(action)\r\n    );\r\n  }\r\n\r\n  performAction(): void {\r\n    const task = this.task;\r\n    if (!task) return;\r\n    const action = this.currentAction.action;\r\n\r\n    switch (action) {\r\n      case 'promote':\r\n        console.log('this.taskUpdateService.increasePriority(task);');\r\n        break;\r\n      case 'demote':\r\n        console.log('this.taskUpdateService.decreasePriority(task);');\r\n\r\n        break;\r\n      case 'edit':\r\n        // display edit popup ?\r\n        break;\r\n      case 'select':\r\n        this.selectedService.addRemoveSelectedTask(task);\r\n        break;\r\n      case 'suggest':\r\n        console.log(' this.gptHelper.suggestTasksForTask(task);');\r\n        break;\r\n\r\n      case 'delete':\r\n        console.log('this.taskUpdateService.delete(task);');\r\n\r\n        break;\r\n      case 'complete':\r\n        console.log('this.taskUpdateService.complete(task);');\r\n        break;\r\n      case 'move':\r\n        console.log('this.taskUpdateService.move(task);');\r\n        break;\r\n      case 'refresh':\r\n        console.log('this.taskUpdateService.renew(task);');\r\n        break;\r\n\r\n      // Add more cases as needed...\r\n      default:\r\n        break;\r\n    }\r\n  }\r\n\r\n  isSelected() {\r\n    if (!this.task) return false;\r\n    return this.selectedService.isSelected(this.task);\r\n  }\r\n\r\n  getIcon(): string {\r\n    if (this.currentAction.action === 'select') {\r\n      return this.isSelected() ? 'check_box' : 'check_box_outline_blank';\r\n    }\r\n    return this.currentAction.icon;\r\n  }\r\n}\r\n",
+            "styleUrl": "./artificer-action.component.scss",
+            "assetsDirs": [],
+            "styleUrlsData": "",
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "artificerService",
+                        "type": "ArtificerService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "selectedService",
+                        "type": "SelectedMultipleService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 21,
+                "jsdoctags": [
+                    {
+                        "name": "artificerService",
+                        "type": "ArtificerService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "selectedService",
+                        "type": "SelectedMultipleService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "extends": [],
+            "templateData": "<button\r\n  class=\"task-btn\"\r\n  [ngClass]=\"getColor()\"\r\n  [ngStyle]=\"getButtonStyle()\"\r\n  (click)=\"performAction()\"\r\n>\r\n  <mat-icon>{{ getIcon() }}</mat-icon>\r\n</button>\r\n"
+        },
+        {
             "name": "ArtificerComponent",
             "id": "component-ArtificerComponent-6d066d4fde29c6a872ebda4e0a238808f1182becf9c7d76d9f2a274785eebacbe96a65177e980243e1bb57c27cc806d2ea1141934d9b20e916232344b3e85972",
             "file": "src/app/components/artificer/artificer.component.ts",
@@ -30147,7 +30353,7 @@
         },
         {
             "name": "HorizontalNavigationComponent",
-            "id": "component-HorizontalNavigationComponent-53bac9f75d2b1d5df265557d471fde2f76ac6613f90c6a19cbf10b9759e3dd6ecb02a86235f46515b6e41efbd8b9c9faff08fabb4dfed8d3883e04edcb92b9b1",
+            "id": "component-HorizontalNavigationComponent-7de433327d484591c74d14d23b83356bb0de8b990ad3d687ea6ca2fca68bbb0569f10ea9855c4d961df8d7bd9735b4a31d45ffe9d60b090491b93535ddac144a",
             "file": "src/app/components/horizontal-navigation/horizontal-navigation.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -30249,7 +30455,7 @@
                     "optional": false,
                     "returnType": "boolean",
                     "typeParameters": [],
-                    "line": 115,
+                    "line": 116,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -30259,7 +30465,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 109,
+                    "line": 110,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -30307,7 +30513,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 99,
+                    "line": 100,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "rawdescription": "\n\nReturn to the top-level navigation.\n",
@@ -30326,7 +30532,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 73,
+                    "line": 74,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "rawdescription": "\n\nShow children for the selected feature or navigate directly.\n",
@@ -30334,8 +30540,8 @@
                     "jsdoctags": [
                         {
                             "name": {
-                                "pos": 2261,
-                                "end": 2265,
+                                "pos": 2282,
+                                "end": 2286,
                                 "kind": 80,
                                 "id": 0,
                                 "flags": 16842752,
@@ -30346,8 +30552,8 @@
                             "deprecated": false,
                             "deprecationMessage": "",
                             "tagName": {
-                                "pos": 2255,
-                                "end": 2260,
+                                "pos": 2276,
+                                "end": 2281,
                                 "kind": 80,
                                 "id": 0,
                                 "flags": 16842752,
@@ -30364,7 +30570,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 59,
+                    "line": 60,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "rawdescription": "\n\nShow top-level features.\n",
@@ -30376,7 +30582,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 103,
+                    "line": 104,
                     "deprecated": false,
                     "deprecationMessage": ""
                 }
@@ -30418,11 +30624,11 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet } from '@angular/router';\r\nimport { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { NavigationBuilderService } from '../../services/navigation-builder.service';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatToolbarModule } from '@angular/material/toolbar';\r\nimport { RouteMetadata } from '../../app.routes-models';\r\nimport { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';\r\n\r\n@Component({\r\n  selector: 'app-horizontal-navigation',\r\n  standalone: true,\r\n  imports: [\r\n    CommonModule,\r\n    MatSidenavModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatToolbarModule,\r\n    RouterOutlet,\r\n    OverlordNavigatorComponent,\r\n  ],\r\n  templateUrl: './horizontal-navigation.component.html',\r\n  styleUrls: ['./horizontal-navigation.component.scss'],\r\n})\r\nexport class HorizontalNavigationComponent implements OnInit {\r\n  navItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  viewingChildren = false;\r\n  isHandset = false;\r\n  selectedFeature = '';\r\n  selectedChild = '';\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private navigationService: NavigationBuilderService,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.showTopLevel(); // Initialize at top level\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n  }\r\n\r\n  isSelected(path: string) {\r\n    this.selectedChild === path || this.selectedFeature === path;\r\n  }\r\n\r\n  /**\r\n   * Show top-level features.\r\n   */\r\n  showTopLevel() {\r\n    this.navItems = this.navigationService\r\n      .getTopLevelFeatures()\r\n      .map((feature) => ({\r\n        path: feature.path,\r\n        metadata: feature.metadata,\r\n      }));\r\n    this.viewingChildren = false;\r\n  }\r\n\r\n  /**\r\n   * Show children for the selected feature or navigate directly.\r\n   * @param item - The selected navigation item.\r\n   */\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    const childrenPaths = this.navigationService.getChildrenPaths(item.path);\r\n\r\n    if (childrenPaths.length > 0) {\r\n      // its a feature\r\n\r\n      this.navItems = childrenPaths.map((childPath) => ({\r\n        path: `${item.path}/${childPath}`,\r\n        metadata: this.navigationService.getRouteMetadata(childPath),\r\n      }));\r\n      this.viewingChildren = true;\r\n      this.selectedChild = item.path;\r\n      // prenavigate automatically to default path for convenience\r\n      // or inconvenience\r\n      this.router.navigate([item.path]);\r\n    } else {\r\n      // child of feature\r\n      this.router.navigate([item.path]); // Navigate directly\r\n      this.closeDrawerOnMobile();\r\n      this.selectedFeature = item.path;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Return to the top-level navigation.\r\n   */\r\n  onBackClick() {\r\n    this.showTopLevel();\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.close();\r\n    }\r\n  }\r\n\r\n  canGoBack() {\r\n    return this.viewingChildren;\r\n  }\r\n}\r\n",
+            "sourceCode": "import { Component, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet } from '@angular/router';\r\nimport { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { NavigationBuilderService } from '../../services/navigation-builder.service';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatToolbarModule } from '@angular/material/toolbar';\r\nimport { RouteMetadata } from '../../app.routes-models';\r\nimport { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';\r\n\r\n@Component({\r\n  selector: 'app-horizontal-navigation',\r\n  standalone: true,\r\n  imports: [\r\n    CommonModule,\r\n    MatSidenavModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatToolbarModule,\r\n    RouterOutlet,\r\n    OverlordNavigatorComponent,\r\n  ],\r\n  templateUrl: './horizontal-navigation.component.html',\r\n  styleUrls: ['./horizontal-navigation.component.scss'],\r\n})\r\nexport class HorizontalNavigationComponent implements OnInit {\r\n  navItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  viewingChildren = false;\r\n  isHandset = false;\r\n  selectedFeature = '';\r\n  selectedChild = '';\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private navigationService: NavigationBuilderService,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.showTopLevel(); // Initialize at top level\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n  }\r\n\r\n  isSelected(path: string) {\r\n    // return true;\r\n    this.selectedChild === path || this.selectedFeature === path;\r\n  }\r\n\r\n  /**\r\n   * Show top-level features.\r\n   */\r\n  showTopLevel() {\r\n    this.navItems = this.navigationService\r\n      .getTopLevelFeatures()\r\n      .map((feature) => ({\r\n        path: feature.path,\r\n        metadata: feature.metadata,\r\n      }));\r\n    this.viewingChildren = false;\r\n  }\r\n\r\n  /**\r\n   * Show children for the selected feature or navigate directly.\r\n   * @param item - The selected navigation item.\r\n   */\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    const childrenPaths = this.navigationService.getChildrenPaths(item.path);\r\n\r\n    if (childrenPaths.length > 0) {\r\n      // its a feature\r\n\r\n      this.navItems = childrenPaths.map((childPath) => ({\r\n        path: `${item.path}/${childPath}`,\r\n        metadata: this.navigationService.getRouteMetadata(childPath),\r\n      }));\r\n      this.viewingChildren = true;\r\n      this.selectedChild = item.path;\r\n      // prenavigate automatically to default path for convenience\r\n      // or inconvenience\r\n      this.router.navigate([item.path]);\r\n    } else {\r\n      // child of feature\r\n      this.router.navigate([item.path]); // Navigate directly\r\n      this.closeDrawerOnMobile();\r\n      this.selectedFeature = item.path;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Return to the top-level navigation.\r\n   */\r\n  onBackClick() {\r\n    this.showTopLevel();\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.close();\r\n    }\r\n  }\r\n\r\n  canGoBack() {\r\n    return this.viewingChildren;\r\n  }\r\n}\r\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": "/* Toolbar for App Title and Floating Button */\r\n.toolbar {\r\n  background-color: #6200ea;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 16px;\r\n\r\n  .nav-fab {\r\n    margin-right: 16px; // Ensure space between the FAB and the title\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n.nav-fab {\r\n  display: none; // Hidden by default (shown only on mobile)\r\n}\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n@media (min-width: 600px) {\r\n  .nav-fab {\r\n    display: none; // Hide the floating button on larger screens\r\n  }\r\n}\r\n",
+                    "data": "/* Toolbar for App Title and Floating Button */\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 16px;\r\n\r\n  .nav-fab {\r\n    margin-right: 16px; // Ensure space between the FAB and the title\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n.nav-fab {\r\n  display: none; // Hidden by default (shown only on mobile)\r\n}\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n@media (min-width: 600px) {\r\n  .nav-fab {\r\n    display: none; // Hide the floating button on larger screens\r\n  }\r\n}\r\n",
                     "styleUrl": "./horizontal-navigation.component.scss"
                 }
             ],
@@ -30488,6 +30694,350 @@
                 "OnInit"
             ],
             "templateData": "<mat-toolbar class=\"toolbar\">\r\n  <!-- Floating Button for Mobile -->\r\n  <button\r\n    mat-fab\r\n    color=\"primary\"\r\n    class=\"nav-fab\"\r\n    *ngIf=\"isHandset\"\r\n    (click)=\"toggleDrawer()\"\r\n  >\r\n    <mat-icon>menu</mat-icon>\r\n  </button>\r\n\r\n  <!-- App Title -->\r\n  <span class=\"app-title\">Taskorator</span>\r\n\r\n  <!-- Overlord Navigator -->\r\n  <!-- <div class=\"overlord-navigator-wrapper\" *ngIf=\"!isHandset\">\r\n    <app-overlord-navigator></app-overlord-navigator>\r\n  </div> -->\r\n</mat-toolbar>\r\n\r\n<!-- Main Sidenav Container -->\r\n<mat-sidenav-container class=\"sidenav-container\">\r\n  <mat-sidenav\r\n    #drawer\r\n    [mode]=\"isHandset ? 'over' : 'side'\"\r\n    [opened]=\"!isHandset || drawer.opened\"\r\n    class=\"sidenav\"\r\n  >\r\n    <ul class=\"nav-list\">\r\n      <li>\r\n        <!-- <app-overlord-navigator></app-overlord-navigator> -->\r\n      </li>\r\n      <li\r\n        *ngFor=\"let item of navItems\"\r\n        [class.selected]=\"isSelected(item.path)\"\r\n        (click)=\"onNavItemClick(item)\"\r\n      >\r\n        <mat-icon>{{ item.metadata.icon }}</mat-icon>\r\n        <span class=\"nav-text\">{{ item.metadata.title }}</span>\r\n      </li>\r\n    </ul>\r\n    <button\r\n      *ngIf=\"canGoBack()\"\r\n      mat-button\r\n      class=\"back-button\"\r\n      (click)=\"onBackClick()\"\r\n    >\r\n      <mat-icon>arrow_back</mat-icon>\r\n      <span>Back</span>\r\n    </button>\r\n  </mat-sidenav>\r\n\r\n  <!-- Main Content Area -->\r\n  <mat-sidenav-content>\r\n    <!-- <div *ngIf=\"isHandset\" class=\"mobile-overlord-navigator\">\r\n      <app-overlord-navigator></app-overlord-navigator>\r\n    </div> -->\r\n    <router-outlet></router-outlet>\r\n  </mat-sidenav-content>\r\n</mat-sidenav-container>\r\n"
+        },
+        {
+            "name": "HorizontalNavigationComponentTest",
+            "id": "component-HorizontalNavigationComponentTest-3e6d904fea1602717da08c8cf1aa836cbe6a1e8404e29379a93bfe53dfb4b0eb1d9d7da69f69a7a2ce52c632a1136e3f0a2559b2549f04c4066594a46b3293a7",
+            "file": "src/app/components/horizontal-navigation/horizontal-navigation-test/horizontal-navigation-test.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-horizontal-navigation",
+            "styleUrls": [
+                "../horizontal-navigation.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./horizontal-navigation-test.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "drawer",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "MatDrawer",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 35,
+                    "decorators": [
+                        {
+                            "name": "ViewChild",
+                            "stringifiedArguments": "'drawer'"
+                        }
+                    ],
+                    "modifierKind": [
+                        170
+                    ]
+                },
+                {
+                    "name": "isHandset",
+                    "defaultValue": "false",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 31
+                },
+                {
+                    "name": "navItems",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "literal type[]",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 29
+                },
+                {
+                    "name": "selectedChild",
+                    "defaultValue": "''",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 33
+                },
+                {
+                    "name": "selectedFeature",
+                    "defaultValue": "''",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 32
+                },
+                {
+                    "name": "viewingChildren",
+                    "defaultValue": "false",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 30
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "canGoBack",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "boolean",
+                    "typeParameters": [],
+                    "line": 116,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "closeDrawerOnMobile",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 110,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "isSelected",
+                    "args": [
+                        {
+                            "name": "path",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 52,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "path",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 43,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "onBackClick",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 100,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nReturn to the top-level navigation.\n",
+                    "description": "<p>Return to the top-level navigation.</p>\n"
+                },
+                {
+                    "name": "onNavItemClick",
+                    "args": [
+                        {
+                            "name": "item",
+                            "type": "literal type",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 74,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nShow children for the selected feature or navigate directly.\n",
+                    "description": "<p>Show children for the selected feature or navigate directly.</p>\n",
+                    "jsdoctags": [
+                        {
+                            "name": {
+                                "pos": 2318,
+                                "end": 2322,
+                                "kind": 80,
+                                "id": 0,
+                                "flags": 16842752,
+                                "transformFlags": 0,
+                                "escapedText": "item"
+                            },
+                            "type": "literal type",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "pos": 2312,
+                                "end": 2317,
+                                "kind": 80,
+                                "id": 0,
+                                "flags": 16842752,
+                                "transformFlags": 0,
+                                "escapedText": "param"
+                            },
+                            "comment": "<ul>\n<li>The selected navigation item.</li>\n</ul>\n"
+                        }
+                    ]
+                },
+                {
+                    "name": "showTopLevel",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 60,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nShow top-level features.\n",
+                    "description": "<p>Show top-level features.</p>\n"
+                },
+                {
+                    "name": "toggleDrawer",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 104,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "CommonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatSidenavModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatButtonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatIconModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatToolbarModule",
+                    "type": "module"
+                },
+                {
+                    "name": "RouterOutlet"
+                },
+                {
+                    "name": "TaskNavigatorTestComponent",
+                    "type": "component"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet } from '@angular/router';\r\nimport { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatToolbarModule } from '@angular/material/toolbar';\r\nimport { RouteMetadata } from '../../../app.routes-models';\r\nimport { NavigationBuilderService } from '../../../services/navigation-builder.service';\r\nimport { TaskNavigatorTestComponent } from '../../task-navigator/task-navigator-test/task-navigator-test.component';\r\n\r\n@Component({\r\n  selector: 'app-horizontal-navigation',\r\n  standalone: true,\r\n  imports: [\r\n    CommonModule,\r\n    MatSidenavModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatToolbarModule,\r\n    RouterOutlet,\r\n    TaskNavigatorTestComponent,\r\n  ],\r\n  templateUrl: './horizontal-navigation-test.component.html',\r\n  styleUrls: ['../horizontal-navigation.component.scss'],\r\n})\r\nexport class HorizontalNavigationComponentTest implements OnInit {\r\n  navItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  viewingChildren = false;\r\n  isHandset = false;\r\n  selectedFeature = '';\r\n  selectedChild = '';\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private navigationService: NavigationBuilderService,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.showTopLevel(); // Initialize at top level\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n  }\r\n\r\n  isSelected(path: string) {\r\n    // return true;\r\n    this.selectedChild === path || this.selectedFeature === path;\r\n  }\r\n\r\n  /**\r\n   * Show top-level features.\r\n   */\r\n  showTopLevel() {\r\n    this.navItems = this.navigationService\r\n      .getTopLevelFeatures()\r\n      .map((feature) => ({\r\n        path: feature.path,\r\n        metadata: feature.metadata,\r\n      }));\r\n    this.viewingChildren = false;\r\n  }\r\n\r\n  /**\r\n   * Show children for the selected feature or navigate directly.\r\n   * @param item - The selected navigation item.\r\n   */\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    const childrenPaths = this.navigationService.getChildrenPaths(item.path);\r\n\r\n    if (childrenPaths.length > 0) {\r\n      // its a feature\r\n\r\n      this.navItems = childrenPaths.map((childPath) => ({\r\n        path: `${item.path}/${childPath}`,\r\n        metadata: this.navigationService.getRouteMetadata(childPath),\r\n      }));\r\n      this.viewingChildren = true;\r\n      this.selectedChild = item.path;\r\n      // prenavigate automatically to default path for convenience\r\n      // or inconvenience\r\n      this.router.navigate([item.path]);\r\n    } else {\r\n      // child of feature\r\n      this.router.navigate([item.path]); // Navigate directly\r\n      this.closeDrawerOnMobile();\r\n      this.selectedFeature = item.path;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Return to the top-level navigation.\r\n   */\r\n  onBackClick() {\r\n    this.showTopLevel();\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.close();\r\n    }\r\n  }\r\n\r\n  canGoBack() {\r\n    return this.viewingChildren;\r\n  }\r\n}\r\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": "/* Toolbar for App Title and Floating Button */\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 16px;\r\n\r\n  .nav-fab {\r\n    margin-right: 16px; // Ensure space between the FAB and the title\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n.nav-fab {\r\n  display: none; // Hidden by default (shown only on mobile)\r\n}\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n@media (min-width: 600px) {\r\n  .nav-fab {\r\n    display: none; // Hide the floating button on larger screens\r\n  }\r\n}\r\n",
+                    "styleUrl": "../horizontal-navigation.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "router",
+                        "type": "Router",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "navigationService",
+                        "type": "NavigationBuilderService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "breakpointObserver",
+                        "type": "BreakpointObserver",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 35,
+                "jsdoctags": [
+                    {
+                        "name": "router",
+                        "type": "Router",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "navigationService",
+                        "type": "NavigationBuilderService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "breakpointObserver",
+                        "type": "BreakpointObserver",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "extends": [],
+            "implements": [
+                "OnInit"
+            ],
+            "templateData": "<mat-toolbar class=\"toolbar\">\r\n  <!-- Floating Button for Mobile -->\r\n  <button\r\n    mat-fab\r\n    color=\"primary\"\r\n    class=\"nav-fab\"\r\n    *ngIf=\"isHandset\"\r\n    (click)=\"toggleDrawer()\"\r\n  >\r\n    <mat-icon>menu</mat-icon>\r\n  </button>\r\n\r\n  <!-- App Title -->\r\n  <span class=\"app-title\">Taskorator</span>\r\n\r\n  <!-- Overlord Navigator -->\r\n  <!-- <div class=\"overlord-navigator-wrapper\" *ngIf=\"!isHandset\">\r\n    <app-overlord-navigator></app-overlord-navigator>\r\n  </div> -->\r\n</mat-toolbar>\r\n\r\n<!-- Main Sidenav Container -->\r\n<mat-sidenav-container class=\"sidenav-container\">\r\n  <mat-sidenav\r\n    #drawer\r\n    [mode]=\"isHandset ? 'over' : 'side'\"\r\n    [opened]=\"!isHandset || drawer.opened\"\r\n    class=\"sidenav\"\r\n  >\r\n    <ul class=\"nav-list\">\r\n      <li>\r\n        <!-- <app-overlord-navigator></app-overlord-navigator> -->\r\n      </li>\r\n      <li\r\n        *ngFor=\"let item of navItems\"\r\n        [class.selected]=\"isSelected(item.path)\"\r\n        (click)=\"onNavItemClick(item)\"\r\n      >\r\n        <mat-icon>{{ item.metadata.icon }}</mat-icon>\r\n        <span class=\"nav-text\">{{ item.metadata.title }}</span>\r\n      </li>\r\n    </ul>\r\n    <button\r\n      *ngIf=\"canGoBack()\"\r\n      mat-button\r\n      class=\"back-button\"\r\n      (click)=\"onBackClick()\"\r\n    >\r\n      <mat-icon>arrow_back</mat-icon>\r\n      <span>Back</span>\r\n    </button>\r\n  </mat-sidenav>\r\n\r\n  <!-- Main Content Area -->\r\n  <mat-sidenav-content>\r\n    <!-- <div *ngIf=\"isHandset\" class=\"mobile-overlord-navigator\">\r\n      <app-overlord-navigator></app-overlord-navigator>\r\n    </div> -->\r\n    <!-- <router-outlet></router-outlet> -->\r\n    <!-- <app-task-navigator-test [showArtificer]=\"true\"></app-task-navigator-test> -->\r\n  </mat-sidenav-content>\r\n</mat-sidenav-container>\r\n"
         },
         {
             "name": "ImportExportComponent",
@@ -31918,387 +32468,6 @@
             "templateData": "<div class=\"login-container\">\n  <h2>Login</h2>\n  <form class=\"login-form\">\n    <button type=\"button\" class=\"btn btn-primary\" (click)=\"loginWithGmail()\">\n      <i class=\"material-icons\">login</i> Login with Google\n    </button>\n    <button type=\"button\" class=\"btn btn-primary\" (click)=\"logout()\">\n      <i class=\"material-icons\">logout</i> Logout\n    </button>\n    <!-- <button type=\"button\" class=\"btn btn-danger\" (click)=\"deleteUser()\">\n      <i class=\"material-icons\">delete_forever</i> Delete User (test only)\n    </button> -->\n  </form>\n</div>\n"
         },
         {
-            "name": "NavigationComponent",
-            "id": "component-NavigationComponent-397ccdd3d5ee6cde95105a1f8a4bdab1446e0bcd32e5da6bc44fc2ba2dfb98d55a5e0fb1a29c5ab1a76a36a093a1146244c5bf8196c9d35a9cc0ab87db8c46d2",
-            "file": "src/app/test-files/navigation/navigation.component.ts",
-            "encapsulation": [],
-            "entryComponents": [],
-            "inputs": [],
-            "outputs": [],
-            "providers": [],
-            "selector": "app-navigation",
-            "styleUrls": [
-                "./navigation.component.scss"
-            ],
-            "styles": [],
-            "templateUrl": [
-                "./navigation.component.html"
-            ],
-            "viewProviders": [],
-            "hostDirectives": [],
-            "inputsClass": [],
-            "outputsClass": [],
-            "propertiesClass": [
-                {
-                    "name": "currentNavItems",
-                    "defaultValue": "[]",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "literal type[]",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 27
-                },
-                {
-                    "name": "drawer",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "MatDrawer",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 33,
-                    "decorators": [
-                        {
-                            "name": "ViewChild",
-                            "stringifiedArguments": "'drawer'"
-                        }
-                    ],
-                    "modifierKind": [
-                        170
-                    ]
-                },
-                {
-                    "name": "isHandset",
-                    "defaultValue": "false",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "boolean",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 31
-                },
-                {
-                    "name": "lastCorePath",
-                    "defaultValue": "null",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "string | null",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 29
-                },
-                {
-                    "name": "navStack",
-                    "defaultValue": "[]",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "literal type[][]",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 28
-                },
-                {
-                    "name": "toNavItem",
-                    "defaultValue": "() => {...}",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 107
-                },
-                {
-                    "name": "viewingParent",
-                    "defaultValue": "true",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 30
-                }
-            ],
-            "methodsClass": [
-                {
-                    "name": "canGoBack",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "boolean",
-                    "typeParameters": [],
-                    "line": 93,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "closeDrawerOnMobile",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 101,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "getChildrenPaths",
-                    "args": [
-                        {
-                            "name": "path",
-                            "type": "string",
-                            "deprecated": false,
-                            "deprecationMessage": ""
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "[] | undefined",
-                    "typeParameters": [],
-                    "line": 121,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "jsdoctags": [
-                        {
-                            "name": "path",
-                            "type": "string",
-                            "deprecated": false,
-                            "deprecationMessage": "",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getTopLevelPaths",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "string[]",
-                    "typeParameters": [],
-                    "line": 116,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "isSelected",
-                    "args": [
-                        {
-                            "name": "path",
-                            "type": "string",
-                            "deprecated": false,
-                            "deprecationMessage": ""
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "boolean",
-                    "typeParameters": [],
-                    "line": 97,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "jsdoctags": [
-                        {
-                            "name": "path",
-                            "type": "string",
-                            "deprecated": false,
-                            "deprecationMessage": "",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "ngOnInit",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 40,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "onBackClick",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 69,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "onNavItemClick",
-                    "args": [
-                        {
-                            "name": "item",
-                            "type": "literal type",
-                            "deprecated": false,
-                            "deprecationMessage": ""
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 49,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "jsdoctags": [
-                        {
-                            "name": "item",
-                            "type": "literal type",
-                            "deprecated": false,
-                            "deprecationMessage": "",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "toggleDrawer",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 87,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "updateMenu",
-                    "args": [
-                        {
-                            "name": "children",
-                            "type": "string[]",
-                            "deprecated": false,
-                            "deprecationMessage": ""
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 82,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "jsdoctags": [
-                        {
-                            "name": "children",
-                            "type": "string[]",
-                            "deprecated": false,
-                            "deprecationMessage": "",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "updateNavItems",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 77,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                }
-            ],
-            "deprecated": false,
-            "deprecationMessage": "",
-            "hostBindings": [],
-            "hostListeners": [],
-            "standalone": true,
-            "imports": [
-                {
-                    "name": "CommonModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatSidenavModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatIconModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatButtonModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatToolbarModule",
-                    "type": "module"
-                },
-                {
-                    "name": "RouterOutlet"
-                }
-            ],
-            "description": "",
-            "rawdescription": "\n",
-            "type": "component",
-            "sourceCode": "import { Component, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet } from '@angular/router';\r\nimport { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatToolbarModule } from '@angular/material/toolbar';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { RouteMetadata } from '../../app.routes-models';\r\nimport { CORE_APP_METADATA } from '../../app.routes-metadata';\r\n\r\n@Component({\r\n  selector: 'app-navigation',\r\n  standalone: true,\r\n  templateUrl: './navigation.component.html',\r\n  styleUrls: ['./navigation.component.scss'],\r\n  imports: [\r\n    CommonModule,\r\n    MatSidenavModule,\r\n    MatIconModule,\r\n    MatButtonModule,\r\n    MatToolbarModule,\r\n    RouterOutlet,\r\n  ],\r\n})\r\nexport class NavigationComponent implements OnInit {\r\n  currentNavItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  navStack: { path: string; metadata: RouteMetadata }[][] = [];\r\n  lastCorePath: string | null = null;\r\n  viewingParent = true;\r\n  isHandset: boolean = false;\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.updateNavItems(); // Start at the top level\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n  }\r\n\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    if (item.path === this.lastCorePath) {\r\n      // Handle clicks on parent (core) path\r\n      this.viewingParent = true;\r\n      this.updateNavItems(); // Show top-level items\r\n    } else {\r\n      const children = this.getChildrenPaths(item.path);\r\n      if (children?.length) {\r\n        // If the route has children, update the menu to show them\r\n        this.viewingParent = false;\r\n        this.lastCorePath = item.path;\r\n        this.updateMenu(children);\r\n      } else {\r\n        // Otherwise, navigate to the child route\r\n        this.router.navigate([item.path]);\r\n        this.closeDrawerOnMobile();\r\n      }\r\n    }\r\n  }\r\n\r\n  onBackClick() {\r\n    if (this.lastCorePath) {\r\n      this.updateNavItems(); // Go back to the top-level\r\n      this.router.navigate([this.lastCorePath]); // Navigate back to the parent path\r\n      this.viewingParent = true;\r\n    }\r\n  }\r\n\r\n  updateNavItems() {\r\n    // Update to show top-level navigation items\r\n    this.currentNavItems = this.getTopLevelPaths().map(this.toNavItem);\r\n  }\r\n\r\n  updateMenu(children: string[]) {\r\n    // Update to show child navigation items\r\n    this.currentNavItems = children.map(this.toNavItem);\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  canGoBack(): boolean {\r\n    return !this.viewingParent;\r\n  }\r\n\r\n  isSelected(path: string): boolean {\r\n    return this.router.url.includes(path);\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  toNavItem = (path: string): { path: string; metadata: RouteMetadata } => {\r\n    const metadata = CORE_APP_METADATA[path] || {\r\n      title: 'Unnamed Route',\r\n      description: '',\r\n      icon: 'extension',\r\n    };\r\n    return { path, metadata };\r\n  };\r\n\r\n  getTopLevelPaths(): string[] {\r\n    // Mock function to get top-level paths; replace with actual implementation\r\n    return ['forge', 'sentinel', 'nexus', 'vortex', 'crucible', 'citadel'];\r\n  }\r\n\r\n  getChildrenPaths(path: string): string[] | undefined {\r\n    // Mock function to get child paths for a route; replace with actual implementation\r\n    const childMap: Record<string, string[]> = {\r\n      forge: ['subforge1', 'subforge2'],\r\n      sentinel: ['subsentinel1', 'subsentinel2'],\r\n    };\r\n    return childMap[path];\r\n  }\r\n}\r\n",
-            "assetsDirs": [],
-            "styleUrlsData": [
-                {
-                    "data": "/* Toolbar for App Title and Floating Button */\r\n.toolbar {\r\n  background-color: #6200ea;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 16px;\r\n\r\n  .nav-fab {\r\n    margin-right: 16px; // Ensure space between the FAB and the title\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n.nav-fab {\r\n  display: none; // Hidden by default (shown only on mobile)\r\n}\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n@media (min-width: 600px) {\r\n  .nav-fab {\r\n    display: none; // Hide the floating button on larger screens\r\n  }\r\n}\r\n",
-                    "styleUrl": "./navigation.component.scss"
-                }
-            ],
-            "stylesData": "",
-            "constructorObj": {
-                "name": "constructor",
-                "description": "",
-                "deprecated": false,
-                "deprecationMessage": "",
-                "args": [
-                    {
-                        "name": "router",
-                        "type": "Router",
-                        "deprecated": false,
-                        "deprecationMessage": ""
-                    },
-                    {
-                        "name": "breakpointObserver",
-                        "type": "BreakpointObserver",
-                        "deprecated": false,
-                        "deprecationMessage": ""
-                    }
-                ],
-                "line": 33,
-                "jsdoctags": [
-                    {
-                        "name": "router",
-                        "type": "Router",
-                        "deprecated": false,
-                        "deprecationMessage": "",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    },
-                    {
-                        "name": "breakpointObserver",
-                        "type": "BreakpointObserver",
-                        "deprecated": false,
-                        "deprecationMessage": "",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    }
-                ]
-            },
-            "extends": [],
-            "implements": [
-                "OnInit"
-            ],
-            "templateData": "<!-- Toolbar with FAB and Title -->\r\n<mat-toolbar class=\"toolbar\">\r\n  <!-- Floating Button for Mobile -->\r\n  <button\r\n    mat-fab\r\n    color=\"primary\"\r\n    class=\"nav-fab\"\r\n    *ngIf=\"isHandset\"\r\n    (click)=\"toggleDrawer()\"\r\n  >\r\n    <mat-icon>menu</mat-icon>\r\n  </button>\r\n  <!-- App Title -->\r\n  <span class=\"app-title\">Taskorator</span>\r\n</mat-toolbar>\r\n\r\n<!-- Main Sidenav Container for both desktop and mobile -->\r\n<mat-sidenav-container class=\"sidenav-container\">\r\n  <mat-sidenav\r\n    #drawer\r\n    [mode]=\"isHandset ? 'over' : 'side'\"\r\n    [opened]=\"!isHandset || drawer.opened\"\r\n    class=\"sidenav\"\r\n  >\r\n    <ul class=\"nav-list\">\r\n      <li\r\n        *ngFor=\"let item of currentNavItems\"\r\n        [class.selected]=\"isSelected(item.path)\"\r\n        (click)=\"onNavItemClick(item)\"\r\n      >\r\n        <mat-icon>{{ item.metadata.icon }}</mat-icon>\r\n        <span class=\"nav-text\">{{ item.metadata.title }}</span>\r\n      </li>\r\n    </ul>\r\n    <button\r\n      *ngIf=\"canGoBack()\"\r\n      mat-button\r\n      class=\"back-button\"\r\n      (click)=\"onBackClick()\"\r\n    >\r\n      <mat-icon>arrow_back</mat-icon>\r\n      <span>Back</span>\r\n    </button>\r\n  </mat-sidenav>\r\n\r\n  <!-- Main Content Area -->\r\n  <mat-sidenav-content>\r\n    <router-outlet></router-outlet>\r\n  </mat-sidenav-content>\r\n</mat-sidenav-container>\r\n"
-        },
-        {
             "name": "NextTaskManagerComponent",
             "id": "component-NextTaskManagerComponent-44e7b34c54c7d5c62e3b15d9106a213c54c5e5509802fbd32d5eab3bafd2ff877a677dfbcd9355932917a50fb04dd7ebc98149246a1dba0e80893b72b21887c4",
             "file": "src/app/features/next-task-manager/next-task-manager.component.ts",
@@ -32688,6 +32857,194 @@
                     {
                         "name": "taskService",
                         "type": "TaskService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "selectedListService",
+                        "type": "SelectedListService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "taskListRules",
+                        "type": "TaskListRulesService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "extends": [],
+            "implements": [
+                "OnInit"
+            ],
+            "templateData": "<div class=\"overlord-navigator-container\">\r\n  <!-- Overlord Name with Icon -->\r\n  <div class=\"overlord-title\">\r\n    <mat-icon class=\"overlord-icon\">account_tree</mat-icon>\r\n    <span class=\"overlord-name\">{{ selectedList?.title }}</span>\r\n    <span class=\"overlord-name\">/</span>\r\n\r\n    <span class=\"overlord-name\">{{ selectedOverlord?.name }}</span>\r\n  </div>\r\n\r\n  <!-- Navigation Buttons -->\r\n  <div class=\"overlord-navigator\">\r\n    <button mat-icon-button class=\"task-btn\" (click)=\"goToSuperParent()\">\r\n      <mat-icon>arrow_upward</mat-icon>\r\n    </button>\r\n    <button mat-icon-button class=\"task-btn\" (click)=\"goBack()\">\r\n      <mat-icon>arrow_back</mat-icon>\r\n    </button>\r\n    <button mat-icon-button class=\"task-btn\" (click)=\"goToRoot()\">\r\n      <mat-icon>home</mat-icon>\r\n    </button>\r\n    <!-- <button mat-icon-button class=\"task-btn\" (click)=\"goToOverlord()\">\r\n      <mat-icon>arrow_forward</mat-icon>\r\n    </button> -->\r\n    <!-- TODO: really just make it go to- in search overlord instead of here... -->\r\n  </div>\r\n\r\n  <!-- Search Overlord Component -->\r\n  <!-- <app-search-overlord></app-search-overlord> -->\r\n</div>\r\n"
+        },
+        {
+            "name": "OverlordNavigatorComponentTest",
+            "id": "component-OverlordNavigatorComponentTest-67779eb7f9a05173c7b592b60a1cb3168da86a285e28ea3ab53e7cd37de06063aa1623951aa376af2d58aa626c667472b3a2d7491d5f4b667395f53019ba6f1a",
+            "file": "src/app/components/overlord-navigator/overlord-navigator-test.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-overlord-navigator-test",
+            "styleUrls": [
+                "./overlord-navigator.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./overlord-navigator.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "selectedList",
+                    "defaultValue": "null",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "TaskListRules | null",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 23
+                },
+                {
+                    "name": "selectedOverlord",
+                    "defaultValue": "null",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ExtendedTask | null",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 22
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "goBack",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 62,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "goToOverlord",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 67,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "goToRoot",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 72,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "goToSuperParent",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 57,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 32,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "MatIcon"
+                },
+                {
+                    "name": "NgIf"
+                },
+                {
+                    "name": "SearchOverlordComponent",
+                    "type": "component"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, Input, OnInit } from '@angular/core';\r\nimport { SelectedOverlordService } from '../../services/task/selected-overlord.service';\r\nimport { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';\r\nimport { MatIcon } from '@angular/material/icon';\r\nimport { NgIf } from '@angular/common';\r\nimport { TaskService } from '../../services/tasks/task.service';\r\nimport { ExtendedTask, getBaseTask } from '../../models/taskModelManager';\r\nimport { SearchOverlordComponent } from '../search-overlord/search-overlord.component';\r\nimport { TaskListRulesService } from '../../services/tasks/task-list-rules.service';\r\nimport { TaskViewService } from '../../services/tasks/task-view.service';\r\nimport { TaskListKey, TaskListRules } from '../../models/task-list-model';\r\nimport { SelectedListService } from '../../services/tasks/selected-list.service';\r\n\r\n@Component({\r\n  standalone: true,\r\n  imports: [MatIcon, NgIf, SearchOverlordComponent],\r\n  selector: 'app-overlord-navigator-test',\r\n  templateUrl: './overlord-navigator.component.html',\r\n  styleUrls: ['./overlord-navigator.component.scss'],\r\n})\r\nexport class OverlordNavigatorComponentTest implements OnInit {\r\n  selectedOverlord: ExtendedTask | null = null;\r\n  selectedList: TaskListRules | null = null;\r\n\r\n  constructor(\r\n    // private taskNavigator: TaskNavigatorUltraService,\r\n    private selectedOverlordService: SelectedOverlordService,\r\n    private selectedListService: SelectedListService,\r\n    private taskListRules: TaskListRulesService\r\n  ) {}\r\n\r\n  ngOnInit(): void {\r\n    this.selectedOverlordService\r\n      .getSelectedOverlordObservable()\r\n      .subscribe((id: string | null) => {\r\n        if (id) {\r\n          const base = getBaseTask();\r\n          base.name = 'Selected Overlord Placeholder';\r\n          const e: ExtendedTask = {\r\n            isVisible: false,\r\n            animationState: 'highlighted',\r\n            ...base,\r\n          };\r\n          this.selectedOverlord = e;\r\n        }\r\n      });\r\n\r\n    this.selectedListService.selectedListKey$.subscribe(\r\n      (l: TaskListKey | null) => {\r\n        if (l) {\r\n          this.selectedList = this.taskListRules.getList(l);\r\n        }\r\n      }\r\n    );\r\n  }\r\n\r\n  goToSuperParent(): void {\r\n    if (!this.selectedOverlord) return;\r\n    console.log('this.taskNavigator.previous(this.selectedOverlord.taskId);');\r\n  }\r\n\r\n  goBack(): void {\r\n    if (!this.selectedOverlord) return;\r\n    console.log('this.taskNavigator.backToPrevious();');\r\n  }\r\n\r\n  goToOverlord(): void {\r\n    if (!this.selectedOverlord) return;\r\n    console.log('this.taskNavigator.next(this.selectedOverlord.taskId);');\r\n  }\r\n\r\n  goToRoot(): void {\r\n    console.log('this.taskNavigator.backToStart()');\r\n  }\r\n}\r\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ".overlord-navigator-container {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  align-items: center;\r\n  justify-content: space-between;\r\n  padding: 8px 16px;\r\n  background-color: #f0f4ff;\r\n  gap: 10px;\r\n\r\n  @media (max-width: 600px) {\r\n    flex-direction: column;\r\n    align-items: flex-start;\r\n  }\r\n}\r\n\r\n/* Overlord Title */\r\n.overlord-title {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  font-size: 1rem;\r\n  font-weight: 500;\r\n  color: #37474f;\r\n\r\n  .overlord-icon {\r\n    font-size: 20px;\r\n    color: #1e88e5;\r\n  }\r\n\r\n  .overlord-name {\r\n    max-width: 200px;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    white-space: nowrap;\r\n\r\n    @media (max-width: 600px) {\r\n      max-width: 100%;\r\n    }\r\n  }\r\n}\r\n\r\n/* Navigation Buttons */\r\n.overlord-navigator {\r\n  display: flex;\r\n  gap: 8px;\r\n\r\n  @media (max-width: 600px) {\r\n    width: 100%;\r\n    justify-content: space-between;\r\n  }\r\n\r\n  .task-btn {\r\n    width: 36px;\r\n    height: 36px;\r\n    background-color: #ffffff;\r\n    border: 1px solid #e0e0e0;\r\n    border-radius: 50%;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);\r\n    transition: background-color 0.2s, box-shadow 0.2s;\r\n\r\n    &:hover {\r\n      background-color: #e3f2fd;\r\n      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);\r\n    }\r\n\r\n    &[disabled] {\r\n      background-color: #f5f5f5;\r\n      cursor: not-allowed;\r\n    }\r\n\r\n    mat-icon {\r\n      font-size: 20px;\r\n      color: #1976d2;\r\n    }\r\n  }\r\n}\r\n\r\n/* Search Overlord Component */\r\napp-search-overlord {\r\n  flex-grow: 1;\r\n  max-width: 400px;\r\n  min-width: 200px;\r\n\r\n  @media (max-width: 600px) {\r\n    width: 100%;\r\n  }\r\n}\r\n",
+                    "styleUrl": "./overlord-navigator.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "selectedOverlordService",
+                        "type": "SelectedOverlordService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "selectedListService",
+                        "type": "SelectedListService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "taskListRules",
+                        "type": "TaskListRulesService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 23,
+                "jsdoctags": [
+                    {
+                        "name": "selectedOverlordService",
+                        "type": "SelectedOverlordService",
                         "deprecated": false,
                         "deprecationMessage": "",
                         "tagName": {
@@ -35485,6 +35842,438 @@
             "templateData": "<div class=\"task-navigator-layout\">\r\n  <div class=\"task-content-wrapper\">\r\n    <!-- Conditionally Render Artificer -->\r\n    <ng-container *ngIf=\"showArtificer\">\r\n      <app-artificer></app-artificer>\r\n    </ng-container>\r\n\r\n    <!-- Task List -->\r\n    <div class=\"task-list\">\r\n      <app-overlord-navigator></app-overlord-navigator>\r\n\r\n      <div *ngIf=\"tasks?.length === 0\" class=\"no-tasks\">\r\n        <p>No tasks yet.</p>\r\n        <!-- <button class=\"task-btn\" (click)=\"goBack(selectedOverlord)\">\r\n          <mat-icon>keyboard_double_arrow_left</mat-icon>\r\n        </button>\r\n        <button class=\"task-btn\" (click)=\"goBackPrevious(selectedOverlord)\">\r\n          <mat-icon>arrow_back</mat-icon>\r\n        </button> -->\r\n      </div>\r\n\r\n      <div\r\n        *ngFor=\"let task of tasks\"\r\n        class=\"task-container\"\r\n        [class.selected]=\"isSelected(task)\"\r\n      >\r\n        <div class=\"left-section\">\r\n          <div class=\"navigation-actions\">\r\n            <!-- <button class=\"task-btn\" (click)=\"onPrevious(task)\">\r\n              <mat-icon>arrow_back</mat-icon>\r\n            </button> -->\r\n            <button class=\"task-btn\" (click)=\"onNext(task)\">\r\n              <mat-icon>arrow_forward</mat-icon>\r\n            </button>\r\n          </div>\r\n          <app-task-mini [task]=\"task\"></app-task-mini>\r\n          <div *ngIf=\"isShowMoreEnabled()\" class=\"show-more\">\r\n            {{ task.why }} - {{ task.todo }}\r\n          </div>\r\n        </div>\r\n        <div class=\"right-section\">\r\n          <app-artificer-action\r\n            [treeNode]=\"getTreeNodeData(task)\"\r\n            [task]=\"task\"\r\n          ></app-artificer-action>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
         },
         {
+            "name": "TaskNavigatorComponent",
+            "id": "component-TaskNavigatorComponent-f71a90b3d32f6b0bcdcf8ccc0ba979aca983eb43df3380425320c750cf6c6548f23141912fe219891af9d71074a12830179dbe0581f9429a02c63d4f040f253a-1",
+            "file": "src/app/test-files/test-components/task-navigator/task-navigator.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-task-navigator",
+            "styleUrls": [],
+            "styles": [],
+            "templateUrl": [
+                "./task-navigator.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component } from '@angular/core';\r\n\r\n@Component({\r\n  selector: 'app-task-navigator',\r\n  standalone: true,\r\n  imports: [],\r\n  templateUrl: './task-navigator.component.html',\r\n  styleUrl: './task-navigator.component.scss'\r\n})\r\nexport class TaskNavigatorComponent {\r\n\r\n}\r\n",
+            "styleUrl": "./task-navigator.component.scss",
+            "assetsDirs": [],
+            "styleUrlsData": "",
+            "stylesData": "",
+            "extends": [],
+            "isDuplicate": true,
+            "duplicateId": 1,
+            "duplicateName": "TaskNavigatorComponent-1",
+            "templateData": "<p>task-navigator works!</p>\r\n"
+        },
+        {
+            "name": "TaskNavigatorTestComponent",
+            "id": "component-TaskNavigatorTestComponent-8f9396902d7cf0e5db154f837ae931831edb695844042ddee14dc59b73b6c1407a4d79ec7763c63e0adad3769d39bfb59a675076322ea05e8f1409a3da99351c",
+            "file": "src/app/components/task-navigator/task-navigator-test/task-navigator-test.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-task-navigator-test",
+            "styleUrls": [],
+            "styles": [],
+            "templateUrl": [
+                "./task-navigator-test.component.html"
+            ],
+            "viewProviders": [],
+            "hostDirectives": [],
+            "inputsClass": [
+                {
+                    "name": "showArtificer",
+                    "defaultValue": "false",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 34,
+                    "type": "boolean",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "errorMessage",
+                    "defaultValue": "null",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string | null",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 37
+                },
+                {
+                    "name": "selectedOverlord",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ExtendedTask | undefined",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 36
+                },
+                {
+                    "name": "selectedTasks",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Task[]",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 38
+                },
+                {
+                    "name": "tasks",
+                    "defaultValue": "null",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ExtendedTask[] | null",
+                    "indexKey": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 35
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "getTreeNodeData",
+                    "args": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "TaskTreeNodeData | undefined",
+                    "typeParameters": [],
+                    "line": 151,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nRetrieve tree node data for the specified task.\n",
+                    "description": "<p>Retrieve tree node data for the specified task.</p>\n",
+                    "jsdoctags": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "goBack",
+                    "args": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask | undefined",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "Promise<void>",
+                    "typeParameters": [],
+                    "line": 113,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nNavigate back to the previous view or selected overlord's tasks.\n",
+                    "description": "<p>Navigate back to the previous view or selected overlord&#39;s tasks.</p>\n",
+                    "modifierKind": [
+                        134
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask | undefined",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "goBackPrevious",
+                    "args": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask | undefined",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "Promise<void>",
+                    "typeParameters": [],
+                    "line": 128,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nNavigate back to the previous view or selected overlord's tasks.\n",
+                    "description": "<p>Navigate back to the previous view or selected overlord&#39;s tasks.</p>\n",
+                    "modifierKind": [
+                        134
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask | undefined",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "isSelected",
+                    "args": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "boolean",
+                    "typeParameters": [],
+                    "line": 158,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nCheck if a task is selected.\n",
+                    "description": "<p>Check if a task is selected.</p>\n",
+                    "jsdoctags": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "isShowMoreEnabled",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "boolean",
+                    "typeParameters": [],
+                    "line": 144,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nCheck if \"Show More\" feature is enabled for the task.\n",
+                    "description": "<p>Check if &quot;Show More&quot; feature is enabled for the task.</p>\n"
+                },
+                {
+                    "name": "logError",
+                    "args": [
+                        {
+                            "name": "message",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 165,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nLog errors in the console and optionally handle display.\n",
+                    "description": "<p>Log errors in the console and optionally handle display.</p>\n",
+                    "modifierKind": [
+                        123
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "message",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 48,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "onNext",
+                    "args": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "Promise<void>",
+                    "typeParameters": [],
+                    "line": 101,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "rawdescription": "\n\nNavigate to the next set of tasks for a given task.\n",
+                    "description": "<p>Navigate to the next set of tasks for a given task.</p>\n",
+                    "modifierKind": [
+                        134
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "task",
+                            "type": "ExtendedTask",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "standalone": true,
+            "imports": [
+                {
+                    "name": "MatCardModule",
+                    "type": "module"
+                },
+                {
+                    "name": "MatIcon"
+                },
+                {
+                    "name": "CommonModule",
+                    "type": "module"
+                },
+                {
+                    "name": "TaskMiniComponent",
+                    "type": "component"
+                },
+                {
+                    "name": "ArtificerComponent",
+                    "type": "component"
+                },
+                {
+                    "name": "OverlordNavigatorComponentTest",
+                    "type": "component"
+                },
+                {
+                    "name": "ArtificerActionComponentTest",
+                    "type": "component"
+                }
+            ],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, Input } from '@angular/core';\r\nimport { ExtendedTask } from '../../../models/taskModelManager';\r\nimport { TaskTreeNodeData } from '../../../models/taskTree';\r\nimport { TreeService } from '../../../services/core/tree.service';\r\nimport { SelectedMultipleService } from '../../../services/task/selected-multiple.service';\r\nimport { Task } from '../../../models/taskModelManager';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatCardModule } from '@angular/material/card';\r\nimport { MatIcon } from '@angular/material/icon';\r\nimport { ArtificerComponent } from '../../artificer/artificer.component';\r\nimport { TaskMiniComponent } from '../../task/task-mini/task-mini.component';\r\nimport { OverlordNavigatorComponentTest } from '../../overlord-navigator/overlord-navigator-test.component';\r\nimport { TaskListKey, TaskListType } from '../../../models/task-list-model';\r\nimport { getRandomTasks } from '../../../test-files/test-data/test-task';\r\nimport { TaskTransmutationService } from '../../../services/tasks/task-transmutation.service';\r\nimport { ArtificerActionComponentTest } from '../../task/artificer-action/artificer-action-test.component';\r\n\r\n@Component({\r\n  selector: 'app-task-navigator-test',\r\n  standalone: true,\r\n  imports: [\r\n    MatCardModule,\r\n    MatIcon,\r\n    CommonModule,\r\n    TaskMiniComponent,\r\n    ArtificerComponent,\r\n    OverlordNavigatorComponentTest,\r\n    ArtificerActionComponentTest,\r\n  ],\r\n  templateUrl: './task-navigator-test.component.html',\r\n  styleUrl: '../task-navigator.component.scss',\r\n})\r\nexport class TaskNavigatorTestComponent {\r\n  @Input() showArtificer: boolean = false;\r\n  tasks: ExtendedTask[] | null = null; // Support any list of tasks\r\n  selectedOverlord: ExtendedTask | undefined;\r\n  errorMessage: string | null = null;\r\n  selectedTasks: Task[] = [];\r\n\r\n  constructor(\r\n    // private navigatorService: TaskNavigatorUltraService,\r\n    private treeService: TreeService,\r\n    private selectedMultiple: SelectedMultipleService,\r\n    // private viewService: TaskViewService,\r\n    private transmute: TaskTransmutationService\r\n  ) {}\r\n\r\n  ngOnInit(): void {\r\n    // Subscribe to TaskViewService for task updates\r\n    // if (this.tasks && this.taskGroupName) {\r\n    //   // in case tasks are passed, we can initialize them to simplify the caller job, it will only have to get data and pass that data\r\n    //   // otherwise it just has to get data, give to tasknavigatorultra to init\r\n    //   this.navigatorService.loadAndInitializeTasks(\r\n    //     this.tasks,\r\n    //     this.taskGroupName\r\n    //   );\r\n    // }\r\n\r\n    // this.viewService.tasks$.subscribe({\r\n    //   next: (tasks) => {\r\n    //     this.tasks = tasks;\r\n    //     this.errorMessage = null;\r\n    //   },\r\n    //   error: (err) => {\r\n    //     console.error('Error updating tasks:', err);\r\n    //     this.errorMessage = 'Failed to update tasks.';\r\n    //   },\r\n    // });\r\n\r\n    const tasks: Task[] = getRandomTasks();\r\n    const originalListGroup: TaskListKey = {\r\n      type: TaskListType.DAILY,\r\n      data: '',\r\n    };\r\n\r\n    this.tasks = this.transmute.toExtendedTasks(tasks);\r\n    // this.navigatorService.loadAndInitializeTasks(tasks, originalListGroup);\r\n\r\n    this.selectedMultiple\r\n      .getSelectedTasks()\r\n      .subscribe((selectedTasks: Task[]) => {\r\n        this.selectedTasks = selectedTasks;\r\n      });\r\n  }\r\n\r\n  /**\r\n   * Navigate to the previous set of tasks for a given task.\r\n   */\r\n  // async onPrevious(task: ExtendedTask): Promise<void> {\r\n  //   try {\r\n  //     await this.navigatorService.previous(task);\r\n  //   } catch (error) {\r\n  //     console.error('Error navigating to previous tasks:', error);\r\n  //     this.errorMessage = 'Failed to navigate to previous tasks.';\r\n  //   }\r\n  // }\r\n\r\n  /**\r\n   * Navigate to the next set of tasks for a given task.\r\n   */\r\n  async onNext(task: ExtendedTask): Promise<void> {\r\n    // try {\r\n    //   await this.navigatorService.next(task.taskId);\r\n    // } catch (error) {\r\n    //   console.error('Error navigating to next tasks:', error);\r\n    //   this.errorMessage = 'Failed to navigate to next tasks.';\r\n    // }\r\n  }\r\n\r\n  /**\r\n   * Navigate back to the previous view or selected overlord's tasks.\r\n   */\r\n  async goBack(task: ExtendedTask | undefined): Promise<void> {\r\n    // try {\r\n    //   // if (!task || !task.overlord) {\r\n    //   //   this.logError('No task or overlord available.');\r\n    //   //   return;\r\n    //   // }\r\n    //   await this.navigatorService.backToStart();\r\n    // } catch (error) {\r\n    //   console.error('Error navigating back:', error);\r\n    //   this.errorMessage = 'Failed to navigate back.';\r\n    // }\r\n  }\r\n  /**\r\n   * Navigate back to the previous view or selected overlord's tasks.\r\n   */\r\n  async goBackPrevious(task: ExtendedTask | undefined): Promise<void> {\r\n    // try {\r\n    //   // if (!task || !task.overlord) {\r\n    //   //   this.logError('No task or overlord available.');\r\n    //   //   return;\r\n    //   // }\r\n    //   await this.navigatorService.backToPrevious();\r\n    // } catch (error) {\r\n    //   console.error('Error navigating back:', error);\r\n    //   this.errorMessage = 'Failed to navigate back.';\r\n    // }\r\n  }\r\n\r\n  /**\r\n   * Check if \"Show More\" feature is enabled for the task.\r\n   */\r\n  isShowMoreEnabled(): boolean {\r\n    return false; // Placeholder: Update this logic as needed.\r\n  }\r\n\r\n  /**\r\n   * Retrieve tree node data for the specified task.\r\n   */\r\n  getTreeNodeData(task: ExtendedTask): TaskTreeNodeData | undefined {\r\n    return this.treeService.getTaskTreeData(task.taskId);\r\n  }\r\n\r\n  /**\r\n   * Check if a task is selected.\r\n   */\r\n  isSelected(task: ExtendedTask): boolean {\r\n    return this.selectedTasks.indexOf(task) > -1;\r\n  }\r\n\r\n  /**\r\n   * Log errors in the console and optionally handle display.\r\n   */\r\n  private logError(message: string): void {\r\n    console.error(message);\r\n    this.errorMessage = message;\r\n  }\r\n}\r\n",
+            "styleUrl": "../task-navigator.component.scss",
+            "assetsDirs": [],
+            "styleUrlsData": "",
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "treeService",
+                        "type": "TreeService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "selectedMultiple",
+                        "type": "SelectedMultipleService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "transmute",
+                        "type": "TaskTransmutationService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 38,
+                "jsdoctags": [
+                    {
+                        "name": "treeService",
+                        "type": "TreeService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "selectedMultiple",
+                        "type": "SelectedMultipleService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "transmute",
+                        "type": "TaskTransmutationService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "extends": [],
+            "templateData": "<div class=\"task-navigator-layout\">\r\n  <div class=\"task-content-wrapper\">\r\n    <!-- Conditionally Render Artificer -->\r\n    <ng-container *ngIf=\"showArtificer\">\r\n      <app-artificer></app-artificer>\r\n    </ng-container>\r\n\r\n    <!-- Task List -->\r\n    <div class=\"task-list\">\r\n      <app-overlord-navigator-test></app-overlord-navigator-test>\r\n\r\n      <div *ngIf=\"tasks?.length === 0\" class=\"no-tasks\">\r\n        <p>No tasks yet.</p>\r\n        <!-- <button class=\"task-btn\" (click)=\"goBack(selectedOverlord)\">\r\n          <mat-icon>keyboard_double_arrow_left</mat-icon>\r\n        </button>\r\n        <button class=\"task-btn\" (click)=\"goBackPrevious(selectedOverlord)\">\r\n          <mat-icon>arrow_back</mat-icon>\r\n        </button> -->\r\n      </div>\r\n\r\n      <div *ngFor=\"let task of tasks\" class=\"task-container\">\r\n        <div class=\"left-section\">\r\n          <div class=\"navigation-actions\">\r\n            <!-- <button class=\"task-btn\" (click)=\"onPrevious(task)\">\r\n              <mat-icon>arrow_back</mat-icon>\r\n            </button> -->\r\n            <button class=\"task-btn\" (click)=\"onNext(task)\">\r\n              <mat-icon>arrow_forward</mat-icon>\r\n            </button>\r\n          </div>\r\n          <app-task-mini [task]=\"task\"></app-task-mini>\r\n          <div *ngIf=\"isShowMoreEnabled()\" class=\"show-more\">\r\n            {{ task.why }} - {{ task.todo }}\r\n          </div>\r\n        </div>\r\n        <div class=\"right-section\">\r\n          <app-artificer-action-test\r\n            [treeNode]=\"getTreeNodeData(task)\"\r\n            [task]=\"task\"\r\n          ></app-artificer-action-test>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+        },
+        {
             "name": "TaskSessionDialogComponent",
             "id": "component-TaskSessionDialogComponent-4420a972d736e4ec41832cfd390884dfea6ded6366506206610c765aedbbe6892f5107d2e687dcb511454e016412e4d2ed1f2b107cc97094f3cec7c1141022e7",
             "file": "src/app/features/core/nexus/session/task-session-dialog/task-session-dialog.component.ts",
@@ -37228,16 +38017,6 @@
                 "defaultValue": "[\r\n  {\r\n    path: 'citadel',\r\n    loadChildren: () =>\r\n      import('./features/core/citadel/citadel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['citadel'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'crucible',\r\n    loadChildren: () =>\r\n      import('./features/core/crucible/crucible-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['crucible'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'dreamforge',\r\n    loadChildren: () =>\r\n      import('./features/core/dreamforge/dreamforge-routes').then(\r\n        (m) => m.default\r\n      ),\r\n    data: CORE_APP_METADATA['dreamforge'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'gateway',\r\n    loadChildren: () =>\r\n      import('./features/core/gateway/gateway-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'nexus',\r\n    loadChildren: () =>\r\n      import('./features/core/nexus/nexus-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['nexus'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'sentinel',\r\n    loadChildren: () =>\r\n      import('./features/core/sentinel/sentinel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['sentinel'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'vortex',\r\n    loadChildren: () =>\r\n      import('./features/core/vortex/vortex-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  { path: '', redirectTo: 'gateway', pathMatch: 'full' },\r\n  { path: '**', redirectTo: 'gateway' },\r\n]"
             },
             {
-                "name": "routesTesting",
-                "ctype": "miscellaneous",
-                "subtype": "variable",
-                "file": "src/app/app.routes.ts",
-                "deprecated": false,
-                "deprecationMessage": "",
-                "type": "Route[]",
-                "defaultValue": "[\r\n  {\r\n    path: 'citadel',\r\n    loadChildren: () =>\r\n      import('./features/core/citadel/citadel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['citadel'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'crucible',\r\n    loadChildren: () =>\r\n      import('./features/core/crucible/crucible-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['crucible'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'dreamforge',\r\n    loadChildren: () =>\r\n      import('./features/core/dreamforge/dreamforge-routes').then(\r\n        (m) => m.default\r\n      ),\r\n    data: CORE_APP_METADATA['dreamforge'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'gateway',\r\n    loadChildren: () =>\r\n      import('./features/core/gateway/gateway-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'nexus',\r\n    loadChildren: () =>\r\n      import('./features/core/nexus/nexus-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['nexus'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'sentinel',\r\n    loadChildren: () =>\r\n      import('./features/core/sentinel/sentinel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['sentinel'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'vortex',\r\n    loadChildren: () =>\r\n      import('./features/core/vortex/vortex-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  { path: '', redirectTo: 'gateway', pathMatch: 'full' },\r\n  { path: '**', redirectTo: 'gateway' },\r\n]"
-            },
-            {
                 "name": "SENSITIVE_CONFIG",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
@@ -37446,6 +38225,94 @@
                 ]
             },
             {
+                "name": "generateRandomTask",
+                "file": "src/app/test-files/test-data/test-task.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": [
+                    {
+                        "name": "overlord",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "defaultValue": "ROOT_TASK_ID"
+                    }
+                ],
+                "returnType": "Task",
+                "jsdoctags": [
+                    {
+                        "name": "overlord",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "defaultValue": "ROOT_TASK_ID",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "generateTaskTree",
+                "file": "src/app/test-files/test-data/test-task.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": [
+                    {
+                        "name": "rootId",
+                        "type": "string",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "depth",
+                        "type": "number",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "breadth",
+                        "type": "number",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "returnType": "Task[]",
+                "jsdoctags": [
+                    {
+                        "name": "rootId",
+                        "type": "string",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "depth",
+                        "type": "number",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "breadth",
+                        "type": "number",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
                 "name": "getBaseTask",
                 "file": "src/app/models/taskModelManager.ts",
                 "ctype": "miscellaneous",
@@ -37594,6 +38461,43 @@
                         }
                     }
                 ]
+            },
+            {
+                "name": "getRandomElement",
+                "file": "src/app/test-files/test-data/test-task.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": [
+                    {
+                        "name": "array",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "returnType": "T",
+                "jsdoctags": [
+                    {
+                        "name": "array",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "getRandomTasks",
+                "file": "src/app/test-files/test-data/test-task.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": []
             }
         ],
         "typealiases": [
@@ -38414,16 +39318,6 @@
                     "deprecationMessage": "",
                     "type": "Route[]",
                     "defaultValue": "[\r\n  {\r\n    path: 'citadel',\r\n    loadChildren: () =>\r\n      import('./features/core/citadel/citadel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['citadel'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'crucible',\r\n    loadChildren: () =>\r\n      import('./features/core/crucible/crucible-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['crucible'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'dreamforge',\r\n    loadChildren: () =>\r\n      import('./features/core/dreamforge/dreamforge-routes').then(\r\n        (m) => m.default\r\n      ),\r\n    data: CORE_APP_METADATA['dreamforge'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'gateway',\r\n    loadChildren: () =>\r\n      import('./features/core/gateway/gateway-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'nexus',\r\n    loadChildren: () =>\r\n      import('./features/core/nexus/nexus-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['nexus'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'sentinel',\r\n    loadChildren: () =>\r\n      import('./features/core/sentinel/sentinel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['sentinel'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  {\r\n    path: 'vortex',\r\n    loadChildren: () =>\r\n      import('./features/core/vortex/vortex-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator\r\n    canActivate: [canActivate],\r\n    canActivateChild: [canActivateChild],\r\n  },\r\n  { path: '', redirectTo: 'gateway', pathMatch: 'full' },\r\n  { path: '**', redirectTo: 'gateway' },\r\n]"
-                },
-                {
-                    "name": "routesTesting",
-                    "ctype": "miscellaneous",
-                    "subtype": "variable",
-                    "file": "src/app/app.routes.ts",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "Route[]",
-                    "defaultValue": "[\r\n  {\r\n    path: 'citadel',\r\n    loadChildren: () =>\r\n      import('./features/core/citadel/citadel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['citadel'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'crucible',\r\n    loadChildren: () =>\r\n      import('./features/core/crucible/crucible-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['crucible'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'dreamforge',\r\n    loadChildren: () =>\r\n      import('./features/core/dreamforge/dreamforge-routes').then(\r\n        (m) => m.default\r\n      ),\r\n    data: CORE_APP_METADATA['dreamforge'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'gateway',\r\n    loadChildren: () =>\r\n      import('./features/core/gateway/gateway-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'nexus',\r\n    loadChildren: () =>\r\n      import('./features/core/nexus/nexus-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['nexus'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'sentinel',\r\n    loadChildren: () =>\r\n      import('./features/core/sentinel/sentinel-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['sentinel'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  {\r\n    path: 'vortex',\r\n    loadChildren: () =>\r\n      import('./features/core/vortex/vortex-routes').then((m) => m.default),\r\n    data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator\r\n    canActivate: [canActivateTesting],\r\n    canActivateChild: [canActivateChildTesting],\r\n  },\r\n  { path: '', redirectTo: 'gateway', pathMatch: 'full' },\r\n  { path: '**', redirectTo: 'gateway' },\r\n]"
                 }
             ],
             "src/app/features/core/sentinel/sentinel-routes.ts": [
@@ -38611,6 +39505,133 @@
                             }
                         }
                     ]
+                }
+            ],
+            "src/app/test-files/test-data/test-task.ts": [
+                {
+                    "name": "generateRandomTask",
+                    "file": "src/app/test-files/test-data/test-task.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "overlord",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "defaultValue": "ROOT_TASK_ID"
+                        }
+                    ],
+                    "returnType": "Task",
+                    "jsdoctags": [
+                        {
+                            "name": "overlord",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "defaultValue": "ROOT_TASK_ID",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "generateTaskTree",
+                    "file": "src/app/test-files/test-data/test-task.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "rootId",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "depth",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "breadth",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "returnType": "Task[]",
+                    "jsdoctags": [
+                        {
+                            "name": "rootId",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "depth",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "breadth",
+                            "type": "number",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getRandomElement",
+                    "file": "src/app/test-files/test-data/test-task.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "array",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "returnType": "T",
+                    "jsdoctags": [
+                        {
+                            "name": "array",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getRandomTasks",
+                    "file": "src/app/test-files/test-data/test-task.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": []
                 }
             ],
             "src/app/models/taskModelManager.ts": [
@@ -39228,16 +40249,6 @@
                 "status": "low"
             },
             {
-                "filePath": "src/app/app.routes.ts",
-                "type": "variable",
-                "linktype": "miscellaneous",
-                "linksubtype": "variable",
-                "name": "routesTesting",
-                "coveragePercent": 0,
-                "coverageCount": "0/1",
-                "status": "low"
-            },
-            {
                 "filePath": "src/app/components/artificer/artificer.component.ts",
                 "type": "component",
                 "linktype": "component",
@@ -39302,12 +40313,30 @@
                 "status": "low"
             },
             {
+                "filePath": "src/app/components/horizontal-navigation/horizontal-navigation-test/horizontal-navigation-test.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "HorizontalNavigationComponentTest",
+                "coveragePercent": 18,
+                "coverageCount": "3/16",
+                "status": "low"
+            },
+            {
                 "filePath": "src/app/components/horizontal-navigation/horizontal-navigation.component.ts",
                 "type": "component",
                 "linktype": "component",
                 "name": "HorizontalNavigationComponent",
                 "coveragePercent": 18,
                 "coverageCount": "3/16",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/overlord-navigator/overlord-navigator-test.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "OverlordNavigatorComponentTest",
+                "coveragePercent": 0,
+                "coverageCount": "0/9",
                 "status": "low"
             },
             {
@@ -39329,6 +40358,15 @@
                 "status": "low"
             },
             {
+                "filePath": "src/app/components/task-navigator/task-navigator-test/task-navigator-test.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "TaskNavigatorTestComponent",
+                "coveragePercent": 46,
+                "coverageCount": "7/15",
+                "status": "medium"
+            },
+            {
                 "filePath": "src/app/components/task-navigator/task-navigator.component.ts",
                 "type": "component",
                 "linktype": "component",
@@ -39344,6 +40382,15 @@
                 "name": "TaskActionComponent",
                 "coveragePercent": 11,
                 "coverageCount": "1/9",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/task/artificer-action/artificer-action-test.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "ArtificerActionComponentTest",
+                "coveragePercent": 0,
+                "coverageCount": "0/12",
                 "status": "low"
             },
             {
@@ -41270,15 +42317,6 @@
                 "status": "low"
             },
             {
-                "filePath": "src/app/test-files/navigation/navigation.component.ts",
-                "type": "component",
-                "linktype": "component",
-                "name": "NavigationComponent",
-                "coveragePercent": 0,
-                "coverageCount": "0/20",
-                "status": "low"
-            },
-            {
                 "filePath": "src/app/test-files/other-files/app.animations.ts",
                 "type": "variable",
                 "linktype": "miscellaneous",
@@ -41335,6 +42373,55 @@
                 "name": "TestAppComponent",
                 "coveragePercent": 0,
                 "coverageCount": "0/8",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/test-files/test-components/task-navigator/task-navigator.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "TaskNavigatorComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/test-files/test-data/test-task.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "generateRandomTask",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/test-files/test-data/test-task.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "generateTaskTree",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/test-files/test-data/test-task.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "getRandomElement",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/test-files/test-data/test-task.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "getRandomTasks",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
                 "status": "low"
             },
             {
