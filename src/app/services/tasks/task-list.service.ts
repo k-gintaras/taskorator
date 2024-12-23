@@ -45,7 +45,7 @@ export class TaskListService {
 
     if (cacheState?.hasGroupAndEmptyTasks) {
       console.log(
-        'getTaskGroupWithCache: cached and empty' +
+        'getTaskGroupWithCache: cached and empty ' +
           taskListKey.type +
           taskListKey.data
       );
@@ -54,7 +54,7 @@ export class TaskListService {
 
     if (cacheState?.hasGroupAndCachedTasks) {
       console.log(
-        'getTaskGroupWithCache: fully cached' +
+        'getTaskGroupWithCache: fully cached ' +
           taskListKey.type +
           taskListKey.data
       );
@@ -65,7 +65,7 @@ export class TaskListService {
     // not cached as a list
     if (!cacheState) {
       console.log(
-        'getTaskGroupWithCache: no group not cached' +
+        'getTaskGroupWithCache: no group not cached ' +
           taskListKey.type +
           taskListKey.data
       );
@@ -79,7 +79,7 @@ export class TaskListService {
     // not cached as a list
     if (cacheState.hasGroupAndNotCachedTasks) {
       console.log(
-        'getTaskGroupWithCache: has group but not cached tasks' +
+        'getTaskGroupWithCache: has group but not cached tasks ' +
           taskListKey.type +
           taskListKey.data
       );
@@ -93,7 +93,7 @@ export class TaskListService {
     // partially cached, fetch missing, add and return
     if (cacheState?.hasGroupAndSomeCachedTasks) {
       console.log(
-        'getTaskGroupWithCache: has group and some cached tasks' +
+        'getTaskGroupWithCache: has group and some cached tasks ' +
           taskListKey.type +
           taskListKey.data
       );

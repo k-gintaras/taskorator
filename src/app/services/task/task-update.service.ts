@@ -40,7 +40,7 @@ export class TaskUpdateService extends CoreService {
   move(targetTask: Task) {
     firstValueFrom(this.selectedService.getSelectedTasks()).then(
       (selectedTasks) => {
-        if (selectedTasks && targetTask.taskId) {
+        if (selectedTasks.length > 0 && targetTask.taskId) {
           for (const task of selectedTasks) {
             task.overlord = targetTask.taskId;
           }

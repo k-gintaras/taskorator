@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { Task } from '../../models/taskModelManager';
 
+/**
+ * must pass task object or else task tree will not be able to add tasks with names...
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -39,19 +43,19 @@ export class EventBusService {
     return this.subjects.get(event)?.asObservable() ?? new Observable();
   }
 
-  getTaskById(taskId: string): void {
+  getTaskById(taskId: Task): void {
     this.emit('getTaskById', taskId);
   }
 
-  getLatestTaskId(taskId: string): void {
+  getLatestTaskId(taskId: Task): void {
     this.emit('getLatestTaskId', taskId);
   }
 
-  getSuperOverlord(taskId: string): void {
+  getSuperOverlord(taskId: Task): void {
     this.emit('getSuperOverlord', taskId);
   }
 
-  getOverlordChildren(taskIds: string[]): void {
+  getOverlordChildren(taskIds: Task[]): void {
     this.emit('getOverlordChildren', taskIds);
   }
 
@@ -60,19 +64,19 @@ export class EventBusService {
   }
 
   // Emit just IDs or arrays of IDs instead of full objects
-  createTask(taskId: string): void {
+  createTask(taskId: Task): void {
     this.emit('createTask', taskId);
   }
 
-  updateTask(taskId: string): void {
+  updateTask(taskId: Task): void {
     this.emit('updateTask', taskId);
   }
 
-  createTasks(taskIds: string[]): void {
+  createTasks(taskIds: Task[]): void {
     this.emit('createTasks', taskIds);
   }
 
-  updateTasks(taskIds: string[]): void {
+  updateTasks(taskIds: Task[]): void {
     this.emit('updateTasks', taskIds);
   }
 }

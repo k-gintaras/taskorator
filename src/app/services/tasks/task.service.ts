@@ -45,7 +45,7 @@ export class TaskService {
         `overlord_${task.overlord}`
       ); // Notify TaskIdCache of update
 
-      this.eventBusService.createTask(extendedTask.taskId);
+      this.eventBusService.createTask(createdTask);
       return extendedTask;
     } catch (error) {
       console.error('Error creating task:', error);
@@ -71,7 +71,7 @@ export class TaskService {
       } else {
         this.taskIdCache.updateTasks([extendedTask]); // Notify TaskIdCache of update
         // this.taskCache.addTask(extendedTask); // Update the cache
-        this.eventBusService.updateTask(extendedTask.taskId);
+        this.eventBusService.updateTask(task);
       }
     } catch (error) {
       console.error('Error updating task:', error);
@@ -94,7 +94,7 @@ export class TaskService {
       if (task) {
         const extendedTask = this.transmutatorService.toExtendedTask(task);
         this.taskCache.addTask(extendedTask); // Cache ExtendedTask
-        this.eventBusService.getTaskById(extendedTask.taskId);
+        this.eventBusService.getTaskById(task);
         return extendedTask;
       } else {
         console.log(`Task ${taskId} not found`);
@@ -163,7 +163,7 @@ export class TaskService {
         if (superOverlordTask) {
           task = this.transmutatorService.toExtendedTask(superOverlordTask); // Convert to ExtendedTask
           this.taskCache.addTask(task); // Cache the ExtendedTask
-          this.eventBusService.getSuperOverlord(task.taskId); // Emit event for listeners
+          this.eventBusService.getSuperOverlord(task); // Emit event for listeners
         }
       }
       return task;

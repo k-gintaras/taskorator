@@ -54,7 +54,7 @@ export class TaskBatchService {
       const ids = this.transmutatorService.getIds(extendedTasks);
 
       // Notify other services
-      this.eventBusService.createTasks(ids);
+      this.eventBusService.createTasks(tasks);
       this.taskActionService.recordBatchAction(ids, TaskActions.CREATED);
 
       return extendedTasks;
@@ -124,7 +124,7 @@ export class TaskBatchService {
       const ids = this.transmutatorService.getIds(extendedTasks);
 
       // Notify other services
-      this.eventBusService.updateTasks(ids);
+      this.eventBusService.updateTasks(tasks);
       this.taskActionService.recordBatchAction(ids, action, subAction);
     } catch (error) {
       console.error('Failed to update task batch:', error);

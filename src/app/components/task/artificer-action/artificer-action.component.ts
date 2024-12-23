@@ -20,6 +20,7 @@ export class ArtificerActionComponent {
   @Input() task: Task | undefined;
   currentAction!: ArtificerDetails;
   @Input() treeNode: TaskTreeNodeData | undefined;
+  @Input() protectTaskFromDelete: boolean = true;
 
   constructor(
     private taskUpdateService: TaskUpdateService,
@@ -55,6 +56,9 @@ export class ArtificerActionComponent {
   }
 
   hasIncompleteChildren() {
+    // fixed gives wrong answer for some reason
+    // all tasks completed... maybe it includes itself?
+    // tasks were not being sent to task tree because they were received as just taskId through eventbus
     if (!this.treeNode) return false;
     if (this.treeNode.childrenCount < 1) return false;
     if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount)
@@ -71,9 +75,10 @@ export class ArtificerActionComponent {
   }
 
   isActionRestricted(action: string): boolean {
+    // we allow move, because we not moving it (which is not allowed), we moving tasks into it
+    if (!this.protectTaskFromDelete) return false;
     return (
-      this.hasIncompleteChildren() &&
-      ['delete', 'complete', 'move'].includes(action)
+      this.hasIncompleteChildren() && ['delete', 'complete'].includes(action)
     );
   }
 
