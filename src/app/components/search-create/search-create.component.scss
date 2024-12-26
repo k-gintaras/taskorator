@@ -1,0 +1,90 @@
+.search-create-container {
+  position: relative; /* Make the container a positioning reference for the absolute list */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 1px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #ffffff72;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 800px) {
+    max-width: 400px;
+  }
+  @media (max-width: 600px) {
+    max-width: 300px;
+  }
+  @media (max-width: 400px) {
+    max-width: 250px;
+  }
+}
+
+.search-create-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .search-bar {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.search-results {
+  position: absolute; /* Position the results list outside the container */
+  top: 100%; /* Align it just below the container */
+  left: 0;
+  width: 100%; /* Make it match the container width */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Elevate the list */
+  z-index: 1000; /* Ensure it stays above other elements */
+  max-height: 200px; /* Limit the height for large result sets */
+  overflow-y: auto; /* Add scrolling for long lists */
+}
+
+.search-results p {
+  margin: 8px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  transition: background-color 0.2s, color 0.2s;
+  color: #333;
+
+  &:hover {
+    background-color: #e0e0e0;
+    color: #000;
+  }
+
+  &.selected {
+    background-color: #d1e7dd;
+    color: #155724;
+    font-weight: bold;
+  }
+}
+
+mat-icon-button {
+  padding: 2px;
+  min-width: 24px;
+  height: 24px;
+  color: black;
+}
+
+@media (max-width: 400px) {
+  .search-results {
+    max-height: 150px; /* Adjust for small screens */
+  }
+
+  mat-icon-button {
+    min-width: 20px;
+    height: 20px;
+  }
+
+  .search-results p {
+    font-size: 0.8rem;
+  }
+}

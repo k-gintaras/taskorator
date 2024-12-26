@@ -2,7 +2,9 @@
   <div class="task-content-wrapper">
     <!-- Conditionally Render Artificer -->
     <ng-container *ngIf="showArtificer">
-      <app-artificer></app-artificer>
+      <div class="app-artificer-container">
+        <app-artificer></app-artificer>
+      </div>
     </ng-container>
 
     <!-- Task List -->
@@ -10,15 +12,13 @@
       <app-overlord-navigator></app-overlord-navigator>
 
       <div *ngIf="tasks?.length === 0" class="no-tasks">
-        <p>No tasks yet.</p>
-        <!-- <button class="task-btn" (click)="goBack(selectedOverlord)">
-          <mat-icon>keyboard_double_arrow_left</mat-icon>
-        </button>
-        <button class="task-btn" (click)="goBackPrevious(selectedOverlord)">
-          <mat-icon>arrow_back</mat-icon>
-        </button> -->
+        <app-task-edit [task]="selectedOverlord"></app-task-edit>
+        <p>No other tasks yet.</p>
       </div>
-
+      <div *ngIf="canShowInfo()" class="no-tasks">
+        <app-task-card [task]="selectedOverlord"></app-task-card>
+      </div>
+      <div class="gap"></div>
       <div
         *ngFor="let task of tasks"
         class="task-container"

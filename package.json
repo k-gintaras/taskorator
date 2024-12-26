@@ -61,6 +61,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "storybook": "^8.4.7",
-    "typescript": "~5.4.2"
+    "typescript": "~5.4.2",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-hot-middleware": "^2.26.1"
   }
 }

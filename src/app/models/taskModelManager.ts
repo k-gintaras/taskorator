@@ -11,9 +11,9 @@ export interface Task {
   repeat: RepeatOptions;
   status: TaskStatus; // Task status options
   stage: TaskStage; // Task stage options
-  type: TaskType;
-  subtype: TaskSubtype;
-  size: TaskSize; // we can delegate this to another owner or something
+  type: TaskType; // basically this defines size of project anyway
+  subtype: TaskSubtype; // good if code, we can make it pretty...
+  size: TaskSize; // we can delegate this to another owner or something, probably rename... its what action shall be taken ?
   owner: string; // for future use of who does whose tasks
   priority: number; // Task priority (1 to 10, for example)
   backupLink: string; // github, file location, web link, nothing
@@ -111,7 +111,7 @@ export type TaskSubtype =
   | 'list';
 
 export const ROOT_TASK_ID = '128';
-export const ROOT_TASK_DESCRIPTION = 'where everything connects';
+export const ROOT_TASK_DESCRIPTION = 'connecting to make sense';
 
 export function getDefaultTask(): Task {
   const now = Date.now(); // Current time in milliseconds
@@ -144,7 +144,7 @@ export function getBaseTask(): Task {
   const now = Date.now(); // Current time in milliseconds
   return {
     taskId: ROOT_TASK_ID,
-    name: 'Me',
+    name: 'Root',
     todo: '',
     why: ROOT_TASK_DESCRIPTION,
     timeCreated: now,

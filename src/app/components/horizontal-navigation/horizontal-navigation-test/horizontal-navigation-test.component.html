@@ -1,24 +1,33 @@
 <mat-toolbar class="toolbar">
-  <!-- Floating Button for Mobile -->
-  <button mat-fab color="primary" (click)="toggleDrawer()">
-    <mat-icon>menu</mat-icon>
-  </button>
+  <!-- Conditional Rendering: Show all items -->
+  <ng-container *ngIf="!isCompact">
+    <!-- Menu Button -->
+    <button mat-icon-button (click)="toggleDrawer()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
-  <!-- App Title -->
-  <span class="app-title">Taskorator</span>
+    <!-- App Title -->
+    <span class="app-title">Taskorator</span>
 
-  <!-- Overlord Navigator -->
-  <!-- <div class="overlord-navigator-wrapper" *ngIf="!isHandset">
-    <app-overlord-navigator></app-overlord-navigator>
-  </div> -->
+    <!-- Search Toggle Button -->
+    <app-search-create-test></app-search-create-test>
+  </ng-container>
+
+  <!-- Compact View: One item at a time -->
+  <ng-container *ngIf="isCompact">
+    <button mat-icon-button (click)="toggleDrawer()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <app-search-create-test></app-search-create-test>
+  </ng-container>
 </mat-toolbar>
 
 <!-- Main Sidenav Container -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
     #drawer
-    [mode]="isHandset ? 'over' : 'side'"
-    [opened]="!isHandset || drawer.opened"
+    [mode]="isCompact ? 'over' : 'side'"
+    [opened]="!isCompact || drawer.opened"
     class="sidenav"
   >
     <ul class="nav-list">

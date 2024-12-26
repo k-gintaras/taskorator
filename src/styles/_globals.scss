@@ -1,0 +1,35 @@
+/* Alignment Utilities */
+.align-top {
+  align-items: flex-start;
+}
+
+.align-center {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Padding Utility */
+.padding-sm {
+  padding: 5px;
+}
+
+.padding-md {
+  padding: 10px;
+}
+
+.padding-lg {
+  padding: 20px;
+}
+
+/* Gap Utilities */
+.gap-sm {
+  gap: 5px;
+}
+
+.gap-md {
+  gap: 10px;
+}
+
+.gap-lg {
+  gap: 20px;
+}

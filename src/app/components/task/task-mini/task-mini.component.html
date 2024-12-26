@@ -1,18 +1,7 @@
 <div
-  class="mini-task-details"
   [ngClass]="{ 'selected-task': isSelected(task) }"
   (click)="onTaskCardClick(task)"
 >
   <!-- Use the safe navigation operator to safely access task properties -->
   <p class="task-title">{{ task?.name }}</p>
-  <p class="task-info">
-    <!-- Display date only if timeEnd is available -->
-    <!-- <span class="task-due-date" *ngIf="task?.timeEnd">
-      {{ task?.timeEnd | date : "mediumDate" }}
-    </span> -->
-    <!-- Display duration only if it is available -->
-    <!-- <span class="task-duration" *ngIf="task?.duration">
-      {{ task?.duration }} min
-    </span> -->
-  </p>
 </div>

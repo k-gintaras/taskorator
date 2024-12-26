@@ -1,0 +1,118 @@
+.task-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  word-break: break-word;
+}
+
+.priority {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.high-priority {
+  color: #d9534f;
+}
+
+.task-body {
+  margin: 12px 0;
+}
+
+.description {
+  font-size: 1rem;
+  margin: 0 0 8px;
+  word-break: break-word;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+}
+
+.statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.status {
+  background-color: #e9ecef;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #999;
+  word-break: break-word;
+}
+
+@media (max-width: 400px) {
+  .task-card {
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .task-name {
+    font-size: 1rem;
+  }
+
+  .priority {
+    font-size: 0.8rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .tags {
+    gap: 2px;
+  }
+
+  .tag {
+    padding: 1px 6px;
+    font-size: 0.7rem;
+  }
+
+  .statuses {
+    gap: 4px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

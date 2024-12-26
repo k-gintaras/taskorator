@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, getBaseTask, Task } from '../../models/taskModelManager';
 import { TaskViewService } from '../../services/tasks/task-view.service';
 import { ArtificerComponent } from '../artificer/artificer.component';
 import { ArtificerActionComponent } from '../task/artificer-action/artificer-action.component';
@@ -12,6 +12,10 @@ import { TreeService } from '../../services/core/tree.service';
 import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
+import { TaskEditComponent } from '../task-edit/task-edit.component';
+import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import { TaskService } from '../../services/tasks/task.service';
+import { TaskCardComponent } from '../task/task-card/task-card.component';
 
 @Component({
   standalone: true,
@@ -23,6 +27,8 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
     ArtificerActionComponent,
     ArtificerComponent,
     OverlordNavigatorComponent,
+    TaskEditComponent,
+    TaskCardComponent,
   ],
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.html',
@@ -31,7 +37,7 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
 export class TaskNavigatorComponent implements OnInit {
   @Input() showArtificer: boolean = false;
   tasks: ExtendedTask[] | null = null; // Support any list of tasks
-  selectedOverlord: ExtendedTask | undefined;
+  selectedOverlord: ExtendedTask | Task = getBaseTask();
   errorMessage: string | null = null;
   selectedTasks: Task[] = [];
 
@@ -39,7 +45,9 @@ export class TaskNavigatorComponent implements OnInit {
     private navigatorService: TaskNavigatorUltraService,
     private treeService: TreeService,
     private selectedMultiple: SelectedMultipleService,
-    private viewService: TaskViewService
+    private selectedOverlordService: SelectedOverlordService,
+    private viewService: TaskViewService,
+    private taskService: TaskService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +76,23 @@ export class TaskNavigatorComponent implements OnInit {
       .subscribe((selectedTasks: Task[]) => {
         this.selectedTasks = selectedTasks;
       });
+
+    this.selectedOverlordService
+      .getSelectedOverlordObservable()
+      .subscribe((id: string | null) => {
+        if (!id) return;
+        this.taskService.getTaskById(id).then((t: ExtendedTask | null) => {
+          if (!t) return;
+          this.selectedOverlord = t;
+        });
+      });
+  }
+
+  canShowInfo(): boolean {
+    if (!this.tasks) return false;
+    if (!this.selectedOverlord) return false;
+    if (this.tasks.length === 0) return false;
+    return true;
   }
 
   /**

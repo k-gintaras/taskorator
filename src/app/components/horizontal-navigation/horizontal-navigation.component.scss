@@ -1,19 +1,58 @@
-/* Toolbar for App Title and Floating Button */
+/* Toolbar */
 .toolbar {
   background-color: #7d4fbf;
   color: white;
   display: flex;
   align-items: center;
   height: 64px;
-  padding: 0 16px;
+  padding: 0 8px;
 
-  .nav-fab {
-    margin-right: 16px; // Ensure space between the FAB and the title
+  button {
+    margin-right: 5px;
   }
 
   .app-title {
     font-size: 20px;
     font-weight: 500;
+    flex-grow: 1; /* Push search bar to the right */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+
+  .app-icon {
+    height: 40px;
+    margin-right: auto;
+  }
+
+  // .search-bar {
+  //   margin-left: auto;
+  //   max-width: 100px;
+  //   flex-grow: 1;
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: flex-end;
+  // }
+
+  @media (max-width: 600px) {
+    .app-title {
+      display: none; /* Hide title on smaller screens */
+    }
+
+    .app-icon {
+      display: inline-block; /* Show icon on mobile */
+    }
+
+    // .search-bar {
+    //   display: none; /* Hide search bar by default */
+    // }
+
+    // .search-bar.active {
+    //   display: flex; /* Show search bar when toggled */
+    //   width: 100%;
+    //   justify-content: center;
+    // }
   }
 }
 
@@ -38,7 +77,7 @@
 /* Navigation list */
 .nav-list {
   list-style: none;
-  padding: 0;
+  padding: 0 8px;
   margin: 0;
   flex-grow: 1; // Ensure the list expands to fill available space
   overflow-y: auto; // Allow scrolling if items overflow
@@ -87,9 +126,9 @@
 }
 
 /* Floating Button for Mobile */
-.nav-fab {
-  display: none; // Hidden by default (shown only on mobile)
-}
+// .nav-fab {
+//   display: none; // Hidden by default (shown only on mobile)
+// }
 
 @media (max-width: 600px) {
   .nav-fab {
@@ -107,8 +146,8 @@
   }
 }
 
-@media (min-width: 600px) {
-  .nav-fab {
-    display: none; // Hide the floating button on larger screens
-  }
-}
+// @media (min-width: 600px) {
+//   .nav-fab {
+//     display: none; // Hide the floating button on larger screens
+//   }
+// }

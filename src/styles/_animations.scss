@@ -1,0 +1,11 @@
+@keyframes flash {
+  0%,
+  100% {
+    color: $primary-color;
+    background-color: $secondary-color;
+  }
+  50% {
+    color: #000;
+    background-color: #fff;
+  }
+}

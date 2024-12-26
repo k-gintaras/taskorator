@@ -15,6 +15,10 @@ function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+export function getRandomTask() {
+  return generateRandomTask();
+}
+
 // Generate a random task
 export function generateRandomTask(
   overlord: string | null = ROOT_TASK_ID
@@ -23,7 +27,7 @@ export function generateRandomTask(
   return {
     ...getDefaultTask(),
     taskId: Math.floor(Math.random() * 1000000).toString(),
-    name: `Task ${Math.floor(Math.random() * 100)}`,
+    name: `Task ${Math.floor(Math.random() * 1000)} ` + generateRandomName(),
     todo: `Do something important ${Math.floor(Math.random() * 10)}`,
     why: `Because ${Math.floor(Math.random() * 10)}`,
     timeCreated: now,
@@ -53,6 +57,18 @@ export function generateRandomTask(
     imageDataUrl: null,
     tags: ['tag1', 'tag2', `tag${Math.floor(Math.random() * 10)}`],
   };
+}
+
+export function generateRandomName() {
+  const symbols = 'abcdefghijklmnopqrstuvwxyz1234567890 ';
+  let s = '';
+  const size = Math.floor(Math.random() * 100);
+  for (let i = 0; i < size; i++) {
+    const randomChar = Math.floor(Math.random() * symbols.length);
+    const val = symbols[randomChar];
+    s += val;
+  }
+  return s;
 }
 
 export function getRandomTasks() {

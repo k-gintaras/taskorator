@@ -1,0 +1,42 @@
+<div *ngIf="task" class="task-card">
+  <div class="header">
+    <h3 class="task-name">{{ task.name }}</h3>
+    <span class="priority" [class.high-priority]="task.priority > 7"
+      >Priority: {{ task.priority }}</span
+    >
+  </div>
+  <div class="task-body">
+    <p class="description" *ngIf="task.description">{{ task.todo }}</p>
+    <p class="why" *ngIf="task.why">Reason: {{ task.why }}</p>
+    <p class="link" *ngIf="task.backupLink">
+      <a href="{{ task.backupLink }}">Link: </a>
+    </p>
+    <div *ngIf="thereIsTags()" class="tags">
+      <span *ngFor="let tag of task.tags" class="tag">{{ tag }}</span>
+    </div>
+    <div class="statuses">
+      <span class="status" *ngIf="task.status">Status: {{ task.status }}</span>
+      <span class="status" *ngIf="task.stage">Stage: {{ task.stage }}</span>
+      <span class="status" *ngIf="task.duration"
+        >Duration: {{ task.duration }}</span
+      >
+      <span class="status" *ngIf="task.type">Type: {{ task.type }}</span>
+      <span class="status" *ngIf="task.subtype"
+        >Subtype: {{ task.subtype }}</span
+      >
+      <span class="status" *ngIf="task.size">Size: {{ task.size }}</span>
+      <span class="status" *ngIf="task.owner">Owner: {{ task.owner }}</span>
+    </div>
+  </div>
+  <div class="footer">
+    <span class="timestamp"
+      >Created: {{ task.timeCreated | date : "short" }}</span
+    >
+    <span class="timestamp"
+      >Updated: {{ task.lastUpdated | date : "short" }}</span
+    >
+    <span *ngIf="task.timeEnd" class="deadline"
+      >Deadline: {{ task.timeEnd | date : "short" }}</span
+    >
+  </div>
+</div>

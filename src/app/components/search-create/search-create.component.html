@@ -1,0 +1,52 @@
+<div class="search-create-container">
+  <!-- Search and Actions Row -->
+  <div class="search-create-row">
+    <!-- Search Input -->
+    <mat-form-field
+      class="search-bar"
+      subscriptSizing="dynamic"
+      appearance="outline"
+    >
+      <mat-label>{{ selectedOverlord?.name }}</mat-label>
+      <input matInput [formControl]="searchControl" />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clearInput()"
+        *ngIf="searchControl.value"
+        aria-label="Clear Input"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Action Buttons -->
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="onCreateTask(searchControl.value)"
+      aria-label="Save Task"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="goToSelectedTask()"
+      aria-label="Go To Task"
+    >
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+
+  <!-- Search Results -->
+  <div class="search-results" *ngIf="searchResults && searchResults.length > 0">
+    <p
+      *ngFor="let task of searchResults"
+      (click)="onSelectTask(task.taskId)"
+      [class.selected]="task.taskId === selectedOverlord?.taskId"
+    >
+      {{ task.name }}
+    </p>
+  </div>
+</div>

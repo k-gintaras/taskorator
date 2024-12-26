@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -9,6 +9,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouteMetadata } from '../../../app.routes-models';
 import { NavigationBuilderService } from '../../../services/navigation-builder.service';
 import { TaskNavigatorTestComponent } from '../../task-navigator/task-navigator-test/task-navigator-test.component';
+import { SearchOverlordComponent } from '../../search-overlord/search-overlord.component';
+import { SearchOverlordTestComponent } from '../../search-overlord/search-overlord-test.component';
+import { SearchCreateComponent } from '../../search-create/search-create.component';
+import { SearchCreateTestComponent } from '../../search-create/search-create-test.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -21,6 +25,8 @@ import { TaskNavigatorTestComponent } from '../../task-navigator/task-navigator-
     MatToolbarModule,
     RouterOutlet,
     TaskNavigatorTestComponent,
+    SearchOverlordTestComponent,
+    SearchCreateTestComponent,
   ],
   templateUrl: './horizontal-navigation-test.component.html',
   styleUrls: ['../horizontal-navigation.component.scss'],
@@ -29,6 +35,9 @@ export class HorizontalNavigationComponentTest implements OnInit {
   navItems: { path: string; metadata: RouteMetadata }[] = [];
   viewingChildren = false;
   isHandset = false;
+  searchActive = false;
+  isCompact = false; // Determines if the toolbar is in compact mode
+
   selectedFeature = '';
   selectedChild = '';
 
@@ -47,8 +56,21 @@ export class HorizontalNavigationComponentTest implements OnInit {
       .subscribe((result) => {
         this.isHandset = result.matches;
       });
+    this.checkViewport();
   }
 
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkViewport();
+  }
+
+  checkViewport() {
+    this.isCompact = window.innerWidth < 600; // Adjust breakpoint as needed
+  }
+
+  toggleSearch() {
+    this.searchActive = !this.searchActive;
+  }
   isSelected(path: string) {
     // return true;
     this.selectedChild === path || this.selectedFeature === path;

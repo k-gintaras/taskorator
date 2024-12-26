@@ -1,12 +1,6 @@
-.task-navigator-layout {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 660px;
-  padding: 10px;
-  box-sizing: border-box;
+.gap {
+  height: 20px;
 }
-
 .task-content-wrapper {
   display: flex;
   flex-direction: row;
@@ -15,36 +9,6 @@
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
-}
-
-.task-list {
-  flex-grow: 1;
-  padding: 10px;
-  background-color: #fafafa;
-  border-radius: 8px;
-  overflow-wrap: break-word;
-  box-sizing: border-box;
-}
-
-.app-artificer {
-  flex-shrink: 0;
-  width: 60px;
-  margin-right: 10px;
-  position: sticky;
-  top: 0;
-}
-
-.task-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .left-section,
@@ -71,23 +35,9 @@
   margin-right: 10px;
 }
 
-.task-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  width: 40px;
-  height: 40px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  margin-right: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.task-btn:hover {
-  background-color: #d0d0d0;
-}
+// .task-btn:hover {
+//   background-color: #d0d0d0;
+// }
 
 .selected {
   background-color: #7490a3;
@@ -135,6 +85,7 @@
   .task-navigator-layout {
     padding: 8px;
     width: 100%;
+    max-width: 360px;
   }
 
   .task-content-wrapper {
@@ -170,11 +121,11 @@
     font-size: 0.8rem;
   }
 
-  .task-btn {
-    width: 35px;
-    height: 35px;
-    padding: 4px;
-  }
+  // .task-btn {
+  //   width: 35px;
+  //   height: 35px;
+  //   padding: 4px;
+  // }
 }
 
 /* Mobile Adjustments */
@@ -182,6 +133,7 @@
   .task-navigator-layout {
     padding: 5px;
     width: 360px;
+    max-width: 360px;
   }
 
   .task-content-wrapper {
@@ -215,9 +167,9 @@
     font-size: 0.7rem;
   }
 
-  .task-btn {
-    width: 30px;
-    height: 30px;
-    padding: 3px;
-  }
+  // .task-btn {
+  //   width: 30px;
+  //   height: 30px;
+  //   padding: 3px;
+  // }
 }

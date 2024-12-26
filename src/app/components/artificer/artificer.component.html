@@ -1,8 +1,8 @@
-<div class="action-menu">
+<div class="app-artificer">
   <div
     *ngFor="let action of actions"
     (click)="selectAction(action)"
-    class="task-btn"
+    class="task-btn artificer-button"
     [ngClass]="getActionClasses(action)"
   >
     <mat-icon>{{ action.icon }}</mat-icon>

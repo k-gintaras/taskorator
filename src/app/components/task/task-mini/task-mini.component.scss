@@ -1,15 +1,7 @@
-.mini-task {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.mini-task-details {
-  flex-grow: 1;
-  cursor: pointer;
-}
+// .mini-task-details {
+//   flex-grow: 1;
+//   cursor: pointer;
+// }
 // .mini-task-details:hover {
 //   color: #999;
 // }
@@ -20,6 +12,28 @@
   font-weight: bold;
   color: #333;
   text-align: center;
+
+  /* Break long words and wrap text */
+  word-wrap: break-word; /* Ensure long words break */
+  overflow-wrap: anywhere; /* Allow breaking at any point for long words */
+
+  /* Prevent horizontal overflow */
+  max-width: 400px; /* Constrain width */
+  white-space: normal; /* Allow text wrapping */
+
+  @media (max-width: 480px) {
+    font-size: 10px;
+    margin-left: 3px;
+    margin-top: 3px;
+    max-width: 200px;
+  }
+
+  @media (min-width: 481px) and (max-width: 768px) {
+    font-size: 12px;
+    margin-left: 1px;
+    margin-top: 1px;
+    max-width: 230px;
+  }
 }
 
 .task-info {

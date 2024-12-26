@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouteMetadata } from '../../app.routes-models';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
+import { SearchCreateComponent } from '../search-create/search-create.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -21,6 +22,7 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
     MatToolbarModule,
     RouterOutlet,
     OverlordNavigatorComponent,
+    SearchCreateComponent,
   ],
   templateUrl: './horizontal-navigation.component.html',
   styleUrls: ['./horizontal-navigation.component.scss'],
@@ -29,6 +31,9 @@ export class HorizontalNavigationComponent implements OnInit {
   navItems: { path: string; metadata: RouteMetadata }[] = [];
   viewingChildren = false;
   isHandset = false;
+  searchActive = false;
+  isCompact = false; // Determines if the toolbar is in compact mode
+
   selectedFeature = '';
   selectedChild = '';
 
@@ -47,6 +52,20 @@ export class HorizontalNavigationComponent implements OnInit {
       .subscribe((result) => {
         this.isHandset = result.matches;
       });
+    this.checkViewport();
+  }
+
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkViewport();
+  }
+
+  checkViewport() {
+    this.isCompact = window.innerWidth < 600; // Adjust breakpoint as needed
+  }
+
+  toggleSearch() {
+    this.searchActive = !this.searchActive;
   }
 
   isSelected(path: string) {

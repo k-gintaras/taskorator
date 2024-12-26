@@ -13,7 +13,12 @@ import {
   orderBy,
   deleteDoc,
 } from '@angular/fire/firestore';
-import { Task, getDefaultTask } from '../../models/taskModelManager';
+import {
+  ROOT_TASK_ID,
+  Task,
+  getBaseTask,
+  getDefaultTask,
+} from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -80,6 +85,10 @@ export class TaskApiService {
 
     try {
       if (task.stage === 'deleted') {
+        if (task.taskId === ROOT_TASK_ID) {
+          this.handleError('updateTask', "can't delete root task!");
+          return false;
+        }
         await deleteDoc(taskDocRef);
         console.log(`Deleted task: ${task.taskId}`);
       } else {
@@ -101,6 +110,9 @@ export class TaskApiService {
         return { taskId: snapshot.id, ...snapshot.data() } as Task;
       } else {
         console.warn(`TaskApiService.getTaskById: Task ${taskId} not found`);
+        // this is custom repair mechanism if task 128 deleted, which is root...
+        // const t = getBaseTask();
+        // this.createTaskWithCustomId(userId, t, '128');
         return null;
       }
     } catch (error) {

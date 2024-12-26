@@ -1,0 +1,203 @@
+<div class="component-width">
+  <!-- Task Title -->
+  <div class="form-group">
+    <label for="task-title">Title:</label>
+    <input
+      id="task-title"
+      type="text"
+      [(ngModel)]="task.name"
+      placeholder="Enter task title"
+    />
+  </div>
+  <div class="form-group">
+    <label for="task-backup-link">Link:</label>
+    <input
+      id="task-backup-link"
+      type="url"
+      [(ngModel)]="task.backupLink"
+      placeholder="Enter link (URL)"
+    />
+  </div>
+
+  <!-- Task Description -->
+  <div class="form-group">
+    <label for="task-description">Description:</label>
+    <input
+      id="task-description"
+      type="text"
+      [(ngModel)]="task.todo"
+      placeholder="Enter task description"
+    />
+  </div>
+  <!-- Task Why -->
+  <div class="form-group">
+    <label for="task-why">Why:</label>
+    <input
+      id="task-why"
+      type="text"
+      [(ngModel)]="task.why"
+      placeholder="Enter task reason why"
+    />
+  </div>
+
+  <!-- Task Status and Priority -->
+  <div class="form-group duo">
+    <div>
+      <label for="task-priority">Priority:</label>
+      <input
+        id="task-priority"
+        type="number"
+        [(ngModel)]="task.priority"
+        min="1"
+        max="10"
+        placeholder="Enter priority (1-10)"
+      />
+    </div>
+    <div>
+      <label for="task-stage">Stage:</label>
+      <select id="task-stage" [(ngModel)]="task.stage">
+        <option value="todo">To Do</option>
+        <option value="seen">Seen</option>
+        <option value="completed">Completed</option>
+        <option value="archived">Archived</option>
+        <option value="deleted">Deleted</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Task Repeat and Stage -->
+  <div class="form-group duo">
+    <div>
+      <label for="task-type">Type:</label>
+      <select id="task-type" [(ngModel)]="task.type">
+        <option value="">None</option>
+        <option value="code">Code</option>
+        <option value="idea">Idea</option>
+        <option value="note">Note</option>
+        <option value="todo">To Do</option>
+        <option value="checklist">Checklist</option>
+        <option value="tree">Decision Tree</option>
+        <option value="flowchart">Flowchart</option>
+        <option value="task">Task</option>
+        <option value="next">Next</option>
+        <option value="job">Job</option>
+        <option value="feature">Feature</option>
+        <option value="schedule">Schedule</option>
+        <option value="project">Project</option>
+      </select>
+    </div>
+    <div>
+      <label for="task-repeat">Repeat:</label>
+      <select id="task-repeat" [(ngModel)]="task.repeat">
+        <option value="once">Once</option>
+        <option value="never">Never</option>
+        <option value="half-hourly">Half-Hourly</option>
+        <option value="hourly">Hourly</option>
+        <option value="half-daily">Half-Daily</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="half-monthly">Half-Monthly</option>
+        <option value="monthly">Monthly</option>
+        <option value="three-monthly">Three-Monthly</option>
+        <option value="half-yearly">Half-Yearly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Task End Time and Duration -->
+  <div class="form-group duo">
+    <div>
+      <label for="task-duration">Duration (Minutes):</label>
+      <input
+        id="task-duration"
+        type="number"
+        [(ngModel)]="durationDisplay"
+        (ngModelChange)="updateDuration($event)"
+        min="0"
+        placeholder="Enter duration"
+      />
+    </div>
+  </div>
+  <div class="form-group duo">
+    <div>
+      <label for="task-end-time">End Time (Optional):</label>
+      <input
+        id="task-end-time"
+        type="datetime-local"
+        [(ngModel)]="endTimeDisplay"
+        (ngModelChange)="updateTimeEnd($event)"
+        placeholder="Select end time"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button
+      type="button"
+      mat-icon-button
+      color="primary"
+      class="task-btn"
+      (click)="onSave(task)"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
+  </div>
+
+  <!-- Placeholder Buttons for Future Features -->
+  <div class="form-actions">
+    <button
+      type="button"
+      mat-raised-button
+      class="app-button future-feature-button"
+      disabled
+    >
+      Edit Tags
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      class="app-button future-feature-button"
+      disabled
+    >
+      Edit Owner
+    </button>
+    <button
+      type="button"
+      mat-raised-button
+      class="app-button future-feature-button"
+      disabled
+    >
+      Add Image
+    </button>
+  </div>
+</div>
+
+<!-- TODO: task edit subtype and size to be added later if needed -->
+<!-- <div class="form-group duo">
+  <div>
+    <label for="task-size">Size:</label>
+    <select id="task-size" [(ngModel)]="task.size">
+      <option value="do now">Do Now</option>
+      <option value="split">Split</option>
+      <option value="delegate">Delegate</option>
+    </select>
+  </div>
+  <div>
+    <label for="task-subtype">Subtype:</label>
+    <select id="task-subtype" [(ngModel)]="task.subtype">
+      <option value="">None</option>
+      <option value="js">JavaScript</option>
+      <option value="ts">TypeScript</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="sound">Sound</option>
+      <option value="android">Android</option>
+      <option value="angular">Angular</option>
+      <option value="nodejs">Node.js</option>
+      <option value="java">Java</option>
+      <option value="text">Text</option>
+      <option value="list">List</option>
+    </select>
+  </div>
+</div> -->

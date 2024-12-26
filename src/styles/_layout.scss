@@ -1,0 +1,159 @@
+.center-vertical {
+  display: flex;
+  align-items: center;
+}
+
+.center-horizontal {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.max-width-650 {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* Component Width for Consistency */
+.component-width {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+.overlord-navigator-container {
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 10px 20px;
+  background-color: $header-secondary-color; /* Match toolbar color */
+  color: $header-text-color; /* Ensure readability */
+  gap: 10px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .overlord-title {
+      order: 1; /* Title goes first */
+      width: 100%;
+      text-align: left;
+    }
+
+    .overlord-navigator {
+      order: 2; /* Buttons stay at the bottom */
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.overlord-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem; /* Slightly larger for emphasis */
+  color: $header-text-color;
+
+  .overlord-icon {
+    font-size: 20px;
+    color: $header-secondary-color; /* Subtle contrast */
+  }
+
+  .overlord-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @media (max-width: 600px) {
+      max-width: 100%;
+    }
+  }
+}
+
+.overlord-navigator {
+  display: flex;
+  gap: 8px;
+
+  button {
+    &:hover {
+      background-color: $header-main-color;
+    }
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.app-artificer-container {
+  padding: 10px 0 0 0;
+}
+.app-artificer {
+  position: sticky; /* Ensure artificer is fixed relative to the viewport */
+  left: 0;
+  z-index: 1000;
+  width: 38px; /* Keep the width compact */
+  background-color: white;
+  margin: 68px 0 0 0;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px; /* Space between buttons */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow for visibility */
+}
+
+.task-navigator-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  max-width: 650px;
+  width: 650px;
+
+  box-sizing: border-box;
+}
+
+.task-list {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.task-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  max-width: 600px;
+  box-sizing: border-box;
+}

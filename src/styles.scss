@@ -1,86 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 @import "./styles/colors";
-
-.noisy-button {
-  background: linear-gradient(
-    135deg,
-    rgba(240, 240, 240, 1) 0%,
-    rgba(245, 245, 245, 1) 100%
-  );
-  background-image: url("/assets/images/noise.png");
-  background-blend-mode: overlay;
-}
+@import "./styles/buttons";
+@import "./styles/inputs";
+@import "./styles/animations";
+@import "./styles/layout";
+@import "./styles/lists";
+@import "./styles/tasks";
+@import "./styles/globals";
 
 html,
 body {
   height: 100%;
-  background-color: #b4b4b4;
-}
-body {
   margin: 0;
+  padding: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-.center-vertical {
-  display: flex;
-  align-items: center;
-}
-
-.center-horizontal {
-  display: flex;
-  justify-content: center;
-}
-
-.width-task {
-  max-width: 600px;
-}
-
-.fill-width {
-  width: 100%;
-}
-
-.task-form-container {
-  width: 100%;
-  max-width: 600px; /* Adjust this to your desired max width */
+  background-color: $background-color;
 }
 
 // TODO: allow debug element size styles
 // * {
 //   outline: 1px solid red; // Adds a red outline to all elements
 // }
-
-button.task-btn {
-  background-color: transparent; /* Remove background color for a more minimal look */
-  border: 0px solid #ccc; /* Subtle border to define the button edges */
-  padding: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%; /* Circular buttons to minimize visual space */
-  transition: background-color 0.3s, border-color 0.3s; /* Smooth transitions for hover effects */
-}
-
-button.task-btn:hover,
-button.task-btn:focus {
-  background-color: #b4b4b4; /* Slightly darker background on hover/focus for feedback */
-  border-color: #bbb; /* Darker border on hover to maintain visibility */
-}
-
-::ng-deep mat-icon {
-  font-size: 12px; /* Adjust icon size for clarity */
-  color: #333; /* Darker color for better visibility */
-}
-
-/* CSS for flashing effect */
-@keyframes flash {
-  0%,
-  100% {
-    color: #f00; /* Red color for visibility */
-    background-color: #ff0; /* Yellow background for contrast */
-  }
-  50% {
-    color: #000; /* Switch to a darker color */
-    background-color: #fff; /* White background for contrast */
-  }
-}

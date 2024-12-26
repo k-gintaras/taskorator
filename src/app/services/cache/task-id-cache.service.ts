@@ -66,9 +66,23 @@ export class TaskIdCacheService {
     this.taskToGroup.clear();
   }
 
+  // moveTask(taskId: string, fromGroup: string, toGroup: string): void {
+  //   this.removeTaskFromGroup(fromGroup, taskId);
+  //   this.addTaskToGroup(toGroup, taskId);
+  // }
+
   moveTask(taskId: string, fromGroup: string, toGroup: string): void {
-    this.removeTaskFromGroup(fromGroup, taskId);
-    this.addTaskToGroup(toGroup, taskId);
+    if (this.canEditGroup(fromGroup)) {
+      this.removeTaskFromGroup(fromGroup, taskId);
+    } else {
+      console.warn(`Cannot edit group ${fromGroup} for task removal.`);
+    }
+
+    if (this.canEditGroup(toGroup)) {
+      this.addTaskToGroup(toGroup, taskId);
+    } else {
+      console.warn(`Cannot edit group ${toGroup} for task addition.`);
+    }
   }
 
   getTasksByIds(taskIds: string[]): ExtendedTask[] {
@@ -114,6 +128,11 @@ export class TaskIdCacheService {
         this.addTaskToGroup(groupName, task.taskId);
       }
     });
+  }
+
+  canEditGroup(groupName: string): boolean {
+    // Returns true if the group exists in cache
+    return this.idCache.has(groupName);
   }
 
   createNewGroup(tasks: ExtendedTask[], groupName: string): void {
