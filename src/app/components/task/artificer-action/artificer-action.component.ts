@@ -10,6 +10,7 @@ import { SelectedMultipleService } from '../../../services/task/selected-multipl
 import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
+import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
 
 @Component({
   selector: 'app-artificer-action',
@@ -134,8 +135,12 @@ export class ArtificerActionComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('Task updated:', result);
         // Update the task in your list or database
+        if (result) {
+          console.log('Task updated on server:', result);
+          const taskAction: TaskActions = TaskActions.UPDATED;
+          this.taskUpdateService.update(result, taskAction);
+        }
       } else {
         console.log('task not updated or so dialog says...');
       }

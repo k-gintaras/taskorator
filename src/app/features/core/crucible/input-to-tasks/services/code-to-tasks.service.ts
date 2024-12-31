@@ -4,55 +4,61 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CodeToTasksService {
-  getClassName(s: string) {
-    const lines = s.split('\n');
-    let classInfo = '';
-    let isClassFound = false;
+  /**
+   * Extracts CamelCase identifiers (class or interface names).
+   */
+  getClassOrInterfaceNames(lines: string[]): string[] {
+    // const camelCaseRegex = /^\s*(class|interface)\s+([A-Z][a-zA-Z0-9]*)/; // Match class or interface
+    const camelCaseRegex =
+      /^\s*(?:export\s+)?(class|interface)\s+([A-Z][a-zA-Z0-9]*)/;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (!isClassFound && line.includes('class ') && line.includes('{')) {
-        let className = line.replace('export', '');
-        className = className.replace('class', '');
-        className = className.trim();
-        className = className.slice(0, className.indexOf('{')).trim();
-        classInfo = className;
-        isClassFound = true;
-      }
-    }
-    return classInfo;
+    return lines
+      .map((line) => line.match(camelCaseRegex))
+      .filter((match) => match) // Only keep matches
+      .map((match) => match![2]); // Extract the name
   }
 
-  getFunctions(s: string) {
-    const className = this.getClassName(s);
-    const functions = [];
-    const lines = s.split('\n');
-    let indentation = 0;
-    if (className) {
-      indentation = 1;
-    }
-    let currentIndentation = 0;
-    // TODO: says useless escape on regex
-    const functionRegex =
-      // eslint-disable-next-line no-useless-escape
-      /[a-zA-Z_]\w*\([^)]*\)\s?(?::\s*([\w|<>[\]\| |<\>]+))?/;
+  /**
+   * Extracts lowerCamelCase function/method names.
+   */
+  getFunctionNames(lines: string[], isWithTypes: boolean): string[] {
+    const methodRegex =
+      /^\s*([a-z][a-zA-Z0-9]*)\s*\([^)]*\)\s*(?::\s*[a-zA-Z0-9<>\[\]]+)?\s*\{/;
+    const arrowFunctionRegex =
+      /^\s*const\s+([a-z][a-zA-Z0-9]*)\s*=\s*\([^)]*\)\s*(?::\s*[a-zA-Z0-9<>\[\]]+)?\s*=>/;
 
-    for (const line of lines) {
-      const functionMatch = line.match(functionRegex);
+    const functions: string[] = [];
 
-      if (functionMatch) {
-        if (currentIndentation === indentation) {
-          // currentFunction = functionName;
-          functions.push(functionMatch[0]);
-        }
+    lines.forEach((line) => {
+      const trimmedLine = line.trim();
+
+      // Match class methods
+      if (
+        methodRegex.test(trimmedLine) &&
+        !trimmedLine.startsWith('constructor')
+      ) {
+        const splitter = isWithTypes ? '{' : '(';
+        const methodName = trimmedLine.split(splitter)[0].trim();
+        functions.push(methodName);
       }
 
-      const openCurlyBraces = line.split('{').length - 1;
-      const closedCurlyBraces = line.split('}').length - 1;
-      currentIndentation += openCurlyBraces - closedCurlyBraces;
-    }
+      // Match arrow functions
+      const arrowMatch = trimmedLine.match(arrowFunctionRegex);
+      if (arrowMatch) {
+        functions.push(arrowMatch[1]);
+      }
+    });
 
-    return functions.join('\n');
+    return functions;
+  }
+
+  /**
+   * Extracts all relevant names from code: classes/interfaces and functions.
+   */
+  extractStringNames(code: string, isWithTypes: boolean): string[] {
+    const lines = code.split('\n').map((line) => line.trim());
+    const classOrInterfaceNames = this.getClassOrInterfaceNames(lines);
+    const functionNames = this.getFunctionNames(lines, isWithTypes);
+    return [...classOrInterfaceNames, ...functionNames];
   }
 }

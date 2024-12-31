@@ -1,0 +1,24 @@
+<div class="task-list">
+  <!-- No Tasks Message -->
+  <div *ngIf="tasks?.length === 0" class="no-tasks">
+    <p>No tasks.</p>
+  </div>
+
+  <!-- Task List -->
+  <div
+    *ngFor="let task of tasks"
+    class="task-container"
+    [class.selected]="false"
+  >
+    <div class="left-section">
+      <button class="task-btn" (click)="editTask(task)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <app-task-mini [task]="task"></app-task-mini>
+    </div>
+
+    <button class="task-btn" (click)="deleteTask(task)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

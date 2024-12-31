@@ -7,6 +7,9 @@ import { MatIcon } from '@angular/material/icon';
 import { TaskTreeNodeData } from '../../../models/taskTree';
 import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
 import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
+import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
+import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-artificer-action-test',
@@ -22,7 +25,8 @@ export class ArtificerActionComponentTest {
 
   constructor(
     private artificerService: ArtificerService,
-    private selectedService: SelectedMultipleService
+    private selectedService: SelectedMultipleService,
+    private dialog: MatDialog
   ) {
     this.artificerService.currentAction$.subscribe((action) => {
       this.currentAction = action;
@@ -89,6 +93,7 @@ export class ArtificerActionComponentTest {
         break;
       case 'edit':
         // display edit popup ?
+        this.editTask(task);
         break;
       case 'select':
         this.selectedService.addRemoveSelectedTask(task);
@@ -115,6 +120,26 @@ export class ArtificerActionComponentTest {
       default:
         break;
     }
+  }
+
+  editTask(task: Task): void {
+    const dialogRef = this.dialog.open(TaskEditPopupComponent, {
+      width: '600px',
+      data: task, // Pass the task to edit
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Update the task in your list or database
+        if (result) {
+          console.log('Task updated on server:', result);
+          const taskAction: TaskActions = TaskActions.UPDATED;
+          // this.taskUpdateService.update(result, taskAction);
+        }
+      } else {
+        console.log('task not updated or so dialog says...');
+      }
+    });
   }
 
   isSelected() {

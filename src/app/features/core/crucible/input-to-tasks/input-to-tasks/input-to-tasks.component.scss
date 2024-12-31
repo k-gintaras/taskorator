@@ -1,8 +1,94 @@
-.select-overlord {
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid grey;
+.overlord {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007bff;
 }
-mat-icon {
-  vertical-align: middle;
+.task-importer {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  .input-section {
+    margin-bottom: 20px;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .input-actions {
+      margin-top: 0px;
+      display: flex;
+      justify-content: right;
+      gap: 10px;
+    }
+  }
+
+  .toggles {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+    mat-slide-toggle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+    div {
+      flex: 1;
+      p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #555;
+
+        strong {
+          color: #333;
+        }
+      }
+    }
+  }
+
+  .task-list {
+    margin-bottom: 20px;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 150px;
+      font-size: 1rem;
+
+      mat-icon {
+        font-size: 1.25rem;
+      }
+    }
+  }
 }

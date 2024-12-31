@@ -33,6 +33,11 @@ export class TaskUsageService {
     return usageData[taskId]?.views || 0;
   }
 
+  getTaskUsage(taskId: string): TaskUsage | null {
+    const usageData = this.getUsageData();
+    return usageData[taskId] || null;
+  }
+
   /**
    * Get all usage data.
    * @returns An object mapping task IDs to usage details.

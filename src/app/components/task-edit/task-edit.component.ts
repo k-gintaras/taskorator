@@ -23,7 +23,7 @@ export class TaskEditComponent {
   // Display values for duration and end time
   endTimeDisplay: string | null = null;
   durationDisplay: number | null = null;
-  constructor(private taskUpdateService: TaskUpdateService) {}
+  // constructor(private taskUpdateService: TaskUpdateService) {}
 
   ngOnInit() {
     // Convert initial task values from milliseconds
@@ -36,12 +36,12 @@ export class TaskEditComponent {
       : null; // Convert to minutes
   }
 
-  onSave(t: Task) {
-    if (t) {
-      const taskAction: TaskActions = TaskActions.UPDATED;
-      this.taskUpdateService.update(t, taskAction);
-    }
-  }
+  // onSave(t: Task) {
+  //   if (t) {
+  //     const taskAction: TaskActions = TaskActions.UPDATED;
+  //     this.taskUpdateService.update(t, taskAction);
+  //   }
+  // }
 
   updateTimeEnd(newTime: string) {
     // Convert from datetime-local string to milliseconds

@@ -5,7 +5,7 @@ import { getDefaultTask, Task } from '../../../../../models/taskModelManager';
   providedIn: 'root',
 })
 export class TextToTasksService {
-  getLinesToTaskObjects(text: string, isShortened: boolean): Task[] {
+  getLinesToTaskLikeObjects(text: string, isShortened: boolean): Task[] {
     const tasks: Task[] = [];
     const listData = text
       .split('\n')

@@ -4,14 +4,22 @@ import {
   MAT_DIALOG_DATA,
   MatDialogContent,
   MatDialogActions,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TaskEditComponent } from '../../task-edit/task-edit.component';
 import { Task } from '../../../models/taskModelManager';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-task-edit-popup',
   standalone: true,
-  imports: [MatDialogContent, MatDialogActions, TaskEditComponent],
+  imports: [
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogTitle,
+    TaskEditComponent,
+    MatIcon,
+  ],
   templateUrl: './task-edit-popup.component.html',
   styleUrl: './task-edit-popup.component.scss',
 })

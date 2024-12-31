@@ -1,89 +1,107 @@
-<div class="component-border">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Task Management</mat-card-title>
-    </mat-card-header>
+<div class="task-importer">
+  <h2>Mass Add Tasks</h2>
 
-    <mat-card-content>
-      <!-- Shorten Checkbox -->
-      <div class="action-row">
-        <mat-label>Shorten</mat-label>
-        <mat-checkbox
-          (click)="preview()"
-          [(ngModel)]="isShortened"
-        ></mat-checkbox>
-        <mat-label>Only Uniques</mat-label>
-        <mat-checkbox
-          (click)="preview()"
-          [(ngModel)]="isOnlyUniques"
-        ></mat-checkbox>
-        <!-- Additional buttons like 'Trim' can go here -->
-        <button mat-button (click)="trimAction()">Trim</button>
-      </div>
+  <!-- Input Section -->
+  <div class="input-section">
+    <!-- Text Input -->
+    <mat-form-field appearance="outline" class="full-width">
+      <textarea
+        matInput
+        [(ngModel)]="inputText"
+        placeholder="Enter tasks (CSV, JSON, list, or code)"
+        (input)="onInputChange()"
+        rows="2"
+      ></textarea>
+    </mat-form-field>
 
-      <!-- Select Overlord -->
-      <div class="select-overlord">
-        select overlord component...
-        <!-- <app-select-overlord [overlords]="overlords"></app-select-overlord> -->
-      </div>
+    <!-- Input Action Buttons -->
+    <div class="input-actions">
+      <button
+        mat-icon-button
+        class="task-btn"
+        color="primary"
+        (click)="parseTasks()"
+        aria-label="Parse Tasks"
+      >
+        <mat-icon>check</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="task-btn"
+        color="warn"
+        (click)="clearInput()"
+        aria-label="Clear Input"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
 
-      <!-- Textarea -->
-      <mat-form-field class="text-area">
-        <textarea
-          matInput
-          matTextareaAutosize
-          matAutosizeMinRows="2"
-          [(ngModel)]="inputText"
-          placeholder="mass tasks or code to tasks"
-          (blur)="preview()"
-        ></textarea>
-      </mat-form-field>
+    <!-- Toggles -->
+    <div class="toggles">
+      <mat-slide-toggle
+        [(ngModel)]="isAutoParse"
+        color="primary"
+        aria-label="Auto-Parse"
+      >
+        Auto-Parse
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        [(ngModel)]="isFunctionsWithTypes"
+        color="primary"
+        aria-label="With Function Types"
+      >
+        With Function Types
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        [(ngModel)]="isLongNamesShortened"
+        color="primary"
+        aria-label="Shorten Names"
+      >
+        Names Shortened
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        [(ngModel)]="isFilterUniques"
+        color="primary"
+        aria-label="Filter Uniques"
+      >
+        Filter Uniques
+      </mat-slide-toggle>
+    </div>
+  </div>
 
-      <!-- Task Name and Action Buttons -->
-      <div class="action-row">
-        <mat-form-field>
-          <input matInput [(ngModel)]="newTaskName" placeholder="one task" />
-        </mat-form-field>
-        <button mat-fab color="primary" (click)="addTask()">
-          <mat-icon>add</mat-icon>
-        </button>
-        <button mat-fab color="primary" (click)="preview()">
-          <mat-icon>preview</mat-icon>
-        </button>
-        <button mat-fab color="accent" (click)="save()">
-          <mat-icon>save</mat-icon>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  <!-- Task Summary -->
 
-  <mat-card>
-    <mat-card-title>Task Management</mat-card-title>
-    <mat-card-content>
-      <div style="display: flex; flex-direction: column">
-        <div style="display: flex; justify-content: space-between">
-          <strong style="width: 30%">Name</strong>
-          <strong style="width: 30%">Todo</strong>
-          <strong style="width: 30%">Overlord</strong>
-        </div>
-        <div
-          *ngFor="let task of tasks; let i = index"
-          style="display: flex; justify-content: space-between; margin-top: 8px"
-        >
-          <mat-form-field appearance="fill" style="width: 30%">
-            <input matInput [(ngModel)]="task.name" />
-          </mat-form-field>
-          <mat-form-field appearance="fill" style="width: 30%">
-            <input matInput [(ngModel)]="task.todo" />
-          </mat-form-field>
-          <div style="width: 30%; display: flex; align-items: center">
-            <span style="flex: 1">{{ getOverlord() }}</span>
-            <mat-icon (click)="removeTask(i)">remove_circle_outline</mat-icon>
-          </div>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  <div class="summary">
+    <div>
+      <p>
+        <strong>Input Type:</strong> {{ taskSummary.inputType || "Unknown" }}
+      </p>
+    </div>
+    <div>
+      <p><strong>Total Tasks:</strong> {{ taskSummary.taskCount }}</p>
+      <p><strong>Unique Tasks:</strong> {{ taskSummary.uniqueTaskCount }}</p>
+    </div>
+  </div>
+  <p>
+    <strong>Target:</strong>
+    <span class="overlord">{{ selectedOverlord?.name || "Unknown" }}</span>
+  </p>
+
+  <!-- Staged Task List -->
+  <div class="task-list">
+    <app-staged-task-list [tasks]="tasks"></app-staged-task-list>
+  </div>
+
+  <!-- Save Button -->
+  <div class="action-buttons">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="importTasks()"
+      [disabled]="tasks.length === 0"
+    >
+      <mat-icon>save</mat-icon>
+      Save Tasks
+    </button>
+  </div>
 </div>
-
-<!-- <div *ngIf="selectedOverlord">{{ selectedOverlord.name }}</div> -->

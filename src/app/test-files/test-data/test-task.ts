@@ -19,6 +19,15 @@ export function getRandomTask() {
   return generateRandomTask();
 }
 
+export function getDefaultTaskCustomized(overrides: Partial<Task> = {}): Task {
+  // Use the existing getDefaultTask as the base and apply overrides
+  const baseTask = getDefaultTask();
+  return {
+    ...baseTask,
+    ...overrides,
+  };
+}
+
 // Generate a random task
 export function generateRandomTask(
   overlord: string | null = ROOT_TASK_ID
@@ -71,7 +80,7 @@ export function generateRandomName() {
   return s;
 }
 
-export function getRandomTasks() {
+export function getRandomTasks(): Task[] {
   const tasks = [];
   for (let i = 0; i < 10; i++) {
     const t = generateRandomTask();

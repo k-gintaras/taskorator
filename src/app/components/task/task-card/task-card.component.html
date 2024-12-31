@@ -6,7 +6,7 @@
     >
   </div>
   <div class="task-body">
-    <p class="description" *ngIf="task.description">{{ task.todo }}</p>
+    <p class="description" *ngIf="task.todo">{{ task.todo }}</p>
     <p class="why" *ngIf="task.why">Reason: {{ task.why }}</p>
     <p class="link" *ngIf="task.backupLink">
       <a href="{{ task.backupLink }}">Link: </a>

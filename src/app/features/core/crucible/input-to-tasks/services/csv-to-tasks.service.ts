@@ -5,7 +5,7 @@ import { getDefaultTask } from '../../../../../models/taskModelManager';
   providedIn: 'root',
 })
 export class CsvToTasksService {
-  getCsvToTaskObjects(text: string) {
+  getCsvToTaskLikeObjects(text: string) {
     const lines = text.trim().split('\n');
     const separator = this.getSeparator(lines);
     // const headers = this.splitCsvLine(lines[0], separator);
@@ -20,7 +20,7 @@ export class CsvToTasksService {
       //   rowData[headers[j]] = rowValues[j];
       // }
 
-      const taskObject = this.loadTaskObject(rowValues, separator);
+      const taskObject = this.loadTaskLikeObject(rowValues, separator);
       objs.push(taskObject);
     }
 
@@ -67,9 +67,9 @@ export class CsvToTasksService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  loadTaskObject(rowData: any, separator: any) {
+  loadTaskLikeObject(rowData: any, separator: any) {
     const t = { ...getDefaultTask() };
-    t.name = rowData[0] + new Date().getTime();
+    t.name = rowData[0];
     t.todo = rowData.join(separator);
     // t.why = rowData.why + ' ' + rowData.idea;
     // t.overlord = rowData['parent or goal'] ? rowData['parent or goal'] : '';

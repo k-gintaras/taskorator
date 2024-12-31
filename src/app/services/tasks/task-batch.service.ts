@@ -28,7 +28,7 @@ export class TaskBatchService {
    */
   async createTaskBatch(
     tasks: Task[],
-    groupName: string
+    overlordId: string
   ): Promise<ExtendedTask[] | null> {
     try {
       // if (!this.validatorService.isTaskValid(task)) {
@@ -50,6 +50,8 @@ export class TaskBatchService {
       // Convert and cache created tasks
       const extendedTasks =
         this.transmutatorService.toExtendedTasks(createdTasks);
+
+      const groupName = 'overlord_' + overlordId;
       this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition
       const ids = this.transmutatorService.getIds(extendedTasks);
 
