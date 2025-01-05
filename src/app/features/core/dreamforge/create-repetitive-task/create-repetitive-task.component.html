@@ -1,10 +1,10 @@
-<div class="task-form-container">
+<div class="component-width">
   <h2>Create Repetitive Task</h2>
 
   <form #taskForm="ngForm" (ngSubmit)="saveTask()">
     <!-- Task Name -->
     <mat-form-field appearance="fill">
-      <mat-label>Task Name</mat-label>
+      <mat-label>Name</mat-label>
       <input
         matInput
         [(ngModel)]="task.name"
@@ -15,20 +15,21 @@
     </mat-form-field>
 
     <!-- Task Description -->
-    <mat-form-field appearance="fill">
+    <!-- <mat-form-field appearance="fill">
       <mat-label>Task Description</mat-label>
       <textarea
         matInput
         [(ngModel)]="task.todo"
         name="todo"
         placeholder="Describe the task"
+        rows="1"
         required
       ></textarea>
-    </mat-form-field>
+    </mat-form-field> -->
 
     <!-- Repetition -->
     <mat-form-field appearance="fill">
-      <mat-label>Repetition</mat-label>
+      <mat-label>Repeat</mat-label>
       <mat-select [(ngModel)]="task.repeat" name="repeat" required>
         <mat-option *ngFor="let option of repeatOptions" [value]="option">
           {{ option }}
@@ -37,7 +38,7 @@
     </mat-form-field>
 
     <!-- Duration -->
-    <mat-form-field appearance="fill">
+    <!-- <mat-form-field appearance="fill">
       <mat-label>Duration (minutes)</mat-label>
       <input
         matInput
@@ -48,10 +49,10 @@
         placeholder="Enter duration"
         min="0"
       />
-    </mat-form-field>
+    </mat-form-field> -->
 
     <!-- Priority -->
-    <mat-form-field appearance="fill">
+    <!-- <mat-form-field appearance="fill">
       <mat-label>Priority (1-10)</mat-label>
       <input
         matInput
@@ -63,20 +64,24 @@
         min="1"
         max="10"
       />
-    </mat-form-field>
+    </mat-form-field> -->
 
     <!-- Submit and Reset Buttons -->
     <div class="button-group">
-      <button mat-raised-button color="primary" type="submit">
+      <!-- <button mat-raised-button color="primary" type="submit">
         Create Task
-      </button>
-      <button
+      </button> -->
+      <!-- <button
         mat-stroked-button
         color="warn"
         type="button"
         (click)="resetForm()"
       >
         Reset Form
+      </button> -->
+      <button class="task-btn" type="submit"><mat-icon>save</mat-icon></button>
+      <button class="task-btn" (click)="resetForm()">
+        <mat-icon>clear</mat-icon>
       </button>
     </div>
   </form>

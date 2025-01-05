@@ -1,15 +1,16 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NavigationBuilderService } from '../../services/navigation-builder.service';
+import { Router, RouterOutlet } from '@angular/router';
+import { RouteMetadata } from '../../app.routes-models';
+import { NavigationService } from '../../services/navigation.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouteMetadata } from '../../app.routes-models';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 import { SearchCreateComponent } from '../search-create/search-create.component';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { NotificationComponent } from '../notification/notification.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -23,6 +24,8 @@ import { SearchCreateComponent } from '../search-create/search-create.component'
     RouterOutlet,
     OverlordNavigatorComponent,
     SearchCreateComponent,
+    NotificationComponent,
+    NotificationComponent,
   ],
   templateUrl: './horizontal-navigation.component.html',
   styleUrls: ['./horizontal-navigation.component.scss'],
@@ -30,29 +33,45 @@ import { SearchCreateComponent } from '../search-create/search-create.component'
 export class HorizontalNavigationComponent implements OnInit {
   navItems: { path: string; metadata: RouteMetadata }[] = [];
   viewingChildren = false;
+  selectedFeature: string | null = null;
+  selectedChild: string | null = null;
   isHandset = false;
-  searchActive = false;
-  isCompact = false; // Determines if the toolbar is in compact mode
-
-  selectedFeature = '';
-  selectedChild = '';
 
   @ViewChild('drawer') drawer!: MatDrawer;
+  isCompact: boolean = false;
 
   constructor(
+    private navigationService: NavigationService,
     private router: Router,
-    private navigationService: NavigationBuilderService,
     private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
-    this.showTopLevel(); // Initialize at top level
+    // Subscribe to feature and child observables
+    this.navigationService.getCurrentFeature().subscribe((feature) => {
+      this.selectedFeature = feature;
+      if (feature) {
+        this.navItems = this.navigationService
+          .getChildrenPaths(feature)
+          .map((childPath) => ({
+            path: `${feature}/${childPath}`,
+            metadata: this.navigationService.getRouteMetadata(`${childPath}`),
+          }));
+        this.viewingChildren = !!this.navItems.length;
+      } else {
+        this.showTopLevel();
+      }
+    });
+
     this.breakpointObserver
       .observe([Breakpoints.Handset])
       .subscribe((result) => {
         this.isHandset = result.matches;
       });
-    this.checkViewport();
+
+    this.navigationService.getCurrentChild().subscribe((child) => {
+      this.selectedChild = child;
+    });
   }
 
   @HostListener('window:resize', [])
@@ -61,63 +80,7 @@ export class HorizontalNavigationComponent implements OnInit {
   }
 
   checkViewport() {
-    this.isCompact = window.innerWidth < 600; // Adjust breakpoint as needed
-  }
-
-  toggleSearch() {
-    this.searchActive = !this.searchActive;
-  }
-
-  isSelected(path: string) {
-    // return true;
-    this.selectedChild === path || this.selectedFeature === path;
-  }
-
-  /**
-   * Show top-level features.
-   */
-  showTopLevel() {
-    this.navItems = this.navigationService
-      .getTopLevelFeatures()
-      .map((feature) => ({
-        path: feature.path,
-        metadata: feature.metadata,
-      }));
-    this.viewingChildren = false;
-  }
-
-  /**
-   * Show children for the selected feature or navigate directly.
-   * @param item - The selected navigation item.
-   */
-  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {
-    const childrenPaths = this.navigationService.getChildrenPaths(item.path);
-
-    if (childrenPaths.length > 0) {
-      // its a feature
-
-      this.navItems = childrenPaths.map((childPath) => ({
-        path: `${item.path}/${childPath}`,
-        metadata: this.navigationService.getRouteMetadata(childPath),
-      }));
-      this.viewingChildren = true;
-      this.selectedChild = item.path;
-      // prenavigate automatically to default path for convenience
-      // or inconvenience
-      this.router.navigate([item.path]);
-    } else {
-      // child of feature
-      this.router.navigate([item.path]); // Navigate directly
-      this.closeDrawerOnMobile();
-      this.selectedFeature = item.path;
-    }
-  }
-
-  /**
-   * Return to the top-level navigation.
-   */
-  onBackClick() {
-    this.showTopLevel();
+    this.isCompact = window.innerWidth < 600;
   }
 
   toggleDrawer() {
@@ -126,10 +89,32 @@ export class HorizontalNavigationComponent implements OnInit {
     }
   }
 
-  closeDrawerOnMobile() {
-    if (this.isHandset && this.drawer) {
-      this.drawer.close();
+  showTopLevel() {
+    this.navItems = this.navigationService.getTopLevelFeatures();
+    this.viewingChildren = false;
+  }
+
+  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {
+    const childrenPaths = this.navigationService.getChildrenPaths(item.path);
+
+    if (childrenPaths.length > 0) {
+      this.navItems = childrenPaths.map((childPath) => ({
+        path: `${item.path}/${childPath}`,
+        metadata: item.metadata,
+      }));
+      this.viewingChildren = true;
+      this.router.navigate([item.path]);
+    } else {
+      this.router.navigate([item.path]);
     }
+  }
+
+  onBackClick() {
+    this.showTopLevel();
+  }
+
+  isSelected(path: string) {
+    return this.router.url.startsWith('/' + path);
   }
 
   canGoBack() {

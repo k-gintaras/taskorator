@@ -7,111 +7,71 @@ import {
 import { TaskTreeNode, TaskTree } from '../../../../../models/taskTree';
 import { SettingsService } from '../../../../../services/core/settings.service';
 import { TreeService } from '../../../../../services/core/tree.service';
+import { TaskService } from '../../../../../services/tasks/task.service';
+import { TaskListService } from '../../../../../services/tasks/task-list.service';
+import { Task, ExtendedTask } from '../../../../../models/taskModelManager';
+import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
+import { MatIcon } from '@angular/material/icon';
+import { SelectedTaskService } from '../../../../../services/task/selected-task.service';
+import { SelectedMultipleService } from '../../../../../services/task/selected-multiple.service';
 
 @Component({
   selector: 'app-focus',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, StagedTaskListComponent, MatIcon],
   templateUrl: './focus.component.html',
   styleUrl: './focus.component.scss',
 })
 export class FocusComponent implements OnInit {
-  focusTasks: TaskTreeNode[] | undefined;
   settings: TaskSettings = getDefaultTaskSettings();
   tree: TaskTree | undefined;
+  tasks: Task[] | [] = [];
+  selectedTasks: Task[] | [] = [];
 
   constructor(
     private settingsService: SettingsService,
-    private treeService: TreeService
+    private taskListService: TaskListService,
+    private selectedTasksService: SelectedMultipleService
   ) {}
 
   ngOnInit(): void {
     this.settingsService.getSettings().subscribe((s: TaskSettings | null) => {
-      if (s) this.settings = s;
+      if (!s) return;
+      this.settings = s;
+      this.loadFocusTasks().then();
     });
-    this.treeService.getTree().subscribe((t: TaskTree | null) => {
-      if (t) {
-        this.tree = t;
-        this.loadFocusTasks();
-      }
+    this.selectedTasksService.getSelectedTasks().subscribe((t: Task[]) => {
+      this.selectedTasks = t;
     });
   }
 
-  // loadFocusTasks() {
-  //   if (this.settings.focusTaskIds.length < 1) return;
-  //   if (!this.tree) return;
-  //   this.settings.focusTaskIds.forEach((id: string) => {
-  //     // focusTasks.push...
-  //   });
-  // }
+  /**
+   * @param updatedTasks come from staged task list allowing us delete them easily
+   */
+  updateTasks(updatedTasks: Task[]): void {
+    this.tasks = updatedTasks;
+  }
+  /**
+   * @param updatedTasks come from staged task list allowing us delete them easily
+   */
+  updateSelectedTasks(updatedTasks: Task[]): void {
+    this.selectedTasks = updatedTasks;
+  }
 
-  // findTaskInTree(id: string) {
-  //   //  ...TaskTreeNode
-  //   // export interface TaskTreeNode {
-  //   // name: string;
-  //   // isCompleted: boolean;
-  //   // taskId: string; // Assuming tasks are identified by string IDs, adjust as necessary
-  //   // overlord: string | null; // The ID of the parent task, or null for the root
-  //   // children: TaskTreeNode[]; // Array of child nodes
-  //   // childrenCount: number; // The total number of direct children of this node
-  //   // completedChildrenCount: number;
-  // }
-
-  updateSettings(updatedFields: Partial<TaskSettings>): void {
-    this.settings = { ...this.settings, ...updatedFields };
+  save() {
+    const ids = this.tasks.map((t) => t.taskId);
+    this.settings.focusTaskIds = ids;
     this.settingsService.updateSettings(this.settings);
   }
 
-  addFocusTask(taskId: string): void {
-    if (!this.settings.focusTaskIds.includes(taskId)) {
-      this.updateSettings({
-        focusTaskIds: [...this.settings.focusTaskIds, taskId],
-      });
-    }
+  add() {
+    const ids = this.selectedTasks.map((t) => t.taskId);
+    this.tasks = [...this.tasks, ...this.selectedTasks];
+    this.settings.focusTaskIds = [...this.settings.focusTaskIds, ...ids];
+    this.settingsService.updateSettings(this.settings);
   }
 
-  removeFocusTask(taskId: string): void {
-    this.updateSettings({
-      focusTaskIds: this.settings.focusTaskIds.filter((id) => id !== taskId),
-    });
-  }
-
-  loadFocusTasks() {
-    if (this.settings.focusTaskIds.length < 1) return;
-    const tree = this.tree;
-    if (!tree) return;
-
-    // Map and filter out undefined values in one go
-    this.focusTasks = this.settings.focusTaskIds
-      .map((id) => this.findTaskInTree(id, tree.root))
-      .filter((task): task is TaskTreeNode => task !== undefined);
-  }
-
-  findTaskInTree(id: string, node: TaskTreeNode): TaskTreeNode | undefined {
-    if (node.taskId === id) {
-      return node;
-    }
-    for (let child of node.children) {
-      let found = this.findTaskInTree(id, child);
-      if (found) {
-        return found;
-      }
-    }
-    return undefined;
-  }
-
-  toggleFocus(taskId: string) {
-    if (this.settings.focusTaskIds.length < 1) return;
-
-    let settings = this.settings;
-    if (settings.focusTaskIds.includes(taskId)) {
-      settings.focusTaskIds = settings.focusTaskIds.filter(
-        (id) => id !== taskId
-      );
-    } else {
-      settings.focusTaskIds.push(taskId);
-    }
-    this.settingsService.updateSettings(settings);
-    this.loadFocusTasks(); // Reload focus tasks based on the updated settings
+  async loadFocusTasks() {
+    this.tasks = (await this.taskListService.getFocusTasks()) || [];
   }
 }

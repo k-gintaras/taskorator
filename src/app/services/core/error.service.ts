@@ -17,6 +17,10 @@ export class ErrorService implements ErrorHandlingStrategy {
     console.log(error);
   }
 
+  warn(error: string) {
+    this.snackBar.open(error, 'Close');
+  }
+
   getFeedback(): Observable<string | null> {
     return this.feedbackSubject.asObservable();
   }

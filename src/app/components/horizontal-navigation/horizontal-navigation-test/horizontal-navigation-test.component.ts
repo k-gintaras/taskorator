@@ -72,8 +72,7 @@ export class HorizontalNavigationComponentTest implements OnInit {
     this.searchActive = !this.searchActive;
   }
   isSelected(path: string) {
-    // return true;
-    this.selectedChild === path || this.selectedFeature === path;
+    return this.router.url === path;
   }
 
   /**

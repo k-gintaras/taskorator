@@ -268,7 +268,7 @@ export class TaskListService {
       data: TaskListSubtype.SETTINGS,
     };
     return this.getTaskGroupWithCache(taskListKey, () =>
-      this.getSettingsTasks('focus')
+      this.getSettingsTasks('favorite')
     );
     // return this.getSettingsTasks('favorite');
   }

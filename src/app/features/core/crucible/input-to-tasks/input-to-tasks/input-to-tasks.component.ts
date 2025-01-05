@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Task, ExtendedTask } from '../../../../../models/taskModelManager';
+import {
+  Task,
+  ExtendedTask,
+  getBaseTask,
+} from '../../../../../models/taskModelManager';
 import { InputToTasksService } from '../services/input-to-tasks.service';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatFormField } from '@angular/material/form-field';
@@ -39,11 +43,12 @@ export class InputToTasksComponent implements OnInit {
     uniqueTaskCount: 0,
     inputType: TextType.UNKNOWN,
   };
-  selectedOverlord: ExtendedTask | null = null;
+  selectedOverlord: Task | null = null;
   isAutoParse = true;
   isFunctionsWithTypes = true;
   isLongNamesShortened: boolean = true;
   isFilterUniques: boolean = true;
+  @Input() overlord: Task | null = null;
 
   constructor(
     private inputToTasksService: InputToTasksService,
@@ -54,10 +59,19 @@ export class InputToTasksComponent implements OnInit {
   ngOnInit() {
     this.selectedOverlord = { name: 'Default Overlord' } as ExtendedTask;
 
-    this.utilityService.getSelectedOverlord().subscribe((t) => {
-      if (!t) return;
-      this.selectedOverlord = t;
-    });
+    if (!this.overlord) {
+      this.utilityService.getSelectedOverlord().subscribe((t) => {
+        if (!t) return;
+        this.selectedOverlord = t;
+      });
+    }
+    if (this.overlord) {
+      this.setNewOverlord();
+    }
+  }
+
+  setNewOverlord() {
+    this.selectedOverlord = this.overlord;
   }
 
   onInputChange(): void {
@@ -103,14 +117,38 @@ export class InputToTasksComponent implements OnInit {
   }
 
   importTasks(): void {
+    if (!this.overlord) {
+      // selected overlord
+      this.importToSelectedOverlord();
+    } else {
+      // local overlord
+      this.importToOverlord(this.overlord);
+    }
+  }
+
+  importToSelectedOverlord() {
     if (!this.selectedOverlord) {
       alert('Select Overlord in search before creating tasks!');
     } else {
-      this.taskBatchService.createTaskBatch(
-        this.tasks,
-        this.selectedOverlord.taskId
-      );
+      if (!this.selectedOverlord.taskId) return;
+      this.importToOverlord(this.selectedOverlord);
+      // action completed, no need to allow re adding
+      this.clearInput();
     }
+  }
+
+  importToOverlord(overlord: Task) {
+    this.tasks.forEach((t) => {
+      if (this.selectedOverlord?.taskId) t.overlord = overlord.taskId;
+    });
+    this.taskBatchService.createTaskBatch(this.tasks, overlord.taskId);
+  }
+
+  /**
+   * @param updatedTasks come from staged task list allowing us delete them easily
+   */
+  updateTasks(updatedTasks: Task[]): void {
+    this.tasks = updatedTasks;
   }
 
   clearInput(): void {

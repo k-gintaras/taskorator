@@ -8,6 +8,7 @@ import { LoggedInUser } from '../../../../models/user';
 import { ConfigService } from '../../../../services/core/config.service';
 import { ErrorService } from '../../../../services/core/error.service';
 import { RegistrationService } from '../../../../services/core/registration.service';
+import { NavigationService } from '../../../../services/navigation.service';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     private router: Router,
     private configService: ConfigService,
     private registration: RegistrationService,
+    private navigationService: NavigationService, // Inject NavigationService
     snackBar: MatSnackBar,
     dialog: MatDialog,
     errorService: ErrorService
@@ -34,19 +36,25 @@ export class LoginComponent extends BaseComponent implements OnInit {
     super(snackBar, dialog, errorService);
     this.authService = this.configService.getAuthStrategy();
     this.cacheService = this.configService.getCacheStrategy();
-    // this.apiService = this.configService.getApiStrategy();
   }
 
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe((user) => {
+    this.authService.getCurrentUser().subscribe(async (user) => {
       if (user) {
         console.log('Redirecting because already logged in');
+
+        const redirectUrl = await this.navigationService.getRedirectUrl();
+
         if (this.configService.isTesting()) {
-          this.delay(1000).then(() => {
-            this.router.navigate(['/sentinel']);
-          });
+          await this.delay(1000);
         }
-        this.router.navigate(['/sentinel']);
+
+        if (redirectUrl) {
+          this.navigationService.clearRedirectUrl();
+          this.router.navigate([redirectUrl]); // Navigate to the saved URL
+        } else {
+          this.router.navigate(['/sentinel']); // Default fallback
+        }
       }
     });
   }
@@ -75,7 +83,13 @@ export class LoginComponent extends BaseComponent implements OnInit {
         this.handleGptApiKey(loggedInUser);
       }
 
-      this.router.navigate(['/navigator']);
+      const redirectUrl = await this.navigationService.getRedirectUrl();
+      if (redirectUrl) {
+        this.navigationService.clearRedirectUrl();
+        this.router.navigate([redirectUrl]);
+      } else {
+        this.router.navigate(['/navigator']); // Default route
+      }
     } catch (error) {
       this.error('Login error:', error);
       this.popup('Login failed. Please try again.');
@@ -87,15 +101,13 @@ export class LoginComponent extends BaseComponent implements OnInit {
       .getApiStrategy()
       .getUserInfo(loggedInUser.userId)
       .then((user: TaskUserInfo | undefined) => {
-        if (user) {
-          if (user && user.canUseGpt) {
-            this.configService
-              .getApiStrategy()
-              .generateApiKey(loggedInUser.userId)
-              .then(() => {
-                console.log('Api key generated: ');
-              });
-          }
+        if (user && user.canUseGpt) {
+          this.configService
+            .getApiStrategy()
+            .generateApiKey(loggedInUser.userId)
+            .then(() => {
+              console.log('API key generated');
+            });
         }
       });
   }
@@ -126,15 +138,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     await this.authService.deleteCurrentUser();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   login(email: string, password: string): void {
-    // this.authService
-    //   .loginWithEmailAndPassword(email, password)
-    //   .then(() => {
-    //     this.router.navigate(['/protected']);
-    //   })
-    //   .catch((error) => {
-    //     console.error('Login error:', error);
-    //   });
+    // Future implementation for email-password login
   }
 }

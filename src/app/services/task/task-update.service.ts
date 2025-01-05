@@ -51,7 +51,10 @@ export class TaskUpdateService extends CoreService {
             targetTask.taskId
           );
           this.clearSelectedTasks();
-          this.feedback('Updated multiple tasks.');
+          this.feedback(
+            'Moved multiple tasks. ' +
+              selectedTasks.map((t) => t.name).join(',')
+          );
         } else {
           this.error(
             "Can't update empty tasks or failed to create new overlord."
@@ -66,6 +69,7 @@ export class TaskUpdateService extends CoreService {
       if (s) {
         if (s.moveTasksOnce) {
           this.selectedService.clear();
+          this.feedback('Cleared selected tasks. ');
         }
       }
     });
@@ -82,7 +86,7 @@ export class TaskUpdateService extends CoreService {
       this.taskBatchService
         .createTaskBatch([taskOne, taskTwo], task.taskId)
         .then(() => {
-          this.log('Tasks split');
+          this.feedback('Tasks split');
         });
     } else {
       this.error('task names are the same');
@@ -93,6 +97,7 @@ export class TaskUpdateService extends CoreService {
     task.timeCreated = Date.now();
     this.taskService.createTask(task).then((createdTask: Task) => {
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
+      this.feedback('Created: ' + ' ' + createdTask.name);
       this.actionService.recordAction(task.taskId, TaskActions.CREATED);
     });
   }
@@ -105,7 +110,7 @@ export class TaskUpdateService extends CoreService {
   update(task: Task, action: TaskActions, subAction?: any) {
     task.lastUpdated = Date.now();
     this.taskService.updateTask(task).then(() => {
-      this.log('Updated: ' + task.name + ' at ' + task.lastUpdated);
+      this.feedback(task.name + ' ' + action + ' ' + (subAction || ''));
       this.actionService.recordAction(task.taskId, action, subAction);
     });
   }

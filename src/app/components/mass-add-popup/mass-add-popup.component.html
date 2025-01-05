@@ -1,0 +1,17 @@
+<h2 mat-dialog-title class="dialog-title">Mass Add</h2>
+<!-- <mat-dialog-title>Edit Task</mat-dialog-title> -->
+<mat-dialog-content>
+  <app-input-to-tasks [overlord]="overlord"></app-input-to-tasks>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button
+    mat-icon-button
+    color="primary"
+    style="color: rgb(15, 177, 75)"
+    class="task-btn"
+    (click)="onSave()"
+    aria-label="Save Task"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

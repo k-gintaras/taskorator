@@ -111,7 +111,7 @@ export type TaskSubtype =
   | 'list';
 
 export const ROOT_TASK_ID = '128';
-export const ROOT_TASK_DESCRIPTION = 'connecting to make sense';
+export const ROOT_TASK_DESCRIPTION = 'Root of all tasks.';
 
 export function getDefaultTask(): Task {
   const now = Date.now(); // Current time in milliseconds

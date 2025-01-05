@@ -26,7 +26,14 @@ export class TaskNavigatorUltraService {
     private taskService: TaskService,
     private selectedOverlord: SelectedOverlordService,
     private taskUsageService: TaskUsageService
-  ) {}
+  ) {
+    // selectedOverlord.getSelectedOverlordObservable().subscribe((t) => {
+    //   if (!t) return;
+    //   // this.next(t);
+    // });
+    // we want to auto navigate to selected overlord but it causes loop...
+    // so probably not
+  }
 
   /**
    * Load and initialize tasks, then update the view.

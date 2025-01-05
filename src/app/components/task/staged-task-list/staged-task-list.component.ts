@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StagedTasksService } from '../../../services/tasks/staged-task.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { getRandomTasks } from '../../../test-files/test-data/test-task';
@@ -18,11 +18,13 @@ import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.compo
 })
 export class StagedTaskListComponent {
   @Input() tasks: Task[] = [];
+  @Output() tasksChange = new EventEmitter<Task[]>(); // Notify parent about changes
 
   constructor(private dialog: MatDialog) {}
 
   deleteTask(t: Task): void {
     this.tasks = this.tasks.filter((task) => task.taskId !== t.taskId);
+    this.tasksChange.emit(this.tasks); // Emit the updated tasks list
   }
 
   editTask(task: Task): void {

@@ -11,6 +11,7 @@ import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
 import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
+import { MassAddPopupComponent } from '../../mass-add-popup/mass-add-popup.component';
 
 @Component({
   selector: 'app-artificer-action',
@@ -101,6 +102,9 @@ export class ArtificerActionComponent {
       case 'edit':
         this.editTask(task);
         break;
+      case 'mass':
+        this.mass(task);
+        break;
       case 'select':
         this.selectedService.addRemoveSelectedTask(task);
         break;
@@ -125,6 +129,27 @@ export class ArtificerActionComponent {
       default:
         break;
     }
+  }
+
+  mass(task: Task) {
+    const dialogRef = this.dialog.open(MassAddPopupComponent, {
+      width: '600px',
+      data: task,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Update the task in your list or database
+        // if (result) {
+        //   console.log('Task updated on server:', result);
+        //   const taskAction: TaskActions = TaskActions.UPDATED;
+        //   this.taskUpdateService.update(result, taskAction);
+        // }
+        console.log('mass add dialog finished');
+      } else {
+        console.log('task not updated or so dialog says...');
+      }
+    });
   }
 
   editTask(task: Task): void {

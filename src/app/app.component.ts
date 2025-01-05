@@ -7,6 +7,7 @@ import { ServiceInitiatorService } from './services/core/service-initiator.servi
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 import { GptCreateComponent } from './features/gpt/gpt-create/gpt-create.component';
 import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
+import { TestTreeService } from './test-files/test-services/test-tree.service';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,8 @@ export class AppComponent {
   constructor(
     private serviceInitiator: ServiceInitiatorService,
     private errorService: ErrorService,
-    private config: ConfigService
+    private config: ConfigService,
+    private testTree: TestTreeService
   ) {
     this.feedbackSubscription = this.errorService
       .getFeedback()
@@ -44,6 +46,8 @@ export class AppComponent {
     await this.serviceInitiator.waitForInitialization();
     this.testing = this.config.isTesting();
     this.authenticated = this.config.getAuthStrategy().isAuthenticated();
+    this.testTree.runTests();
+
     console.log('Authenticated: ' + this.authenticated);
     // Proceed with the login process or other initialization tasks
   }

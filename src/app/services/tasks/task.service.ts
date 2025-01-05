@@ -8,6 +8,7 @@ import { AuthService } from '../core/auth.service';
 import { TaskTransmutationService } from './task-transmutation.service';
 import { TaskActions } from './task-action-tracker.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
+import { ErrorService } from '../core/error.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,8 @@ export class TaskService {
     private taskIdCache: TaskIdCacheService,
     private apiService: TaskApiService,
     private authService: AuthService,
-    private transmutatorService: TaskTransmutationService
+    private transmutatorService: TaskTransmutationService,
+    private errorService: ErrorService
   ) {}
 
   /**
@@ -46,6 +48,7 @@ export class TaskService {
       ); // Notify TaskIdCache of update
 
       this.eventBusService.createTask(createdTask);
+
       return extendedTask;
     } catch (error) {
       console.error('Error creating task:', error);
@@ -68,6 +71,7 @@ export class TaskService {
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
         this.taskIdCache.deleteTask(extendedTask.taskId); // Notify TaskIdCache of deletion
+        this.feedBack('task deleted' + extendedTask.name);
       } else {
         this.taskIdCache.updateTasks([extendedTask]); // Notify TaskIdCache of update
         // this.taskCache.addTask(extendedTask); // Update the cache
@@ -191,6 +195,12 @@ export class TaskService {
    * Centralized error handling.
    */
   private handleError(method: string, error: unknown): void {
-    console.error(`TaskService.${method} failed:`, error);
+    const message = `TaskService.${method} failed: ${error}`;
+    this.errorService.error(message);
+    this.errorService.popup(message); // Notify users if needed
+  }
+
+  private feedBack(s: string) {
+    this.errorService.feedback(s);
   }
 }

@@ -15079,7 +15079,7 @@
         },
         {
             "name": "TaskBatchService",
-            "id": "injectable-TaskBatchService-70ad114ee198f844d2226c7b7f89eb739337ac289c926106f22b278adea527a705371dfb19989a546e34a6ccd82503ef9f10f25451293fcfa405a895f343ce58",
+            "id": "injectable-TaskBatchService-43c6dc5b75009ac0a5c870cb74ade8de74af20ebdeb0941c5cb8c0eb5ff144a345eb708e111e356c48aaaff155c81a18e0dd07d2873b0f990d974539097d5571",
             "file": "src/app/services/tasks/task-batch.service.ts",
             "properties": [],
             "methods": [
@@ -15093,7 +15093,7 @@
                             "deprecationMessage": ""
                         },
                         {
-                            "name": "groupName",
+                            "name": "overlordId",
                             "type": "string",
                             "deprecated": false,
                             "deprecationMessage": ""
@@ -15121,7 +15121,7 @@
                             }
                         },
                         {
-                            "name": "groupName",
+                            "name": "overlordId",
                             "type": "string",
                             "deprecated": false,
                             "deprecationMessage": "",
@@ -15137,7 +15137,7 @@
                     "optional": false,
                     "returnType": "Promise<string>",
                     "typeParameters": [],
-                    "line": 138,
+                    "line": 140,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "rawdescription": "\n\nRetrieve the current user ID (handles authentication checks).\n",
@@ -15173,7 +15173,7 @@
                     "optional": false,
                     "returnType": "Promise<void>",
                     "typeParameters": [],
-                    "line": 70,
+                    "line": 72,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "rawdescription": "\n\nUpdate a batch of tasks, refresh cache, and notify listeners.\n",
@@ -15217,7 +15217,7 @@
             "deprecationMessage": "",
             "description": "",
             "rawdescription": "\n",
-            "sourceCode": "import { Injectable } from '@angular/core';\r\nimport { ExtendedTask, Task } from '../../models/taskModelManager';\r\nimport { TaskApiService } from '../api/task-api.service';\r\nimport { TaskIdCacheService } from '../cache/task-id-cache.service';\r\nimport { AuthService } from '../core/auth.service';\r\nimport { EventBusService } from '../core/event-bus.service';\r\nimport { TaskTransmutationService } from './task-transmutation.service';\r\nimport {\r\n  TaskActions,\r\n  TaskActionTrackerService,\r\n} from './task-action-tracker.service';\r\n\r\n@Injectable({\r\n  providedIn: 'root',\r\n})\r\nexport class TaskBatchService {\r\n  constructor(\r\n    private taskIdCache: TaskIdCacheService,\r\n    private taskApi: TaskApiService,\r\n    private authService: AuthService,\r\n    private eventBusService: EventBusService,\r\n    private transmutatorService: TaskTransmutationService,\r\n    private taskActionService: TaskActionTrackerService\r\n  ) {}\r\n\r\n  /**\r\n   * Create a batch of tasks, update the cache, and cache their IDs.\r\n   */\r\n  async createTaskBatch(\r\n    tasks: Task[],\r\n    groupName: string\r\n  ): Promise<ExtendedTask[] | null> {\r\n    try {\r\n      // if (!this.validatorService.isTaskValid(task)) {\r\n      //   throw new Error('Invalid task, probably because it is empty');\r\n      // }\r\n      const userId = await this.getUserId();\r\n      if (!userId) throw new Error('User not authenticated');\r\n\r\n      // Create tasks via API\r\n      const createdTasks: Task[] | null = await this.taskApi.createTasks(\r\n        userId,\r\n        tasks\r\n      );\r\n      if (!createdTasks) {\r\n        console.warn('No tasks were created.');\r\n        return null;\r\n      }\r\n\r\n      // Convert and cache created tasks\r\n      const extendedTasks =\r\n        this.transmutatorService.toExtendedTasks(createdTasks);\r\n      this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition\r\n      const ids = this.transmutatorService.getIds(extendedTasks);\r\n\r\n      // Notify other services\r\n      this.eventBusService.createTasks(tasks);\r\n      this.taskActionService.recordBatchAction(ids, TaskActions.CREATED);\r\n\r\n      return extendedTasks;\r\n    } catch (error) {\r\n      console.error('Failed to create task batch:', error);\r\n      return null;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Update a batch of tasks, refresh cache, and notify listeners.\r\n   */\r\n  async updateTaskBatch(\r\n    tasks: Task[],\r\n    action: TaskActions,\r\n    subAction?: any\r\n  ): Promise<void> {\r\n    try {\r\n      // if (!this.validatorService.isTaskValid(task)) {\r\n      //   throw new Error('Invalid task, probably because it is empty');\r\n      // }\r\n      const userId = await this.getUserId();\r\n      if (!userId) {\r\n        console.error('User not authenticated');\r\n        return;\r\n      }\r\n\r\n      // Update tasks via API\r\n      await this.taskApi.updateTasks(userId, tasks);\r\n\r\n      // Refresh cache with updated tasks\r\n      const extendedTasks = this.transmutatorService.toExtendedTasks(tasks);\r\n\r\n      // Notify TaskIdCache based on action\r\n      switch (action) {\r\n        case TaskActions.MOVED:\r\n          extendedTasks.forEach((task) => {\r\n            const currentGroup = this.taskIdCache.getTaskGroup(task.taskId);\r\n            if (currentGroup) {\r\n              // THE ISSUE WAS wrong overlord key... but we need to still allow other keys...\r\n              // we assume subAction will be overlord.taskId the new owner of the tasks...\r\n              // what if it is not? well i guess we save it to a list we can never access? somewhere in memory :D\r\n              // do not worry as API will just have tasks with new overlord... and later we can just get them from that overlord\r\n              // if we know which overlord now owns them :D\r\n              // what if we forget? search in a tree?\r\n              this.taskIdCache.moveTask(\r\n                task.taskId,\r\n                currentGroup,\r\n                'overlord_' + subAction || 'default'\r\n              );\r\n            }\r\n          });\r\n          break;\r\n        case TaskActions.DELETED:\r\n          extendedTasks.forEach((task) => {\r\n            const groupName = this.taskIdCache.getTaskGroup(task.taskId);\r\n            if (groupName) {\r\n              this.taskIdCache.deleteTask(task.taskId);\r\n            }\r\n          });\r\n          break;\r\n        case TaskActions.UPDATED:\r\n          this.taskIdCache.updateTasks(extendedTasks); // Just refresh cache with updated tasks\r\n          break;\r\n      }\r\n\r\n      const ids = this.transmutatorService.getIds(extendedTasks);\r\n\r\n      // Notify other services\r\n      this.eventBusService.updateTasks(tasks);\r\n      this.taskActionService.recordBatchAction(ids, action, subAction);\r\n    } catch (error) {\r\n      console.error('Failed to update task batch:', error);\r\n      throw error;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Retrieve the current user ID (handles authentication checks).\r\n   */\r\n  private async getUserId(): Promise<string> {\r\n    try {\r\n      const userId = await this.authService.getCurrentUserId();\r\n      if (!userId) throw new Error('User not authenticated');\r\n      return userId;\r\n    } catch (error) {\r\n      console.error('Error retrieving user ID:', error);\r\n      throw error;\r\n    }\r\n  }\r\n}\r\n",
+            "sourceCode": "import { Injectable } from '@angular/core';\r\nimport { ExtendedTask, Task } from '../../models/taskModelManager';\r\nimport { TaskApiService } from '../api/task-api.service';\r\nimport { TaskIdCacheService } from '../cache/task-id-cache.service';\r\nimport { AuthService } from '../core/auth.service';\r\nimport { EventBusService } from '../core/event-bus.service';\r\nimport { TaskTransmutationService } from './task-transmutation.service';\r\nimport {\r\n  TaskActions,\r\n  TaskActionTrackerService,\r\n} from './task-action-tracker.service';\r\n\r\n@Injectable({\r\n  providedIn: 'root',\r\n})\r\nexport class TaskBatchService {\r\n  constructor(\r\n    private taskIdCache: TaskIdCacheService,\r\n    private taskApi: TaskApiService,\r\n    private authService: AuthService,\r\n    private eventBusService: EventBusService,\r\n    private transmutatorService: TaskTransmutationService,\r\n    private taskActionService: TaskActionTrackerService\r\n  ) {}\r\n\r\n  /**\r\n   * Create a batch of tasks, update the cache, and cache their IDs.\r\n   */\r\n  async createTaskBatch(\r\n    tasks: Task[],\r\n    overlordId: string\r\n  ): Promise<ExtendedTask[] | null> {\r\n    try {\r\n      // if (!this.validatorService.isTaskValid(task)) {\r\n      //   throw new Error('Invalid task, probably because it is empty');\r\n      // }\r\n      const userId = await this.getUserId();\r\n      if (!userId) throw new Error('User not authenticated');\r\n\r\n      // Create tasks via API\r\n      const createdTasks: Task[] | null = await this.taskApi.createTasks(\r\n        userId,\r\n        tasks\r\n      );\r\n      if (!createdTasks) {\r\n        console.warn('No tasks were created.');\r\n        return null;\r\n      }\r\n\r\n      // Convert and cache created tasks\r\n      const extendedTasks =\r\n        this.transmutatorService.toExtendedTasks(createdTasks);\r\n\r\n      const groupName = 'overlord_' + overlordId;\r\n      this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition\r\n      const ids = this.transmutatorService.getIds(extendedTasks);\r\n\r\n      // Notify other services\r\n      this.eventBusService.createTasks(tasks);\r\n      this.taskActionService.recordBatchAction(ids, TaskActions.CREATED);\r\n\r\n      return extendedTasks;\r\n    } catch (error) {\r\n      console.error('Failed to create task batch:', error);\r\n      return null;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Update a batch of tasks, refresh cache, and notify listeners.\r\n   */\r\n  async updateTaskBatch(\r\n    tasks: Task[],\r\n    action: TaskActions,\r\n    subAction?: any\r\n  ): Promise<void> {\r\n    try {\r\n      // if (!this.validatorService.isTaskValid(task)) {\r\n      //   throw new Error('Invalid task, probably because it is empty');\r\n      // }\r\n      const userId = await this.getUserId();\r\n      if (!userId) {\r\n        console.error('User not authenticated');\r\n        return;\r\n      }\r\n\r\n      // Update tasks via API\r\n      await this.taskApi.updateTasks(userId, tasks);\r\n\r\n      // Refresh cache with updated tasks\r\n      const extendedTasks = this.transmutatorService.toExtendedTasks(tasks);\r\n\r\n      // Notify TaskIdCache based on action\r\n      switch (action) {\r\n        case TaskActions.MOVED:\r\n          extendedTasks.forEach((task) => {\r\n            const currentGroup = this.taskIdCache.getTaskGroup(task.taskId);\r\n            if (currentGroup) {\r\n              // THE ISSUE WAS wrong overlord key... but we need to still allow other keys...\r\n              // we assume subAction will be overlord.taskId the new owner of the tasks...\r\n              // what if it is not? well i guess we save it to a list we can never access? somewhere in memory :D\r\n              // do not worry as API will just have tasks with new overlord... and later we can just get them from that overlord\r\n              // if we know which overlord now owns them :D\r\n              // what if we forget? search in a tree?\r\n              this.taskIdCache.moveTask(\r\n                task.taskId,\r\n                currentGroup,\r\n                'overlord_' + subAction || 'default'\r\n              );\r\n            }\r\n          });\r\n          break;\r\n        case TaskActions.DELETED:\r\n          extendedTasks.forEach((task) => {\r\n            const groupName = this.taskIdCache.getTaskGroup(task.taskId);\r\n            if (groupName) {\r\n              this.taskIdCache.deleteTask(task.taskId);\r\n            }\r\n          });\r\n          break;\r\n        case TaskActions.UPDATED:\r\n          this.taskIdCache.updateTasks(extendedTasks); // Just refresh cache with updated tasks\r\n          break;\r\n      }\r\n\r\n      const ids = this.transmutatorService.getIds(extendedTasks);\r\n\r\n      // Notify other services\r\n      this.eventBusService.updateTasks(tasks);\r\n      this.taskActionService.recordBatchAction(ids, action, subAction);\r\n    } catch (error) {\r\n      console.error('Failed to update task batch:', error);\r\n      throw error;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Retrieve the current user ID (handles authentication checks).\r\n   */\r\n  private async getUserId(): Promise<string> {\r\n    try {\r\n      const userId = await this.authService.getCurrentUserId();\r\n      if (!userId) throw new Error('User not authenticated');\r\n      return userId;\r\n    } catch (error) {\r\n      console.error('Error retrieving user ID:', error);\r\n      throw error;\r\n    }\r\n  }\r\n}\r\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -26559,10 +26559,20 @@
         },
         {
             "name": "UrlHelperService",
-            "id": "injectable-UrlHelperService-1006298d855ec99895c6d05a2de866365abe3ac40d59c1ac2dd889fb107106def1b653e8fb201d930e74f72ee1a64e2002ca7c2cfaaf1c513cd3700eb8bc0563",
+            "id": "injectable-UrlHelperService-17190c4026bdd6f2373eb3ebe51addf77384149e259eaa86308ffb39c5bf69bfc9fd790456555fb607f2ab9f6a5e4e111d9c40730ac12ca8ecd3ee1bf2694d5c",
             "file": "src/app/services/task/url-helper.service.ts",
             "properties": [],
             "methods": [
+                {
+                    "name": "getTaskIdFromUrl",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "string | null",
+                    "typeParameters": [],
+                    "line": 13,
+                    "deprecated": false,
+                    "deprecationMessage": ""
+                },
                 {
                     "name": "selectedOverlordUrlUpdate",
                     "args": [
@@ -26588,7 +26598,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 11,
+                    "line": 19,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -26626,7 +26636,48 @@
             "deprecationMessage": "use ExtendedTask for ui... or extend task to have \"selected\" property, none of componetns use this yet...",
             "description": "",
             "rawdescription": "\n\n",
-            "sourceCode": "import { Injectable } from '@angular/core';\r\nimport { Task } from '../../models/taskModelManager';\r\nimport { ActivatedRoute, Router } from '@angular/router';\r\n/**\r\n * @fix or @deprecated use ExtendedTask for ui... or extend task to have \"selected\" property, none of componetns use this yet...\r\n */\r\n@Injectable({\r\n  providedIn: 'root',\r\n})\r\nexport class UrlHelperService {\r\n  selectedOverlordUrlUpdate(task: Task, router: Router, route: ActivatedRoute) {\r\n    router.navigate([], {\r\n      relativeTo: route,\r\n      queryParams: { selectedOverlord: task.taskId },\r\n      queryParamsHandling: 'merge',\r\n    });\r\n  }\r\n}\r\n",
+            "sourceCode": "import { Injectable } from '@angular/core';\r\nimport { Task } from '../../models/taskModelManager';\r\nimport { ActivatedRoute, Router } from '@angular/router';\r\n/**\r\n * @fix or @deprecated use ExtendedTask for ui... or extend task to have \"selected\" property, none of componetns use this yet...\r\n */\r\n@Injectable({\r\n  providedIn: 'root',\r\n})\r\nexport class UrlHelperService {\r\n  constructor(private router: Router, private route: ActivatedRoute) {}\r\n\r\n  getTaskIdFromUrl(): string | null {\r\n    const urlSegments = this.router.url.split('/');\r\n    const taskIndex = urlSegments.indexOf('task');\r\n    return taskIndex > -1 ? urlSegments[taskIndex + 1] : null;\r\n  }\r\n\r\n  selectedOverlordUrlUpdate(task: Task, router: Router, route: ActivatedRoute) {\r\n    router.navigate([], {\r\n      relativeTo: route,\r\n      queryParams: { selectedOverlord: task.taskId },\r\n      queryParamsHandling: 'merge',\r\n    });\r\n  }\r\n}\r\n",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "args": [
+                    {
+                        "name": "router",
+                        "type": "Router",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "route",
+                        "type": "ActivatedRoute",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    }
+                ],
+                "line": 10,
+                "jsdoctags": [
+                    {
+                        "name": "router",
+                        "type": "Router",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "route",
+                        "type": "ActivatedRoute",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
             "extends": [],
             "type": "injectable"
         },
@@ -31480,7 +31531,7 @@
         },
         {
             "name": "HorizontalNavigationComponent",
-            "id": "component-HorizontalNavigationComponent-5dfec9935dac2306358361f6b41ce6d8ace13dc54efcde23fed7204e7a64d64c2fdb00ab5bdec780b430110681030bd2ee1c59d88198201f074fd8ee429e5de0",
+            "id": "component-HorizontalNavigationComponent-1f46bd6d3c32cb8abd15ed1f043f365810d37db7d478fb5d8e02bb67d2f3b32bcd3e12d0c2eab580ca290a390a53c3cd068113a606ecc620eafcd7c3030d8290",
             "file": "src/app/components/horizontal-navigation/horizontal-navigation.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -31508,7 +31559,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 40,
+                    "line": 29,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -31528,7 +31579,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 35
+                    "line": 24
                 },
                 {
                     "name": "isHandset",
@@ -31539,7 +31590,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 33
+                    "line": 23
                 },
                 {
                     "name": "navItems",
@@ -31550,18 +31601,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 31
-                },
-                {
-                    "name": "searchActive",
-                    "defaultValue": "false",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "",
-                    "indexKey": "",
-                    "optional": false,
-                    "description": "",
-                    "line": 34
+                    "line": 21
                 },
                 {
                     "name": "selectedChild",
@@ -31572,7 +31612,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 38
+                    "line": 27
                 },
                 {
                     "name": "selectedFeature",
@@ -31583,7 +31623,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 37
+                    "line": 26
                 },
                 {
                     "name": "viewingChildren",
@@ -31594,27 +31634,17 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 32
+                    "line": 22
                 }
             ],
             "methodsClass": [
-                {
-                    "name": "canGoBack",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "boolean",
-                    "typeParameters": [],
-                    "line": 135,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
                 {
                     "name": "checkViewport",
                     "args": [],
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 63,
+                    "line": 59,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -31624,7 +31654,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 129,
+                    "line": 104,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -31639,9 +31669,9 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "void",
+                    "returnType": "boolean",
                     "typeParameters": [],
-                    "line": 71,
+                    "line": 63,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "jsdoctags": [
@@ -31662,7 +31692,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 48,
+                    "line": 37,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -31672,11 +31702,9 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 119,
+                    "line": 94,
                     "deprecated": false,
-                    "deprecationMessage": "",
-                    "rawdescription": "\n\nReturn to the top-level navigation.\n",
-                    "description": "<p>Return to the top-level navigation.</p>\n"
+                    "deprecationMessage": ""
                 },
                 {
                     "name": "onNavItemClick",
@@ -31691,35 +31719,18 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 93,
+                    "line": 77,
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "rawdescription": "\n\nShow children for the selected feature or navigate directly.\n",
-                    "description": "<p>Show children for the selected feature or navigate directly.</p>\n",
                     "jsdoctags": [
                         {
-                            "name": {
-                                "pos": 2797,
-                                "end": 2801,
-                                "kind": 80,
-                                "id": 0,
-                                "flags": 16842752,
-                                "transformFlags": 0,
-                                "escapedText": "item"
-                            },
+                            "name": "item",
                             "type": "literal type",
                             "deprecated": false,
                             "deprecationMessage": "",
                             "tagName": {
-                                "pos": 2791,
-                                "end": 2796,
-                                "kind": 80,
-                                "id": 0,
-                                "flags": 16842752,
-                                "transformFlags": 0,
-                                "escapedText": "param"
-                            },
-                            "comment": "<ul>\n<li>The selected navigation item.</li>\n</ul>\n"
+                                "text": "param"
+                            }
                         }
                     ]
                 },
@@ -31729,7 +31740,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 59,
+                    "line": 55,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "decorators": [
@@ -31748,11 +31759,19 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 79,
+                    "line": 67,
                     "deprecated": false,
-                    "deprecationMessage": "",
-                    "rawdescription": "\n\nShow top-level features.\n",
-                    "description": "<p>Show top-level features.</p>\n"
+                    "deprecationMessage": ""
+                },
+                {
+                    "name": "syncWithUrl",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 110,
+                    "deprecated": false,
+                    "deprecationMessage": ""
                 },
                 {
                     "name": "toggleDrawer",
@@ -31760,17 +31779,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 123,
-                    "deprecated": false,
-                    "deprecationMessage": ""
-                },
-                {
-                    "name": "toggleSearch",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 67,
+                    "line": 98,
                     "deprecated": false,
                     "deprecationMessage": ""
                 }
@@ -31785,51 +31794,26 @@
                     "argsDecorator": [],
                     "deprecated": false,
                     "deprecationMessage": "",
-                    "line": 59
+                    "line": 55
                 }
             ],
             "standalone": true,
             "imports": [
                 {
-                    "name": "CommonModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatSidenavModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatButtonModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatIconModule",
-                    "type": "module"
-                },
-                {
-                    "name": "MatToolbarModule",
-                    "type": "module"
-                },
-                {
                     "name": "RouterOutlet"
                 },
                 {
-                    "name": "OverlordNavigatorComponent",
-                    "type": "component"
-                },
-                {
-                    "name": "SearchCreateComponent",
-                    "type": "component"
+                    "name": "MatDrawer"
                 }
             ],
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, HostListener, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet } from '@angular/router';\r\nimport { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { NavigationBuilderService } from '../../services/navigation-builder.service';\r\nimport { CommonModule } from '@angular/common';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatToolbarModule } from '@angular/material/toolbar';\r\nimport { RouteMetadata } from '../../app.routes-models';\r\nimport { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';\r\nimport { SearchCreateComponent } from '../search-create/search-create.component';\r\n\r\n@Component({\r\n  selector: 'app-horizontal-navigation',\r\n  standalone: true,\r\n  imports: [\r\n    CommonModule,\r\n    MatSidenavModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatToolbarModule,\r\n    RouterOutlet,\r\n    OverlordNavigatorComponent,\r\n    SearchCreateComponent,\r\n  ],\r\n  templateUrl: './horizontal-navigation.component.html',\r\n  styleUrls: ['./horizontal-navigation.component.scss'],\r\n})\r\nexport class HorizontalNavigationComponent implements OnInit {\r\n  navItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  viewingChildren = false;\r\n  isHandset = false;\r\n  searchActive = false;\r\n  isCompact = false; // Determines if the toolbar is in compact mode\r\n\r\n  selectedFeature = '';\r\n  selectedChild = '';\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private navigationService: NavigationBuilderService,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.showTopLevel(); // Initialize at top level\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n    this.checkViewport();\r\n  }\r\n\r\n  @HostListener('window:resize', [])\r\n  onResize() {\r\n    this.checkViewport();\r\n  }\r\n\r\n  checkViewport() {\r\n    this.isCompact = window.innerWidth < 600; // Adjust breakpoint as needed\r\n  }\r\n\r\n  toggleSearch() {\r\n    this.searchActive = !this.searchActive;\r\n  }\r\n\r\n  isSelected(path: string) {\r\n    // return true;\r\n    this.selectedChild === path || this.selectedFeature === path;\r\n  }\r\n\r\n  /**\r\n   * Show top-level features.\r\n   */\r\n  showTopLevel() {\r\n    this.navItems = this.navigationService\r\n      .getTopLevelFeatures()\r\n      .map((feature) => ({\r\n        path: feature.path,\r\n        metadata: feature.metadata,\r\n      }));\r\n    this.viewingChildren = false;\r\n  }\r\n\r\n  /**\r\n   * Show children for the selected feature or navigate directly.\r\n   * @param item - The selected navigation item.\r\n   */\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    const childrenPaths = this.navigationService.getChildrenPaths(item.path);\r\n\r\n    if (childrenPaths.length > 0) {\r\n      // its a feature\r\n\r\n      this.navItems = childrenPaths.map((childPath) => ({\r\n        path: `${item.path}/${childPath}`,\r\n        metadata: this.navigationService.getRouteMetadata(childPath),\r\n      }));\r\n      this.viewingChildren = true;\r\n      this.selectedChild = item.path;\r\n      // prenavigate automatically to default path for convenience\r\n      // or inconvenience\r\n      this.router.navigate([item.path]);\r\n    } else {\r\n      // child of feature\r\n      this.router.navigate([item.path]); // Navigate directly\r\n      this.closeDrawerOnMobile();\r\n      this.selectedFeature = item.path;\r\n    }\r\n  }\r\n\r\n  /**\r\n   * Return to the top-level navigation.\r\n   */\r\n  onBackClick() {\r\n    this.showTopLevel();\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.close();\r\n    }\r\n  }\r\n\r\n  canGoBack() {\r\n    return this.viewingChildren;\r\n  }\r\n}\r\n",
+            "sourceCode": "import { Component, HostListener, OnInit, ViewChild } from '@angular/core';\r\nimport { Router, RouterOutlet, NavigationEnd } from '@angular/router';\r\nimport { MatDrawer } from '@angular/material/sidenav';\r\nimport { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';\r\nimport { NavigationBuilderService } from '../../services/navigation-builder.service';\r\nimport { RouteMetadata } from '../../app.routes-models';\r\nimport { filter } from 'rxjs/operators';\r\n\r\n@Component({\r\n  selector: 'app-horizontal-navigation',\r\n  standalone: true,\r\n  imports: [\r\n    RouterOutlet,\r\n    MatDrawer,\r\n    // Import other required modules\r\n  ],\r\n  templateUrl: './horizontal-navigation.component.html',\r\n  styleUrls: ['./horizontal-navigation.component.scss'],\r\n})\r\nexport class HorizontalNavigationComponent implements OnInit {\r\n  navItems: { path: string; metadata: RouteMetadata }[] = [];\r\n  viewingChildren = false;\r\n  isHandset = false;\r\n  isCompact = false;\r\n\r\n  selectedFeature = '';\r\n  selectedChild = '';\r\n\r\n  @ViewChild('drawer') drawer!: MatDrawer;\r\n\r\n  constructor(\r\n    private router: Router,\r\n    private navigationService: NavigationBuilderService,\r\n    private breakpointObserver: BreakpointObserver\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.showTopLevel();\r\n    this.breakpointObserver\r\n      .observe([Breakpoints.Handset])\r\n      .subscribe((result) => {\r\n        this.isHandset = result.matches;\r\n      });\r\n\r\n    this.router.events\r\n      .pipe(filter((event) => event instanceof NavigationEnd))\r\n      .subscribe(() => {\r\n        this.syncWithUrl();\r\n      });\r\n\r\n    this.checkViewport();\r\n  }\r\n\r\n  @HostListener('window:resize', [])\r\n  onResize() {\r\n    this.checkViewport();\r\n  }\r\n\r\n  checkViewport() {\r\n    this.isCompact = window.innerWidth < 600;\r\n  }\r\n\r\n  isSelected(path: string) {\r\n    return this.router.url === path;\r\n  }\r\n\r\n  showTopLevel() {\r\n    this.navItems = this.navigationService\r\n      .getTopLevelFeatures()\r\n      .map((feature) => ({\r\n        path: feature.path,\r\n        metadata: feature.metadata,\r\n      }));\r\n    this.viewingChildren = false;\r\n  }\r\n\r\n  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {\r\n    const childrenPaths = this.navigationService.getChildrenPaths(item.path);\r\n\r\n    if (childrenPaths.length > 0) {\r\n      this.navItems = childrenPaths.map((childPath) => ({\r\n        path: `${item.path}/${childPath}`,\r\n        metadata: this.navigationService.getRouteMetadata(childPath),\r\n      }));\r\n      this.viewingChildren = true;\r\n      this.selectedFeature = item.path;\r\n    } else {\r\n      this.router.navigate([item.path]);\r\n      this.closeDrawerOnMobile();\r\n      this.selectedChild = item.path;\r\n    }\r\n  }\r\n\r\n  onBackClick() {\r\n    this.showTopLevel();\r\n  }\r\n\r\n  toggleDrawer() {\r\n    if (this.drawer) {\r\n      this.drawer.toggle();\r\n    }\r\n  }\r\n\r\n  closeDrawerOnMobile() {\r\n    if (this.isHandset && this.drawer) {\r\n      this.drawer.close();\r\n    }\r\n  }\r\n\r\n  syncWithUrl() {\r\n    const currentUrl = this.router.url;\r\n    const match = this.navItems.find((item) =>\r\n      currentUrl.startsWith(item.path)\r\n    );\r\n    if (match) {\r\n      this.selectedFeature = match.path;\r\n    } else {\r\n      this.selectedFeature = '';\r\n      this.selectedChild = '';\r\n    }\r\n  }\r\n}\r\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": "/* Toolbar */\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 8px;\r\n\r\n  button {\r\n    margin-right: 5px;\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    flex-grow: 1; /* Push search bar to the right */\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    text-align: center;\r\n  }\r\n\r\n  .app-icon {\r\n    height: 40px;\r\n    margin-right: auto;\r\n  }\r\n\r\n  // .search-bar {\r\n  //   margin-left: auto;\r\n  //   max-width: 100px;\r\n  //   flex-grow: 1;\r\n  //   display: flex;\r\n  //   align-items: center;\r\n  //   justify-content: flex-end;\r\n  // }\r\n\r\n  @media (max-width: 600px) {\r\n    .app-title {\r\n      display: none; /* Hide title on smaller screens */\r\n    }\r\n\r\n    .app-icon {\r\n      display: inline-block; /* Show icon on mobile */\r\n    }\r\n\r\n    // .search-bar {\r\n    //   display: none; /* Hide search bar by default */\r\n    // }\r\n\r\n    // .search-bar.active {\r\n    //   display: flex; /* Show search bar when toggled */\r\n    //   width: 100%;\r\n    //   justify-content: center;\r\n    // }\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0 8px;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n// .nav-fab {\r\n//   display: none; // Hidden by default (shown only on mobile)\r\n// }\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n// @media (min-width: 600px) {\r\n//   .nav-fab {\r\n//     display: none; // Hide the floating button on larger screens\r\n//   }\r\n// }\r\n",
+                    "data": "/* Toolbar */\r\n.nav-alt {\r\n  font-size: 12px;\r\n  color: gray;\r\n  margin-top: -4px;\r\n  display: block;\r\n}\r\n\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 8px;\r\n\r\n  button {\r\n    margin-right: 5px;\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    flex-grow: 1; /* Push search bar to the right */\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    text-align: center;\r\n  }\r\n\r\n  .app-icon {\r\n    height: 40px;\r\n    margin-right: auto;\r\n  }\r\n\r\n  // .search-bar {\r\n  //   margin-left: auto;\r\n  //   max-width: 100px;\r\n  //   flex-grow: 1;\r\n  //   display: flex;\r\n  //   align-items: center;\r\n  //   justify-content: flex-end;\r\n  // }\r\n\r\n  @media (max-width: 600px) {\r\n    .app-title {\r\n      display: none; /* Hide title on smaller screens */\r\n    }\r\n\r\n    .app-icon {\r\n      display: inline-block; /* Show icon on mobile */\r\n    }\r\n\r\n    // .search-bar {\r\n    //   display: none; /* Hide search bar by default */\r\n    // }\r\n\r\n    // .search-bar.active {\r\n    //   display: flex; /* Show search bar when toggled */\r\n    //   width: 100%;\r\n    //   justify-content: center;\r\n    // }\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0 8px;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n// .nav-fab {\r\n//   display: none; // Hidden by default (shown only on mobile)\r\n// }\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n// @media (min-width: 600px) {\r\n//   .nav-fab {\r\n//     display: none; // Hide the floating button on larger screens\r\n//   }\r\n// }\r\n",
                     "styleUrl": "./horizontal-navigation.component.scss"
                 }
             ],
@@ -31859,7 +31843,7 @@
                         "deprecationMessage": ""
                     }
                 ],
-                "line": 40,
+                "line": 29,
                 "jsdoctags": [
                     {
                         "name": "router",
@@ -31894,7 +31878,7 @@
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<mat-toolbar class=\"toolbar\">\r\n  <!-- Conditional Rendering: Show all items -->\r\n  <ng-container *ngIf=\"!isCompact\">\r\n    <!-- Menu Button -->\r\n    <button mat-icon-button (click)=\"toggleDrawer()\">\r\n      <mat-icon>menu</mat-icon>\r\n    </button>\r\n\r\n    <!-- App Title -->\r\n    <span class=\"app-title\">Taskorator</span>\r\n\r\n    <!-- Search Toggle Button -->\r\n    <app-search-create></app-search-create>\r\n  </ng-container>\r\n\r\n  <!-- Compact View: One item at a time -->\r\n  <ng-container *ngIf=\"isCompact\">\r\n    <button mat-icon-button (click)=\"toggleDrawer()\">\r\n      <mat-icon>menu</mat-icon>\r\n    </button>\r\n    <app-search-create></app-search-create>\r\n  </ng-container>\r\n</mat-toolbar>\r\n\r\n<!-- Main Sidenav Container -->\r\n<mat-sidenav-container class=\"sidenav-container\">\r\n  <mat-sidenav\r\n    #drawer\r\n    [mode]=\"isHandset ? 'over' : 'side'\"\r\n    [opened]=\"!isHandset || drawer.opened\"\r\n    class=\"sidenav\"\r\n  >\r\n    <ul class=\"nav-list\">\r\n      <li>\r\n        <!-- <app-overlord-navigator></app-overlord-navigator> -->\r\n      </li>\r\n      <li\r\n        *ngFor=\"let item of navItems\"\r\n        [class.selected]=\"isSelected(item.path)\"\r\n        (click)=\"onNavItemClick(item)\"\r\n      >\r\n        <mat-icon>{{ item.metadata.icon }}</mat-icon>\r\n        <span class=\"nav-text\">{{ item.metadata.title }}</span>\r\n      </li>\r\n    </ul>\r\n    <button\r\n      *ngIf=\"canGoBack()\"\r\n      mat-button\r\n      class=\"back-button\"\r\n      (click)=\"onBackClick()\"\r\n    >\r\n      <mat-icon>arrow_back</mat-icon>\r\n      <span>Back</span>\r\n    </button>\r\n  </mat-sidenav>\r\n\r\n  <!-- Main Content Area -->\r\n  <mat-sidenav-content>\r\n    <!-- <div *ngIf=\"isHandset\" class=\"mobile-overlord-navigator\">\r\n      <app-overlord-navigator></app-overlord-navigator>\r\n    </div> -->\r\n    <router-outlet></router-outlet>\r\n  </mat-sidenav-content>\r\n</mat-sidenav-container>\r\n"
+            "templateData": "<mat-toolbar class=\"toolbar\">\r\n  <!-- Conditional Rendering: Show all items -->\r\n  <ng-container *ngIf=\"!isCompact\">\r\n    <!-- Menu Button -->\r\n    <button mat-icon-button (click)=\"toggleDrawer()\">\r\n      <mat-icon>menu</mat-icon>\r\n    </button>\r\n\r\n    <!-- App Title -->\r\n    <span class=\"app-title\">Taskorator</span>\r\n\r\n    <!-- Search Toggle Button -->\r\n    <app-search-create></app-search-create>\r\n  </ng-container>\r\n\r\n  <!-- Compact View: One item at a time -->\r\n  <ng-container *ngIf=\"isCompact\">\r\n    <button mat-icon-button (click)=\"toggleDrawer()\">\r\n      <mat-icon>menu</mat-icon>\r\n    </button>\r\n    <app-search-create></app-search-create>\r\n  </ng-container>\r\n</mat-toolbar>\r\n\r\n<!-- Main Sidenav Container -->\r\n<mat-sidenav-container class=\"sidenav-container\">\r\n  <mat-sidenav\r\n    #drawer\r\n    [mode]=\"isHandset ? 'over' : 'side'\"\r\n    [opened]=\"!isHandset || drawer.opened\"\r\n    class=\"sidenav\"\r\n  >\r\n    <ul class=\"nav-list\">\r\n      <li\r\n        *ngFor=\"let item of navItems\"\r\n        [class.selected]=\"isSelected(item.path)\"\r\n        (click)=\"onNavItemClick(item)\"\r\n      >\r\n        <mat-icon>{{ item.metadata.icon }}</mat-icon>\r\n        <span class=\"nav-text\">{{ item.metadata.title }}</span>\r\n        <span class=\"nav-alt\">{{ item.metadata.altName }}</span>\r\n      </li>\r\n    </ul>\r\n\r\n    <button\r\n      *ngIf=\"canGoBack()\"\r\n      mat-button\r\n      class=\"back-button\"\r\n      (click)=\"onBackClick()\"\r\n    >\r\n      <mat-icon>arrow_back</mat-icon>\r\n      <span>Back</span>\r\n    </button>\r\n  </mat-sidenav>\r\n\r\n  <!-- Main Content Area -->\r\n  <mat-sidenav-content>\r\n    <!-- <div *ngIf=\"isHandset\" class=\"mobile-overlord-navigator\">\r\n      <app-overlord-navigator></app-overlord-navigator>\r\n    </div> -->\r\n    <router-outlet></router-outlet>\r\n  </mat-sidenav-content>\r\n</mat-sidenav-container>\r\n"
         },
         {
             "name": "HorizontalNavigationComponentTest",
@@ -32251,7 +32235,7 @@
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": "/* Toolbar */\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 8px;\r\n\r\n  button {\r\n    margin-right: 5px;\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    flex-grow: 1; /* Push search bar to the right */\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    text-align: center;\r\n  }\r\n\r\n  .app-icon {\r\n    height: 40px;\r\n    margin-right: auto;\r\n  }\r\n\r\n  // .search-bar {\r\n  //   margin-left: auto;\r\n  //   max-width: 100px;\r\n  //   flex-grow: 1;\r\n  //   display: flex;\r\n  //   align-items: center;\r\n  //   justify-content: flex-end;\r\n  // }\r\n\r\n  @media (max-width: 600px) {\r\n    .app-title {\r\n      display: none; /* Hide title on smaller screens */\r\n    }\r\n\r\n    .app-icon {\r\n      display: inline-block; /* Show icon on mobile */\r\n    }\r\n\r\n    // .search-bar {\r\n    //   display: none; /* Hide search bar by default */\r\n    // }\r\n\r\n    // .search-bar.active {\r\n    //   display: flex; /* Show search bar when toggled */\r\n    //   width: 100%;\r\n    //   justify-content: center;\r\n    // }\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0 8px;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n// .nav-fab {\r\n//   display: none; // Hidden by default (shown only on mobile)\r\n// }\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n// @media (min-width: 600px) {\r\n//   .nav-fab {\r\n//     display: none; // Hide the floating button on larger screens\r\n//   }\r\n// }\r\n",
+                    "data": "/* Toolbar */\r\n.nav-alt {\r\n  font-size: 12px;\r\n  color: gray;\r\n  margin-top: -4px;\r\n  display: block;\r\n}\r\n\r\n.toolbar {\r\n  background-color: #7d4fbf;\r\n  color: white;\r\n  display: flex;\r\n  align-items: center;\r\n  height: 64px;\r\n  padding: 0 8px;\r\n\r\n  button {\r\n    margin-right: 5px;\r\n  }\r\n\r\n  .app-title {\r\n    font-size: 20px;\r\n    font-weight: 500;\r\n    flex-grow: 1; /* Push search bar to the right */\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    text-align: center;\r\n  }\r\n\r\n  .app-icon {\r\n    height: 40px;\r\n    margin-right: auto;\r\n  }\r\n\r\n  // .search-bar {\r\n  //   margin-left: auto;\r\n  //   max-width: 100px;\r\n  //   flex-grow: 1;\r\n  //   display: flex;\r\n  //   align-items: center;\r\n  //   justify-content: flex-end;\r\n  // }\r\n\r\n  @media (max-width: 600px) {\r\n    .app-title {\r\n      display: none; /* Hide title on smaller screens */\r\n    }\r\n\r\n    .app-icon {\r\n      display: inline-block; /* Show icon on mobile */\r\n    }\r\n\r\n    // .search-bar {\r\n    //   display: none; /* Hide search bar by default */\r\n    // }\r\n\r\n    // .search-bar.active {\r\n    //   display: flex; /* Show search bar when toggled */\r\n    //   width: 100%;\r\n    //   justify-content: center;\r\n    // }\r\n  }\r\n}\r\n\r\n/* Ensure the sidenav container takes full height */\r\n.sidenav-container {\r\n  height: calc(\r\n    100vh - 64px\r\n  ); // Adjust to take full viewport minus toolbar height\r\n  display: flex;\r\n  flex-direction: column;\r\n}\r\n\r\n/* Sidenav Styling */\r\n.sidenav {\r\n  width: 250px;\r\n  background-color: #f8f9fa;\r\n  border-right: 1px solid #e0e0e0;\r\n  display: flex;\r\n  flex-direction: column; // Flexbox layout for consistent spacing\r\n}\r\n\r\n/* Navigation list */\r\n.nav-list {\r\n  list-style: none;\r\n  padding: 0 8px;\r\n  margin: 0;\r\n  flex-grow: 1; // Ensure the list expands to fill available space\r\n  overflow-y: auto; // Allow scrolling if items overflow\r\n\r\n  li {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 12px;\r\n    cursor: pointer;\r\n    transition: background-color 0.3s ease;\r\n\r\n    mat-icon {\r\n      margin-right: 16px;\r\n      font-size: 24px;\r\n    }\r\n\r\n    &:hover {\r\n      background-color: #eceff1;\r\n    }\r\n\r\n    &.selected {\r\n      background-color: #6200ea;\r\n      color: white;\r\n\r\n      mat-icon {\r\n        color: white;\r\n      }\r\n    }\r\n\r\n    .nav-text {\r\n      flex-grow: 1;\r\n    }\r\n  }\r\n}\r\n\r\n/* Back Button */\r\n.back-button {\r\n  width: 100%;\r\n  text-align: left;\r\n  margin-top: 16px;\r\n  color: #6200ea;\r\n\r\n  mat-icon {\r\n    margin-right: 8px;\r\n  }\r\n}\r\n\r\n/* Floating Button for Mobile */\r\n// .nav-fab {\r\n//   display: none; // Hidden by default (shown only on mobile)\r\n// }\r\n\r\n@media (max-width: 600px) {\r\n  .nav-fab {\r\n    display: inline-flex; // Show the floating button on mobile\r\n  }\r\n\r\n  /* Ensure the navigation text remains visible on mobile */\r\n  .nav-list .nav-text {\r\n    display: block; // Show the text for nav items on mobile\r\n  }\r\n\r\n  /* Sidenav width for mobile */\r\n  .sidenav {\r\n    width: 250px; // Keep the same width on mobile\r\n  }\r\n}\r\n\r\n// @media (min-width: 600px) {\r\n//   .nav-fab {\r\n//     display: none; // Hide the floating button on larger screens\r\n//   }\r\n// }\r\n",
                     "styleUrl": "../horizontal-navigation.component.scss"
                 }
             ],
@@ -32358,7 +32342,7 @@
         },
         {
             "name": "InputToTasksComponent",
-            "id": "component-InputToTasksComponent-f6dfe7eeb71f88780500a3eaa65a34ac3acdd3ce9348a8d50bd09673cf8139b10641fb0bcb478e92648277ad2c2ff8abe8f5065fec437d92c8fc411bbed9b2a1",
+            "id": "component-InputToTasksComponent-b7e3da11c80e6298a74e4e052cd12375034e421f09bb6aaa26c3cbf7529e416093275f31b80fc6da456db8404123172b912525c9ac100e7a6ea81e76a7a2529c",
             "file": "src/app/features/core/crucible/input-to-tasks/input-to-tasks/input-to-tasks.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -32387,7 +32371,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 29
+                    "line": 31
                 },
                 {
                     "name": "isAutoParse",
@@ -32398,7 +32382,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 41
+                    "line": 43
                 },
                 {
                     "name": "isFilterUniques",
@@ -32409,7 +32393,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 44
+                    "line": 46
                 },
                 {
                     "name": "isFunctionsWithTypes",
@@ -32420,7 +32404,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 42
+                    "line": 44
                 },
                 {
                     "name": "isLongNamesShortened",
@@ -32431,7 +32415,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 43
+                    "line": 45
                 },
                 {
                     "name": "selectedOverlord",
@@ -32442,7 +32426,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 40
+                    "line": 42
                 },
                 {
                     "name": "tasks",
@@ -32453,7 +32437,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 30
+                    "line": 32
                 },
                 {
                     "name": "taskSummary",
@@ -32464,7 +32448,7 @@
                     "indexKey": "",
                     "optional": false,
                     "description": "",
-                    "line": 31
+                    "line": 33
                 }
             ],
             "methodsClass": [
@@ -32474,7 +32458,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 117,
+                    "line": 116,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -32484,7 +32468,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 101,
+                    "line": 94,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -32494,7 +32478,7 @@
                     "optional": false,
                     "returnType": "string",
                     "typeParameters": [],
-                    "line": 87,
+                    "line": 90,
                     "deprecated": false,
                     "deprecationMessage": "",
                     "modifierKind": [
@@ -32507,7 +32491,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 112,
+                    "line": 105,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -32517,7 +32501,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 48,
+                    "line": 54,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -32527,7 +32511,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 52,
+                    "line": 63,
                     "deprecated": false,
                     "deprecationMessage": ""
                 },
@@ -32537,22 +32521,9 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 58,
+                    "line": 69,
                     "deprecated": false,
                     "deprecationMessage": ""
-                },
-                {
-                    "name": "updateSummary",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 91,
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "modifierKind": [
-                        123
-                    ]
                 }
             ],
             "deprecated": false,
@@ -32592,11 +32563,11 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, OnInit } from '@angular/core';\r\nimport { FormsModule } from '@angular/forms';\r\nimport { Task, ExtendedTask } from '../../../../../models/taskModelManager';\r\nimport { InputToTasksService } from '../services/input-to-tasks.service';\r\nimport { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';\r\nimport { MatFormField } from '@angular/material/form-field';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatInputModule } from '@angular/material/input';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatSlideToggleModule } from '@angular/material/slide-toggle';\r\nimport { TextType } from '../services/text-type-detector.service';\r\n\r\n@Component({\r\n  selector: 'app-input-to-tasks',\r\n  standalone: true,\r\n  imports: [\r\n    FormsModule,\r\n    StagedTaskListComponent,\r\n    MatFormField,\r\n    MatInputModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatSlideToggleModule,\r\n  ],\r\n  templateUrl: './input-to-tasks.component.html',\r\n  styleUrls: ['./input-to-tasks.component.scss'],\r\n})\r\nexport class InputToTasksComponent implements OnInit {\r\n  inputText = '';\r\n  tasks: Task[] = [];\r\n  taskSummary: {\r\n    taskCount: number;\r\n    uniqueTaskCount: number;\r\n    inputType: TextType | null;\r\n  } = {\r\n    taskCount: 0,\r\n    uniqueTaskCount: 0,\r\n    inputType: TextType.UNKNOWN,\r\n  };\r\n  selectedOverlord: ExtendedTask | null = null;\r\n  isAutoParse = true;\r\n  isFunctionsWithTypes = true;\r\n  isLongNamesShortened: boolean = true;\r\n  isFilterUniques: boolean = true;\r\n\r\n  constructor(private inputToTasksService: InputToTasksService) {}\r\n\r\n  ngOnInit() {\r\n    this.selectedOverlord = { name: 'Default Overlord' } as ExtendedTask;\r\n  }\r\n\r\n  onInputChange(): void {\r\n    if (this.isAutoParse) {\r\n      this.parseTasks();\r\n    }\r\n  }\r\n\r\n  parseTasks(): void {\r\n    this.inputToTasksService.setInput(\r\n      this.inputText,\r\n      this.isAutoParse,\r\n      this.isFunctionsWithTypes,\r\n      this.isLongNamesShortened\r\n    );\r\n    // this.updateSummary();\r\n    this.taskSummary = this.inputToTasksService.getTaskSummary();\r\n    this.tasks = this.inputToTasksService\r\n      .parseTasks(this.isFunctionsWithTypes, this.isLongNamesShortened)\r\n      .map((task) => ({\r\n        ...task,\r\n        taskId: task.taskId === '0' ? this.generateUniqueId() : task.taskId,\r\n      }));\r\n\r\n    if (this.isFilterUniques) {\r\n      this.filterUniques();\r\n    }\r\n  }\r\n\r\n  // updateTasks(updatedTasks: Task[]): void {\r\n  //   this.tasks = updatedTasks.map((task) => ({\r\n  //     ...task,\r\n  //     taskId: task.taskId === '0' ? this.generateUniqueId() : task.taskId,\r\n  //   }));\r\n  //   this.updateSummary();\r\n  // }\r\n\r\n  private generateUniqueId(): string {\r\n    return Math.random().toString(36).substring(2, 9);\r\n  }\r\n\r\n  private updateSummary(): void {\r\n    // Calculate unique task names\r\n    const uniqueTaskNames = new Set(this.tasks.map((task) => task.name));\r\n    // Update taskSummary\r\n    this.taskSummary.taskCount = this.tasks.length;\r\n    this.taskSummary.uniqueTaskCount = uniqueTaskNames.size;\r\n    console.log(this.taskSummary);\r\n    //\r\n  }\r\n\r\n  filterUniques(): void {\r\n    const uniqueTaskNames = new Set<string>();\r\n    this.tasks = this.tasks.filter((task) => {\r\n      if (uniqueTaskNames.has(task.name)) {\r\n        return false; // Duplicate, exclude from filtered list\r\n      }\r\n      uniqueTaskNames.add(task.name); // Mark this name as seen\r\n      return true; // Unique, include in filtered list\r\n    });\r\n  }\r\n\r\n  importTasks(): void {\r\n    console.log('Imported Tasks:', this.tasks);\r\n    alert('Tasks imported successfully!');\r\n  }\r\n\r\n  clearInput(): void {\r\n    this.inputText = '';\r\n    this.tasks = [];\r\n    this.taskSummary = { taskCount: 0, uniqueTaskCount: 0, inputType: null };\r\n  }\r\n}\r\n",
+            "sourceCode": "import { Component, OnInit } from '@angular/core';\r\nimport { FormsModule } from '@angular/forms';\r\nimport { Task, ExtendedTask } from '../../../../../models/taskModelManager';\r\nimport { InputToTasksService } from '../services/input-to-tasks.service';\r\nimport { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';\r\nimport { MatFormField } from '@angular/material/form-field';\r\nimport { MatButtonModule } from '@angular/material/button';\r\nimport { MatInputModule } from '@angular/material/input';\r\nimport { MatIconModule } from '@angular/material/icon';\r\nimport { MatSlideToggleModule } from '@angular/material/slide-toggle';\r\nimport { TextType } from '../services/text-type-detector.service';\r\nimport { TaskUtilityService } from '../../../../../services/tasks/task-utility.service';\r\nimport { TaskBatchService } from '../../../../../services/tasks/task-batch.service';\r\n\r\n@Component({\r\n  selector: 'app-input-to-tasks',\r\n  standalone: true,\r\n  imports: [\r\n    FormsModule,\r\n    StagedTaskListComponent,\r\n    MatFormField,\r\n    MatInputModule,\r\n    MatButtonModule,\r\n    MatIconModule,\r\n    MatSlideToggleModule,\r\n  ],\r\n  templateUrl: './input-to-tasks.component.html',\r\n  styleUrls: ['./input-to-tasks.component.scss'],\r\n})\r\nexport class InputToTasksComponent implements OnInit {\r\n  inputText = '';\r\n  tasks: Task[] = [];\r\n  taskSummary: {\r\n    taskCount: number;\r\n    uniqueTaskCount: number;\r\n    inputType: TextType | null;\r\n  } = {\r\n    taskCount: 0,\r\n    uniqueTaskCount: 0,\r\n    inputType: TextType.UNKNOWN,\r\n  };\r\n  selectedOverlord: ExtendedTask | null = null;\r\n  isAutoParse = true;\r\n  isFunctionsWithTypes = true;\r\n  isLongNamesShortened: boolean = true;\r\n  isFilterUniques: boolean = true;\r\n\r\n  constructor(\r\n    private inputToTasksService: InputToTasksService,\r\n    private utilityService: TaskUtilityService,\r\n    private taskBatchService: TaskBatchService\r\n  ) {}\r\n\r\n  ngOnInit() {\r\n    this.selectedOverlord = { name: 'Default Overlord' } as ExtendedTask;\r\n\r\n    this.utilityService.getSelectedOverlord().subscribe((t) => {\r\n      if (!t) return;\r\n      this.selectedOverlord = t;\r\n    });\r\n  }\r\n\r\n  onInputChange(): void {\r\n    if (this.isAutoParse) {\r\n      this.parseTasks();\r\n    }\r\n  }\r\n\r\n  parseTasks(): void {\r\n    this.inputToTasksService.setInput(\r\n      this.inputText,\r\n      this.isAutoParse,\r\n      this.isFunctionsWithTypes,\r\n      this.isLongNamesShortened\r\n    );\r\n    // this.updateSummary();\r\n    this.taskSummary = this.inputToTasksService.getTaskSummary();\r\n    this.tasks = this.inputToTasksService\r\n      .parseTasks(this.isFunctionsWithTypes, this.isLongNamesShortened)\r\n      .map((task) => ({\r\n        ...task,\r\n        taskId: task.taskId === '0' ? this.generateUniqueId() : task.taskId,\r\n      }));\r\n\r\n    if (this.isFilterUniques) {\r\n      this.filterUniques();\r\n    }\r\n  }\r\n\r\n  private generateUniqueId(): string {\r\n    return Math.random().toString(36).substring(2, 9);\r\n  }\r\n\r\n  filterUniques(): void {\r\n    const uniqueTaskNames = new Set<string>();\r\n    this.tasks = this.tasks.filter((task) => {\r\n      if (uniqueTaskNames.has(task.name)) {\r\n        return false; // Duplicate, exclude from filtered list\r\n      }\r\n      uniqueTaskNames.add(task.name); // Mark this name as seen\r\n      return true; // Unique, include in filtered list\r\n    });\r\n  }\r\n\r\n  importTasks(): void {\r\n    if (!this.selectedOverlord) {\r\n      alert('Select Overlord in search before creating tasks!');\r\n    } else {\r\n      this.taskBatchService.createTaskBatch(\r\n        this.tasks,\r\n        this.selectedOverlord.taskId\r\n      );\r\n    }\r\n  }\r\n\r\n  clearInput(): void {\r\n    this.inputText = '';\r\n    this.tasks = [];\r\n    this.taskSummary = { taskCount: 0, uniqueTaskCount: 0, inputType: null };\r\n  }\r\n}\r\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".task-importer {\r\n  max-width: 650px;\r\n  margin: 0 auto;\r\n  padding: 20px;\r\n  border: 1px solid #ddd;\r\n  border-radius: 8px;\r\n  background-color: #f9f9f9;\r\n\r\n  h2 {\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    font-size: 1.5rem;\r\n    color: #333;\r\n  }\r\n\r\n  .input-section {\r\n    margin-bottom: 20px;\r\n\r\n    mat-form-field {\r\n      width: 100%;\r\n    }\r\n\r\n    .input-actions {\r\n      margin-top: 10px;\r\n      display: flex;\r\n      justify-content: center;\r\n      gap: 10px;\r\n\r\n      button {\r\n        min-width: 40px;\r\n        display: flex;\r\n        justify-content: center;\r\n        align-items: center;\r\n\r\n        mat-icon {\r\n          font-size: 1.25rem;\r\n        }\r\n      }\r\n    }\r\n  }\r\n\r\n  .toggles {\r\n    display: flex;\r\n    justify-content: space-around;\r\n    margin-top: 10px;\r\n    padding: 10px;\r\n    background-color: #fff;\r\n    border-radius: 4px;\r\n    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);\r\n\r\n    mat-slide-toggle {\r\n      font-size: 0.9rem;\r\n    }\r\n  }\r\n\r\n  .summary {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n    margin-bottom: 20px;\r\n    padding: 10px;\r\n    background-color: #fff;\r\n    border-radius: 4px;\r\n    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);\r\n\r\n    div {\r\n      flex: 1;\r\n      p {\r\n        margin: 0;\r\n        font-size: 0.95rem;\r\n        color: #555;\r\n\r\n        strong {\r\n          color: #333;\r\n        }\r\n      }\r\n\r\n      .overlord {\r\n        font-size: 1.2rem;\r\n        font-weight: bold;\r\n        color: #007bff;\r\n      }\r\n    }\r\n  }\r\n\r\n  .task-list {\r\n    margin-bottom: 20px;\r\n  }\r\n\r\n  .action-buttons {\r\n    display: flex;\r\n    justify-content: center;\r\n\r\n    button {\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 5px;\r\n      min-width: 150px;\r\n      font-size: 1rem;\r\n\r\n      mat-icon {\r\n        font-size: 1.25rem;\r\n      }\r\n    }\r\n  }\r\n}\r\n",
+                    "data": ".overlord {\r\n  font-size: 1.2rem;\r\n  font-weight: bold;\r\n  color: #007bff;\r\n}\r\n.task-importer {\r\n  max-width: 650px;\r\n  margin: 0 auto;\r\n  padding: 20px;\r\n  border: 1px solid #ddd;\r\n  border-radius: 8px;\r\n  background-color: #f9f9f9;\r\n\r\n  h2 {\r\n    text-align: center;\r\n    margin-bottom: 20px;\r\n    font-size: 1.5rem;\r\n    color: #333;\r\n  }\r\n\r\n  .input-section {\r\n    margin-bottom: 20px;\r\n\r\n    mat-form-field {\r\n      width: 100%;\r\n    }\r\n\r\n    .input-actions {\r\n      margin-top: 0px;\r\n      display: flex;\r\n      justify-content: right;\r\n      gap: 10px;\r\n    }\r\n  }\r\n\r\n  .toggles {\r\n    display: flex;\r\n    justify-content: space-around;\r\n    margin-top: 10px;\r\n    padding: 10px;\r\n    background-color: #fff;\r\n    border-radius: 4px;\r\n    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);\r\n\r\n    mat-slide-toggle {\r\n      font-size: 0.9rem;\r\n    }\r\n  }\r\n\r\n  .summary {\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n    margin-bottom: 20px;\r\n    padding: 10px;\r\n    background-color: #fff;\r\n    border-radius: 4px;\r\n    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);\r\n\r\n    div {\r\n      flex: 1;\r\n      p {\r\n        margin: 0;\r\n        font-size: 0.95rem;\r\n        color: #555;\r\n\r\n        strong {\r\n          color: #333;\r\n        }\r\n      }\r\n    }\r\n  }\r\n\r\n  .task-list {\r\n    margin-bottom: 20px;\r\n  }\r\n\r\n  .action-buttons {\r\n    display: flex;\r\n    justify-content: center;\r\n\r\n    button {\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 5px;\r\n      min-width: 150px;\r\n      font-size: 1rem;\r\n\r\n      mat-icon {\r\n        font-size: 1.25rem;\r\n      }\r\n    }\r\n  }\r\n}\r\n",
                     "styleUrl": "./input-to-tasks.component.scss"
                 }
             ],
@@ -32612,13 +32583,43 @@
                         "type": "InputToTasksService",
                         "deprecated": false,
                         "deprecationMessage": ""
+                    },
+                    {
+                        "name": "utilityService",
+                        "type": "TaskUtilityService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "taskBatchService",
+                        "type": "TaskBatchService",
+                        "deprecated": false,
+                        "deprecationMessage": ""
                     }
                 ],
-                "line": 44,
+                "line": 46,
                 "jsdoctags": [
                     {
                         "name": "inputToTasksService",
                         "type": "InputToTasksService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "utilityService",
+                        "type": "TaskUtilityService",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "taskBatchService",
+                        "type": "TaskBatchService",
                         "deprecated": false,
                         "deprecationMessage": "",
                         "tagName": {
@@ -32631,7 +32632,7 @@
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<div class=\"task-importer\">\r\n  <h2>Mass Add Tasks</h2>\r\n\r\n  <!-- Input Section -->\r\n  <div class=\"input-section\">\r\n    <!-- Text Input -->\r\n    <mat-form-field appearance=\"outline\" class=\"full-width\">\r\n      <textarea\r\n        matInput\r\n        [(ngModel)]=\"inputText\"\r\n        placeholder=\"Enter tasks (CSV, JSON, list, or code)\"\r\n        (input)=\"onInputChange()\"\r\n        rows=\"2\"\r\n      ></textarea>\r\n    </mat-form-field>\r\n\r\n    <!-- Input Action Buttons -->\r\n    <div class=\"input-actions\">\r\n      <button\r\n        mat-icon-button\r\n        color=\"primary\"\r\n        (click)=\"parseTasks()\"\r\n        aria-label=\"Parse Tasks\"\r\n      >\r\n        <mat-icon>check</mat-icon>\r\n      </button>\r\n      <button\r\n        mat-icon-button\r\n        color=\"warn\"\r\n        (click)=\"clearInput()\"\r\n        aria-label=\"Clear Input\"\r\n      >\r\n        <mat-icon>clear</mat-icon>\r\n      </button>\r\n    </div>\r\n\r\n    <!-- Toggles -->\r\n    <div class=\"toggles\">\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isAutoParse\"\r\n        color=\"primary\"\r\n        aria-label=\"Auto-Parse\"\r\n      >\r\n        Auto-Parse\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isFunctionsWithTypes\"\r\n        color=\"primary\"\r\n        aria-label=\"With Function Types\"\r\n      >\r\n        With Function Types\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isLongNamesShortened\"\r\n        color=\"primary\"\r\n        aria-label=\"Shorten Names\"\r\n      >\r\n        Names Shortened\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isFilterUniques\"\r\n        color=\"primary\"\r\n        aria-label=\"Filter Uniques\"\r\n      >\r\n        Filter Uniques\r\n      </mat-slide-toggle>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- Task Summary -->\r\n  <div class=\"summary\">\r\n    <div>\r\n      <p>\r\n        <strong>Target:</strong>\r\n        <span class=\"overlord\">{{ selectedOverlord?.name || \"Unknown\" }}</span>\r\n      </p>\r\n      <p>\r\n        <strong>Input Type:</strong> {{ taskSummary.inputType || \"Unknown\" }}\r\n      </p>\r\n    </div>\r\n    <div>\r\n      <p><strong>Total Tasks:</strong> {{ taskSummary.taskCount }}</p>\r\n      <p><strong>Unique Tasks:</strong> {{ taskSummary.uniqueTaskCount }}</p>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- Staged Task List -->\r\n  <div class=\"task-list\">\r\n    <app-staged-task-list [tasks]=\"tasks\"></app-staged-task-list>\r\n  </div>\r\n\r\n  <!-- Save Button -->\r\n  <div class=\"action-buttons\">\r\n    <button\r\n      mat-raised-button\r\n      color=\"primary\"\r\n      (click)=\"importTasks()\"\r\n      [disabled]=\"tasks.length === 0\"\r\n    >\r\n      <mat-icon>save</mat-icon>\r\n      Save Tasks\r\n    </button>\r\n  </div>\r\n</div>\r\n"
+            "templateData": "<div class=\"task-importer\">\r\n  <h2>Mass Add Tasks</h2>\r\n\r\n  <!-- Input Section -->\r\n  <div class=\"input-section\">\r\n    <!-- Text Input -->\r\n    <mat-form-field appearance=\"outline\" class=\"full-width\">\r\n      <textarea\r\n        matInput\r\n        [(ngModel)]=\"inputText\"\r\n        placeholder=\"Enter tasks (CSV, JSON, list, or code)\"\r\n        (input)=\"onInputChange()\"\r\n        rows=\"2\"\r\n      ></textarea>\r\n    </mat-form-field>\r\n\r\n    <!-- Input Action Buttons -->\r\n    <div class=\"input-actions\">\r\n      <button\r\n        mat-icon-button\r\n        class=\"task-btn\"\r\n        color=\"primary\"\r\n        (click)=\"parseTasks()\"\r\n        aria-label=\"Parse Tasks\"\r\n      >\r\n        <mat-icon>check</mat-icon>\r\n      </button>\r\n      <button\r\n        mat-icon-button\r\n        class=\"task-btn\"\r\n        color=\"warn\"\r\n        (click)=\"clearInput()\"\r\n        aria-label=\"Clear Input\"\r\n      >\r\n        <mat-icon>clear</mat-icon>\r\n      </button>\r\n    </div>\r\n\r\n    <!-- Toggles -->\r\n    <div class=\"toggles\">\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isAutoParse\"\r\n        color=\"primary\"\r\n        aria-label=\"Auto-Parse\"\r\n      >\r\n        Auto-Parse\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isFunctionsWithTypes\"\r\n        color=\"primary\"\r\n        aria-label=\"With Function Types\"\r\n      >\r\n        With Function Types\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isLongNamesShortened\"\r\n        color=\"primary\"\r\n        aria-label=\"Shorten Names\"\r\n      >\r\n        Names Shortened\r\n      </mat-slide-toggle>\r\n      <mat-slide-toggle\r\n        [(ngModel)]=\"isFilterUniques\"\r\n        color=\"primary\"\r\n        aria-label=\"Filter Uniques\"\r\n      >\r\n        Filter Uniques\r\n      </mat-slide-toggle>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- Task Summary -->\r\n\r\n  <div class=\"summary\">\r\n    <div>\r\n      <p>\r\n        <strong>Input Type:</strong> {{ taskSummary.inputType || \"Unknown\" }}\r\n      </p>\r\n    </div>\r\n    <div>\r\n      <p><strong>Total Tasks:</strong> {{ taskSummary.taskCount }}</p>\r\n      <p><strong>Unique Tasks:</strong> {{ taskSummary.uniqueTaskCount }}</p>\r\n    </div>\r\n  </div>\r\n  <p>\r\n    <strong>Target:</strong>\r\n    <span class=\"overlord\">{{ selectedOverlord?.name || \"Unknown\" }}</span>\r\n  </p>\r\n\r\n  <!-- Staged Task List -->\r\n  <div class=\"task-list\">\r\n    <app-staged-task-list [tasks]=\"tasks\"></app-staged-task-list>\r\n  </div>\r\n\r\n  <!-- Save Button -->\r\n  <div class=\"action-buttons\">\r\n    <button\r\n      mat-raised-button\r\n      color=\"primary\"\r\n      (click)=\"importTasks()\"\r\n      [disabled]=\"tasks.length === 0\"\r\n    >\r\n      <mat-icon>save</mat-icon>\r\n      Save Tasks\r\n    </button>\r\n  </div>\r\n</div>\r\n"
         },
         {
             "name": "LatestCreatedTaskListComponent",
@@ -42762,8 +42763,8 @@
                 "type": "component",
                 "linktype": "component",
                 "name": "HorizontalNavigationComponent",
-                "coveragePercent": 13,
-                "coverageCount": "3/22",
+                "coveragePercent": 0,
+                "coverageCount": "0/20",
                 "status": "low"
             },
             {
@@ -43102,7 +43103,7 @@
                 "linktype": "component",
                 "name": "InputToTasksComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/18",
+                "coverageCount": "0/17",
                 "status": "low"
             },
             {
@@ -44621,7 +44622,7 @@
                 "linktype": "injectable",
                 "name": "UrlHelperService",
                 "coveragePercent": 0,
-                "coverageCount": "0/2",
+                "coverageCount": "0/4",
                 "status": "low"
             },
             {

@@ -39,8 +39,8 @@ export const routes: Route[] = [
     loadChildren: () =>
       import('./features/core/gateway/gateway-routes').then((m) => m.default),
     data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
+    // canActivate: [canActivate],
+    // canActivateChild: [canActivateChild],
   },
   {
     path: 'nexus',

@@ -1,0 +1,58 @@
+.notification-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+
+  .app-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .feedback-message {
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: #ff5722;
+    animation: fadeIn 0.5s ease-in-out;
+    display: block; /* Default for large screens */
+  }
+
+  .blinker {
+    width: 12px;
+    height: 12px;
+    background-color: #ff5722;
+    border-radius: 50%;
+    animation: blinker 1.5s infinite;
+    display: none; /* Hidden by default */
+  }
+
+  @media (max-width: 600px) {
+    .app-title {
+      display: none; /* Hide feedback message on small screens */
+    }
+    .feedback-message {
+      display: none; /* Hide feedback message on small screens */
+    }
+
+    .blinker {
+      display: inline-block; /* Show blinker on small screens */
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.5;
+  }
+}

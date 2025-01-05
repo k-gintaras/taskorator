@@ -33,7 +33,6 @@ export class SearchTasksService {
 
         // Flatten the tree to make it searchable
         const flattenedTasks = this.treeNodeService.getFlattened(tree);
-
         // Filter tasks based on the search query
         const lowerCaseQuery = query.toLowerCase();
         return flattenedTasks.filter((task) =>

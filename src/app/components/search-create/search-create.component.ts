@@ -11,6 +11,8 @@ import { SelectedOverlordService } from '../../services/task/selected-overlord.s
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
+import { TaskUpdateService } from '../../services/task/task-update.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 
 @Component({
   selector: 'app-search-create',
@@ -38,8 +40,10 @@ export class SearchCreateComponent {
 
   constructor(
     private taskService: TaskService,
+    private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
-    private taskSearchService: SearchTasksService
+    private taskSearchService: SearchTasksService,
+    private navigatorService: TaskNavigatorUltraService
   ) {}
 
   ngOnInit(): void {
@@ -65,8 +69,6 @@ export class SearchCreateComponent {
         if (!taskId) return;
         this.taskService.getTaskById(taskId).then((task) => {
           if (!task) return;
-          console.log('getting task named: ' + task.name);
-          console.log('getting task: ');
           this.selectedOverlord = task;
         });
       });
@@ -75,8 +77,9 @@ export class SearchCreateComponent {
   /**
    * Handles task selection from search results.
    */
-  onSelectTask(taskId: string): void {
-    this.selectedOverlordService.setSelectedOverlord(taskId); // Select task as overlord
+  onSelectTask(task: TaskTreeNode): void {
+    // this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
+    this.navigatorService.next(task.taskId);
     this.resetState();
   }
 
@@ -96,9 +99,9 @@ export class SearchCreateComponent {
       overlord: this.selectedOverlord?.taskId || null,
     };
 
-    this.taskService.createTask(task).then(() => {
-      this.resetState();
-    });
+    this.taskupdateService.create(task); //.then(() => {
+    this.resetState();
+    // });
   }
 
   /**

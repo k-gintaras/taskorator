@@ -8,22 +8,24 @@ import {
   TaskActions,
 } from '../../services/tasks/task-action-tracker.service';
 import { MatIcon } from '@angular/material/icon';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-task-edit',
   standalone: true,
-  imports: [FormsModule, MatIcon],
+  imports: [FormsModule, MatIcon, NgIf],
   templateUrl: './task-edit.component.html',
   styleUrl: './task-edit.component.scss',
 })
 export class TaskEditComponent {
   // @Input() task: Task = getRandomTask();
   @Input() task: Task = getBaseTask();
+  @Input() isPopup: boolean = true;
 
   // Display values for duration and end time
   endTimeDisplay: string | null = null;
   durationDisplay: number | null = null;
-  // constructor(private taskUpdateService: TaskUpdateService) {}
+  constructor(private taskUpdateService: TaskUpdateService) {}
 
   ngOnInit() {
     // Convert initial task values from milliseconds
@@ -36,12 +38,12 @@ export class TaskEditComponent {
       : null; // Convert to minutes
   }
 
-  // onSave(t: Task) {
-  //   if (t) {
-  //     const taskAction: TaskActions = TaskActions.UPDATED;
-  //     this.taskUpdateService.update(t, taskAction);
-  //   }
-  // }
+  onSave(t: Task) {
+    if (t) {
+      const taskAction: TaskActions = TaskActions.UPDATED;
+      this.taskUpdateService.update(t, taskAction);
+    }
+  }
 
   updateTimeEnd(newTime: string) {
     // Convert from datetime-local string to milliseconds

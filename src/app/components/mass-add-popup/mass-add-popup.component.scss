@@ -1,0 +1,48 @@
+.mat-dialog-title {
+  display: flex;
+  margin-left: 20px;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #37474f;
+}
+
+.mat-dialog-content {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  gap: 8px;
+
+  .save-button {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+
+    &:hover {
+      background-color: darken(#007bff, 10%);
+    }
+
+    mat-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  .close-button {
+    font-size: 1rem;
+    color: #666;
+    text-transform: none;
+  }
+}
+
+button {
+  margin-left: 8px;
+}

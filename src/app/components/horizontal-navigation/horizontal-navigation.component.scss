@@ -1,4 +1,11 @@
 /* Toolbar */
+.nav-alt {
+  font-size: 12px;
+  color: rgb(88, 87, 87);
+  margin-top: -4px;
+  display: block;
+}
+
 .toolbar {
   background-color: #7d4fbf;
   color: white;
@@ -36,9 +43,9 @@
   // }
 
   @media (max-width: 600px) {
-    .app-title {
-      display: none; /* Hide title on smaller screens */
-    }
+    // .app-title {
+    //   display: none; /* Hide title on smaller screens */
+    // }
 
     .app-icon {
       display: inline-block; /* Show icon on mobile */
@@ -63,6 +70,7 @@
   ); // Adjust to take full viewport minus toolbar height
   display: flex;
   flex-direction: column;
+  // background-color: #7f60ab;
 }
 
 /* Sidenav Styling */
@@ -77,7 +85,7 @@
 /* Navigation list */
 .nav-list {
   list-style: none;
-  padding: 0 8px;
+  padding: 0px;
   margin: 0;
   flex-grow: 1; // Ensure the list expands to fill available space
   overflow-y: auto; // Allow scrolling if items overflow
@@ -99,11 +107,14 @@
     }
 
     &.selected {
-      background-color: #6200ea;
+      background-color: #7f60ab;
       color: white;
 
       mat-icon {
         color: white;
+      }
+      .nav-alt {
+        color: rgb(222, 220, 220);
       }
     }
 

@@ -27,3 +27,12 @@
   display: flex;
   align-items: center;
 }
+
+.data {
+  display: block;
+  padding: 5px;
+}
+
+.user-info {
+  margin: 20px;
+}

@@ -1,5 +1,4 @@
-<form [formGroup]="settingsForm">
-  <!-- Filter Section -->
+<!-- <form [formGroup]="settingsForm">
   <div class="filter-section">
     <div class="filter-title">Task Filters:</div>
     <div class="filter-options">
@@ -14,7 +13,6 @@
     </div>
   </div>
 
-  <!-- Action Button Section -->
   <div class="action-section">
     <div class="action-title">Complete Action:</div>
     <div class="action-buttons">
@@ -36,4 +34,32 @@
       </button>
     </div>
   </div>
-</form>
+</form> -->
+
+<div class="user-info">
+  <span class="data">Allowed Templates: {{ user?.allowedTemplates }}</span>
+  <span class="data">Can Create Templates: {{ user?.canCreate }}</span>
+  <span class="data">Can Use GPT: {{ user?.canUseGpt }}</span>
+  <span class="data">Role: {{ user?.role }}</span>
+</div>
+
+<div class="task-container">
+  <div class="left-section">
+    <div class="navigation-actions">
+      <button class="task-btn" (click)="editTask(task)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    <app-task-mini [task]="task"></app-task-mini>
+  </div>
+  <div class="right-section">
+    <button class="task-btn" (click)="saveTask(task)">
+      <mat-icon>save</mat-icon>
+    </button>
+  </div>
+</div>
+<!-- <div>
+  <pre>
+    {{ tree }}
+  </pre>
+</div> -->

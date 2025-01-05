@@ -8,6 +8,14 @@ import { ActivatedRoute, Router } from '@angular/router';
   providedIn: 'root',
 })
 export class UrlHelperService {
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  getTaskIdFromUrl(): string | null {
+    const urlSegments = this.router.url.split('/');
+    const taskIndex = urlSegments.indexOf('task');
+    return taskIndex > -1 ? urlSegments[taskIndex + 1] : null;
+  }
+
   selectedOverlordUrlUpdate(task: Task, router: Router, route: ActivatedRoute) {
     router.navigate([], {
       relativeTo: route,

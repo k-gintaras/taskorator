@@ -12,7 +12,10 @@
       <app-overlord-navigator></app-overlord-navigator>
 
       <div *ngIf="tasks?.length === 0" class="no-tasks">
-        <app-task-edit [task]="selectedOverlord"></app-task-edit>
+        <app-task-edit
+          [task]="selectedOverlord"
+          [isPopup]="false"
+        ></app-task-edit>
         <p>No other tasks yet.</p>
       </div>
       <div *ngIf="canShowInfo()" class="no-tasks">

@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { TaskService } from '../../../../services/tasks/task.service';
 import { TaskUpdateService } from '../../../../services/task/task-update.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-create-repetitive-task',
@@ -28,6 +29,7 @@ import { TaskUpdateService } from '../../../../services/task/task-update.service
     MatSelectModule,
     MatButtonModule,
     NgForOf,
+    MatIcon,
   ],
   templateUrl: './create-repetitive-task.component.html',
   styleUrl: './create-repetitive-task.component.scss',
@@ -52,7 +54,7 @@ export class CreateRepetitiveTaskComponent {
   saveTask(): void {
     // Here, you'd integrate this with your service or event bus.
     console.log('Task created:', this.task);
-    alert(`Repetitive Task "${this.task.name}" created successfully.`);
+    // alert(`Repetitive Task "${this.task.name}" created successfully.`);
     this.task.lastUpdated = 0;
     this.taskService.create(this.task);
   }

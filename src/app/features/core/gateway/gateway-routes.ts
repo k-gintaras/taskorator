@@ -15,11 +15,11 @@ const routes: Routes = [
     path: '',
     component: GatewayComponent,
     children: [
-      {
-        path: '',
-        redirectTo: 'login',
-        pathMatch: 'full',
-      },
+      // {
+      //   path: '',
+      //   redirectTo: 'login',
+      //   pathMatch: 'full',
+      // },
       {
         path: 'login',
         component: LoginComponent, // Replace with your actual component

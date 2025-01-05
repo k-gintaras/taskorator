@@ -47,6 +47,7 @@ export class TextTypeDetectorService {
 
     const separator = this.getSeparator(lines);
     const firstLineSeparators = this.countSeparators(lines[0], separator);
+    if (firstLineSeparators < 3) return false;
 
     for (let i = 1; i < lines.length; i++) {
       if (this.countSeparators(lines[i], separator) !== firstLineSeparators) {

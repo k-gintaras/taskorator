@@ -7,7 +7,8 @@
     </button>
 
     <!-- App Title -->
-    <span class="app-title">Taskorator</span>
+    <span class="app-title"><app-notification></app-notification></span>
+    <!-- <app-notification></app-notification> -->
 
     <!-- Search Toggle Button -->
     <app-search-create></app-search-create>
@@ -18,6 +19,8 @@
     <button mat-icon-button (click)="toggleDrawer()">
       <mat-icon>menu</mat-icon>
     </button>
+    <span class="app-title"><app-notification></app-notification></span>
+
     <app-search-create></app-search-create>
   </ng-container>
 </mat-toolbar>
@@ -31,9 +34,6 @@
     class="sidenav"
   >
     <ul class="nav-list">
-      <li>
-        <!-- <app-overlord-navigator></app-overlord-navigator> -->
-      </li>
       <li
         *ngFor="let item of navItems"
         [class.selected]="isSelected(item.path)"
@@ -41,8 +41,10 @@
       >
         <mat-icon>{{ item.metadata.icon }}</mat-icon>
         <span class="nav-text">{{ item.metadata.title }}</span>
+        <span class="nav-alt">{{ item.metadata.altName }}</span>
       </li>
     </ul>
+
     <button
       *ngIf="canGoBack()"
       mat-button

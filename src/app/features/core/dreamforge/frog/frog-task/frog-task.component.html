@@ -1,17 +1,19 @@
-<div class="frog-task-container">
-  <div *ngIf="frogTasks?.length; else noTasks">
-    <ul>
-      <li *ngFor="let task of frogTasks">
-        {{ task.name }}
-        <button (click)="removeFrogTask(task.taskId)">Remove</button>
-      </li>
-    </ul>
-  </div>
-  <ng-template #noTasks>
-    <p>No Frog Tasks added yet.</p>
-  </ng-template>
-
-  <!-- Assuming a way to add tasks, replace "taskIdToAdd" with actual logic -->
-  <!-- <input [(ngModel)]="taskIdToAdd" placeholder="Task ID to add" />
-  <button (click)="addFrogTask(taskIdToAdd)">Add Frog Task</button> -->
+<div class="component-width">
+  <h1>Focus Tasks</h1>
+  <app-staged-task-list [tasks]="tasks" (tasksChange)="updateTasks($event)">
+  </app-staged-task-list>
+  <button class="task-btn" (click)="save()">
+    <mat-icon>save</mat-icon>Save Settings
+  </button>
+</div>
+<div class="component-width">
+  <h1>Selected Tasks</h1>
+  <app-staged-task-list
+    [tasks]="selectedTasks"
+    (tasksChange)="updateSelectedTasks($event)"
+  >
+  </app-staged-task-list>
+  <button class="task-btn" (click)="add()">
+    <mat-icon>add</mat-icon>Add To Focus
+  </button>
 </div>

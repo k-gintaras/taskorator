@@ -20,6 +20,7 @@ export interface Artificer {
   demote(task: Task): void;
   select(task: Task): void;
   suggest(task: Task): void;
+  mass(task: Task): void;
 }
 
 export interface ArtificerDetails {
@@ -38,4 +39,5 @@ export const artificerDetailList: ArtificerDetails[] = [
   { action: 'suggest', icon: 'search', colorClass: 'refresh-icon-color' }, // create color for it ?
   { action: 'promote', icon: 'expand_less', colorClass: 'refresh-icon-color' }, // create color for it ?
   { action: 'demote', icon: 'expand_more', colorClass: 'refresh-icon-color' }, // create color for it ?
+  { action: 'mass', icon: 'add', colorClass: 'refresh-icon-color' }, // create color for it ?
 ];

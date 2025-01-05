@@ -75,6 +75,7 @@ export class TreeService extends CoreService implements TreeStrategy {
   }
 
   private subscribeToTaskEvents(): void {
+    console.log('tree service is listening');
     this.eventBusService.onEvent<any>('createTask').subscribe((task) => {
       this.handleCreateTask(task);
     });
@@ -241,19 +242,31 @@ export class TreeService extends CoreService implements TreeStrategy {
   }
 
   async getTreeOnce(): Promise<TaskTree | null> {
+    console.log('log: ' + 'getting tree once: ');
     try {
       let tree = await this.cacheService.getTree();
       if (!tree) {
+        console.log('getting user ID: ');
+
         const userId = await this.authService.getCurrentUserId();
+        console.log('userId');
+        console.log(userId);
         if (!userId) return null;
 
         tree = await this.apiService.getTree(userId);
+        console.log('tree in get tree once: ');
+        console.log(tree);
+
         if (!tree) return null;
 
         await this.cacheService.updateTree(tree);
       }
+      console.log('tree CACHE');
+
       return tree;
     } catch (error) {
+      console.log('tree in get tree once: ERRORRRRRRRRRRRRRRRR');
+
       this.error(error);
       return null;
     }

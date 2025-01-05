@@ -43,7 +43,7 @@
   <div class="search-results" *ngIf="searchResults && searchResults.length > 0">
     <p
       *ngFor="let task of searchResults"
-      (click)="onSelectTask(task.taskId)"
+      (click)="onSelectTask(task)"
       [class.selected]="task.taskId === selectedOverlord?.taskId"
     >
       {{ task.name }}

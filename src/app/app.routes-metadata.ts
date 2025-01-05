@@ -13,14 +13,14 @@ export const CORE_APP_METADATA: AppRouteMap = {
     description:
       'Strategic command center for overseeing, prioritizing, and managing tasks at a high level.',
     icon: 'security',
-    altName: 'Command',
+    altName: 'Task Lists',
   },
   nexus: {
     title: 'Nexus',
     description:
       'Central hub for organizing and planning tasks, focusing on workflow management and time-based sessions.',
     icon: 'hub',
-    altName: 'Task Hub',
+    altName: 'Time Management',
   },
   vortex: {
     title: 'Vortex',
@@ -34,7 +34,7 @@ export const CORE_APP_METADATA: AppRouteMap = {
     description:
       'A focused area for refining and executing group actions on selected tasks.',
     icon: 'filter_list',
-    altName: 'Task Batch',
+    altName: 'Mass Process',
   },
   citadel: {
     title: 'Citadel',

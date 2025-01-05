@@ -48,7 +48,7 @@ export class TextToTasksService {
 
   // Function to identify common separators in a string, returns the first one found
   findCommonSeparator(str: string): string | null {
-    const separators = [',', ';', '|'];
+    const separators = [',', ';', '|', ' ', '  '];
     for (const sep of separators) {
       if (str.includes(sep)) {
         return sep;

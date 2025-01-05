@@ -1,9 +1,19 @@
-<ul class="focus-task-list">
-  <li
-    *ngFor="let task of focusTasks"
-    [class.is-focused]="task.isCompleted"
-    (click)="toggleFocus(task.taskId)"
+<div class="component-width">
+  <h1>Focus Tasks</h1>
+  <app-staged-task-list [tasks]="tasks" (tasksChange)="updateTasks($event)">
+  </app-staged-task-list>
+  <button class="task-btn" (click)="save()">
+    <mat-icon>save</mat-icon>Save Settings
+  </button>
+</div>
+<div class="component-width">
+  <h1>Selected Tasks</h1>
+  <app-staged-task-list
+    [tasks]="selectedTasks"
+    (tasksChange)="updateSelectedTasks($event)"
   >
-    {{ task.name }}
-  </li>
-</ul>
+  </app-staged-task-list>
+  <button class="task-btn" (click)="add()">
+    <mat-icon>add</mat-icon>Add To Focus
+  </button>
+</div>

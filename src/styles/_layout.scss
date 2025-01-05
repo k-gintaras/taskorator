@@ -6,6 +6,8 @@
 .center-horizontal {
   display: flex;
   justify-content: center;
+  margin-top: 20px;
+  // background-color: rgb(83, 63, 88);
 }
 
 .flex-center {
@@ -136,14 +138,14 @@
   box-sizing: border-box;
 }
 
-// .task-list {
-//   flex-grow: 1;
-//   padding: 10px;
-//   background-color: #fafafa;
-//   border-radius: 8px;
-//   overflow-wrap: break-word;
-//   box-sizing: border-box;
-// }
+.task-list {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
 
 .task-container {
   display: flex;

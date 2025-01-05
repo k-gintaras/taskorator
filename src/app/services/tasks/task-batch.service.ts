@@ -9,6 +9,7 @@ import {
   TaskActions,
   TaskActionTrackerService,
 } from './task-action-tracker.service';
+import { ErrorService } from '../core/error.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,8 @@ export class TaskBatchService {
     private authService: AuthService,
     private eventBusService: EventBusService,
     private transmutatorService: TaskTransmutationService,
-    private taskActionService: TaskActionTrackerService
+    private taskActionService: TaskActionTrackerService,
+    private errorService: ErrorService
   ) {}
 
   /**
@@ -58,6 +60,12 @@ export class TaskBatchService {
       // Notify other services
       this.eventBusService.createTasks(tasks);
       this.taskActionService.recordBatchAction(ids, TaskActions.CREATED);
+      this.errorService.feedback(
+        'Batch ' +
+          TaskActions.CREATED +
+          ' ' +
+          createdTasks.map((t) => t.name).join(',')
+      );
 
       return extendedTasks;
     } catch (error) {
@@ -109,6 +117,7 @@ export class TaskBatchService {
               );
             }
           });
+
           break;
         case TaskActions.DELETED:
           extendedTasks.forEach((task) => {

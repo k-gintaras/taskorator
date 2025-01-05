@@ -1,13 +1,19 @@
-<div class="favorite-task-container">
-  <div *ngIf="favoriteTasks?.length; else noTasks">
-    <ul>
-      <li *ngFor="let task of favoriteTasks">
-        {{ task.name }}
-        <button (click)="removeFavoriteTask(task.taskId)">Remove</button>
-      </li>
-    </ul>
-  </div>
-  <ng-template #noTasks>
-    <p>No Favorite Tasks added yet.</p>
-  </ng-template>
+<div class="component-width">
+  <h1>Favorite Tasks</h1>
+  <app-staged-task-list [tasks]="tasks" (tasksChange)="updateTasks($event)">
+  </app-staged-task-list>
+  <button class="task-btn" (click)="save()">
+    <mat-icon>save</mat-icon>Save Settings
+  </button>
+</div>
+<div class="component-width">
+  <h1>Selected Tasks</h1>
+  <app-staged-task-list
+    [tasks]="selectedTasks"
+    (tasksChange)="updateSelectedTasks($event)"
+  >
+  </app-staged-task-list>
+  <button class="task-btn" (click)="add()">
+    <mat-icon>add</mat-icon>Add To Favorite
+  </button>
 </div>

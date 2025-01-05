@@ -10,7 +10,7 @@
         [(ngModel)]="inputText"
         placeholder="Enter tasks (CSV, JSON, list, or code)"
         (input)="onInputChange()"
-        rows="2"
+        rows="1"
       ></textarea>
     </mat-form-field>
 
@@ -89,7 +89,8 @@
 
   <!-- Staged Task List -->
   <div class="task-list">
-    <app-staged-task-list [tasks]="tasks"></app-staged-task-list>
+    <app-staged-task-list [tasks]="tasks" (tasksChange)="updateTasks($event)">
+    </app-staged-task-list>
   </div>
 
   <!-- Save Button -->
