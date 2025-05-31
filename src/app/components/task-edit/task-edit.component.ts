@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { getRandomTask } from '../../test-files/test-data/test-task';
-import { getBaseTask, Task } from '../../models/taskModelManager';
+import { getDefaultTask, Task } from '../../models/taskModelManager';
 import { FormsModule } from '@angular/forms';
-import { TaskUpdateService } from '../../services/task/task-update.service';
+import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import {
   TaskAction,
   TaskActions,
@@ -19,7 +19,7 @@ import { NgIf } from '@angular/common';
 })
 export class TaskEditComponent {
   // @Input() task: Task = getRandomTask();
-  @Input() task: Task = getBaseTask();
+  @Input() task: Task = getDefaultTask();
   @Input() isPopup: boolean = true;
 
   // Display values for duration and end time

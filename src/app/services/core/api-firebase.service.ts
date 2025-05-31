@@ -6,7 +6,7 @@ import {
   TaskUserInfo,
 } from '../../models/service-strategies/user';
 import { TaskSettings } from '../../models/settings';
-import { Task } from '../../models/taskModelManager';
+import { getUniqueTaskId, Task } from '../../models/taskModelManager';
 import { TaskTree } from '../../models/taskTree';
 import { TaskApiService } from '../api/task-api.service';
 import { TaskSettingsApiService } from '../api/task-settings-api.service';
@@ -16,6 +16,8 @@ import { TaskListApiService } from '../api/task-list-api.service';
 import { RegisterApiService } from '../api/register-api.service';
 import { KeyApiService } from '../api/key-api.service';
 import { UserApiService } from '../api/user-api.service';
+import { TaskListKey } from '../../models/task-list-model';
+import { RegistrationData } from '../../models/service-strategies/registration-strategy';
 
 @Injectable({
   providedIn: 'root',
@@ -23,8 +25,6 @@ import { UserApiService } from '../api/user-api.service';
 export class ApiFirebaseService implements ApiStrategy {
   constructor(
     private registerService: RegisterApiService,
-    private apiKeyService: KeyApiService,
-    private userService: UserApiService,
     private taskService: TaskApiService,
     private taskListService: TaskListApiService,
     private settingsService: TaskSettingsApiService,
@@ -32,130 +32,173 @@ export class ApiFirebaseService implements ApiStrategy {
     private treeService: TaskTreeApiService
   ) {}
 
-  generateApiKey(userId: string): Promise<string | undefined> {
-    return this.apiKeyService.generateApiKey(userId);
+  generateApiKey(): void {
+    this.registerService.generateApiKey();
   }
 
-  register(
-    userId: string,
-    initialTask: Task,
-    additionalTasks: Task[],
-    settings: TaskSettings,
-    score: Score,
-    tree: TaskTree
-  ): Promise<RegisterUserResult> {
-    return this.registerService.register(
-      userId,
-      initialTask,
-      additionalTasks,
-      settings,
-      score,
-      tree
-    );
+  createUserInfo(userInfo: TaskUserInfo): Promise<void> {
+    return this.registerService.createUserInfo(userInfo);
   }
 
-  getUserInfo(userId: string): Promise<TaskUserInfo | undefined> {
-    return this.userService.getUserInfo(userId);
+  updateUserInfo(userInfo: TaskUserInfo): Promise<void> {
+    return this.registerService.updateUserInfo(userInfo);
   }
 
-  createTask(userId: string, task: Task): Promise<Task | null> {
+  register(registrationData: RegistrationData): Promise<RegisterUserResult> {
+    return this.registerService.register(registrationData);
+  }
+
+  getUserInfo(): Promise<TaskUserInfo | undefined> {
+    return this.registerService.getUserInfo();
+  }
+
+  deleteUser(): Promise<void> {
+    return this.registerService.deleteCurrentUser();
+  }
+
+  getLatestCreatedTasks(): Promise<Task[] | null> {
+    return this.taskListService.getLatestCreatedTasks();
+  }
+
+  getLatestUpdatedTasks(): Promise<Task[] | null> {
+    return this.taskListService.getLatestUpdatedTasks();
+  }
+
+  getOverlordTasks(taskId: string): Promise<Task[] | null> {
+    return this.taskListService.getOverlordTasks(taskId);
+  }
+
+  getSessionTasks(sessionId: string): Promise<Task[] | null> {
+    return this.taskListService.getSessionTasks(sessionId);
+  }
+
+  getDailyTasks(): Promise<Task[] | null> {
+    return this.taskListService.getDailyTasks();
+  }
+
+  getWeeklyTasks(): Promise<Task[] | null> {
+    return this.taskListService.getWeeklyTasks();
+  }
+
+  getMonthlyTasks(): Promise<Task[] | null> {
+    return this.taskListService.getMonthlyTasks();
+  }
+
+  getYearlyTasks(): Promise<Task[] | null> {
+    return this.taskListService.getYearlyTasks();
+  }
+
+  getFocusTasks(): Promise<Task[] | null> {
+    return this.taskListService.getFocusTasks();
+  }
+
+  getFavoriteTasks(): Promise<Task[] | null> {
+    return this.taskListService.getFavoriteTasks();
+  }
+
+  getFrogTasks(): Promise<Task[] | null> {
+    return this.taskListService.getFrogTasks();
+  }
+
+  getTasksToSplit(): Promise<Task[] | null> {
+    return this.taskListService.getTasksToSplit();
+  }
+
+  getTasksToCrush(): Promise<Task[] | null> {
+    return this.taskListService.getTasksToCrush();
+  }
+
+  getTasksByType(taskListType: TaskListKey): Promise<Task[] | null> {
+    return this.taskListService.getTasksByType(taskListType);
+  }
+
+  getTasksFromIds(taskIds: string[]): Promise<Task[] | null> {
+    return this.taskListService.getTasksFromIds(taskIds);
+  }
+
+  createTask(task: Task): Promise<Task | null> {
     // Generate a new unique task ID if not provided
     if (!task.taskId) {
-      task.taskId = this.generateUniqueId();
+      task.taskId = getUniqueTaskId();
     }
-    return this.taskService.createTask(userId, task);
+    return this.taskService.createTask(task);
   }
 
-  createTaskWithCustomId(
-    userId: string,
-    task: Task,
-    taskId: string
-  ): Promise<Task | null> {
+  createTaskWithCustomId(task: Task, taskId: string): Promise<Task | null> {
     task.taskId = taskId;
-    return this.taskService.createTask(userId, task);
+    return this.taskService.createTask(task);
   }
 
-  updateTask(userId: string, task: Task): Promise<boolean> {
-    return this.taskService.updateTask(userId, task);
+  updateTask(task: Task): Promise<boolean> {
+    return this.taskService.updateTask(task);
   }
 
-  getTaskById(userId: string, taskId: string): Promise<Task | null> {
-    return this.taskService.getTaskById(userId, taskId);
+  getTaskById(taskId: string): Promise<Task | null> {
+    return this.taskService.getTaskById(taskId);
   }
 
-  getLatestTaskId(userId: string): Promise<string | null> {
-    return this.taskService.getLatestTaskId(userId);
+  getLatestTaskId(): Promise<string | null> {
+    return this.taskService.getLatestTaskId();
   }
 
-  getSuperOverlord(userId: string, taskId: string): Promise<Task | null> {
-    return this.taskService.getSuperOverlord(userId, taskId);
+  getSuperOverlord(taskId: string): Promise<Task | null> {
+    return this.taskService.getSuperOverlord(taskId);
   }
 
-  getOverlordChildren(
-    userId: string,
-    overlordId: string
-  ): Promise<Task[] | null> {
-    return this.taskListService.getOverlordTasks(userId, overlordId);
+  getOverlordChildren(overlordId: string): Promise<Task[] | null> {
+    return this.taskListService.getOverlordTasks(overlordId);
   }
 
-  getTasks(userId: string): Promise<Task[] | null> {
-    return this.taskService.getTasks(userId);
+  getTasks(): Promise<Task[] | null> {
+    return this.taskService.getTasks();
   }
 
-  createTasks(userId: string, tasks: Task[]): Promise<Task[] | null> {
+  createTasks(tasks: Task[]): Promise<Task[] | null> {
     // Assign unique IDs to tasks without an ID
     const tasksWithIds = tasks.map((task) => ({
       ...task,
-      id: task.taskId || this.generateUniqueId(),
+      id: task.taskId || getUniqueTaskId(),
     }));
-    return this.taskService.createTasks(userId, tasksWithIds);
+    return this.taskService.createTasks(tasksWithIds);
   }
 
-  updateTasks(userId: string, tasks: Task[]): Promise<boolean> {
-    return this.taskService.updateTasks(userId, tasks);
+  updateTasks(tasks: Task[]): Promise<boolean> {
+    return this.taskService.updateTasks(tasks);
   }
 
-  getTree(userId: string): Promise<TaskTree | null> {
-    return this.treeService.getTree(userId);
+  getTree(): Promise<TaskTree | null> {
+    return this.treeService.getTree();
   }
 
-  updateTree(userId: string, taskTree: TaskTree): Promise<void> {
-    return this.treeService.updateTree(userId, taskTree);
+  updateTree(taskTree: TaskTree): Promise<void> {
+    return this.treeService.updateTree(taskTree);
   }
 
-  createTree(userId: string, taskTree: TaskTree): Promise<TaskTree | null> {
-    return this.treeService.createTree(userId, taskTree);
+  createTree(taskTree: TaskTree): Promise<TaskTree | null> {
+    return this.treeService.createTree(taskTree);
   }
 
-  getSettings(userId: string): Promise<TaskSettings | null> {
-    return this.settingsService.getSettings(userId);
+  getSettings(): Promise<TaskSettings | null> {
+    return this.settingsService.getSettings();
   }
 
-  updateSettings(userId: string, settings: TaskSettings): Promise<void> {
-    return this.settingsService.updateSettings(userId, settings);
+  updateSettings(settings: TaskSettings): Promise<void> {
+    return this.settingsService.updateSettings(settings);
   }
 
-  createSettings(
-    userId: string,
-    settings: TaskSettings
-  ): Promise<TaskSettings | null> {
-    return this.settingsService.createSettings(userId, settings);
+  createSettings(settings: TaskSettings): Promise<TaskSettings | null> {
+    return this.settingsService.createSettings(settings);
   }
 
-  createScore(userId: string, score: Score): Promise<Score | null> {
-    return this.scoreService.createScore(userId, score);
+  createScore(score: Score): Promise<Score | null> {
+    return this.scoreService.createScore(score);
   }
 
-  getScore(userId: string): Promise<Score | null> {
-    return this.scoreService.getScore(userId);
+  getScore(): Promise<Score | null> {
+    return this.scoreService.getScore();
   }
 
-  updateScore(userId: string, score: Score): Promise<void> {
-    return this.scoreService.updateScore(userId, score);
-  }
-
-  // Utility method to generate unique IDs
-  private generateUniqueId(): string {
-    return `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  updateScore(score: Score): Promise<void> {
+    return this.scoreService.updateScore(score);
   }
 }

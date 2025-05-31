@@ -7,35 +7,31 @@ import {
   TaskType,
   TaskSubtype,
   TaskSize,
-  TASK_ACTIONS,
 } from '../../models/taskModelManager';
-import { CoreService } from '../core/core.service';
-import { ConfigService } from '../core/config.service';
 import { SelectedMultipleService } from './selected-multiple.service';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
-import { SettingsService } from '../core/settings.service';
+import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
-import { TaskService } from '../tasks/task.service';
-import { TaskBatchService } from '../tasks/task-batch.service';
+import { TaskService } from '../sync-api-cache/task.service';
+import { TaskBatchService } from '../sync-api-cache/task-batch.service';
 import {
   TaskActions,
   TaskActionTrackerService,
-} from '../tasks/task-action-tracker.service';
+} from './task-action-tracker.service';
+import { ErrorService } from '../core/error.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskUpdateService extends CoreService {
+export class TaskUpdateService {
   constructor(
     private taskService: TaskService,
     private taskBatchService: TaskBatchService,
     private selectedService: SelectedMultipleService,
     private settingsService: SettingsService,
     private actionService: TaskActionTrackerService,
-    protected config: ConfigService
-  ) {
-    super(config);
-  }
+    private errorService: ErrorService
+  ) {}
 
   move(targetTask: Task) {
     firstValueFrom(this.selectedService.getSelectedTasks()).then(
@@ -350,5 +346,15 @@ export class TaskUpdateService extends CoreService {
     task.size = size;
     this.update(task, TaskActions.SIZE_UPDATED, size);
     this.log('Updated size: ' + task.name);
+  }
+
+  feedback(msg: string) {
+    this.errorService.feedback(msg);
+  }
+  log(msg: string) {
+    this.errorService.log(msg);
+  }
+  error(msg: string) {
+    this.errorService.error(msg);
   }
 }

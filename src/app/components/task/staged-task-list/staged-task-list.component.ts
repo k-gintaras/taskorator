@@ -1,8 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { StagedTasksService } from '../../../services/tasks/staged-task.service';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { getRandomTasks } from '../../../test-files/test-data/test-task';
-import { of } from 'rxjs/internal/observable/of';
+import { NgFor, NgIf } from '@angular/common';
 import { Task } from '../../../models/taskModelManager';
 import { TaskMiniComponent } from '../task-mini/task-mini.component';
 import { MatIcon } from '@angular/material/icon';

@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
-import { TaskService } from '../../services/tasks/task.service';
+import { TaskService } from '../../services/sync-api-cache/task.service';
 import { ExtendedTask } from '../../models/taskModelManager';
 import { SearchOverlordComponent } from '../search-overlord/search-overlord.component';
 import { TaskListRulesService } from '../../services/tasks/task-list-rules.service';

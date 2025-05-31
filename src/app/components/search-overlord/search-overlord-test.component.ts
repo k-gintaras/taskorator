@@ -6,13 +6,11 @@ import { MatSelect } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
-import { TreeService } from '../../services/core/tree.service';
-import { TreeNodeService } from '../../services/core/tree-node.service';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
+import { TreeNodeService } from '../../services/tree/tree-node.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { Task } from '../../models/taskModelManager';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
-import { TaskService } from '../../services/tasks/task.service';
-import { AuthService } from '../../services/core/auth.service';
 
 @Component({
   selector: 'app-search-overlord-test',
@@ -74,7 +72,7 @@ export class SearchOverlordTestComponent implements OnInit {
   loadTaskOptions() {
     this.treeService.getTree().subscribe((taskTree) => {
       if (taskTree) {
-        this.taskOptions = this.treeNodeService.getFlattened(taskTree);
+        this.taskOptions = []; //this.treeNodeService.getFlattened(taskTree);
         // Re-trigger the filtering logic to include newly loaded options
         this.taskSearchCtrl.setValue(this.taskSearchCtrl.value || '');
       }
@@ -96,9 +94,8 @@ export class SearchOverlordTestComponent implements OnInit {
 
     return this.taskOptions
       .filter(
-        (option) =>
-          option.name?.toLowerCase().includes(filterValue) && // Safely check for name
-          !option.isCompleted
+        (option) => option.name?.toLowerCase().includes(filterValue) //&& // Safely check for name
+        // !option.isCompleted
       )
       .sort((a, b) => b.children.length - a.children.length); // Sort by number of children
   }

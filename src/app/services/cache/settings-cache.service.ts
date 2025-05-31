@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { TASK_CONFIG } from '../../app.config';
 import { TaskSettings } from '../../models/settings';
+import { SettingsCacheStrategy } from '../../models/service-strategies/settings-strategy.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SettingsCacheService {
+export class SettingsCacheService implements SettingsCacheStrategy {
   private cache: { settings: TaskSettings; timestamp: number } | null = null;
 
+  createSettings(settings: TaskSettings): void {
+    this.addSettings(settings);
+  }
   /**
    * Add settings to the cache with a timestamp.
    */
-  addSettings(settings: TaskSettings): void {
+  private addSettings(settings: TaskSettings): void {
     const timestamp = Date.now();
     this.cache = { settings, timestamp };
   }

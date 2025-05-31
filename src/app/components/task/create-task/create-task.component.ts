@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Task, getDefaultTask } from '../../../models/taskModelManager';
-import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
 import { NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,8 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
 import { SearchOverlordComponent } from '../../search-overlord/search-overlord.component';
-import { TaskService } from '../../../services/tasks/task.service';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
+import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 
 @Component({
   selector: 'app-create-task',

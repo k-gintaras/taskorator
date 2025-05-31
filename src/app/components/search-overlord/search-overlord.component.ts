@@ -6,13 +6,13 @@ import { MatSelect } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
-import { TreeService } from '../../services/core/tree.service';
-import { TreeNodeService } from '../../services/core/tree-node.service';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import { TreeNodeService } from '../../services/tree/tree-node.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { Task } from '../../models/taskModelManager';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
-import { TaskService } from '../../services/tasks/task.service';
-import { AuthService } from '../../services/core/auth.service';
+import { TaskService } from '../../services/sync-api-cache/task.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
+import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
 
 @Component({
   selector: 'app-search-overlord',
@@ -41,20 +41,19 @@ export class SearchOverlordComponent implements OnInit {
 
   constructor(
     private treeService: TreeService,
-    private treeNodeService: TreeNodeService,
+    private treeNodeToolsService: TaskTreeNodeToolsService,
     private selectedOverlordService: SelectedOverlordService,
-    private taskService: TaskService,
-    private authService: AuthService // Assuming AuthService exists
+    private taskService: TaskService
   ) {}
 
   ngOnInit() {
-    this.authService
-      .isAuthenticatedObservable()
-      .subscribe((isAuthenticated) => {
-        if (isAuthenticated) {
-          this.loadTaskOptions();
-        }
-      });
+    // this.authService
+    //   .isAuthenticatedObservable()
+    //   .subscribe((isAuthenticated) => {
+    //     if (isAuthenticated) {
+    //       this.loadTaskOptions();
+    //     }
+    //   });
 
     // Set up the filter for the select options
     this.filteredTaskOptions = this.taskSearchCtrl.valueChanges.pipe(
@@ -76,7 +75,8 @@ export class SearchOverlordComponent implements OnInit {
   loadTaskOptions() {
     this.treeService.getTree().subscribe((taskTree) => {
       if (taskTree) {
-        this.taskOptions = this.treeNodeService.getFlattened(taskTree);
+        console.log('Task tree loaded @ search overlord:', taskTree);
+        this.taskOptions = this.treeNodeToolsService.getFlattened(taskTree);
         // Re-trigger the filtering logic to include newly loaded options
         this.taskSearchCtrl.setValue(this.taskSearchCtrl.value || '');
       }
@@ -100,7 +100,7 @@ export class SearchOverlordComponent implements OnInit {
       .filter(
         (option) =>
           option.name?.toLowerCase().includes(filterValue) && // Safely check for name
-          !option.isCompleted
+          option.stage !== 'completed'
       )
       .sort((a, b) => b.children.length - a.children.length); // Sort by number of children
   }

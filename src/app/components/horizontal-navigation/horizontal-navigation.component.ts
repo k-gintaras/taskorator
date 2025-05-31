@@ -11,6 +11,7 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
 import { SearchCreateComponent } from '../search-create/search-create.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationComponent } from '../notification/notification.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-horizontal-navigation',

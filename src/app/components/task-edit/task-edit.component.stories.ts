@@ -9,7 +9,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { getRandomTask } from '../../test-files/test-data/test-task';
 import { TaskActions } from '../../services/tasks/task-action-tracker.service';
-import { TaskUpdateService } from '../../services/task/task-update.service';
+import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { MatIcon } from '@angular/material/icon';
 import { Task } from '../../models/taskModelManager';
 

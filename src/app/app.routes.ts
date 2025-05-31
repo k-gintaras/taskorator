@@ -1,13 +1,13 @@
 import { Route } from '@angular/router';
 import { CORE_APP_METADATA } from './app.routes-metadata';
-import {
-  canActivate,
-  canActivateChild,
-  canActivateChildTesting,
-  canActivateTesting,
-} from './services/core/auth-guard';
+import { canActivate, canActivateChild } from './services/core/auth-guard';
+import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
 
 export const routes: Route[] = [
+  {
+    path: 'next',
+    component: NextTaskManagerComponent,
+  },
   {
     path: 'citadel',
     loadChildren: () =>

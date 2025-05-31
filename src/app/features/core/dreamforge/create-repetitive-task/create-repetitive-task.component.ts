@@ -4,19 +4,13 @@ import {
   RepeatOptions,
   Task,
 } from '../../../../models/taskModelManager';
-import {
-  MatFormField,
-  MatFormFieldModule,
-  MatLabel,
-} from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgForOf } from '@angular/common';
-import { MatOption } from '@angular/material/core';
+import { NgForOf } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { TaskService } from '../../../../services/tasks/task.service';
-import { TaskUpdateService } from '../../../../services/task/task-update.service';
+import { TaskUpdateService } from '../../../../services/tasks/task-update.service';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({

@@ -14,7 +14,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormField } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { TaskBatchService } from '../../../../../services/tasks/task-batch.service';
+import { TaskBatchService } from '../../../../../services/sync-api-cache/task-batch.service';
 
 class MockTaskUtilityService {
   getSelectedOverlord() {

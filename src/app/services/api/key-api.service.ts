@@ -1,25 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { AuthService } from '../core/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class KeyApiService {
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async generateApiKey(userId: string): Promise<string | undefined> {
+  private getUserId(): string {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
+
+  /**
+   * beware this will only be used by our separate API not angular
+   * API server should check if "key" allowed... not just if key exists...
+   */
+  async generateApiKey(): Promise<void> {
     try {
       // Generate a unique API key (you can use any method to generate a key)
+      const userId = this.getUserId();
+
       const apiKey = this.generateUniqueApiKey();
 
       // Store the API key in a separate collection "apiKeys" indexed by user ID
       const apiKeyDocRef = doc(this.firestore, 'apiKeys', userId);
       await setDoc(apiKeyDocRef, { apiKey });
-
-      return apiKey;
     } catch (error) {
       console.error('Error generating API key:', error);
-      return undefined;
     }
   }
 

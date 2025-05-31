@@ -1,11 +1,5 @@
-import { Component, NgModule, OnInit } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  FormControlName,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, NgClass } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -14,20 +8,23 @@ import {
   CompleteButtonAction,
   TaskSettings,
 } from '../../../../models/settings';
-import { SettingsService } from '../../../../services/core/settings.service';
-import { getBaseTask } from '../../../../models/taskModelManager';
+import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
+import {
+  getRootTaskObject,
+  ROOT_TASK_ID,
+} from '../../../../models/taskModelManager';
 import { Task } from '../../../../models/taskModelManager';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../../../../components/task/task-edit-popup/task-edit-popup.component';
-import { TaskUpdateService } from '../../../../services/task/task-update.service';
+import { TaskUpdateService } from '../../../../services/tasks/task-update.service';
 import { TaskActions } from '../../../../services/tasks/task-action-tracker.service';
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
-import { TaskService } from '../../../../services/tasks/task.service';
-import { AuthService } from '../../../../services/core/auth.service';
-import { ApiFirebaseService } from '../../../../services/core/api-firebase.service';
+import { TaskService } from '../../../../services/sync-api-cache/task.service';
 import { TaskUserInfo } from '../../../../models/service-strategies/user';
-import { TreeService } from '../../../../services/core/tree.service';
-import { TaskTree } from '../../../../models/taskTree';
+import { SessionManagerService } from '../../../../services/session-manager.service';
+import { RouteMetadata } from '../../../../app.routes-models';
+import { Router } from '@angular/router';
+import { NavigationService } from '../../../../services/navigation.service';
 
 @Component({
   selector: 'app-settings',
@@ -35,7 +32,6 @@ import { TaskTree } from '../../../../models/taskTree';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
   imports: [
-    NgClass,
     MatIcon,
     MatCardModule,
     CommonModule,
@@ -53,9 +49,11 @@ export class SettingsComponent implements OnInit {
     'todo',
   ];
   currentSettings: TaskSettings | undefined;
-  task: Task = getBaseTask();
+  task: Task = getRootTaskObject();
   user: TaskUserInfo | null = null;
   tree: string | null = null;
+
+  navItems: { path: string; metadata: RouteMetadata }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -63,10 +61,11 @@ export class SettingsComponent implements OnInit {
     private taskUpdateService: TaskUpdateService,
     private taskService: TaskService,
     private dialog: MatDialog,
-    private auth: AuthService,
-    private apiService: ApiFirebaseService
-  ) // private treeService: TreeService
-  {
+    private sessionService: SessionManagerService,
+    private navigationService: NavigationService,
+    private router: Router,
+    private sessionManager: SessionManagerService
+  ) {
     this.settingsForm = this.fb.group({
       isShowArchived: [false],
       isShowCompleted: [false],
@@ -77,10 +76,22 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {
+    // const childrenPaths = this.navigationService.getChildrenPaths(item.path);
+
+    // if (childrenPaths.length > 0) {
+    //   this.router.navigate([item.path]);
+    // } else {
+    this.router.navigate(['gateway/' + item.path]);
+    // }
+  }
+
   // Add a private member to control the save operation
   private isInitializingForm = true;
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    // await this.sessionManager.waitForInitialization();
+
     // this.loadCurrentSettings();
 
     // Subscribe to form value changes with additional logic to prevent loop
@@ -95,21 +106,35 @@ export class SettingsComponent implements OnInit {
     //   if (!t) return;
     //   this.tree = JSON.stringify(t, null, 2);
     // });
-    this.auth.isAuthenticatedObservable().subscribe((b) => {
-      if (!b) return;
-      this.taskService.getTaskById(this.task.taskId).then((t) => {
-        if (!t) return;
-        this.task = t;
-      });
 
-      this.auth.getCurrentUserId().then((id) => {
-        if (!id) return;
-        this.apiService.getUserInfo(id).then((u) => {
-          if (!u) return;
-          this.user = u;
+    // TODO: replace with the correct auth
+    this.getAuth()
+      .getCurrentUser()
+      .subscribe((u) => {
+        if (!u) return;
+        this.taskService.getTaskById(this.task.taskId).then((t) => {
+          if (!t) return;
+          this.task = t;
         });
+
+        const userId = this.getAuth().getCurrentUserId();
+        if (!userId) return;
+        this.getApi()
+          .getUserInfo()
+          .then((u) => {
+            if (!u) return;
+            this.user = u;
+          });
       });
-    });
+    this.navItems = this.navigationService.getSettingsPaths();
+  }
+
+  getApi() {
+    return this.sessionService.getApiStrategy();
+  }
+
+  getAuth() {
+    return this.sessionService.getAuthStrategy();
   }
 
   editTask(t: Task) {
@@ -121,10 +146,11 @@ export class SettingsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // Update the task in your list or database
-        if (result) {
+        if (typeof result === 'object') {
           console.log('Task updated on server:', result);
           const taskAction: TaskActions = TaskActions.UPDATED;
-          this.taskUpdateService.update(result, taskAction);
+          const canUpdate = this.isUpdateValid(result);
+          if (canUpdate) this.taskUpdateService.update(result, taskAction);
         }
       } else {
         console.log('task not updated or so dialog says...');
@@ -132,6 +158,25 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  isUpdateValid(task: Task): boolean {
+    if (task.taskId === ROOT_TASK_ID) {
+      // Rule 1: Root task must never be marked as !completed
+      if (task.stage !== 'completed') {
+        console.error('Root task must always be completed.');
+        return false;
+      }
+
+      // Rule 3: Root task repeat can only be "once" or "never"
+      if (task.repeat && task.repeat !== 'once' && task.repeat !== 'never') {
+        console.error('Root task repeat can only be "once" or "never".');
+        return false;
+      }
+    }
+
+    // Add further validations for non-root tasks if needed
+
+    return true; // All validations passed
+  }
   saveTask(t: Task) {}
 
   private loadCurrentSettings(): void {

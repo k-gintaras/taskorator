@@ -7,16 +7,11 @@ import {
 } from './task-action-tracker.service';
 import { ExtendedTask } from '../../models/taskModelManager';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
-import {
-  getIdFromKey,
-  TaskListKey,
-  TaskListRules,
-  TaskListType,
-} from '../../models/task-list-model';
+import { TaskListKey, TaskListRules } from '../../models/task-list-model';
 import { TaskListRulesService } from './task-list-rules.service';
 import { SelectedListService } from './selected-list.service';
-import { TaskListService } from './task-list.service';
 import { TaskListSimpleService } from './task-list-simple.service';
+import { TaskListService } from '../sync-api-cache/task-list.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,10 +25,8 @@ export class TaskViewService {
 
   constructor(
     private actionTracker: TaskActionTrackerService,
-    private taskIdService: TaskIdCacheService,
     private taskListRulesService: TaskListRulesService,
     private selectedList: SelectedListService,
-    private taskLists: TaskListService,
     private taskListSimpleService: TaskListSimpleService
   ) {
     this.initializeActionListener();

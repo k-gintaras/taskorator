@@ -4,6 +4,9 @@
     <button type="button" class="btn btn-primary" (click)="loginWithGmail()">
       <i class="material-icons">login</i> Login with Google
     </button>
+    <button type="button" class="btn btn-primary" (click)="loginOffline()">
+      <i class="material-icons">login</i> Use Offline
+    </button>
     <button type="button" class="btn btn-primary" (click)="logout()">
       <i class="material-icons">logout</i> Logout
     </button>
@@ -12,3 +15,19 @@
     </button> -->
   </form>
 </div>
+<hr />
+<h3>UserInfo</h3>
+<p>{{ userInfo?.allowedTemplates }}</p>
+<p>{{ userInfo?.canCreate }}</p>
+<p>{{ userInfo?.canUseGpt }}</p>
+<p>{{ userInfo?.registered }}</p>
+<p>{{ userInfo?.role }}</p>
+<hr />
+<h3>UserAuthInfo</h3>
+<hr />
+<p>{{ userAuthInfo?.displayName }}</p>
+<p>{{ userAuthInfo?.email }}</p>
+<p>{{ userAuthInfo?.emailVerified }}</p>
+<p>{{ userAuthInfo?.isAnonymous }}</p>
+<p>{{ userAuthInfo?.isNewUser }}</p>
+<p>{{ userAuthInfo?.uid }}</p>

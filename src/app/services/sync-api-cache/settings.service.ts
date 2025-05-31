@@ -1,30 +1,41 @@
 import { Injectable } from '@angular/core';
 import { SettingsStrategy } from '../../models/service-strategies/settings-strategy.interface';
-import { ConfigService } from './config.service';
-import { CoreService } from './core.service';
 import { BehaviorSubject } from 'rxjs';
 import { TaskSettings, getDefaultTaskSettings } from '../../models/settings';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
+import { ErrorService } from '../core/error.service';
 /**
  * @deprecated
  */
 @Injectable({
   providedIn: 'root',
 })
-export class SettingsService extends CoreService implements SettingsStrategy {
+export class SettingsService implements SettingsStrategy {
   private settingsSubject: BehaviorSubject<TaskSettings | null> =
     new BehaviorSubject<TaskSettings | null>(null);
+  apiService: ApiStrategy | null = null;
 
-  constructor(configService: ConfigService) {
-    super(configService);
+  initialize(apiStrategy: ApiStrategy): void {
+    this.apiService = apiStrategy;
+    console.log('SettingsService initialized with API strategy');
   }
+
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
+  constructor(
+    private cacheService: CacheOrchestratorService,
+    private errorService: ErrorService
+  ) {}
 
   async createSettings(settings: TaskSettings): Promise<TaskSettings> {
     try {
-      const userId = await this.authService.getCurrentUserId();
-      if (!userId) {
-        throw new Error('not logged in');
-      }
-      await this.apiService.createSettings(userId, settings);
+      await this.ensureApiService().createSettings(settings);
       await this.cacheService.createSettings(settings);
       this.settingsSubject.next(settings);
       return settings;
@@ -35,10 +46,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
   }
 
   getSettings(): BehaviorSubject<TaskSettings | null> {
-    if (
-      this.settingsSubject.value === null &&
-      this.authService.isAuthenticated()
-    ) {
+    if (this.settingsSubject.value === null) {
       this.fetchSettings();
     }
     return this.settingsSubject;
@@ -46,16 +54,12 @@ export class SettingsService extends CoreService implements SettingsStrategy {
 
   async fetchSettings(): Promise<void> {
     try {
-      const userId = await this.authService.getCurrentUserId();
-      if (!userId) throw new Error('Not logged in');
-
       let settings = await this.cacheService.getSettings();
       if (!settings) {
-        settings = await this.apiService.getSettings(userId);
+        settings = await this.ensureApiService().getSettings();
         if (!settings) {
           // Settings not found or error occurred
           const defaultSettings = getDefaultTaskSettings(); // Assume some default settings exist
-          this.log('recreating settings:');
 
           await this.createSettings(defaultSettings);
           settings = defaultSettings;
@@ -71,11 +75,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
 
   async updateSettings(settings: TaskSettings): Promise<void> {
     try {
-      const userId = await this.authService.getCurrentUserId();
-      if (!userId) {
-        throw new Error('not logged in');
-      }
-      await this.apiService.updateSettings(userId, settings);
+      await this.ensureApiService().updateSettings(settings);
       this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);
     } catch (error) {
@@ -89,10 +89,7 @@ export class SettingsService extends CoreService implements SettingsStrategy {
     try {
       let settings = await this.cacheService.getSettings();
       if (!settings) {
-        const userId = await this.authService.getCurrentUserId();
-        if (!userId) return null;
-
-        settings = await this.apiService.getSettings(userId);
+        settings = await this.ensureApiService().getSettings();
         if (!settings) return null;
 
         // Optionally update the cache with the fetched settings
@@ -103,5 +100,9 @@ export class SettingsService extends CoreService implements SettingsStrategy {
       this.error(error);
       return null;
     }
+  }
+
+  error(msg: unknown) {
+    this.errorService.error(msg);
   }
 }

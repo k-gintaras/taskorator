@@ -1,54 +1,41 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { ConfigService } from './services/core/config.service';
-import { ErrorService } from './services/core/error.service';
-import { ServiceInitiatorService } from './services/core/service-initiator.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { SessionManagerService } from './services/session-manager.service';
+import { NAVIGATION_CONFIG } from './app.config';
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
-import { GptCreateComponent } from './features/gpt/gpt-create/gpt-create.component';
-import { GptTasksComponent } from './features/gpt/gpt-tasks/gpt-tasks.component';
-import { TestTreeService } from './test-files/test-services/test-tree.service';
+import { NavigationService } from './services/navigation.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    HorizontalNavigationComponent,
-    GptCreateComponent,
-    GptTasksComponent,
-  ],
+  imports: [HorizontalNavigationComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  title = 'taskorator';
-  testing = false;
-  authenticated = true;
-
-  feedback = ''; // Change feedbacks array to a single string variable
-
-  private feedbackSubscription: Subscription;
-  // we init services here so their listeners are able to activate when necessary, because these services are kinda updated in background with eventBus
+export class AppComponent implements OnInit {
   constructor(
-    private serviceInitiator: ServiceInitiatorService,
-    private errorService: ErrorService,
-    private config: ConfigService,
-    private testTree: TestTreeService
-  ) {
-    this.feedbackSubscription = this.errorService
-      .getFeedback()
-      .subscribe((message) => {
-        if (message) this.feedback = message; // Assign the new message to feedback
-      });
-  }
+    private sessionManager: SessionManagerService,
+    private router: Router,
+    private navigationService: NavigationService
+  ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.serviceInitiator.waitForInitialization();
-    this.testing = this.config.isTesting();
-    this.authenticated = this.config.getAuthStrategy().isAuthenticated();
-    this.testTree.runTests();
+    // Initialize the session (online or offline)
+    await this.sessionManager.initialize('online');
 
-    console.log('Authenticated: ' + this.authenticated);
-    // Proceed with the login process or other initialization tasks
+    // Redirect based on login state
+    const isLoggedIn = this.sessionManager.isLoggedIn();
+    if (isLoggedIn) {
+      const previousRoute = await this.navigationService.getRedirectUrl();
+      // i mean... if logged in, why redirect, just allow go wherever they want ???
+      // TODO: previous route always null, fix this
+      // if (!previousRoute) {
+      //   this.router.navigate([NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Replace with your default route
+      // }
+      // console.warn('Redirecting to previous route:', previousRoute);
+      // this.router.navigate([previousRoute]);
+    } else {
+      this.router.navigate(['/login']); // Redirect to login if not authenticated
+    }
   }
 }

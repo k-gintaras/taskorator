@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
-import { TaskService } from '../../services/tasks/task.service';
-import { ExtendedTask, getBaseTask } from '../../models/taskModelManager';
+import { TaskService } from '../../services/sync-api-cache/task.service';
+import { ExtendedTask, getRootTaskObject } from '../../models/taskModelManager';
 import { SearchOverlordComponent } from '../search-overlord/search-overlord.component';
 import { TaskListRulesService } from '../../services/tasks/task-list-rules.service';
 import { TaskViewService } from '../../services/tasks/task-view.service';
@@ -34,7 +34,7 @@ export class OverlordNavigatorComponentTest implements OnInit {
       .getSelectedOverlordObservable()
       .subscribe((id: string | null) => {
         if (id) {
-          const base = getBaseTask();
+          const base = getRootTaskObject();
           base.name = 'Selected Overlord Placeholder';
           const e: ExtendedTask = {
             isVisible: false,

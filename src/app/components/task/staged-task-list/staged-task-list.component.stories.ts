@@ -1,6 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Meta, moduleMetadata, StoryFn } from '@storybook/angular';
-import { StagedTasksService } from '../../../services/tasks/staged-task.service';
 import { StagedTaskListComponent } from './staged-task-list.component';
 import { TaskMiniComponent } from '../task-mini/task-mini.component';
 import { MatIcon } from '@angular/material/icon';

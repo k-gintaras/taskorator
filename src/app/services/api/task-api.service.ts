@@ -16,18 +16,33 @@ import {
 import {
   ROOT_TASK_ID,
   Task,
-  getBaseTask,
   getDefaultTask,
 } from '../../models/taskModelManager';
-
+import { TaskApiStrategy } from '../../models/service-strategies/task-strategy.interface';
+import { AuthService } from '../core/auth.service';
+/**
+ * Task API service for Firestore.
+ * BEWARE task 128 is the root task. It should never be deleted.
+ */
 @Injectable({
   providedIn: 'root',
 })
-export class TaskApiService {
-  constructor(private firestore: Firestore) {}
+export class TaskApiService implements TaskApiStrategy {
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async getTasks(userId: string): Promise<Task[] | null> {
-    return null;
+  private getUserId(): string {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
+
+  async getTasks(): Promise<Task[] | null> {
+    const userId = this.getUserId();
+    throw new Error(
+      'Can not just get tasks as non admin. Not implemented yet anyway.'
+    );
   }
 
   private getTaskCollection(userId: string) {
@@ -42,7 +57,9 @@ export class TaskApiService {
     return { ...task, overlord: task.overlord ?? getDefaultTask().overlord };
   }
 
-  async createTask(userId: string, task: Task): Promise<Task | null> {
+  async createTask(task: Task): Promise<Task | null> {
+    const userId = this.getUserId();
+
     const taskCollection = this.getTaskCollection(userId);
     const taskDocRef = doc(taskCollection);
     const newTask = { ...this.ensureOverlord(task), taskId: taskDocRef.id };
@@ -57,10 +74,11 @@ export class TaskApiService {
   }
 
   async createTaskWithCustomId(
-    userId: string,
     task: Task,
     taskId: string
   ): Promise<Task | null> {
+    const userId = this.getUserId();
+
     const taskCollection = this.getTaskCollection(userId);
     const taskDocRef = doc(taskCollection, taskId);
     const newTask = { ...this.ensureOverlord(task), taskId };
@@ -74,7 +92,9 @@ export class TaskApiService {
     }
   }
 
-  async updateTask(userId: string, task: Task): Promise<boolean> {
+  async updateTask(task: Task): Promise<boolean> {
+    const userId = this.getUserId();
+
     if (!task.taskId) {
       console.warn('TaskApiService.updateTask: Missing task ID for update');
       return false;
@@ -94,6 +114,15 @@ export class TaskApiService {
       } else {
         await updateDoc(taskDocRef, { ...updatedTask });
       }
+      if (task.taskId === ROOT_TASK_ID) {
+        if (task.stage !== 'completed') {
+          console.warn(
+            'TaskApiService.updateTask: Safety: Root task must always be completed'
+          );
+          this.handleError('updateTask', "can't delete root task!");
+          return false;
+        }
+      }
       return true;
     } catch (error) {
       this.handleError('updateTask', error);
@@ -101,7 +130,9 @@ export class TaskApiService {
     }
   }
 
-  async getTaskById(userId: string, taskId: string): Promise<Task | null> {
+  async getTaskById(taskId: string): Promise<Task | null> {
+    const userId = this.getUserId();
+
     const taskDocRef = doc(this.getTaskCollection(userId), taskId);
 
     try {
@@ -121,7 +152,9 @@ export class TaskApiService {
     }
   }
 
-  async getLatestTaskId(userId: string): Promise<string | null> {
+  async getLatestTaskId(): Promise<string | null> {
+    const userId = this.getUserId();
+
     const taskCollection = this.getTaskCollection(userId);
     const latestTaskQuery = query(
       taskCollection,
@@ -142,7 +175,9 @@ export class TaskApiService {
     }
   }
 
-  async createTasks(userId: string, tasks: Task[]): Promise<Task[] | null> {
+  async createTasks(tasks: Task[]): Promise<Task[] | null> {
+    const userId = this.getUserId();
+
     const batch = writeBatch(this.firestore);
     const taskCollection = this.getTaskCollection(userId);
     const newTasks: Task[] = [];
@@ -163,7 +198,9 @@ export class TaskApiService {
     }
   }
 
-  async updateTasks(userId: string, tasks: Task[]): Promise<boolean> {
+  async updateTasks(tasks: Task[]): Promise<boolean> {
+    const userId = this.getUserId();
+
     const batch = writeBatch(this.firestore);
     const taskCollection = this.getTaskCollection(userId);
 
@@ -171,6 +208,12 @@ export class TaskApiService {
       tasks.forEach((task) => {
         if (!task.taskId) {
           console.warn(`TaskApiService.updateTasks: Missing task ID for task`);
+          return;
+        }
+        if (task.taskId === ROOT_TASK_ID) {
+          console.warn(
+            `TaskApiService.updateTasks: Safety: Can't mass update with root task`
+          );
           return;
         }
         const taskDocRef = doc(taskCollection, task.taskId);
@@ -191,10 +234,9 @@ export class TaskApiService {
    * @param overlordId
    * @returns super overlord if we pass task.overlord or overlord if we pass task.taskId
    */
-  async getSuperOverlord(
-    userId: string,
-    overlordId: string
-  ): Promise<Task | null> {
+  async getSuperOverlord(overlordId: string): Promise<Task | null> {
+    const userId = this.getUserId();
+
     const overlordDocRef = doc(this.getTaskCollection(userId), overlordId);
 
     try {

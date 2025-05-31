@@ -11,15 +11,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Task } from '../../../../../models/taskModelManager';
-import { SelectedMultipleService } from '../../../../../services/task/selected-multiple.service';
-import { TaskListService } from '../../../../../services/tasks/task-list.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
-import {
-  TaskListKey,
-  TaskListType,
-} from '../../../../../models/task-list-model';
+import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
 @Component({
   selector: 'app-session',

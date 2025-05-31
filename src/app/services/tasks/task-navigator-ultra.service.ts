@@ -1,51 +1,36 @@
 import { Injectable } from '@angular/core';
-import { TaskService } from './task.service';
+import { TaskService } from '../sync-api-cache/task.service';
 import { TaskViewService } from './task-view.service';
-import { TaskTransmutationService } from './task-transmutation.service';
-import { TaskListService } from './task-list.service';
 import {
   ExtendedTask,
   ROOT_TASK_ID,
   Task,
 } from '../../models/taskModelManager';
-import { SelectedOverlordService } from '../task/selected-overlord.service';
+import { SelectedOverlordService } from './selected-overlord.service';
 import { TaskListKey, TaskListType } from '../../models/task-list-model';
 import { TaskUsageService } from './task-usage.service';
+import { TaskListService } from '../sync-api-cache/task-list.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskNavigatorUltraService {
-  private originalTaskIds: string[] | null = null; // Store the original list of task IDs
   private originalListGroup: TaskListKey | null = null; // Store the original list group name
 
   constructor(
     private taskListService: TaskListService,
-    private transmutationService: TaskTransmutationService,
     private viewService: TaskViewService,
     private taskService: TaskService,
     private selectedOverlord: SelectedOverlordService,
     private taskUsageService: TaskUsageService
-  ) {
-    // selectedOverlord.getSelectedOverlordObservable().subscribe((t) => {
-    //   if (!t) return;
-    //   // this.next(t);
-    // });
-    // we want to auto navigate to selected overlord but it causes loop...
-    // so probably not
-  }
+  ) {}
 
   /**
    * Load and initialize tasks, then update the view.
    */
-  async loadAndInitializeTasks(
-    tasks: Task[],
-    originalListGroup: TaskListKey
-  ): Promise<void> {
+  async loadAndInitializeTasks(originalListGroup: TaskListKey): Promise<void> {
     try {
       this.selectedOverlord.setSelectedOverlord(ROOT_TASK_ID);
-      const extendedTasks = this.transmutationService.toExtendedTasks(tasks);
-      this.originalTaskIds = this.transmutationService.getIds(extendedTasks);
       this.originalListGroup = originalListGroup;
 
       this.updateView(originalListGroup);
@@ -118,31 +103,6 @@ export class TaskNavigatorUltraService {
    * Navigate back to the original task list or to the root task if unavailable.
    */
   async backToStart(): Promise<ExtendedTask[] | null> {
-    // try {
-    //   if (this.originalTaskIds && this.originalListGroup) {
-    //     const tasks = await this.taskListService.getTasks(this.originalTaskIds);
-    //     if (!tasks) return null;
-
-    //     this.updateView(this.originalListGroup);
-    //     return this.transmutationService.toExtendedTasks(tasks);
-    //   } else {
-    //     const rootTasks = await this.taskListService.getOverlordTasks(
-    //       ROOT_TASK_ID
-    //     );
-    //     if (rootTasks) {
-    //       const taskListKey: TaskListKey = {
-    //         type: TaskListType.OVERLORD,
-    //         data: ROOT_TASK_ID,
-    //       };
-    //       this.updateView(taskListKey);
-    //     }
-
-    //     return rootTasks;
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to navigate back to start:', error);
-    //   throw error;
-    // }
     if (!this.originalListGroup) return null;
     this.viewService.setTasksListGroup(this.originalListGroup);
     // in case we go back and selected overlord is last clicked task... going home just resets to root

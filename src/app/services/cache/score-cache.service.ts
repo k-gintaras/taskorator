@@ -1,17 +1,23 @@
 import { Injectable } from '@angular/core';
 import { TASK_CONFIG } from '../../app.config';
 import { Score } from '../../models/score';
+import { ScoreCacheStrategy } from '../../models/service-strategies/score-strategy.interface copy';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ScoreCacheService {
+export class ScoreCacheService implements ScoreCacheStrategy {
   private cache: { score: Score; timestamp: number } | null = null;
+
+  createScore(score: Score): void {
+    const timestamp = Date.now();
+    this.cache = { score, timestamp };
+  }
 
   /**
    * Add a score to the cache with a timestamp.
    */
-  addScore(score: Score): void {
+  private addScore(score: Score): void {
     const timestamp = Date.now();
     this.cache = { score, timestamp };
   }

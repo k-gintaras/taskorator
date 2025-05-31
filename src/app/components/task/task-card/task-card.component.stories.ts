@@ -8,7 +8,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { getRandomTask } from '../../../test-files/test-data/test-task';
 import { TaskCardComponent } from './task-card.component';
 import { Meta, moduleMetadata, StoryFn } from '@storybook/angular';
-import { getBaseTask, getDefaultTask } from '../../../models/taskModelManager';
 
 export default {
   title: 'Components/Task Card',

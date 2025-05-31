@@ -4,16 +4,13 @@ import {
   TaskSettings,
   getDefaultTaskSettings,
 } from '../../../../../models/settings';
-import { TaskTreeNode, TaskTree } from '../../../../../models/taskTree';
-import { SettingsService } from '../../../../../services/core/settings.service';
-import { TreeService } from '../../../../../services/core/tree.service';
-import { TaskService } from '../../../../../services/tasks/task.service';
-import { TaskListService } from '../../../../../services/tasks/task-list.service';
-import { Task, ExtendedTask } from '../../../../../models/taskModelManager';
+import { TaskTree } from '../../../../../models/taskTree';
+import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
+import { Task } from '../../../../../models/taskModelManager';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatIcon } from '@angular/material/icon';
-import { SelectedTaskService } from '../../../../../services/task/selected-task.service';
-import { SelectedMultipleService } from '../../../../../services/task/selected-multiple.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
+import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
 @Component({
   selector: 'app-focus',

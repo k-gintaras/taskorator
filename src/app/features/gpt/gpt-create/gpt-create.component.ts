@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { getDefaultTask, Task } from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
-import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
-import { TreeService } from '../../../services/core/tree.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
+import { TreeService } from '../../../services/sync-api-cache/tree.service';
 import { CurrentInputService } from '../../../services/current-input.service';
 import { GptRequestService } from '../services/gpt-request.service';
-import { NgFor, NgIf } from '@angular/common';
-import { ConfigService } from '../../../services/core/config.service';
+import { NgIf } from '@angular/common';
 import { GptTasksService } from '../services/gpt-tasks.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { TaskService } from '../../../services/tasks/task.service';
-import { TaskListService } from '../../../services/tasks/task-list.service';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
+import { TaskListService } from '../../../services/sync-api-cache/task-list.service';
+import { SessionManagerService } from '../../../services/session-manager.service';
 
 @Component({
   selector: 'app-gpt-create',
@@ -30,6 +30,7 @@ export class GptCreateComponent implements OnInit {
 
   isLoading = false;
   result: string[] | null = null;
+  canUseComponent: boolean = true;
 
   constructor(
     private selectedOverlordService: SelectedOverlordService,
@@ -39,7 +40,7 @@ export class GptCreateComponent implements OnInit {
     private taskListService: TaskListService,
     private gptService: GptRequestService,
     private gptTasksService: GptTasksService,
-    private configService: ConfigService
+    private sessionService: SessionManagerService
   ) {}
 
   ngOnInit(): void {
@@ -58,14 +59,17 @@ export class GptCreateComponent implements OnInit {
     this.currentInputService
       .getCurrentInput()
       .subscribe((input) => (this.prompt = input));
+
+    const sessionType = this.sessionService.getSessionType();
+    if (sessionType === 'offline') {
+      this.canUseComponent = false;
+    }
   }
 
   async getSuggestion() {
-    const userId = await this.configService
-      .getAuthStrategy()
-      .getCurrentUserId();
+    if (!this.canUseComponent) alert('Must login online to use gpt');
     const overlordId = this.currentOverlordId;
-    if (!userId || !overlordId) {
+    if (!overlordId) {
       console.log('Missing userId or selectedOverlord.');
       return;
     }
@@ -95,7 +99,7 @@ export class GptCreateComponent implements OnInit {
         currentInput,
         overlord
       );
-      const response = await this.gptService.makeGptRequest(request, userId);
+      const response = await this.gptService.makeGptRequest(request);
       this.result = response.text.split('\n');
       this.result?.forEach((t: string) => {
         const task = this.getTaskFromResponse(t, overlord);

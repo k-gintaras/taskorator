@@ -1,14 +1,9 @@
 import { Component } from '@angular/core';
-import { getBaseTemplate, TaskTemplate } from '../models/template';
+import { TaskTemplate } from '../models/template';
 import { AdminService } from '../services/admin.service';
 import { NgFor, NgIf } from '@angular/common';
-import { TreeService } from '../../../services/core/tree.service';
-import { TreeNodeService } from '../../../services/core/tree-node.service';
-import {
-  getBaseTask,
-  getDefaultTask,
-  Task,
-} from '../../../models/taskModelManager';
+import { TreeNodeService } from '../../../services/tree/tree-node.service';
+import { getDefaultTask, Task } from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
 import { LocalSqliteService } from '../services/local-sqlite.service';
 import { TreeBuilderService } from '../services/tree-builder.service';
@@ -16,40 +11,30 @@ import { take } from 'rxjs';
 import { RegistrationService } from '../../../services/core/registration.service';
 import { TaskUserInfo } from '../../../models/service-strategies/user';
 import { GptRequestService } from '../../gpt/services/gpt-request.service';
-import { AuthService } from '../../../services/core/auth.service';
 import {
   Firestore,
   collection,
-  doc,
-  updateDoc,
-  writeBatch,
-  query,
-  where,
-  limit,
-  orderBy,
-  getDoc,
   setDoc,
   getDocs,
-  runTransaction,
-  DocumentReference,
   Timestamp,
   CollectionReference,
 } from '@angular/fire/firestore';
 import { testTemplate } from '../../../test-files/other-files/testTemplate';
 import { TreeViewComponent } from '../../core/vortex/tree-view/tree-view.component';
-import { TaskService } from '../../../services/tasks/task.service';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
 import { ApiFirebaseService } from '../../../services/core/api-firebase.service';
 import { GeneralApiService } from '../../../services/api/general-api.service';
-import { TaskListService } from '../../../services/tasks/task-list.service';
-import { TaskBatchService } from '../../../services/tasks/task-batch.service';
+import { TaskBatchService } from '../../../services/sync-api-cache/task-batch.service';
 import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
+import { TaskListService } from '../../../services/sync-api-cache/task-list.service';
+import { TreeService } from '../../../services/sync-api-cache/tree.service';
 /**
  * @deprecated This component/service is deprecated and will be removed in future releases.
  */
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [NgIf, NgFor, TreeViewComponent],
+  imports: [NgIf, NgFor],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
 })
@@ -77,24 +62,17 @@ export class AdminComponent {
     private apiService: ApiFirebaseService,
     private apiBaseService: GeneralApiService,
     private gptService: GptRequestService,
-    private authService: AuthService,
     private firestore: Firestore
   ) {}
 
   gptTest() {
-    this.authService.getCurrentUserId().then((id) => {
-      console.log(id);
-      if (id) {
-        const request = 'make joke about very big cat';
-        this.gptService.makeGptRequest(request, id).then((result) => {
-          this.joke = JSON.stringify(result, null, 2);
-        });
-      }
+    const request = 'make joke about very big cat';
+    this.gptService.makeGptRequest(request).then((result) => {
+      this.joke = JSON.stringify(result, null, 2);
     });
   }
   registerTest() {
-    const userId = 'qqpewpew';
-    this.registrationService.registerUserById(userId);
+    this.registrationService.registerUser();
   }
 
   getUserTest() {
@@ -181,21 +159,15 @@ export class AdminComponent {
   }
 
   migrateDatesFix(): void {
-    this.authService
-      .getCurrentUserId()
-      .then((id) => {
-        if (!id) throw new Error('no user');
-        this.migrateTaskDates(id)
-          .then(() => {
-            console.log('Migration completed successfully.');
-          })
-          .catch((error) => {
-            console.error('Error migrating dates:', error);
-          });
-      })
-      .catch((error) => {
-        console.error('Error getting user ID:', error);
-      });
+    // const id = this.authService.getCurrentUserId();
+    // if (!id) throw new Error('no user');
+    // this.migrateTaskDates(id)
+    //   .then(() => {
+    //     console.log('Migration completed successfully.');
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error migrating dates:', error);
+    //   });
   }
 
   sqliteTest() {
@@ -224,7 +196,7 @@ export class AdminComponent {
           // Update the tree with the new tasks
           this.treeService.updateTree(oldTree).then();
           const noRootTasks = filteredTasks.filter((t) => t.taskId !== '128');
-          this.taskBatchService.createTaskBatch(noRootTasks).then();
+          this.taskBatchService.createTaskBatch(noRootTasks, '128').then();
           this.taskListService
             .getOverlordTasks('128')
             .then((result: Task[] | null) => {
@@ -361,7 +333,7 @@ export class AdminComponent {
     const template = await this.templateService.getTemplate(this.templateId);
     if (template) {
       const tasks = template.tasks.filter((task) => task.taskId !== '128');
-      await this.taskBatchService.createTaskBatch(tasks);
+      await this.taskBatchService.createTaskBatch(tasks, '128');
       this.message = 'Tasks copied successfully, except the root task.';
     } else {
       this.message = 'Template not found.';

@@ -4,8 +4,8 @@ import { TaskTemplate } from '../models/template';
 import { TemplateService } from '../services/template.service';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskService } from '../../../../../services/tasks/task.service';
-import { TaskUpdateService } from '../../../../../services/task/task-update.service';
+import { TaskService } from '../../../../../services/sync-api-cache/task.service';
+import { TaskUpdateService } from '../../../../../services/tasks/task-update.service';
 /**
  * @deprecated This component/service is deprecated and will be removed in future releases.
  * will be split into, CREATE templates and browse templates with ability to add...

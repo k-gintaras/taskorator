@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EventBusService } from '../../services/core/event-bus.service';
-import { TreeService } from '../../services/core/tree.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,17 +19,17 @@ export class TestTreeService {
     this.eventBus.emit('createTask', testTask);
 
     // Test 2: Update Tree Directly
-    const tree = await this.treeService.getTreeOnce();
+    const tree = this.treeService.getLatestTree();
     if (tree) {
       console.log('Current tree:', tree);
-      tree.root.name = 'Updated Root';
+      tree.primarch.name = 'Updated Root';
       this.treeService.updateTree(tree);
     } else {
       console.warn('No tree available for update.');
     }
 
     // Test 3: Fetch Tree
-    const fetchedTree = await this.treeService.getTreeOnce();
+    const fetchedTree = this.treeService.getLatestTree();
     console.log('Fetched tree:', fetchedTree);
   }
 }

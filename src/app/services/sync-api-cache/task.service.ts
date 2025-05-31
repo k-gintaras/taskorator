@@ -3,26 +3,27 @@ import { EventBusService } from '../core/event-bus.service';
 import { TaskValidatorService } from '../core/task-validator.service';
 import { ExtendedTask, Task } from '../../models/taskModelManager';
 import { TaskCacheService } from '../cache/task-cache.service';
-import { TaskApiService } from '../api/task-api.service';
-import { AuthService } from '../core/auth.service';
-import { TaskTransmutationService } from './task-transmutation.service';
-import { TaskActions } from './task-action-tracker.service';
+import { TaskTransmutationService } from '../tasks/task-transmutation.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { ErrorService } from '../core/error.service';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   private latestTaskId: string | null = null;
+  apiService: ApiStrategy | null = null;
+  initialize(apiStrategy: ApiStrategy): void {
+    this.apiService = apiStrategy;
+    console.log('TaskService initialized with API strategy');
+  }
 
   constructor(
     private eventBusService: EventBusService,
     private validatorService: TaskValidatorService,
     private taskCache: TaskCacheService,
     private taskIdCache: TaskIdCacheService,
-    private apiService: TaskApiService,
-    private authService: AuthService,
     private transmutatorService: TaskTransmutationService,
     private errorService: ErrorService
   ) {}
@@ -35,9 +36,11 @@ export class TaskService {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
       }
-      const userId = await this.getUserId();
+      if (!this.apiService) {
+        throw new Error('TaskService api not initialized');
+      }
 
-      const createdTask = await this.apiService.createTask(userId, task);
+      const createdTask = await this.apiService.createTask(task);
       if (!createdTask) throw new Error('Task creation failed');
 
       const extendedTask = this.transmutatorService.toExtendedTask(createdTask);
@@ -47,7 +50,7 @@ export class TaskService {
         `overlord_${task.overlord}`
       ); // Notify TaskIdCache of update
 
-      this.eventBusService.createTask(createdTask);
+      this.eventBusService.createTask(extendedTask);
 
       return extendedTask;
     } catch (error) {
@@ -64,8 +67,10 @@ export class TaskService {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
       }
-      const userId = await this.getUserId();
-      await this.apiService.updateTask(userId, task);
+      if (!this.apiService) {
+        throw new Error('TaskService api not initialized');
+      }
+      await this.apiService.updateTask(task);
 
       const extendedTask = this.transmutatorService.toExtendedTask(task);
       if (task.stage === 'deleted') {
@@ -75,8 +80,8 @@ export class TaskService {
       } else {
         this.taskIdCache.updateTasks([extendedTask]); // Notify TaskIdCache of update
         // this.taskCache.addTask(extendedTask); // Update the cache
-        this.eventBusService.updateTask(task);
       }
+      this.eventBusService.updateTask(extendedTask);
     } catch (error) {
       console.error('Error updating task:', error);
       throw error;
@@ -90,15 +95,19 @@ export class TaskService {
     try {
       const cachedTask = this.taskCache.getTask(taskId) as ExtendedTask | null;
       if (cachedTask) {
+        this.eventBusService.getTaskById(cachedTask);
+
         return cachedTask;
       }
 
-      const userId = await this.getUserId();
-      const task = await this.apiService.getTaskById(userId, taskId);
+      if (!this.apiService) {
+        throw new Error('TaskService api not initialized');
+      }
+      const task = await this.apiService.getTaskById(taskId);
       if (task) {
         const extendedTask = this.transmutatorService.toExtendedTask(task);
         this.taskCache.addTask(extendedTask); // Cache ExtendedTask
-        this.eventBusService.getTaskById(task);
+        this.eventBusService.getTaskById(extendedTask);
         return extendedTask;
       } else {
         console.log(`Task ${taskId} not found`);
@@ -133,11 +142,10 @@ export class TaskService {
       }
 
       // Fetch from API if not in cache
-      const userId = await this.getUserId();
-      const latestTask = await this.apiService.getTaskById(
-        userId,
-        this.latestTaskId
-      );
+      if (!this.apiService) {
+        throw new Error('TaskService api not initialized');
+      }
+      const latestTask = await this.apiService.getTaskById(this.latestTaskId);
       if (latestTask) {
         const extendedTask =
           this.transmutatorService.toExtendedTask(latestTask); // Convert to ExtendedTask
@@ -156,38 +164,25 @@ export class TaskService {
    */
   async getSuperOverlord(taskId: string): Promise<ExtendedTask | null> {
     try {
-      const userId = await this.getUserId();
       let task = this.taskCache.getTask(taskId) as ExtendedTask | null; // Check cache first
       if (!task) {
         // Fetch from API if not cached
+        if (!this.apiService) {
+          throw new Error('TaskService api not initialized');
+        }
         const superOverlordTask = await this.apiService.getSuperOverlord(
-          userId,
           taskId
         );
         if (superOverlordTask) {
           task = this.transmutatorService.toExtendedTask(superOverlordTask); // Convert to ExtendedTask
           this.taskCache.addTask(task); // Cache the ExtendedTask
-          this.eventBusService.getSuperOverlord(task); // Emit event for listeners
         }
       }
+      if (task) this.eventBusService.getSuperOverlord(task); // Emit event for listeners
       return task;
     } catch (error) {
       this.handleError('getSuperOverlord', error);
       return null;
-    }
-  }
-
-  /**
-   * Private helper to get the current user ID.
-   */
-  private async getUserId(): Promise<string> {
-    try {
-      const userId = await this.authService.getCurrentUserId();
-      if (!userId) throw new Error('Not logged in');
-      return userId;
-    } catch (error) {
-      this.handleError('getUserId', error);
-      throw error;
     }
   }
 

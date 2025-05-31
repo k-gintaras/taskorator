@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { Task } from '../../models/taskModelManager';
+import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { TaskListKey } from '../../models/task-list-model';
 
 /**
  * must pass task object or else task tree will not be able to add tasks with names...
@@ -43,40 +44,41 @@ export class EventBusService {
     return this.subjects.get(event)?.asObservable() ?? new Observable();
   }
 
-  getTaskById(taskId: Task): void {
+  getTaskById(taskId: ExtendedTask): void {
     this.emit('getTaskById', taskId);
   }
 
-  getLatestTaskId(taskId: Task): void {
+  getLatestTaskId(taskId: ExtendedTask): void {
     this.emit('getLatestTaskId', taskId);
   }
 
-  getSuperOverlord(taskId: Task): void {
+  getSuperOverlord(taskId: ExtendedTask): void {
     this.emit('getSuperOverlord', taskId);
   }
 
-  getOverlordChildren(taskIds: Task[]): void {
+  getOverlordChildren(taskIds: ExtendedTask[]): void {
     this.emit('getOverlordChildren', taskIds);
   }
 
-  getTasks(userId: string): void {
-    this.emit('getTasks', userId);
+  getTasks(tasks: ExtendedTask[], taskListKey: TaskListKey): void {
+    const tasksObject = { tasks, taskListKey };
+    this.emit('getTasks', tasksObject);
   }
 
   // Emit just IDs or arrays of IDs instead of full objects
-  createTask(taskId: Task): void {
+  createTask(taskId: ExtendedTask): void {
     this.emit('createTask', taskId);
   }
 
-  updateTask(taskId: Task): void {
+  updateTask(taskId: ExtendedTask): void {
     this.emit('updateTask', taskId);
   }
 
-  createTasks(taskIds: Task[]): void {
+  createTasks(taskIds: ExtendedTask[]): void {
     this.emit('createTasks', taskIds);
   }
 
-  updateTasks(taskIds: Task[]): void {
+  updateTasks(taskIds: ExtendedTask[]): void {
     this.emit('updateTasks', taskIds);
   }
 }

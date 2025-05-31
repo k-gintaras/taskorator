@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { TaskCacheService } from '../cache/task-cache.service';
-import { TaskListApiService } from '../api/task-list-api.service';
-import { AuthService } from '../core/auth.service';
-import { SettingsService } from '../core/settings.service';
+import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
 import { ExtendedTask, Task } from '../../models/taskModelManager';
-import { TaskTransmutationService } from './task-transmutation.service';
 import {
   getIdFromKey,
   TaskListKey,
   TaskListSubtype,
   TaskListType,
 } from '../../models/task-list-model';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { TaskTransmutationService } from '../tasks/task-transmutation.service';
+import { EventBusService } from '../core/event-bus.service';
 
 type RepeatType = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type SettingsType = 'focus' | 'frog' | 'favorite';
@@ -21,13 +21,25 @@ type SettingsType = 'focus' | 'frog' | 'favorite';
   providedIn: 'root',
 })
 export class TaskListService {
+  apiService: ApiStrategy | null = null;
+  initialize(apiStrategy: ApiStrategy): void {
+    this.apiService = apiStrategy;
+    console.log('TaskListService initialized with API strategy');
+  }
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
+  // TODO: since here we get superoverlord... we might aswell tell event bus...
   constructor(
     private taskIdCache: TaskIdCacheService,
     private taskCache: TaskCacheService,
-    private taskListApi: TaskListApiService,
-    private authService: AuthService,
     private settingsService: SettingsService,
-    private transmutatorService: TaskTransmutationService
+    private transmutatorService: TaskTransmutationService,
+    private eventBusService: EventBusService
   ) {}
 
   // Main GETTER:
@@ -49,6 +61,7 @@ export class TaskListService {
           taskListKey.type +
           taskListKey.data
       );
+      this.eventBusService.getTasks([], taskListKey);
       return []; // Known to be empty, no need to fetch
     }
 
@@ -58,6 +71,8 @@ export class TaskListService {
           taskListKey.type +
           taskListKey.data
       );
+
+      this.eventBusService.getTasks(cacheState.tasksWithData, taskListKey);
 
       return cacheState.tasksWithData; // Return fully cached tasks
     }
@@ -72,7 +87,7 @@ export class TaskListService {
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toExtendedTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
-
+      this.eventBusService.getTasks(converted, taskListKey);
       return converted;
     }
 
@@ -86,6 +101,7 @@ export class TaskListService {
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toExtendedTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
+      this.eventBusService.getTasks(converted, taskListKey);
 
       return converted;
     }
@@ -97,13 +113,10 @@ export class TaskListService {
           taskListKey.type +
           taskListKey.data
       );
-      const userId = await this.getUserId();
-      if (!userId) return null;
       // Fetch missing tasks from API
       const missingTasks =
         cacheState.taskIdsWithoutData.length > 0
-          ? await this.taskListApi.getTasksFromIds(
-              userId,
+          ? await this.ensureApiService().getTasksFromIds(
               cacheState.taskIdsWithoutData
             )
           : [];
@@ -113,7 +126,11 @@ export class TaskListService {
       const extendedTasks =
         this.transmutatorService.toExtendedTasks(missingTasks);
       this.taskIdCache.addTasksWithGroup(extendedTasks, groupName);
-      return [...cacheState.tasksWithData, ...extendedTasks];
+
+      const tasksAndMissing = [...cacheState.tasksWithData, ...extendedTasks];
+      this.eventBusService.getTasks(tasksAndMissing, taskListKey);
+
+      return tasksAndMissing;
     }
     return null;
   }
@@ -133,9 +150,6 @@ export class TaskListService {
     fetchFn: () => Promise<Task[] | null>
   ): Promise<ExtendedTask[] | null> {
     if (missingIds.length === 0) return null;
-
-    const userId = await this.getUserId();
-    if (!userId) return null;
 
     const fetchedTasks = await fetchFn();
     return fetchedTasks
@@ -157,28 +171,22 @@ export class TaskListService {
   }
 
   async getLatestUpdatedTasks(): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.LATEST_UPDATED,
       data: TaskListSubtype.API,
     };
     return this.getTaskGroupWithCache(taskListKey, () =>
-      this.taskListApi.getLatestUpdatedTasks(userId)
+      this.ensureApiService().getLatestUpdatedTasks()
     );
   }
 
   async getLatestTasks(): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.LATEST_CREATED,
       data: TaskListSubtype.API,
     };
     return this.getTaskGroupWithCache(taskListKey, () =>
-      this.taskListApi.getLatestTasks(userId)
+      this.ensureApiService().getLatestCreatedTasks()
     );
   }
 
@@ -186,15 +194,12 @@ export class TaskListService {
    * Get tasks for a specific overlord as ExtendedTask[]
    */
   async getOverlordTasks(overlordId: string): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.OVERLORD,
       data: overlordId,
     };
     return this.getTaskGroupWithCache(taskListKey, () =>
-      this.taskListApi.getOverlordTasks(userId, overlordId)
+      this.ensureApiService().getOverlordTasks(overlordId)
     );
   }
 
@@ -232,9 +237,6 @@ export class TaskListService {
   }
 
   async getFocusTasks(): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.FOCUS,
       data: TaskListSubtype.SETTINGS,
@@ -246,9 +248,6 @@ export class TaskListService {
   }
 
   async getFrogTasks(): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.FROG,
       data: TaskListSubtype.SETTINGS,
@@ -260,9 +259,6 @@ export class TaskListService {
   }
 
   async getFavoriteTasks(): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
-
     const taskListKey: TaskListKey = {
       type: TaskListType.FAVORITE,
       data: TaskListSubtype.SETTINGS,
@@ -279,8 +275,6 @@ export class TaskListService {
   private async getRepeatingTasks(
     type: RepeatType
   ): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return null;
     const taskListKey: TaskListKey = {
       type: TaskListType.DAILY,
       data: TaskListSubtype.REPEATING,
@@ -301,13 +295,14 @@ export class TaskListService {
     }
 
     return this.getTaskGroupWithCache(taskListKey, () => {
+      const api = this.ensureApiService();
       const apiMethodMap = {
-        daily: this.taskListApi.getDailyTasks.bind(this.taskListApi),
-        weekly: this.taskListApi.getWeeklyTasks.bind(this.taskListApi),
-        monthly: this.taskListApi.getMonthlyTasks.bind(this.taskListApi),
-        yearly: this.taskListApi.getYearlyTasks.bind(this.taskListApi),
+        daily: api.getDailyTasks.bind(api),
+        weekly: api.getWeeklyTasks.bind(api),
+        monthly: api.getMonthlyTasks.bind(api),
+        yearly: api.getYearlyTasks.bind(api),
       };
-      return apiMethodMap[type](userId);
+      return apiMethodMap[type]();
     });
   }
 
@@ -335,8 +330,6 @@ export class TaskListService {
     ids: string[],
     taskListKey: TaskListKey
   ): Promise<ExtendedTask[] | null> {
-    const userId = await this.getUserId();
-    if (!userId) return null;
     const groupName = getIdFromKey(taskListKey);
 
     // Retrieve tasks from cache
@@ -347,8 +340,7 @@ export class TaskListService {
 
     if (missingIds.length > 0) {
       // Fetch missing tasks from the API
-      const fetchedTasks = await this.taskListApi.getTasksFromIds(
-        userId,
+      const fetchedTasks = await this.ensureApiService().getTasksFromIds(
         missingIds
       );
       if (fetchedTasks) {
@@ -363,13 +355,5 @@ export class TaskListService {
     }
 
     return cachedTasks;
-  }
-
-  private async getUserId(): Promise<string | undefined> {
-    try {
-      return await this.authService.getCurrentUserId();
-    } catch (error) {
-      throw new Error('Not logged in');
-    }
   }
 }

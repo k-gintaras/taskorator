@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { TaskSessionCacheService } from './task-session-cache.service';
 import { TaskSessionApiService } from './task-session-api.service';
 import { TaskSession } from '../task-session.model';
-import { AuthService } from '../../../../../services/core/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,12 +10,11 @@ import { AuthService } from '../../../../../services/core/auth.service';
 export class TaskSessionService {
   constructor(
     private cacheService: TaskSessionCacheService,
-    private apiService: TaskSessionApiService,
-    private auth: AuthService
+    private apiService: TaskSessionApiService
   ) {}
 
   async getSessions(): Promise<TaskSession[]> {
-    const userId = await this.auth.getCurrentUserId();
+    const userId = null; //await this.auth.getCurrentUserId();
     if (!userId) return [];
     let sessions = this.cacheService.getCache();
     if (sessions) {
@@ -29,7 +27,7 @@ export class TaskSessionService {
   }
 
   async createSession(session: TaskSession): Promise<void> {
-    const userId = await this.auth.getCurrentUserId();
+    const userId = null; //await this.auth.getCurrentUserId();
     if (!userId) return;
     try {
       const createdSession = await this.apiService.createSession(
@@ -44,7 +42,7 @@ export class TaskSessionService {
   }
 
   async updateSession(session: TaskSession): Promise<void> {
-    const userId = await this.auth.getCurrentUserId();
+    const userId = null; //await this.auth.getCurrentUserId();
     if (!userId) return;
     await this.apiService.updateSession(userId, session);
     this.cacheService.updateCache(session);
@@ -52,7 +50,7 @@ export class TaskSessionService {
 
   async deleteSession(sessionId: string): Promise<void> {
     if (!sessionId) return;
-    const userId = await this.auth.getCurrentUserId();
+    const userId = null; //await this.auth.getCurrentUserId();
     if (!userId) return;
     await this.apiService.deleteSession(userId, sessionId);
     this.cacheService.removeFromCache(sessionId);

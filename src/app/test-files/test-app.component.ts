@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ConfigService } from '../services/core/config.service';
 import { ErrorService } from '../services/core/error.service';
-import { ServiceInitiatorService } from '../services/core/service-initiator.service';
 import { ArtificerComponent } from '../components/artificer/artificer.component';
 import { HorizontalNavigationComponent } from '../components/horizontal-navigation/horizontal-navigation.component';
 

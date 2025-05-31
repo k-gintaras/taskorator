@@ -1,24 +1,35 @@
 import { Injectable } from '@angular/core';
 import { ExtendedTask, Task } from '../../models/taskModelManager';
-import { TaskApiService } from '../api/task-api.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
-import { AuthService } from '../core/auth.service';
 import { EventBusService } from '../core/event-bus.service';
-import { TaskTransmutationService } from './task-transmutation.service';
+import { TaskTransmutationService } from '../tasks/task-transmutation.service';
 import {
   TaskActions,
   TaskActionTrackerService,
-} from './task-action-tracker.service';
+} from '../tasks/task-action-tracker.service';
 import { ErrorService } from '../core/error.service';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskBatchService {
+  apiService: ApiStrategy | null = null;
+
+  initialize(apiStrategy: ApiStrategy): void {
+    this.apiService = apiStrategy;
+    console.log('TaskService initialized with API strategy');
+  }
+
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
   constructor(
     private taskIdCache: TaskIdCacheService,
-    private taskApi: TaskApiService,
-    private authService: AuthService,
     private eventBusService: EventBusService,
     private transmutatorService: TaskTransmutationService,
     private taskActionService: TaskActionTrackerService,
@@ -36,14 +47,10 @@ export class TaskBatchService {
       // if (!this.validatorService.isTaskValid(task)) {
       //   throw new Error('Invalid task, probably because it is empty');
       // }
-      const userId = await this.getUserId();
-      if (!userId) throw new Error('User not authenticated');
 
       // Create tasks via API
-      const createdTasks: Task[] | null = await this.taskApi.createTasks(
-        userId,
-        tasks
-      );
+      const createdTasks: Task[] | null =
+        await this.ensureApiService().createTasks(tasks);
       if (!createdTasks) {
         console.warn('No tasks were created.');
         return null;
@@ -58,7 +65,7 @@ export class TaskBatchService {
       const ids = this.transmutatorService.getIds(extendedTasks);
 
       // Notify other services
-      this.eventBusService.createTasks(tasks);
+      this.eventBusService.createTasks(extendedTasks);
       this.taskActionService.recordBatchAction(ids, TaskActions.CREATED);
       this.errorService.feedback(
         'Batch ' +
@@ -86,14 +93,9 @@ export class TaskBatchService {
       // if (!this.validatorService.isTaskValid(task)) {
       //   throw new Error('Invalid task, probably because it is empty');
       // }
-      const userId = await this.getUserId();
-      if (!userId) {
-        console.error('User not authenticated');
-        return;
-      }
 
       // Update tasks via API
-      await this.taskApi.updateTasks(userId, tasks);
+      await this.ensureApiService().updateTasks(tasks);
 
       // Refresh cache with updated tasks
       const extendedTasks = this.transmutatorService.toExtendedTasks(tasks);
@@ -135,24 +137,10 @@ export class TaskBatchService {
       const ids = this.transmutatorService.getIds(extendedTasks);
 
       // Notify other services
-      this.eventBusService.updateTasks(tasks);
+      this.eventBusService.updateTasks(extendedTasks);
       this.taskActionService.recordBatchAction(ids, action, subAction);
     } catch (error) {
       console.error('Failed to update task batch:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Retrieve the current user ID (handles authentication checks).
-   */
-  private async getUserId(): Promise<string> {
-    try {
-      const userId = await this.authService.getCurrentUserId();
-      if (!userId) throw new Error('User not authenticated');
-      return userId;
-    } catch (error) {
-      console.error('Error retrieving user ID:', error);
       throw error;
     }
   }

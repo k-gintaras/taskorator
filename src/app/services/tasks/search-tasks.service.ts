@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, map } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
-import { TreeNodeService } from '../core/tree-node.service';
-import { TreeService } from '../core/tree.service';
+import { TreeNodeService } from '../tree/tree-node.service';
+import { TreeService } from '../sync-api-cache/tree.service';
+import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { TreeService } from '../core/tree.service';
 export class SearchTasksService {
   constructor(
     private treeService: TreeService,
-    private treeNodeService: TreeNodeService
+    private treeNodeToolsService: TaskTreeNodeToolsService
   ) {}
 
   /**
@@ -19,6 +20,7 @@ export class SearchTasksService {
    * @returns An observable of filtered task nodes.
    */
   searchTasks(query: string): Observable<TaskTreeNode[]> {
+    console.log('Searching tasks for query:', query);
     if (!query.trim()) {
       // Return an empty array if the query is empty
       return of([]);
@@ -32,7 +34,7 @@ export class SearchTasksService {
         }
 
         // Flatten the tree to make it searchable
-        const flattenedTasks = this.treeNodeService.getFlattened(tree);
+        const flattenedTasks = this.treeNodeToolsService.getFlattened(tree);
         // Filter tasks based on the search query
         const lowerCaseQuery = query.toLowerCase();
         return flattenedTasks.filter((task) =>

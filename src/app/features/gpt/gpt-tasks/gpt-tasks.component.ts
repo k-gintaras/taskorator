@@ -5,7 +5,7 @@ import { CommonModule, NgFor } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
-import { TaskService } from '../../../services/tasks/task.service';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
 
 @Component({
   selector: 'app-gpt-tasks',

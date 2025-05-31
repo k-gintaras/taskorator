@@ -9,9 +9,9 @@ import { TaskMiniComponent } from '../task/task-mini/task-mini.component';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 import { of } from 'rxjs';
 import { TaskViewService } from '../../services/tasks/task-view.service';
-import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
+import { SelectedMultipleService } from '../../services/tasks/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
-import { TreeService } from '../../services/core/tree.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { ExtendedTask, Task } from '../../models/taskModelManager';
 import { TaskNavigatorTestComponent } from './task-navigator-test/task-navigator-test.component';
 

@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { UserCredential } from 'firebase/auth';
-import { ConfigService } from './config.service';
-import { CoreService } from './core.service';
-import { TreeNodeService } from './tree-node.service';
+import { TreeNodeService } from '../tree/tree-node.service';
 import { getDefaultScore } from '../../models/score';
 import { getDefaultTaskSettings, TaskSettings } from '../../models/settings';
 import {
   Task,
-  getBaseTask,
+  getRootTaskObject,
   ROOT_TASK_ID,
   getDefaultTask,
 } from '../../models/taskModelManager';
 import { TaskTree, getDefaultTree } from '../../models/taskTree';
+import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
+import { CacheOrchestratorService } from './cache-orchestrator.service';
+import { RegistrationData } from '../../models/service-strategies/registration-strategy';
+import { TaskUserInfo } from '../../models/service-strategies/user';
 
 /**
  * Registration additional service
@@ -23,44 +24,134 @@ import { TaskTree, getDefaultTree } from '../../models/taskTree';
  * Sets up all the data associated with user when registering
  */
 @Injectable({ providedIn: 'root' })
-export class RegistrationService extends CoreService {
+export class RegistrationService {
+  apiService: ApiStrategy | null = null;
+  initialized: boolean = false;
+  initialize(apiStrategy: ApiStrategy): void {
+    this.apiService = apiStrategy;
+    console.log('RegistrationService initialized with API strategy');
+    this.initialized = true;
+  }
+  isInitialized() {
+    return this.initialized;
+  }
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
   constructor(
-    configService: ConfigService,
-    private treeNodeService: TreeNodeService
-  ) {
-    super(configService);
+    private treeNodeService: TreeNodeService,
+    private cacheService: CacheOrchestratorService
+  ) {}
+
+  generateApiKey() {
+    this.ensureApiService().generateApiKey();
   }
 
-  async registerUser(user: UserCredential) {
-    const userId = user.user?.uid;
-    if (!userId) {
-      throw new Error('No user id in user credentials @registerUser()');
-    }
-
-    this.registerUserById(userId);
+  getUserInfo(): Promise<TaskUserInfo | undefined> {
+    return this.ensureApiService().getUserInfo();
   }
 
-  async registerUserById(userId: string): Promise<boolean> {
-    console.log('registering: ' + userId);
-    if (!userId) {
-      throw new Error('No user id in user credentials @registerUser()');
+  updateUser(userInfo: TaskUserInfo) {
+    return this.ensureApiService().updateUserInfo(userInfo);
+  }
+
+  async registerNewUser(): Promise<TaskUserInfo | null> {
+    console.log('Attempting to register a new user...');
+    let success = false;
+    let attempts = 0;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second delay
+    let data: TaskUserInfo | null = null;
+
+    while (!success && attempts < maxRetries) {
+      try {
+        console.log(`Register attempt ${attempts + 1} of ${maxRetries}`);
+        data = await this.registerUser();
+        if (data) {
+          success = true;
+          console.log('User registered successfully.');
+        } else {
+          console.warn('Registration returned null. Retrying...');
+          attempts++;
+          if (attempts < maxRetries) {
+            console.log(`Retrying in ${retryDelay}ms...`);
+            await this.delay(retryDelay);
+          }
+        }
+      } catch (error) {
+        attempts++;
+        console.error(
+          `Unexpected error during registration (attempt ${attempts}):`,
+          error
+        );
+        if (attempts < maxRetries) {
+          console.log(`Retrying in ${retryDelay}ms...`);
+          await this.delay(retryDelay);
+        }
+      }
     }
 
+    if (!success) {
+      console.error(
+        `All ${attempts} registration attempts failed. Deleting user.`
+      );
+      await this.deleteUser();
+      return null;
+    }
+
+    return data;
+  }
+
+  /**
+   * Helper method to introduce a delay.
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async deleteUser(): Promise<void> {
+    if (!this.apiService) return;
+    return this.apiService.deleteUser();
+  }
+
+  async handleFailedRegistration(): Promise<void> {
+    console.error('Deleting user due to failed registration.');
+    await this.ensureApiService().deleteUser();
+    throw new Error('Registration failed and user has been deleted.');
+  }
+
+  async registerUser(): Promise<TaskUserInfo | null> {
     const initialTask = this.getInitialTask();
     const additionalTasks = this.getAdditionalTasks(initialTask);
     const settings = this.getBaseSettings(initialTask.taskId);
     const score = this.getBaseScore();
     const tree = this.getBaseTree(initialTask);
+    const userInfo: TaskUserInfo = {
+      allowedTemplates: [],
+      canCreate: false,
+      canUseGpt: false,
+      role: '',
+      registered: false,
+    };
+
     this.treeNodeService.createTasks(tree, additionalTasks);
 
     try {
-      const registrationResult = await this.apiService.register(
-        userId,
+      const registrationData: RegistrationData = {
         initialTask,
         additionalTasks,
         settings,
         score,
-        tree
+        tree,
+        userInfo,
+      };
+
+      const registrationResult = await this.ensureApiService().register(
+        registrationData
       );
 
       if (registrationResult.success) {
@@ -72,17 +163,19 @@ export class RegistrationService extends CoreService {
         await this.cacheService.createScore(score);
         await this.cacheService.createTree(tree);
 
-        return true; // Registration successful
+        return userInfo; // Registration successful
       } else {
-        return false; // Registration failed
+        console.warn('Registration failed:', registrationResult);
+        return null; // Registration failed
       }
     } catch (error) {
-      return false; // Registration failed
+      console.error('Unexpected error during registration:', error);
+      return null; // Registration failed
     }
   }
 
   private getInitialTask(): Task {
-    const task = getBaseTask();
+    const task = getRootTaskObject();
     task.taskId = ROOT_TASK_ID;
     return task;
   }
@@ -124,8 +217,8 @@ export class RegistrationService extends CoreService {
 
   private getBaseTree(initialTask: Task): TaskTree {
     const baseTree: TaskTree = getDefaultTree();
-    baseTree.root.taskId = initialTask.taskId;
-    baseTree.root.name = initialTask.name;
+    baseTree.primarch.taskId = initialTask.taskId;
+    baseTree.primarch.name = initialTask.name;
     return baseTree;
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SettingsService } from '../core/settings.service';
+import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
 import { Task } from '../../models/taskModelManager';
 /**
@@ -8,7 +8,7 @@ import { Task } from '../../models/taskModelManager';
 @Injectable({
   providedIn: 'root',
 })
-export class TaskPriorityService {
+export class TaskSettingsTasksService {
   settings: TaskSettings | undefined;
 
   constructor(private settingsService: SettingsService) {

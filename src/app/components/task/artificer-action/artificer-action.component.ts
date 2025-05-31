@@ -1,17 +1,18 @@
 import { Component, Input } from '@angular/core';
 import { Task } from '../../../models/taskModelManager';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import { TaskTreeNodeData } from '../../../models/taskTree';
-import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
-import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
+import { TaskNodeInfo } from '../../../models/taskTree';
+import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
 import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
 import { MassAddPopupComponent } from '../../mass-add-popup/mass-add-popup.component';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
 
 @Component({
   selector: 'app-artificer-action',
@@ -23,13 +24,14 @@ import { MassAddPopupComponent } from '../../mass-add-popup/mass-add-popup.compo
 export class ArtificerActionComponent {
   @Input() task: Task | undefined;
   currentAction!: ArtificerDetails;
-  @Input() treeNode: TaskTreeNodeData | undefined;
+  @Input() treeNode: TaskNodeInfo | null = null;
   @Input() protectTaskFromDelete: boolean = true;
 
   constructor(
     private taskUpdateService: TaskUpdateService,
     private artificerService: ArtificerService,
     private selectedService: SelectedMultipleService,
+    private taskService: TaskService,
     private gptHelper: GptSuggestService,
     private dialog: MatDialog
   ) {
@@ -93,6 +95,9 @@ export class ArtificerActionComponent {
     const action = this.currentAction.action;
 
     switch (action) {
+      case 'moveToParent':
+        this.moveToParent(task);
+        break;
       case 'promote':
         this.taskUpdateService.increasePriority(task);
         break;
@@ -129,6 +134,22 @@ export class ArtificerActionComponent {
       default:
         break;
     }
+  }
+
+  async moveToParent(task: Task): Promise<void> {
+    if (!task.overlord) {
+      console.warn('Task has no parent, cannot move to parent level.');
+      return;
+    }
+
+    const parentTask = await this.taskService.getSuperOverlord(task.overlord);
+    if (!parentTask) {
+      console.warn('Parent task not found, cannot move to parent level.');
+      return;
+    }
+
+    task.overlord = parentTask.overlord;
+    await this.taskUpdateService.update(task, TaskActions.MOVED);
   }
 
   mass(task: Task) {

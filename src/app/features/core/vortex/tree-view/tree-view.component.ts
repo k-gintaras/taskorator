@@ -8,7 +8,7 @@ import {
 import * as d3 from 'd3';
 import { ZoomBehavior, Selection, zoomIdentity } from 'd3';
 import { TaskTreeNode, TaskTree } from '../../../../models/taskTree';
-import { TreeService } from '../../../../services/core/tree.service';
+import { TreeService } from '../../../../services/sync-api-cache/tree.service';
 
 interface TreeNode extends TaskTreeNode {
   x?: number;
@@ -61,80 +61,42 @@ export class TreeViewComponent implements OnInit, OnChanges {
   // ...
 
   private renderTree(tree: TaskTree) {
-    this.originalNode = tree.root;
-    this.currentNode = tree.root;
+    this.originalNode = tree.primarch;
+    this.currentNode = tree.primarch;
 
     let renderedTree: TaskTree;
 
     // if (this.showFilteredTree) {
     renderedTree = {
       ...tree,
-      root: this.filterTree(tree.root),
+      primarch: this.filterTree(tree.primarch),
     };
-    // } else {
-    //   //filterCompletedTasks
-    //   const filtered = this.filterCompletedTasks(tree.root);
-    //   if (filtered) {
-    //     renderedTree = {
-    //       ...tree,
-    //       root: filtered,
-    //     };
-    //   } else {
-    //     renderedTree = tree;
-    //   }
-    // }
 
-    const nodeCount = this.countNodes(renderedTree.root);
+    const nodeCount = this.countNodes(renderedTree.primarch);
     const margin = { top: 20, right: 220, bottom: 30, left: 220 };
     const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
     const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
 
     this.svg = this.createSvg(margin, width, height);
     this.treemap = this.createTreeMap(height, width);
-    this.treeData = this.createTreeData(renderedTree.root);
+    this.treeData = this.createTreeData(renderedTree.primarch);
 
     this.updateTree();
   }
 
-  // ...
-
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   this.originalNode = node.data;
-  //   this.currentNode = node.data;
-
-  //   if (this.showFilteredTree) {
-  //     const filteredNode = this.filterTree(node.data);
-  //     this.renderTreeFromCurrentNode(filteredNode);
-  //   } else {
-  //     this.renderTreeFromCurrentNode(node.data);
-  //   }
-  // }
-
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   this.originalNode = node.data;
-  //   this.currentNode = node.data;
-
-  //   this.renderTreeFromCurrentNode(node.data);
-  // }
-
   private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
     if (!this.originalTree) return;
     const originalNode = this.findNodeInTree(
-      this.originalTree.root,
+      this.originalTree.primarch,
       node.data.taskId
     );
     if (originalNode) {
       this.originalNode = originalNode;
       this.currentNode = originalNode;
 
-      // if (this.showFilteredTree) {
       const filteredNode = this.filterTree(originalNode);
       this.renderTreeFromCurrentNode(filteredNode);
-      // } else {
-      //   this.renderTreeFromCurrentNode(originalNode);
-      // }
     }
-    // }
   }
 
   toggleFilteredTree() {
@@ -143,9 +105,6 @@ export class TreeViewComponent implements OnInit, OnChanges {
       // if (this.showFilteredTree) {
       const filteredNode = this.filterTree(this.originalNode);
       this.renderTreeFromCurrentNode(filteredNode);
-      // } else {
-      //   this.renderTreeFromCurrentNode(this.originalNode);
-      // }
     }
   }
 
@@ -155,61 +114,8 @@ export class TreeViewComponent implements OnInit, OnChanges {
       // if (this.showFilteredTree) {
       const filteredNode = this.filterTree(this.originalNode);
       this.renderTreeFromCurrentNode(filteredNode);
-      // } else {
-      //   this.renderTreeFromCurrentNode(this.originalNode);
-      // }
     }
   }
-
-  // ...
-
-  // toggleFilteredTree() {
-  //   this.showFilteredTree = !this.showFilteredTree;
-  //   this.renderTreeFromCurrentNode();
-  // }
-  // toggleFilteredTree() {
-  //   this.showFilteredTree = !this.showFilteredTree;
-
-  //   if (this.currentNode) {
-  //     const originalNode = this.findNodeInTree(
-  //       this.treeInput!.root,
-  //       this.currentNode.taskId
-  //     );
-  //     if (originalNode) {
-  //       this.renderTreeFromCurrentNode(originalNode);
-  //     }
-  //   }
-  // }
-
-  // toggleFilteredTree() {
-  //   this.showFilteredTree = !this.showFilteredTree;
-
-  //   if (this.currentNode) {
-  //     if (this.treeInput) {
-  //       const originalNode = this.findNodeInTree(
-  //         this.treeInput.root,
-  //         this.currentNode.taskId
-  //       );
-  //       if (originalNode) {
-  //         this.renderTreeFromCurrentNode(originalNode);
-  //       }
-  //     } else {
-  //       this.renderTreeFromCurrentNode(this.currentNode);
-  //     }
-  //   }
-  // }
-  // toggleFilteredTree() {
-  //   this.showFilteredTree = !this.showFilteredTree;
-
-  //   if (this.originalNode) {
-  //     if (this.showFilteredTree) {
-  //       const filteredNode = this.filterTree(this.originalNode);
-  //       this.renderTreeFromCurrentNode(filteredNode);
-  //     } else {
-  //       this.renderTreeFromCurrentNode(this.originalNode);
-  //     }
-  //   }
-  // }
 
   private findNodeInTree(node: TaskTreeNode, id: string): TaskTreeNode | null {
     if (node.taskId === id) {
@@ -239,7 +145,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
   }
 
   filterCompletedTasks(node: TaskTreeNode): TreeNode | null {
-    if (node.isCompleted) {
+    if (node.stage === 'completed') {
       return null; // Exclude this node
     }
 
@@ -254,49 +160,10 @@ export class TreeViewComponent implements OnInit, OnChanges {
 
     return treeNode;
   }
-  // private renderTreeFromCurrentNode(node: TaskTreeNode) {
-  //   let renderedNode: TaskTreeNode;
-
-  //   if (this.showFilteredTree) {
-  //     renderedNode = this.filterTree(node);
-  //   } else {
-  //     renderedNode = node;
-  //   }
-
-  //   const nodeCount = this.countNodes(renderedNode);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(renderedNode);
-
-  //   this.updateTree();
-  // }
-  // private renderTreeFromCurrentNode(node: TaskTreeNode) {
-  //   this.currentNode = node;
-
-  //   const nodeCount = this.countNodes(node);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(node);
-
-  //   this.updateTree();
-  // }
 
   private renderTreeFromCurrentNode(node: TaskTreeNode) {
     let renderedNode: TaskTreeNode;
-
-    // if (this.showFilteredTree) {
     renderedNode = this.filterTree(node);
-    // } else {
-    //   renderedNode = node;
-    // }
 
     this.currentNode = renderedNode;
 
@@ -312,51 +179,10 @@ export class TreeViewComponent implements OnInit, OnChanges {
     this.updateTree();
   }
 
-  // private renderTreeFromCurrentNode() {
-  //   if (this.currentNode) {
-  //     let renderedNode: TaskTreeNode;
-
-  //     if (this.showFilteredTree) {
-  //       renderedNode = this.filterTree(this.currentNode);
-  //     } else {
-  //       renderedNode = this.currentNode;
-  //     }
-
-  //     const nodeCount = this.countNodes(renderedNode);
-  //     const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //     const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //     const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //     this.svg = this.createSvg(margin, width, height);
-  //     this.treemap = this.createTreeMap(height, width);
-  //     this.treeData = this.createTreeData(renderedNode);
-
-  //     this.updateTree();
-  //   }
-  // }
-
-  // resetTree() {
-  //   if (this.treeInput) {
-  //     this.currentNode = this.treeInput.root;
-  //     this.renderTree(this.treeInput);
-  //   } else {
-  //     this.initTree();
-  //   }
-  // }
-
-  // resetTree() {
-  //   if (this.treeInput) {
-  //     this.currentNode = this.treeInput.root;
-  //     this.renderTreeFromCurrentNode(this.treeInput.root);
-  //   } else {
-  //     this.initTree();
-  //   }
-  // }
-
   resetTree() {
     if (this.treeInput) {
-      this.currentNode = this.treeInput.root;
-      this.renderTreeFromCurrentNode(this.treeInput.root);
+      this.currentNode = this.treeInput.primarch;
+      this.renderTreeFromCurrentNode(this.treeInput.primarch);
     } else {
       this.treeInput = null;
       this.initTree();
@@ -373,7 +199,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
     if (node.children) {
       // Filter children based on whether they are completed and showCompletedTasks flag
       const filteredChildren = node.children.filter(
-        (child) => this.showCompletedTasks || !child.isCompleted
+        (child) => this.showCompletedTasks || child.stage !== 'completed'
       );
 
       // Recursively filter the remaining children
@@ -392,121 +218,6 @@ export class TreeViewComponent implements OnInit, OnChanges {
 
     return filteredNode;
   }
-
-  // private filterTree(node: TaskTreeNode): TaskTreeNode {
-  //   // this.showCompletedTasks:boolean
-  //   // this.showFilteredTree:boolean
-  //   const filteredNode: TaskTreeNode = {
-  //     ...node,
-  //     children: [],
-  //   };
-
-  //   if (node.children) {
-  //     const childrenWithChildren = node.children.filter(
-  //       (child) =>
-  //         child.children && child.children.length > 0 && !child.isCompleted
-  //     );
-  //     const childrenWithoutChildren = node.children.filter(
-  //       (child) =>
-  //         (!child.children || child.children.length === 0) && !child.isCompleted
-  //     );
-
-  //     filteredNode.children = childrenWithChildren.map((child) =>
-  //       this.filterTree(child)
-  //     );
-
-  //     const limitedChildrenWithoutChildren = childrenWithoutChildren.slice(
-  //       0,
-  //       this.maxTasksToShow
-  //     );
-  //     filteredNode.children.push(...limitedChildrenWithoutChildren);
-  //   }
-
-  //   return filteredNode;
-  // }
-
-  // private filterTree(node: TaskTreeNode): TaskTreeNode {
-  //   const filteredNode: TaskTreeNode = {
-  //     ...node,
-  //     children: [],
-  //   };
-
-  //   if (node.children) {
-  //     const childrenWithChildren = node.children.filter(
-  //       (child) => child.children && child.children.length > 0
-  //     );
-  //     const childrenWithoutChildren = node.children.filter(
-  //       (child) => !child.children || child.children.length === 0
-  //     );
-
-  //     filteredNode.children = childrenWithChildren.map((child) =>
-  //       this.filterTree(child)
-  //     );
-
-  //     const limitedChildrenWithoutChildren = childrenWithoutChildren.slice(
-  //       0,
-  //       this.maxTasksToShow
-  //     );
-  //     filteredNode.children.push(...limitedChildrenWithoutChildren);
-  //   }
-
-  //   return filteredNode;
-  // }
-  // private renderTree(tree: TaskTree) {
-  //   let renderedTree: TaskTree;
-  //   this.currentNode = tree.root;
-
-  //   if (this.showFilteredTree) {
-  //     renderedTree = {
-  //       ...tree,
-  //       root: this.filterTree(tree.root),
-  //     };
-  //   } else {
-  //     renderedTree = tree;
-  //   }
-
-  //   const nodeCount = this.countNodes(renderedTree.root);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(renderedTree.root);
-
-  //   this.updateTree();
-  // }
-  // private renderTree(tree: TaskTree) {
-  //   const filteredTree: TaskTree = {
-  //     ...tree,
-  //     root: this.filterTree(tree.root),
-  //   };
-
-  //   const nodeCount = this.countNodes(filteredTree.root);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(filteredTree.root);
-
-  //   this.updateTree();
-  // }
-  // private renderTree(tree: TaskTree) {
-  //   const nodeCount = this.countNodes(tree.root);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(tree.root);
-
-  //   // this.renderLinks();
-  //   // this.renderNodes();
-  //   this.updateTree();
-  // }
 
   private countNodes(node: TaskTreeNode): number {
     let count = 1;
@@ -560,19 +271,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
       });
   }
 
-  // private createTreeData(root: TaskTreeNode) {
-  //   const nodes = d3.hierarchy<TreeNode>(
-  //     root as TreeNode,
-  //     (d) => d.children as TreeNode[]
-  //   );
-  //   return this.treemap!(nodes);
-  // }
-
   private createTreeData(root: TaskTreeNode) {
-    // const filteredRoot = this.filterCompletedTasks(root);
-    // if (!filteredRoot) {
-    //   return undefined; // Handle the case where the root itself is 'completed' or has no visible children
-    // }
     const nodes = d3.hierarchy<TreeNode>(
       root as TreeNode,
       (d) => d.children as TreeNode[]
@@ -595,79 +294,6 @@ export class TreeViewComponent implements OnInit, OnChanges {
       .attr('fill', 'none')
       .attr('stroke', 'grey');
   }
-
-  // In tree-view.component.ts
-
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   // this.treeData = this.createTreeData(node.data);
-
-  //   const nodeCount = this.countNodes(node.data);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(node.data);
-  //   this.updateTree();
-  // }
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   let zoomedNode: TaskTreeNode;
-  //   this.currentNode = node.data;
-
-  //   if (this.showFilteredTree) {
-  //     zoomedNode = this.filterTree(node.data);
-  //   } else {
-  //     zoomedNode = node.data;
-  //   }
-
-  //   const nodeCount = this.countNodes(zoomedNode);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(zoomedNode);
-  //   this.updateTree();
-  // }
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   this.currentNode = node.data;
-  //   this.renderTreeFromCurrentNode(node.data);
-  // }
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   this.currentNode = node.data;
-  //   this.originalNode = node.data;
-
-  //   if (this.showFilteredTree) {
-  //     const filteredNode = this.filterTree(node.data);
-  //     this.renderTreeFromCurrentNode(filteredNode);
-  //   } else {
-  //     this.renderTreeFromCurrentNode(node.data);
-  //   }
-  // }
-
-  // private zoomToNode(node: d3.HierarchyNode<TreeNode>) {
-  //   const filteredNode = this.filterTree(node.data);
-
-  //   const nodeCount = this.countNodes(filteredNode);
-  //   const margin = { top: 20, right: 220, bottom: 30, left: 220 };
-  //   const width = Math.max(960, nodeCount * 50) - margin.left - margin.right;
-  //   const height = Math.max(600, nodeCount * 30) - margin.top - margin.bottom;
-
-  //   this.svg = this.createSvg(margin, width, height);
-  //   this.treemap = this.createTreeMap(height, width);
-  //   this.treeData = this.createTreeData(filteredNode);
-  //   this.updateTree();
-  // }
-
-  // The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.ts(2362)
-  /**
-Argument of type '(selection: Selection<SVGSVGElement, unknown, any, any> | TransitionLike<SVGSVGElement, unknown>, transform: ZoomTransform | ((this: SVGSVGElement, event: any, d: unknown) => ZoomTransform), point?: [...] | ... 1 more ... | undefined) => void' is not assignable to parameter of type '(transition: Transition<SVGGElement, unknown, HTMLElement, any>, ...args: any[]) => any'.
-  Types of parameters 'selection' and 'transition' are incompatible.
-    Type 'Transition<SVGGElement, unknown, HTMLElement, any>' is not assignable to type 'Selection<SVGSVGElement, unknown, any, any> | TransitionLike<SVGSVGElement, unknown>'.
-      Type 'Transition<SVGGElement, unknown, HTMLElement, any>' is missing the following properties from type 'Selection<SVGSVGElement, unknown, any, any>': classed, property, html, append, and 14 more.ts(2345)
- */
   private updateTree() {
     if (!this.svg) return;
 
@@ -703,14 +329,6 @@ Argument of type '(selection: Selection<SVGSVGElement, unknown, any, any> | Tran
     );
   }
 
-  // resetTree() {
-  //   if (this.treeInput) {
-  //     this.renderTree(this.treeInput);
-  //   } else {
-  //     this.initTree();
-  //   }
-  // }
-
   private renderNodes() {
     const nodes = this.svg!.selectAll('.node')
       .data(this.treeData!.descendants())
@@ -722,12 +340,26 @@ Argument of type '(selection: Selection<SVGSVGElement, unknown, any, any> | Tran
 
     nodes
       .append('circle')
-      .attr('r', 3)
-      .attr('fill', (d: any) => (d.children ? '#3498db' : '#e74c3c'))
-      .attr('stroke', (d: any) => {
-        return !d.data.isCompleted ? '#2c3e50' : 'green';
+      .attr('r', 5) // Increased radius for better visibility
+      .attr('fill', (d: any) => {
+        switch (d.data.stage) {
+          case 'todo':
+            return '#27ae60'; // Green
+          case 'completed':
+            return '#3498db'; // Blue
+          case 'deleted':
+            return '#95a5a6'; // Gray
+          default:
+            return '#e74c3c'; // Default red for undefined
+        }
       })
-      .attr('stroke-width', 2);
+      .attr('stroke', (d: any) => {
+        return d.data.stage === 'deleted' ? '#7f8c8d' : '#2c3e50';
+      })
+      .attr('stroke-width', 2)
+      .style('stroke-dasharray', (d: any) =>
+        d.data.stage === 'deleted' ? '4 2' : '0'
+      ); // Dashed for deleted
 
     nodes.on('click', (event: any, d: any) => {
       this.zoomToNode(d);
@@ -741,7 +373,7 @@ Argument of type '(selection: Selection<SVGSVGElement, unknown, any, any> | Tran
         .attr('dy', '.35em')
         .attr('x', (d: any) => (d.children ? -20 : 20))
         .attr('text-anchor', (d: any) => (d.children ? 'end' : 'start'))
-        .text((d: any) => d.data.name)
+        .text((d: any) => `${d.data.name} (${d.data.stage})`) // Added stage in text for clarity
         .attr('font-family', 'Arial')
         .attr('font-size', '14px')
         .attr('fill', '#2c3e50')
@@ -749,22 +381,25 @@ Argument of type '(selection: Selection<SVGSVGElement, unknown, any, any> | Tran
 
       if (textElement) {
         const bbox = textElement.getBBox();
-        const padding = 4;
+        const padding = 6;
         node
           .insert('rect', 'text')
           .attr('x', bbox.x - padding)
           .attr('y', bbox.y - padding)
           .attr('width', bbox.width + 2 * padding)
           .attr('height', bbox.height + 2 * padding)
-          .attr('rx', 10)
-          .attr('ry', 10)
-          .attr('fill', '#f0f0f0')
-          .attr('stroke', '#b0b0b0')
-          .attr('stroke-width', '1')
+          .attr('rx', 8)
+          .attr('ry', 8)
+          .attr('fill', '#f9f9f9') // Subtle background
+          .attr('stroke', '#d0d0d0') // Lighter border
+          .attr('stroke-width', 1)
           .lower();
       }
     });
 
-    nodes.append('title').text((d: any) => d.data.name);
+    // Add tooltips for more information
+    nodes
+      .append('title')
+      .text((d: any) => `Task: ${d.data.name}\nStage: ${d.data.stage}`);
   }
 }

@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FavoriteTaskService } from '../services/favorite-task.service';
-import { TaskTree, TaskTreeNode } from '../../../../../models/taskTree';
+import { TaskTree } from '../../../../../models/taskTree';
 import {
   TaskSettings,
   getDefaultTaskSettings,
 } from '../../../../../models/settings';
-import { SettingsService } from '../../../../../services/core/settings.service';
-import { SelectedMultipleService } from '../../../../../services/task/selected-multiple.service';
-import { TaskListService } from '../../../../../services/tasks/task-list.service';
+import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
 import { Task } from '../../../../../models/taskModelManager';
 import { MatIcon } from '@angular/material/icon';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
+import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
 @Component({
   selector: 'app-favorite-task',

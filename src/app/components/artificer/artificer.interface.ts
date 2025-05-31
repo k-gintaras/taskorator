@@ -21,6 +21,7 @@ export interface Artificer {
   select(task: Task): void;
   suggest(task: Task): void;
   mass(task: Task): void;
+  moveToParent(task: Task): void;
 }
 
 export interface ArtificerDetails {
@@ -40,4 +41,9 @@ export const artificerDetailList: ArtificerDetails[] = [
   { action: 'promote', icon: 'expand_less', colorClass: 'refresh-icon-color' }, // create color for it ?
   { action: 'demote', icon: 'expand_more', colorClass: 'refresh-icon-color' }, // create color for it ?
   { action: 'mass', icon: 'add', colorClass: 'refresh-icon-color' }, // create color for it ?
+  {
+    action: 'moveToParent',
+    icon: 'arrow_upward',
+    colorClass: 'refresh-icon-color',
+  },
 ];

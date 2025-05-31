@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
-import { TaskTree } from '../../models/taskTree';
-import { TreeService } from '../core/tree.service';
-import { CurrentInputService } from '../current-input.service';
-import { SelectedOverlordService } from '../task/selected-overlord.service';
-import { GptTasksService } from '../../features/gpt/services/gpt-tasks.service';
-import { GptRequestService } from '../../features/gpt/services/gpt-request.service';
-import { Task } from '../../models/taskModelManager';
-import { ConfigService } from '../core/config.service';
-import { TaskListService } from './task-list.service';
-import { TaskService } from './task.service';
+import { GptTasksService } from './gpt-tasks.service';
+import { GptRequestService } from './gpt-request.service';
+import { Task } from '../../../models/taskModelManager';
+import { TaskListService } from '../../../services/sync-api-cache/task-list.service';
+import { TreeService } from '../../../services/sync-api-cache/tree.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,11 +14,9 @@ export class GptSuggestService {
 
   constructor(
     private treeService: TreeService,
-    private taskService: TaskService,
     private taskListService: TaskListService,
     private gptService: GptRequestService,
-    private gptTasksService: GptTasksService,
-    private configService: ConfigService
+    private gptTasksService: GptTasksService
   ) {}
 
   async suggestTasksForTask(task: Task): Promise<string[]> {
@@ -36,12 +29,7 @@ export class GptSuggestService {
     const relatedTasks = await this.getRelatedTasks(task);
     const request = this.generateGptRequest(treePath, relatedTasks, '', task);
 
-    const userId = await this.configService
-      .getAuthStrategy()
-      .getCurrentUserId();
-    if (!userId) throw new Error('User ID missing.');
-
-    const response = await this.gptService.makeGptRequest(request, userId);
+    const response = await this.gptService.makeGptRequest(request);
     const taskList = response.text.split('\n');
     this.addGeneratedTasksToGptService(taskList, task);
 

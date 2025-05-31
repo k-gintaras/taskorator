@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Task } from '../../../models/taskModelManager';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
+import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 

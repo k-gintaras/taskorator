@@ -12,7 +12,6 @@ import {
   onAuthStateChanged,
   User,
 } from '@angular/fire/auth';
-import { RegistrationService } from './registration.service';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { map, Observable } from 'rxjs';
 /**
@@ -25,16 +24,19 @@ import { map, Observable } from 'rxjs';
 export class AuthService implements AuthStrategy {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
 
-  constructor(private auth: Auth, private registration: RegistrationService) {
+  constructor(private auth: Auth) {}
+
+  initialize() {
+    this.currentUserSubject.next(this.auth.currentUser);
+
     onAuthStateChanged(this.auth, (user) => {
-      if (user) {
-        this.currentUserSubject.next(user);
-        console.log('User is logged in:', user.uid);
-      } else {
-        this.currentUserSubject.next(null);
-        console.log('User is not logged in');
-      }
+      this.currentUserSubject.next(user);
+      console.log(user ? `User logged in: ${user.uid}` : 'User logged out');
     });
+  }
+
+  login(): Promise<{ userId: string; isNewUser: boolean }> {
+    throw new Error('Method not implemented.');
   }
 
   async deleteCurrentUser(): Promise<void> {
@@ -62,7 +64,7 @@ export class AuthService implements AuthStrategy {
         password
       );
       // we do this here so to guarantee stuff is done and to not forget it
-      this.registration.registerUser(user);
+      // this.registration.registerUser(user);
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -81,7 +83,7 @@ export class AuthService implements AuthStrategy {
     }
   }
 
-  async getCurrentUserId(): Promise<string | undefined> {
+  getCurrentUserId(): string | undefined {
     const user = this.auth.currentUser;
     // console.log('user: ' + user?.uid);
     return user ? user.uid : undefined;
@@ -92,7 +94,9 @@ export class AuthService implements AuthStrategy {
   }
 
   isAuthenticated(): boolean {
-    return !!this.currentUserSubject.getValue();
+    const isAuthenticated = !!this.currentUserSubject.getValue();
+    console.log(`isAuthenticated called. Result: ${isAuthenticated}`);
+    return isAuthenticated;
   }
 
   isAuthenticatedObservable(): Observable<boolean> {

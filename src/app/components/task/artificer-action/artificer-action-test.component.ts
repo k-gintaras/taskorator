@@ -4,9 +4,8 @@ import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import { TaskTreeNodeData } from '../../../models/taskTree';
-import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
-import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
+import { TaskNodeInfo } from '../../../models/taskTree';
+import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
 import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,7 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class ArtificerActionComponentTest {
   @Input() task: Task | undefined;
   currentAction!: ArtificerDetails;
-  @Input() treeNode: TaskTreeNodeData | undefined;
+  @Input() treeNode: TaskNodeInfo | undefined;
 
   constructor(
     private artificerService: ArtificerService,

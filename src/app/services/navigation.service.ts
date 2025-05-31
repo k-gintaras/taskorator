@@ -24,6 +24,66 @@ export class NavigationService {
       });
   }
 
+  getSettingsPaths(): { path: string; metadata: RouteMetadata }[] {
+    // Define admin-only links
+    // const adminOnlyPaths = [
+    //   {
+    //     path: 'admin-dashboard',
+    //     metadata: {
+    //       title: 'Admin Dashboard',
+    //       altName: 'Admin Panel',
+    //       description: 'Access administrative tools and settings.',
+    //       icon: 'admin_panel_settings',
+    //     },
+    //   },
+    //   {
+    //     path: 'user-management',
+    //     metadata: {
+    //       title: 'User Management',
+    //       altName: 'Manage Users',
+    //       description: 'Add, edit, or remove user accounts.',
+    //       icon: 'group',
+    //     },
+    //   },
+    // ];
+
+    // Define general settings paths
+    const generalPaths = [
+      // {
+      //   path: 'profile',
+      //   metadata: {
+      //     title: 'Profile',
+      //     altName: 'User Profile',
+      //     description: 'Edit your personal information and settings.',
+      //     icon: 'person',
+      //   },
+      // },
+      // {
+      //   path: 'preferences',
+      //   metadata: {
+      //     title: 'Preferences',
+      //     altName: 'User Preferences',
+      //     description: 'Customize your application settings.',
+      //     icon: 'settings',
+      //   },
+      // },
+      {
+        path: 'next',
+        metadata: {
+          title: 'Next Task',
+          altName: 'Create Task',
+          description: 'Create a task not assigned to any feature.',
+          icon: 'add_task',
+        },
+      },
+    ];
+
+    // Combine paths and return
+    return [...generalPaths];
+    // return [...generalPaths, ...adminOnlyPaths];
+  }
+  // }
+
   /**
    * Save the intended URL for redirection after login.
    */

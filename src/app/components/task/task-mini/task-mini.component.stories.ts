@@ -2,8 +2,8 @@ import { Meta, moduleMetadata, StoryFn } from '@storybook/angular';
 import { TaskMiniComponent } from './task-mini.component';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
-import { SelectedTaskService } from '../../../services/task/selected-task.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { SelectedTaskService } from '../../../services/tasks/selected-task.service';
 import { Task } from '../../../models/taskModelManager';
 
 // Mock Services

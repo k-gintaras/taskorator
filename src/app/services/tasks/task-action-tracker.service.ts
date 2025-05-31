@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export enum TaskActions {
+  SELECTED = 'selected',
   MOVED = 'moved',
   CREATED = 'created',
   UPDATED = 'updated',

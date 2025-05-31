@@ -8,9 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { SearchOverlordComponent } from '../../search-overlord/search-overlord.component';
-import { TaskService } from '../../../services/tasks/task.service';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
-import { SelectedOverlordService } from '../../../services/task/selected-overlord.service';
+import { TaskService } from '../../../services/sync-api-cache/task.service';
+import { TaskUpdateService } from '../../../services/tasks/task-update.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
 
 // Mock Services
 class MockTaskService {

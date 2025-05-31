@@ -1,13 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Score } from '../../models/score';
+import { ScoreApiStrategy } from '../../models/service-strategies/score-strategy.interface copy';
+import { AuthService } from '../core/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskScoreApiService {
-  constructor(private firestore: Firestore) {}
-  async createScore(userId: string, score: Score): Promise<Score | null> {
+export class TaskScoreApiService implements ScoreApiStrategy {
+  constructor(private firestore: Firestore, private authService: AuthService) {}
+
+  private getUserId(): string {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
+
+  async createScore(score: Score): Promise<Score | null> {
+    const userId = this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const scoreData = JSON.parse(JSON.stringify(score));
@@ -19,7 +31,8 @@ export class TaskScoreApiService {
     }
   }
 
-  async getScore(userId: string): Promise<Score | null> {
+  async getScore(): Promise<Score | null> {
+    const userId = this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const docSnap = await getDoc(scoreDocRef);
@@ -35,7 +48,8 @@ export class TaskScoreApiService {
     }
   }
 
-  async updateScore(userId: string, score: Score): Promise<void> {
+  async updateScore(score: Score): Promise<void> {
+    const userId = this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const scoreData = JSON.parse(JSON.stringify(score));

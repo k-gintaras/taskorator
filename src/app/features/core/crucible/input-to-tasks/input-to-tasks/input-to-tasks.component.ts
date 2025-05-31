@@ -1,10 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  Task,
-  ExtendedTask,
-  getBaseTask,
-} from '../../../../../models/taskModelManager';
+import { Task, ExtendedTask } from '../../../../../models/taskModelManager';
 import { InputToTasksService } from '../services/input-to-tasks.service';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatFormField } from '@angular/material/form-field';
@@ -14,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TextType } from '../services/text-type-detector.service';
 import { TaskUtilityService } from '../../../../../services/tasks/task-utility.service';
-import { TaskBatchService } from '../../../../../services/tasks/task-batch.service';
+import { TaskBatchService } from '../../../../../services/sync-api-cache/task-batch.service';
 
 @Component({
   selector: 'app-input-to-tasks',

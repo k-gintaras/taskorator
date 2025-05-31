@@ -3,9 +3,9 @@ import { ArtificerActionComponent } from './artificer-action.component';
 import { MatIconModule } from '@angular/material/icon';
 import { of } from 'rxjs';
 import { ArtificerService } from '../../artificer/artificer.service';
-import { TaskUpdateService } from '../../../services/task/task-update.service';
-import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
-import { GptSuggestService } from '../../../services/tasks/gpt-suggest.service';
+import { TaskUpdateService } from '../../../services/tasks/task-update.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
 import { Task } from '../../../models/taskModelManager';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 

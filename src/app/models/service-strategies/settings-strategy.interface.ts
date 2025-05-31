@@ -13,10 +13,7 @@ export interface SettingsCacheStrategy {
 }
 
 export interface SettingsApiStrategy {
-  getSettings(userId: string): Promise<TaskSettings | null>;
-  updateSettings(userId: string, settings: TaskSettings): Promise<void>;
-  createSettings(
-    userId: string,
-    settings: TaskSettings
-  ): Promise<TaskSettings | null>;
+  getSettings(): Promise<TaskSettings | null>;
+  updateSettings(settings: TaskSettings): Promise<void>;
+  createSettings(settings: TaskSettings): Promise<TaskSettings | null>;
 }

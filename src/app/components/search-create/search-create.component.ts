@@ -5,13 +5,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { NgForOf, NgIf } from '@angular/common';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
-import { ExtendedTask, getBaseTask, Task } from '../../models/taskModelManager';
-import { TaskService } from '../../services/tasks/task.service';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import {
+  ExtendedTask,
+  getDefaultTask,
+  getRootTaskObject,
+  ROOT_TASK_ID,
+  Task,
+} from '../../models/taskModelManager';
+import { TaskService } from '../../services/sync-api-cache/task.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
-import { TaskUpdateService } from '../../services/task/task-update.service';
+import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 
 @Component({
@@ -35,7 +41,7 @@ export class SearchCreateComponent {
   selectedOverlord: ExtendedTask | null = {
     isVisible: true,
     animationState: 'normal',
-    ...getBaseTask(),
+    ...getRootTaskObject(),
   };
 
   constructor(
@@ -94,9 +100,9 @@ export class SearchCreateComponent {
     }
 
     const task: Task = {
-      ...getBaseTask(),
+      ...getDefaultTask(),
       name: taskName.trim(),
-      overlord: this.selectedOverlord?.taskId || null,
+      overlord: this.selectedOverlord?.taskId || ROOT_TASK_ID,
     };
 
     this.taskupdateService.create(task); //.then(() => {

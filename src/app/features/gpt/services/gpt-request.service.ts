@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { SENSITIVE_CONFIG } from '../../../app.config';
+import { AuthService } from '../../../services/core/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,18 +10,18 @@ import { SENSITIVE_CONFIG } from '../../../app.config';
 export class GptRequestService {
   private apiUrl = SENSITIVE_CONFIG.gptServiceUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  // makeGptRequest(userInput: string, userId: string): Observable<any> {
-  //   const requestData = { userInput };
-  //   const headers = { 'user-id': userId };
+  private getUserId(): string {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
 
-  //   return this.http.post<any>(`${this.apiUrl}/gpt-request`, requestData, {
-  //     headers,
-  //   });
-  // }
-
-  async makeGptRequest(userInput: string, userId: string): Promise<any> {
+  async makeGptRequest(userInput: string): Promise<any> {
+    const userId = this.getUserId();
     const requestData = { userInput };
     const headers = { 'user-id': userId };
 

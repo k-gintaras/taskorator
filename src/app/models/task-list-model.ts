@@ -1,4 +1,4 @@
-import { ExtendedTask } from './taskModelManager';
+import { ExtendedTask, ROOT_TASK_ID } from './taskModelManager';
 
 export interface TaskListRules {
   id: string; // Unique identifier for the list
@@ -221,7 +221,7 @@ export const defaultTaskLists: TaskListRules[] = [
     type: TaskListType.LATEST_CREATED,
     description: 'Most recently created or updated tasks',
     rules: {
-      filter: () => true, // Include all tasks
+      filter: (task) => task.taskId !== ROOT_TASK_ID, // don't show root when it is updated, as it might seem as normal task...
       sorter: (a, b) => (b.timeCreated || 0) - (a.timeCreated || 0), // Most recent first
       permissions: {
         canAdd: false, // we don't know which overlord to add it to
@@ -238,7 +238,7 @@ export const defaultTaskLists: TaskListRules[] = [
     type: TaskListType.LATEST_UPDATED,
     description: 'Most recently created or updated tasks',
     rules: {
-      filter: () => true, // Include all tasks
+      filter: (task) => task.taskId !== ROOT_TASK_ID, // don't show root when it is updated, as it might seem as normal task...
       sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
       permissions: {
         canAdd: true, // we don't know which overlord to add it to
@@ -255,7 +255,7 @@ export const defaultTaskLists: TaskListRules[] = [
     type: TaskListType.OVERLORD,
     description: 'Tasks associated with a specific overlord',
     rules: {
-      filter: (task) => task.stage === 'todo', // Filter tasks that have an overlord
+      filter: (task) => task.stage === 'todo' && task.taskId !== ROOT_TASK_ID, // Filter tasks that have an overlord
       sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
       permissions: {
         canAdd: true,

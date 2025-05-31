@@ -1,14 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BaseComponent } from '../../../../components/base/base.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TaskUserInfo } from '../../../../models/service-strategies/user';
 import { LoggedInUser } from '../../../../models/user';
-import { ConfigService } from '../../../../services/core/config.service';
 import { ErrorService } from '../../../../services/core/error.service';
 import { RegistrationService } from '../../../../services/core/registration.service';
 import { NavigationService } from '../../../../services/navigation.service';
+import { SessionManagerService } from '../../../../services/session-manager.service';
+import { CacheOrchestratorService } from '../../../../services/core/cache-orchestrator.service';
+import {
+  appConfig,
+  NAVIGATION_CONFIG,
+  OTHER_CONFIG,
+} from '../../../../app.config';
+import { AuthUser } from '../../../../models/service-strategies/auth-strategy.interface';
 
 @Component({
   selector: 'app-login',
@@ -16,47 +22,34 @@ import { NavigationService } from '../../../../services/navigation.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent extends BaseComponent implements OnInit {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   isLoggedIn = false;
-
-  private authService;
-  private cacheService;
+  userInfo: TaskUserInfo | undefined;
+  userAuthInfo: AuthUser | undefined;
 
   constructor(
     private router: Router,
-    private configService: ConfigService,
     private registration: RegistrationService,
-    private navigationService: NavigationService, // Inject NavigationService
-    snackBar: MatSnackBar,
-    dialog: MatDialog,
-    errorService: ErrorService
-  ) {
-    super(snackBar, dialog, errorService);
-    this.authService = this.configService.getAuthStrategy();
-    this.cacheService = this.configService.getCacheStrategy();
-  }
+    private navigationService: NavigationService,
+    private sessionManagerService: SessionManagerService,
+    private cacheService: CacheOrchestratorService,
+    private errorService: ErrorService
+  ) {}
 
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe(async (user) => {
-      if (user) {
-        console.log('Redirecting because already logged in');
-
-        const redirectUrl = await this.navigationService.getRedirectUrl();
-
-        if (this.configService.isTesting()) {
-          await this.delay(1000);
+    this.getAuth()
+      .getCurrentUser()
+      .subscribe((r) => {
+        if (!r) return;
+        this.userAuthInfo = r;
+        if (this.registration.isInitialized()) {
+          this.registration.getUserInfo().then((u) => {
+            this.userInfo = u;
+          });
         }
-
-        if (redirectUrl) {
-          this.navigationService.clearRedirectUrl();
-          this.router.navigate([redirectUrl]); // Navigate to the saved URL
-        } else {
-          this.router.navigate(['/sentinel']); // Default fallback
-        }
-      }
-    });
+      });
   }
 
   delay(ms: number) {
@@ -64,23 +57,32 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   async logout() {
-    this.authService.logOut();
+    this.getAuth().logOut();
   }
 
-  async loginWithGmail(): Promise<void> {
+  getAuth() {
+    return this.sessionManagerService.getAuthStrategy();
+  }
+
+  async loginOffline() {
     try {
       this.cacheService.clearCache();
-      localStorage.removeItem('test_user_id');
-      const loggedInUser: LoggedInUser =
-        await this.authService.loginWithGoogle();
-
-      this.log('strategy at login: ' + this.configService.getApiStrategy());
+      localStorage.removeItem(OTHER_CONFIG.OFFLINE_USER_ID);
+      const loggedInUser: LoggedInUser = await this.getAuth().login();
 
       if (loggedInUser.isNewUser) {
-        this.log('New user detected.');
-        await this.registerNewUserOrDelete(loggedInUser.userId);
+        console.log('New user detected.');
+        const userInfo = await this.registration.registerNewUser();
+        if (userInfo) {
+          userInfo.registered = true;
+          this.registration.updateUser(userInfo);
+          // offline no gpt
+          // this.handleGptApiKey(loggedInUser);
+        }
       } else {
-        this.handleGptApiKey(loggedInUser);
+        if (!this.userInfo?.registered) {
+          alert('registration failed');
+        }
       }
 
       const redirectUrl = await this.navigationService.getRedirectUrl();
@@ -88,57 +90,66 @@ export class LoginComponent extends BaseComponent implements OnInit {
         this.navigationService.clearRedirectUrl();
         this.router.navigate([redirectUrl]);
       } else {
-        this.router.navigate(['/navigator']); // Default route
+        this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
       }
     } catch (error) {
-      this.error('Login error:', error);
+      this.error(error);
+      this.popup('Login failed. Please try again.');
+    }
+  }
+
+  async loginWithGmail(): Promise<void> {
+    try {
+      this.cacheService.clearCache();
+      localStorage.removeItem('test_user_id');
+      const loggedInUser: LoggedInUser = await this.getAuth().loginWithGoogle();
+
+      if (loggedInUser.isNewUser) {
+        console.log('New user detected.');
+        const userInfo = await this.registration.registerNewUser();
+        if (userInfo) {
+          userInfo.registered = true;
+          this.registration.updateUser(userInfo);
+          this.handleGptApiKey(loggedInUser);
+        }
+      } else {
+        if (!this.userInfo?.registered) {
+          alert('registration failed');
+        }
+      }
+
+      const redirectUrl = await this.navigationService.getRedirectUrl();
+      if (redirectUrl) {
+        this.navigationService.clearRedirectUrl();
+        this.router.navigate([redirectUrl]);
+      } else {
+        this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
+      }
+    } catch (error) {
+      this.error(error);
       this.popup('Login failed. Please try again.');
     }
   }
 
   handleGptApiKey(loggedInUser: LoggedInUser) {
-    this.configService
-      .getApiStrategy()
-      .getUserInfo(loggedInUser.userId)
-      .then((user: TaskUserInfo | undefined) => {
-        if (user && user.canUseGpt) {
-          this.configService
-            .getApiStrategy()
-            .generateApiKey(loggedInUser.userId)
-            .then(() => {
-              console.log('API key generated');
-            });
-        }
-      });
-  }
-
-  async registerNewUserOrDelete(userId: string): Promise<void> {
-    let registrationSuccess = false;
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    while (!registrationSuccess && retryCount < maxRetries) {
-      registrationSuccess = await this.registration.registerUserById(userId);
-      if (!registrationSuccess) {
-        this.error('Registration attempt failed, retrying...', '');
-        retryCount++;
-      }
-    }
-
-    if (!registrationSuccess) {
-      this.feedback(
-        'Unable to register after multiple attempts. User will be deleted.'
-      );
-      await this.authService.deleteCurrentUser();
-      throw new Error('Registration failed. Please try again.');
-    }
-  }
-
-  async deleteUser() {
-    await this.authService.deleteCurrentUser();
+    if (loggedInUser.isNewUser) return;
+    this.registration.getUserInfo().then((u) => {
+      if (!u) return;
+      if (u.canUseGpt) this.registration.generateApiKey();
+    });
   }
 
   login(email: string, password: string): void {
     // Future implementation for email-password login
+  }
+
+  error(msg: unknown) {
+    this.errorService.error(msg);
+  }
+  popup(msg: string) {
+    this.errorService.popup(msg);
+  }
+  feedback(msg: string) {
+    this.errorService.feedback(msg);
   }
 }

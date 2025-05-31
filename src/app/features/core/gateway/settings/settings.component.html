@@ -58,6 +58,16 @@
     </button>
   </div>
 </div>
+
+<div *ngIf="user?.role === 'admin'">
+  <ul class="nav-list">
+    <li *ngFor="let item of navItems" (click)="onNavItemClick(item)">
+      <mat-icon>{{ item.metadata.icon }}</mat-icon>
+      <span class="nav-text">{{ item.metadata.title }}</span>
+      <span class="nav-alt">{{ item.metadata.altName }}</span>
+    </li>
+  </ul>
+</div>
 <!-- <div>
   <pre>
     {{ tree }}

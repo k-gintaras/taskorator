@@ -5,9 +5,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { NgForOf, NgIf } from '@angular/common';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
-import { ExtendedTask, getBaseTask, Task } from '../../models/taskModelManager';
-import { TaskService } from '../../services/tasks/task.service';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
+import {
+  ExtendedTask,
+  getRootTaskObject,
+  Task,
+} from '../../models/taskModelManager';
+import { TaskService } from '../../services/sync-api-cache/task.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
@@ -33,7 +37,7 @@ export class SearchCreateTestComponent {
   selectedOverlord: ExtendedTask | null = {
     isVisible: true,
     animationState: 'normal',
-    ...getBaseTask(),
+    ...getRootTaskObject(),
   };
 
   constructor(
@@ -89,7 +93,7 @@ export class SearchCreateTestComponent {
     }
 
     const task: Task = {
-      ...getBaseTask(),
+      ...getRootTaskObject(),
       name: taskName.trim(),
       overlord: this.selectedOverlord?.taskId || null,
     };

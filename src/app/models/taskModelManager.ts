@@ -22,6 +22,11 @@ export interface Task {
   tags: string[]; // Array of tags associated with the task
 }
 
+// Utility method to generate unique IDs
+export function getUniqueTaskId(): string {
+  return `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
 export const TASK_ACTIONS = [
   'created',
   'updated',
@@ -111,7 +116,7 @@ export type TaskSubtype =
   | 'list';
 
 export const ROOT_TASK_ID = '128';
-export const ROOT_TASK_DESCRIPTION = 'Root of all tasks.';
+export const ROOT_TASK_DESCRIPTION = 'Legends never die!';
 
 export function getDefaultTask(): Task {
   const now = Date.now(); // Current time in milliseconds
@@ -140,11 +145,11 @@ export function getDefaultTask(): Task {
   };
 }
 
-export function getBaseTask(): Task {
+export function getRootTaskObject(): Task {
   const now = Date.now(); // Current time in milliseconds
   return {
     taskId: ROOT_TASK_ID,
-    name: 'Root',
+    name: 'Primarch',
     todo: '',
     why: ROOT_TASK_DESCRIPTION,
     timeCreated: now,
@@ -154,7 +159,7 @@ export function getBaseTask(): Task {
     overlord: null,
     repeat: 'once',
     status: 'active',
-    stage: 'todo',
+    stage: 'completed',
     type: 'todo',
     subtype: 'list',
     size: 'do now',

@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { ExtendedTask } from '../../../models/taskModelManager';
-import { TaskTreeNodeData } from '../../../models/taskTree';
-import { TreeService } from '../../../services/core/tree.service';
-import { SelectedMultipleService } from '../../../services/task/selected-multiple.service';
+import { TaskNodeInfo } from '../../../models/taskTree';
+import { TreeService } from '../../../services/sync-api-cache/tree.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
 import { Task } from '../../../models/taskModelManager';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -148,7 +148,7 @@ export class TaskNavigatorTestComponent {
   /**
    * Retrieve tree node data for the specified task.
    */
-  getTreeNodeData(task: ExtendedTask): TaskTreeNodeData | undefined {
+  getTreeNodeData(task: ExtendedTask): TaskNodeInfo | null {
     return this.treeService.getTaskTreeData(task.taskId);
   }
 

@@ -1,16 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { getDefaultTaskSettings, TaskSettings } from '../../models/settings';
+import { SettingsApiStrategy } from '../../models/service-strategies/settings-strategy.interface';
+import { AuthService } from '../core/auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class TaskSettingsApiService {
-  constructor(private firestore: Firestore) {}
+export class TaskSettingsApiService implements SettingsApiStrategy {
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async createSettings(
-    userId: string,
-    settings: TaskSettings
-  ): Promise<TaskSettings | null> {
+  private getUserId(): string {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
+
+  async createSettings(settings: TaskSettings): Promise<TaskSettings | null> {
+    const userId = this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -25,7 +33,8 @@ export class TaskSettingsApiService {
     }
   }
 
-  async getSettings(userId: string): Promise<TaskSettings | null> {
+  async getSettings(): Promise<TaskSettings | null> {
+    const userId = this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -47,7 +56,8 @@ export class TaskSettingsApiService {
     }
   }
 
-  async updateSettings(userId: string, settings: TaskSettings): Promise<void> {
+  async updateSettings(settings: TaskSettings): Promise<void> {
+    const userId = this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`

@@ -1,5 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ExtendedTask, getBaseTask, Task } from '../../models/taskModelManager';
+import {
+  ExtendedTask,
+  getRootTaskObject,
+  Task,
+} from '../../models/taskModelManager';
 import { TaskViewService } from '../../services/tasks/task-view.service';
 import { ArtificerComponent } from '../artificer/artificer.component';
 import { ArtificerActionComponent } from '../task/artificer-action/artificer-action.component';
@@ -7,15 +11,15 @@ import { TaskMiniComponent } from '../task/task-mini/task-mini.component';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { TaskTreeNodeData } from '../../models/taskTree';
-import { TreeService } from '../../services/core/tree.service';
-import { SelectedMultipleService } from '../../services/task/selected-multiple.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
+import { SelectedMultipleService } from '../../services/tasks/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
-import { TaskService } from '../../services/tasks/task.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TaskCardComponent } from '../task/task-card/task-card.component';
+import { TaskNodeInfo } from '../../models/taskTree';
 
 @Component({
   standalone: true,
@@ -37,7 +41,7 @@ import { TaskCardComponent } from '../task/task-card/task-card.component';
 export class TaskNavigatorComponent implements OnInit {
   @Input() showArtificer: boolean = false;
   tasks: ExtendedTask[] | null = null; // Support any list of tasks
-  selectedOverlord: ExtendedTask | Task = getBaseTask();
+  selectedOverlord: ExtendedTask | Task = getRootTaskObject();
   errorMessage: string | null = null;
   selectedTasks: Task[] = [];
 
@@ -160,7 +164,7 @@ export class TaskNavigatorComponent implements OnInit {
   /**
    * Retrieve tree node data for the specified task.
    */
-  getTreeNodeData(task: ExtendedTask): TaskTreeNodeData | undefined {
+  getTreeNodeData(task: ExtendedTask): TaskNodeInfo | null {
     return this.treeService.getTaskTreeData(task.taskId);
   }
 

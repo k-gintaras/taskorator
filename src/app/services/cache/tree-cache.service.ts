@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
 import { TASK_CONFIG } from '../../app.config';
 import { TaskTree } from '../../models/taskTree';
+import { TreeCacheStrategy } from '../../models/service-strategies/tree-strategy.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TreeCacheService {
+export class TreeCacheService implements TreeCacheStrategy {
   private cache: { tree: TaskTree; timestamp: number } | null = null;
+
+  createTree(taskTree: TaskTree): void {
+    this.addTree(taskTree);
+  }
 
   /**
    * Add a task tree to the cache with a timestamp.
    */
-  addTree(tree: TaskTree): void {
+  private addTree(tree: TaskTree): void {
     const timestamp = Date.now();
     this.cache = { tree, timestamp };
   }

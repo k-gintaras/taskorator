@@ -21,19 +21,29 @@ export class TreeBuilderService {
 
     console.log('unconnectedTasks');
     console.log(unconnectedTasks);
-    return { root };
+    return {
+      primarch: root,
+      abyss: [],
+      connected: true,
+      totalTasks: 0,
+    };
   }
 
   private convertTasksToNodes(tasks: Task[]): TaskTreeNode[] {
-    return tasks.map((task) => ({
-      taskId: task.taskId,
-      overlord: task.overlord,
-      children: [],
-      childrenCount: 0,
-      completedChildrenCount: 0,
-      name: task.name,
-      isCompleted: task.stage === 'completed',
-    }));
+    return tasks.map((task) => {
+      const treeNode: TaskTreeNode = {
+        taskId: task.taskId,
+        name: task.name,
+        overlord: null,
+        children: [],
+        childrenCount: 0,
+        completedChildrenCount: 0,
+        connected: false,
+        stage: task.stage,
+      };
+
+      return treeNode;
+    });
   }
 
   private findRootNode(tasks: TaskTreeNode[]): TaskTreeNode | undefined {
@@ -51,14 +61,16 @@ export class TreeBuilderService {
   }
 
   private getDefaultRootNode(): TaskTreeNode {
-    return {
+    const node: TaskTreeNode = {
       taskId: '128',
+      name: 'Primarch Node',
       overlord: null,
       children: [],
       childrenCount: 0,
       completedChildrenCount: 0,
-      name: 'Root Node',
-      isCompleted: false,
+      connected: true,
+      stage: 'todo',
     };
+    return node;
   }
 }

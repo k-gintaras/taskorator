@@ -10,6 +10,10 @@ export class TaskCacheService {
     new Map();
   private specialKeys: Map<string, string> = new Map(); // Special key -> taskId mapping
 
+  getAllTasks(): ExtendedTask[] {
+    return Array.from(this.cache.values()).map((entry) => entry.task);
+  }
+
   addTaskWithTime(task: ExtendedTask) {
     const timestamp = Date.now();
     const data = { task, timestamp };
@@ -98,4 +102,8 @@ export class TaskCacheService {
   getMissingTaskIds(taskIds: string[]): string[] {
     return taskIds.filter((id) => !this.cache.has(id));
   }
+
+  // getTasks(): ExtendedTask[] {
+  //   return this.cache.entries().map((v) => v.task);
+  // }
 }

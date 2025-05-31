@@ -48,7 +48,7 @@ export class CacheOrchestratorService implements CacheStrategy {
   }
 
   createTree(taskTree: TaskTree): void {
-    return this.treeCache.addTree(taskTree);
+    return this.treeCache.createTree(taskTree);
   }
 
   getTree(): TaskTree | null {
@@ -60,7 +60,7 @@ export class CacheOrchestratorService implements CacheStrategy {
   }
 
   createSettings(settings: TaskSettings): void {
-    return this.settingsCache.addSettings(settings);
+    return this.settingsCache.createSettings(settings);
   }
 
   getSettings(): TaskSettings | null {
@@ -72,7 +72,7 @@ export class CacheOrchestratorService implements CacheStrategy {
   }
 
   createScore(score: Score): void {
-    return this.scoreCache.addScore(score);
+    return this.scoreCache.createScore(score);
   }
 
   getScore(): Score | null {

@@ -10,10 +10,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'; // 
 import { TaskTreeNode } from '../../models/taskTree';
 import { Task } from '../../models/taskModelManager';
 import { AuthService } from '../../services/core/auth.service';
-import { TreeNodeService } from '../../services/core/tree-node.service';
-import { TreeService } from '../../services/core/tree.service';
-import { SelectedOverlordService } from '../../services/task/selected-overlord.service';
-import { TaskService } from '../../services/tasks/task.service';
+import { TreeNodeService } from '../../services/tree/tree-node.service';
+import { TreeService } from '../../services/sync-api-cache/tree.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { TaskService } from '../../services/sync-api-cache/task.service';
 
 // Mock Services
 class MockTreeService {
@@ -36,28 +36,31 @@ class MockTreeNodeService {
         taskId: '1',
         name: 'Root Task',
         children: [],
-        isCompleted: false,
         overlord: null,
         childrenCount: 0,
         completedChildrenCount: 0,
+        connected: false,
+        stage: 'todo',
       },
       {
         taskId: '2',
         name: 'Child Task 1',
         children: [],
-        isCompleted: false,
         overlord: null,
         childrenCount: 0,
         completedChildrenCount: 0,
+        connected: false,
+        stage: 'todo',
       },
       {
         taskId: '3',
         name: 'Child Task 2',
         children: [],
-        isCompleted: true,
         overlord: null,
         childrenCount: 0,
         completedChildrenCount: 0,
+        connected: false,
+        stage: 'todo',
       },
     ];
   }

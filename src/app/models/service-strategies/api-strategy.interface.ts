@@ -1,4 +1,4 @@
-import { TaskManagementApiStrategy } from './task-management-strategy.interface';
+import { TaskApiStrategy } from './task-strategy.interface';
 import { SettingsApiStrategy } from './settings-strategy.interface';
 import { ScoreApiStrategy } from './score-strategy.interface copy';
 import { TreeApiStrategy } from './tree-strategy.interface';
@@ -7,22 +7,16 @@ import { Score } from '../score';
 import { TaskSettings } from '../settings';
 import { Task } from '../taskModelManager';
 import { TaskTree } from '../taskTree';
+import { TaskListApiStrategy } from './task-list-strategy.interface';
+import { RegistrationApiStrategy } from './registration-strategy';
 
 // TODO: might wanna add SKIN strategy so people can have color scheme and styles... (purchase probably)
 export interface ApiStrategy
-  extends TaskManagementApiStrategy, // using different duo to that it needs user ID
+  extends TaskApiStrategy, // using different duo to that it needs user ID
     TreeApiStrategy,
     SettingsApiStrategy,
-    ScoreApiStrategy {
-  generateApiKey(userId: string): Promise<string | undefined>;
-  register(
-    userId: string,
-    initialTask: Task,
-    additionalTasks: Task[],
-    settings: TaskSettings,
-    score: Score,
-    tree: TaskTree
-  ): Promise<RegisterUserResult>;
-  getUserInfo(userId: string): Promise<TaskUserInfo | undefined>; // the user might not exist
+    ScoreApiStrategy,
+    TaskListApiStrategy,
+    RegistrationApiStrategy {
   // might have special unique methods later on in life
 }

@@ -1,84 +1,60 @@
 import { Injectable } from '@angular/core';
-import {
-  Firestore,
-  collection,
-  query,
-  where,
-  limit,
-  getDocs,
-  QueryConstraint,
-} from '@angular/fire/firestore';
-import { TASK_LIST_LIMIT } from '../../models/service-strategies/task-list-strategy.interface';
 import { Task } from '../../models/taskModelManager';
 import { TaskTree, TaskTreeNode } from '../../models/taskTree';
-import { TreeNodeService } from '../core/tree-node.service';
+import { TreeNodeService } from '../tree/tree-node.service';
+import { TASK_CONFIG } from '../../app.config';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskListAssistantApiService {
-  constructor(
-    private firestore: Firestore,
-    private taskTreeNodeService: TreeNodeService
-  ) {}
+export class TaskListAssistantService {
+  constructor(private taskTreeNodeService: TreeNodeService) {}
 
-  // crush or split:
-  /**
-   * Retrieves tasks that should be split into smaller tasks.
-   * These tasks are identified by having a significant number of total descendants
-   * or by being deeply nested within the task tree.
-   * @param taskTree - The root of the task tree.
-   * @returns An array of tasks that should be split.
-   */
-  getTasksToSplit(taskTree: TaskTree): TaskTreeNode[] {
-    const tasksToSplit: TaskTreeNode[] = [];
+  // // crush or split:
+  // /**
+  //  * Retrieves tasks that should be split into smaller tasks.
+  //  * These tasks are identified by having a significant number of total descendants
+  //  * or by being deeply nested within the task tree.
+  //  * @param taskTree - The root of the task tree.
+  //  * @returns An array of tasks that should be split.
+  //  */
+  // getTasksToSplit(taskTree: TaskTree): TaskTreeNode[] {
+  //   const tasksToSplit: TaskTreeNode[] = [];
 
-    const traverse = (task: TaskTreeNode) => {
-      if (
-        this.taskTreeNodeService.hasManyDescendants(task, 20) ||
-        this.taskTreeNodeService.isDeeplyNested(task, 3)
-      ) {
-        tasksToSplit.push(task);
-      }
-      task.children.forEach(traverse);
-    };
+  //   const traverse = (task: TaskTreeNode) => {
+  //     if (
+  //       this.taskTreeNodeService.hasManyDescendants(task, 20) ||
+  //       this.taskTreeNodeService.isDeeplyNested(task, 3)
+  //     ) {
+  //       tasksToSplit.push(task);
+  //     }
+  //     task.children.forEach(traverse);
+  //   };
 
-    traverse(taskTree.root);
-    return tasksToSplit;
-  }
+  //   traverse(taskTree.primarch);
+  //   return tasksToSplit;
+  // }
 
-  /**
-   * Retrieves tasks that should be crushed and organized.
-   * These tasks have a high number of immediate children and can become bottlenecks.
-   * @param taskTree - The root of the task tree.
-   * @returns An array of tasks that should be crushed.
-   */
-  getTasksToCrush(taskTree: TaskTree): TaskTreeNode[] {
-    const tasksToCrush: TaskTreeNode[] = [];
+  // /**
+  //  * Retrieves tasks that should be crushed and organized.
+  //  * These tasks have a high number of immediate children and can become bottlenecks.
+  //  * @param taskTree - The root of the task tree.
+  //  * @returns An array of tasks that should be crushed.
+  //  */
+  // getTasksToCrush(taskTree: TaskTree): TaskTreeNode[] {
+  //   const tasksToCrush: TaskTreeNode[] = [];
 
-    const traverse = (task: TaskTreeNode) => {
-      if (task.children.length > 10) {
-        // Example threshold
-        tasksToCrush.push(task);
-      }
-      task.children.forEach(traverse);
-    };
+  //   const traverse = (task: TaskTreeNode) => {
+  //     if (task.children.length > 10) {
+  //       // Example threshold
+  //       tasksToCrush.push(task);
+  //     }
+  //     task.children.forEach(traverse);
+  //   };
 
-    traverse(taskTree.root);
-    return tasksToCrush;
-  }
-
-  // task repetition:
-  async getRepeatingTasks(
-    userId: string,
-    repeatInterval: string
-  ): Promise<Task[] | null> {
-    const queryConstraints: QueryConstraint[] = [
-      where('repeat', '==', repeatInterval),
-      limit(TASK_LIST_LIMIT),
-    ];
-    return this.getTasksWithConstraints(userId, queryConstraints);
-  }
+  //   traverse(taskTree.primarch);
+  //   return tasksToCrush;
+  // }
 
   private calculatePeriodTimes(repeatInterval: string): {
     startTime: number;
@@ -154,31 +130,5 @@ export class TaskListAssistantApiService {
     });
 
     return filteredTasks;
-  }
-
-  async getTasksWithConstraints(
-    userId: string,
-    queryConstraints: QueryConstraint[]
-  ): Promise<Task[] | null> {
-    try {
-      const tasksCollection = collection(
-        this.firestore,
-        `users/${userId}/tasks`
-      );
-      const taskQuery = query(tasksCollection, ...queryConstraints);
-      const querySnapshot = await getDocs(taskQuery);
-
-      if (!querySnapshot.empty) {
-        const tasks = querySnapshot.docs.map(
-          (doc) => ({ taskId: doc.id, ...doc.data() } as Task)
-        );
-        return tasks;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching tasks with constraints:', error);
-      throw error;
-    }
   }
 }

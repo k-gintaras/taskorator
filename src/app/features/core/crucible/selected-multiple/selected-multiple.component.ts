@@ -11,12 +11,12 @@ import { SearchOverlordComponent } from '../../../../components/search-overlord/
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
 import { TaskSettings } from '../../../../models/settings';
 import { Task } from '../../../../models/taskModelManager';
-import { SettingsService } from '../../../../services/core/settings.service';
-import { SelectedMultipleService } from '../../../../services/task/selected-multiple.service';
-import { SelectedOverlordService } from '../../../../services/task/selected-overlord.service';
-import { TaskPriorityService } from '../../../../services/task/task-priority.service';
-import { TaskService } from '../../../../services/tasks/task.service';
-import { TaskBatchService } from '../../../../services/tasks/task-batch.service';
+import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
+import { SelectedMultipleService } from '../../../../services/tasks/selected-multiple.service';
+import { SelectedOverlordService } from '../../../../services/tasks/selected-overlord.service';
+import { TaskSettingsTasksService } from '../../../../services/tasks/task-settings-tasks.service';
+import { TaskService } from '../../../../services/sync-api-cache/task.service';
+import { TaskBatchService } from '../../../../services/sync-api-cache/task-batch.service';
 import { TaskActions } from '../../../../services/tasks/task-action-tracker.service';
 
 @Component({
@@ -46,7 +46,7 @@ export class SelectedMultipleComponent implements OnInit {
     private taskBatchService: TaskBatchService,
     private settingsService: SettingsService,
     private selectedOverlordService: SelectedOverlordService,
-    private taskPriorityService: TaskPriorityService
+    private taskPriorityService: TaskSettingsTasksService
   ) {}
 
   ngOnInit() {
