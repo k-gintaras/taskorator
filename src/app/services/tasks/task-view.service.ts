@@ -21,7 +21,7 @@ export class TaskViewService {
   private tasksSubject = new BehaviorSubject<ExtendedTask[]>([]);
   tasks$ = this.tasksSubject.asObservable();
   currentTaskListKey: TaskListKey | null = null;
-  currentTaskListRunes: TaskListRules | null = null;
+  currentTaskListRules: TaskListRules | null = null;
 
   constructor(
     private actionTracker: TaskActionTrackerService,
@@ -53,6 +53,8 @@ export class TaskViewService {
     }
 
     // let tasks = [...this.taskIdService.getTasks(ids), ...cachedTasks];
+    console.log('Fetching tasks for list key:', this.currentTaskListKey);
+
     let tasks = await this.taskListSimpleService.getList(
       this.currentTaskListKey
     );
@@ -64,7 +66,7 @@ export class TaskViewService {
       tasks
     );
 
-    this.currentTaskListRunes = this.taskListRulesService.getList(
+    this.currentTaskListRules = this.taskListRulesService.getList(
       this.currentTaskListKey
     );
 

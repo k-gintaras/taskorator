@@ -2,11 +2,20 @@ import { Route } from '@angular/router';
 import { CORE_APP_METADATA } from './app.routes-metadata';
 import { canActivate, canActivateChild } from './services/core/auth-guard';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
+import { TaskViewComponent } from './components/task/task-view/task-view.component';
 
 export const routes: Route[] = [
   {
     path: 'next',
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
     component: NextTaskManagerComponent,
+  },
+  {
+    path: 'tasks/:taskId',
+    canActivate: [canActivate],
+    canActivateChild: [canActivateChild],
+    component: TaskViewComponent, // allow simply navigate to task by url id
   },
   {
     path: 'citadel',

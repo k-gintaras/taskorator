@@ -36,6 +36,7 @@ export class RootTaskListComponent implements OnInit {
         data: ROOT_TASK_ID,
       };
       this.taskListRules = this.taskListRulesService.getList(taskListKey);
+
       this.navigatorService.loadAndInitializeTasks(taskListKey);
       this.errorMessage = '';
     } catch (error) {

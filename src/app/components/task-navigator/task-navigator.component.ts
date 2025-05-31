@@ -1,3 +1,5 @@
+// TAG: ui,service
+
 import { Component, Input, OnInit } from '@angular/core';
 import {
   ExtendedTask,

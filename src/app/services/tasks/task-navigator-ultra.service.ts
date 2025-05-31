@@ -30,7 +30,7 @@ export class TaskNavigatorUltraService {
    */
   async loadAndInitializeTasks(originalListGroup: TaskListKey): Promise<void> {
     try {
-      this.selectedOverlord.setSelectedOverlord(ROOT_TASK_ID);
+      // this.selectedOverlord.setSelectedOverlord(ROOT_TASK_ID);
       this.originalListGroup = originalListGroup;
 
       this.updateView(originalListGroup);

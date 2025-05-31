@@ -19,6 +19,7 @@ import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search-create',
@@ -49,7 +50,8 @@ export class SearchCreateComponent {
     private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
     private taskSearchService: SearchTasksService,
-    private navigatorService: TaskNavigatorUltraService
+    private navigatorService: TaskNavigatorUltraService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -80,12 +82,17 @@ export class SearchCreateComponent {
       });
   }
 
-  /**
-   * Handles task selection from search results.
-   */
+  // /**
+  //  * Handles task selection from search results.
+  //  */
+  // onSelectTask(task: TaskTreeNode): void {
+  //   // this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
+  //   this.navigatorService.next(task.taskId);
+  //   this.resetState();
+  // }
+
   onSelectTask(task: TaskTreeNode): void {
-    // this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
-    this.navigatorService.next(task.taskId);
+    this.router.navigate(['/tasks', task.taskId]);
     this.resetState();
   }
 
