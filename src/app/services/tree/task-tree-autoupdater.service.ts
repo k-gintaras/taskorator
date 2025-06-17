@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EventBusService } from '../core/event-bus.service';
 import { TreeNodeService } from './tree-node.service';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import { debounceTime, Subject } from 'rxjs';
 import { OTHER_CONFIG } from '../../app.config';
 import { TreeService } from '../sync-api-cache/tree.service';
@@ -104,6 +104,7 @@ export class TaskTreeAutoupdaterService {
           const tree = this.taskTreeService.getLatestTree();
           if (tree) {
             await this.taskTreeService.updateTree(tree);
+            console.log('Batched tree update completed successfully.');
           }
         } catch (error) {
           console.error('Error during batched tree update:', error);
@@ -117,7 +118,7 @@ export class TaskTreeAutoupdaterService {
     this.updateQueue.next();
   }
 
-  private async handleCreateTask(task: Task): Promise<void> {
+  private async handleCreateTask(task: TaskoratorTask): Promise<void> {
     if (!task) return;
 
     const tree = this.taskTreeService.getLatestTree();
@@ -127,7 +128,7 @@ export class TaskTreeAutoupdaterService {
     }
   }
 
-  private async handleCreateTasks(tasks: Task[]): Promise<void> {
+  private async handleCreateTasks(tasks: TaskoratorTask[]): Promise<void> {
     const tree = this.taskTreeService.getLatestTree();
     if (tree) {
       await this.treeNodeService.createTasks(tree, tasks);
@@ -135,7 +136,7 @@ export class TaskTreeAutoupdaterService {
     }
   }
 
-  private async handleUpdateTask(task: Task): Promise<void> {
+  private async handleUpdateTask(task: TaskoratorTask): Promise<void> {
     const tree = this.taskTreeService.getLatestTree();
     if (tree) {
       await this.treeNodeService.updateTasks(tree, [task]);
@@ -143,7 +144,7 @@ export class TaskTreeAutoupdaterService {
     }
   }
 
-  private async handleUpdateTasks(tasks: Task[]): Promise<void> {
+  private async handleUpdateTasks(tasks: TaskoratorTask[]): Promise<void> {
     const tree = this.taskTreeService.getLatestTree();
     if (tree) {
       await this.treeNodeService.updateTasks(tree, tasks);

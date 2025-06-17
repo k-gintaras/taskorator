@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Component, Input } from '@angular/core';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { completeButtonColorMap } from '../../../models/colors';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -15,8 +15,8 @@ import { SelectedTaskService } from '../../../services/tasks/selected-task.servi
   imports: [CommonModule, MatIcon],
 })
 export class TaskMiniComponent {
-  @Input() task: Task | undefined;
-  @Input() overlord: Task | null | undefined;
+  @Input() task: TaskoratorTask | undefined;
+  @Input() overlord: TaskoratorTask | null | undefined;
   expanded = false;
 
   constructor(
@@ -24,11 +24,11 @@ export class TaskMiniComponent {
     private selected: SelectedTaskService
   ) {}
 
-  viewDetails(task: Task | undefined) {
+  viewDetails(task: TaskoratorTask | undefined) {
     console.log(task);
   }
 
-  editTask(task: Task | undefined) {
+  editTask(task: TaskoratorTask | undefined) {
     console.log(task);
   }
 
@@ -36,13 +36,13 @@ export class TaskMiniComponent {
     return this.task?.stage ? completeButtonColorMap[this.task.stage] : 'black';
   }
 
-  onTaskCardClick(task: Task | undefined) {
+  onTaskCardClick(task: TaskoratorTask | undefined) {
     if (!task) return;
     this.selectedMultiple.addRemoveSelectedTask(task);
     this.selected.setSelectedTask(task);
   }
 
-  isSelected(task: Task | undefined): boolean {
+  isSelected(task: TaskoratorTask | undefined): boolean {
     if (!task) return false;
     return this.selectedMultiple.isSelected(task);
   }

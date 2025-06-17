@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ArtificerDetails } from './artificer.interface';
 import { ArtificerService } from './artificer.service';
-import { NgClass, NgFor } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 /**
  * what we can do with each task
@@ -17,13 +17,14 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-artificer',
   standalone: true,
-  imports: [NgFor, NgClass, MatIcon],
+  imports: [NgFor, NgIf, NgClass, MatIcon],
   templateUrl: './artificer.component.html',
   styleUrl: './artificer.component.scss',
 })
 export class ArtificerComponent {
   actions: ArtificerDetails[];
   currentAction!: ArtificerDetails;
+  isHorizontal = true;
 
   constructor(private artificerService: ArtificerService) {
     this.actions = this.artificerService.getActions();

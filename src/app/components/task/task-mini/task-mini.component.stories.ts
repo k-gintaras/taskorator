@@ -4,13 +4,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
 import { SelectedTaskService } from '../../../services/tasks/selected-task.service';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 // Mock Services
 class MockSelectedMultipleService {
   private selectedTasks = new Set<string>();
 
-  addRemoveSelectedTask(task: Task) {
+  addRemoveSelectedTask(task: TaskoratorTask) {
     if (this.selectedTasks.has(task.taskId)) {
       this.selectedTasks.delete(task.taskId);
     } else {
@@ -18,19 +18,19 @@ class MockSelectedMultipleService {
     }
   }
 
-  isSelected(task: Task) {
+  isSelected(task: TaskoratorTask) {
     return this.selectedTasks.has(task.taskId);
   }
 }
 
 class MockSelectedTaskService {
-  private selectedTask: Task | null = null;
+  private selectedTask: TaskoratorTask | null = null;
 
-  setSelectedTask(task: Task) {
+  setSelectedTask(task: TaskoratorTask) {
     this.selectedTask = task;
   }
 
-  getSelectedTask(): Task | null {
+  getSelectedTask(): TaskoratorTask | null {
     return this.selectedTask;
   }
 }

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GptTasksService {
-  private tasks: BehaviorSubject<Task[]> = new BehaviorSubject<Task[]>([]);
+  private tasks: BehaviorSubject<TaskoratorTask[]> = new BehaviorSubject<
+    TaskoratorTask[]
+  >([]);
 
   constructor() {}
 
@@ -14,7 +16,7 @@ export class GptTasksService {
     return this.tasks.asObservable();
   }
 
-  addTask(task: Task) {
+  addTask(task: TaskoratorTask) {
     const currentTasks = this.tasks.getValue();
     if (task.taskId === '0') {
       task.taskId = this.generateUniqueId(); // Ensure each task has a unique ID

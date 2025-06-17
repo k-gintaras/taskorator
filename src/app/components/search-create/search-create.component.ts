@@ -10,7 +10,7 @@ import {
   getDefaultTask,
   getRootTaskObject,
   ROOT_TASK_ID,
-  Task,
+  TaskoratorTask,
 } from '../../models/taskModelManager';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
@@ -50,7 +50,7 @@ export class SearchCreateComponent {
     private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
     private taskSearchService: SearchTasksService,
-    private navigatorService: TaskNavigatorUltraService,
+    private taskNavigator: TaskNavigatorUltraService,
     private router: Router
   ) {}
 
@@ -82,11 +82,8 @@ export class SearchCreateComponent {
       });
   }
 
-  // /**
-  //  * Handles task selection from search results.
-  //  */
   // onSelectTask(task: TaskTreeNode): void {
-  //   // this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
+  //   this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
   //   this.navigatorService.next(task.taskId);
   //   this.resetState();
   // }
@@ -106,7 +103,7 @@ export class SearchCreateComponent {
       return;
     }
 
-    const task: Task = {
+    const task: TaskoratorTask = {
       ...getDefaultTask(),
       name: taskName.trim(),
       overlord: this.selectedOverlord?.taskId || ROOT_TASK_ID,
@@ -133,4 +130,9 @@ export class SearchCreateComponent {
   }
 
   goToSelectedTask() {}
+
+  goBack(): void {
+    if (!this.selectedOverlord) return;
+    this.taskNavigator.backToPrevious();
+  }
 }

@@ -4,7 +4,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import {
   ExtendedTask,
   getRootTaskObject,
-  Task,
+  TaskoratorTask,
 } from '../../models/taskModelManager';
 import { TaskViewService } from '../../services/tasks/task-view.service';
 import { ArtificerComponent } from '../artificer/artificer.component';
@@ -22,6 +22,17 @@ import { SelectedOverlordService } from '../../services/tasks/selected-overlord.
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TaskCardComponent } from '../task/task-card/task-card.component';
 import { TaskNodeInfo } from '../../models/taskTree';
+import { ColorService } from '../../services/utils/color.service';
+import { ErrorService } from '../../services/core/error.service';
+import {
+  TaskUiStatus,
+  TaskStatusService,
+} from '../../services/tasks/task-status.service';
+
+/**
+ * @Requirements:
+ * - on going back highlight the task we just viewed
+ */
 
 @Component({
   standalone: true,
@@ -43,9 +54,9 @@ import { TaskNodeInfo } from '../../models/taskTree';
 export class TaskNavigatorComponent implements OnInit {
   @Input() showArtificer: boolean = false;
   tasks: ExtendedTask[] | null = null; // Support any list of tasks
-  selectedOverlord: ExtendedTask | Task = getRootTaskObject();
+  selectedOverlord: ExtendedTask | TaskoratorTask = getRootTaskObject();
   errorMessage: string | null = null;
-  selectedTasks: Task[] = [];
+  selectedTasks: TaskoratorTask[] = [];
 
   constructor(
     private navigatorService: TaskNavigatorUltraService,
@@ -53,19 +64,13 @@ export class TaskNavigatorComponent implements OnInit {
     private selectedMultiple: SelectedMultipleService,
     private selectedOverlordService: SelectedOverlordService,
     private viewService: TaskViewService,
-    private taskService: TaskService
+    private taskService: TaskService,
+    private colorService: ColorService,
+    private errorService: ErrorService,
+    private taskStatusService: TaskStatusService
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to TaskViewService for task updates
-    // if (this.tasks && this.taskGroupName) {
-    //   // in case tasks are passed, we can initialize them to simplify the caller job, it will only have to get data and pass that data
-    //   // otherwise it just has to get data, give to tasknavigatorultra to init
-    //   this.navigatorService.loadAndInitializeTasks(
-    //     this.tasks,
-    //     this.taskGroupName
-    //   );
-    // }
     this.viewService.tasks$.subscribe({
       next: (tasks) => {
         this.tasks = tasks;
@@ -79,7 +84,7 @@ export class TaskNavigatorComponent implements OnInit {
 
     this.selectedMultiple
       .getSelectedTasks()
-      .subscribe((selectedTasks: Task[]) => {
+      .subscribe((selectedTasks: TaskoratorTask[]) => {
         this.selectedTasks = selectedTasks;
       });
 
@@ -94,6 +99,11 @@ export class TaskNavigatorComponent implements OnInit {
       });
   }
 
+  getTaskStatus(taskId: string) {
+    const status = this.taskStatusService.getStatus(taskId);
+    return status;
+  }
+
   canShowInfo(): boolean {
     if (!this.tasks) return false;
     if (!this.selectedOverlord) return false;
@@ -101,87 +111,61 @@ export class TaskNavigatorComponent implements OnInit {
     return true;
   }
 
-  /**
-   * Navigate to the previous set of tasks for a given task.
-   */
-  // async onPrevious(task: ExtendedTask): Promise<void> {
-  //   try {
-  //     await this.navigatorService.previous(task);
-  //   } catch (error) {
-  //     console.error('Error navigating to previous tasks:', error);
-  //     this.errorMessage = 'Failed to navigate to previous tasks.';
-  //   }
-  // }
-
-  /**
-   * Navigate to the next set of tasks for a given task.
-   */
   async onNext(task: ExtendedTask): Promise<void> {
     try {
       await this.navigatorService.next(task.taskId);
-    } catch (error) {
-      console.error('Error navigating to next tasks:', error);
-      this.errorMessage = 'Failed to navigate to next tasks.';
+      this.taskStatusService.setStatus(task.taskId, 'viewed');
+    } catch (error: any) {
+      this.errorService.warn('Failed to navigate to next tasks.');
     }
   }
 
-  /**
-   * Navigate back to the previous view or selected overlord's tasks.
-   */
-  async goBack(task: ExtendedTask | undefined): Promise<void> {
+  async goBack(task?: ExtendedTask): Promise<void> {
     try {
-      // if (!task || !task.overlord) {
-      //   this.logError('No task or overlord available.');
-      //   return;
-      // }
       await this.navigatorService.backToStart();
-    } catch (error) {
-      console.error('Error navigating back:', error);
-      this.errorMessage = 'Failed to navigate back.';
-    }
-  }
-  /**
-   * Navigate back to the previous view or selected overlord's tasks.
-   */
-  async goBackPrevious(task: ExtendedTask | undefined): Promise<void> {
-    try {
-      // if (!task || !task.overlord) {
-      //   this.logError('No task or overlord available.');
-      //   return;
-      // }
-      await this.navigatorService.backToPrevious();
-    } catch (error) {
-      console.error('Error navigating back:', error);
-      this.errorMessage = 'Failed to navigate back.';
+    } catch (error: any) {
+      this.errorService.warn('Failed to navigate back.');
     }
   }
 
-  /**
-   * Check if "Show More" feature is enabled for the task.
-   */
+  async goBackPrevious(task?: ExtendedTask): Promise<void> {
+    try {
+      await this.navigatorService.backToPrevious();
+    } catch (error: any) {
+      console.error('Error navigating back:', error);
+      this.errorService.warn('Failed to navigate back.');
+    }
+  }
+
   isShowMoreEnabled(): boolean {
     return false; // Placeholder: Update this logic as needed.
   }
 
-  /**
-   * Retrieve tree node data for the specified task.
-   */
   getTreeNodeData(task: ExtendedTask): TaskNodeInfo | null {
     return this.treeService.getTaskTreeData(task.taskId);
   }
 
-  /**
-   * Check if a task is selected.
-   */
   isSelected(task: ExtendedTask): boolean {
     return this.selectedTasks.indexOf(task) > -1;
   }
 
-  /**
-   * Log errors in the console and optionally handle display.
-   */
-  private logError(message: string): void {
-    console.error(message);
-    this.errorMessage = message;
+  getDateBasedColor(timestamp: number): string {
+    return this.colorService.getDateBasedColor(timestamp);
+  }
+
+  getAgeColor(task: TaskoratorTask): string {
+    return this.colorService.getAgeColor(task);
+  }
+
+  getProgressPercent(node: TaskNodeInfo | null): number {
+    return this.colorService.getProgressPercent(node);
+  }
+
+  warn(msg: string): void {
+    this.errorService.warn(msg);
+  }
+
+  feedback(msg: string): void {
+    this.errorService.feedback(msg);
   }
 }

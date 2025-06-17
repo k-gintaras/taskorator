@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,7 @@ export class LocalSqliteService {
 
   // Example method to fetch data from the database
 
-  getTaskData(): Observable<Task[]> {
+  getTaskData(): Observable<TaskoratorTask[]> {
     return this.http.get<any[]>(`${this.baseUrl}/tasks`).pipe(
       map((tasks) => {
         // Ensure taskId and overlord are consistently returned as strings

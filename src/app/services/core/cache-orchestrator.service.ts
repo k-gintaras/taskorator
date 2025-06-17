@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CacheStrategy } from '../../models/service-strategies/cache-strategy.interface';
 import { Score } from '../../models/score';
 import { TaskSettings } from '../../models/settings';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTree } from '../../models/taskTree';
 import { TaskCacheService } from '../cache/task-cache.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
@@ -24,11 +24,11 @@ export class CacheOrchestratorService implements CacheStrategy {
     private transmuterService: TaskTransmutationService
   ) {}
 
-  getTaskById(taskId: string): Task | null {
+  getTaskById(taskId: string): TaskoratorTask | null {
     return this.taskCache.getTask(taskId);
   }
 
-  createTask(task: Task): void {
+  createTask(task: TaskoratorTask): void {
     const extendedTask = this.transmuterService.toExtendedTask(task);
     this.taskCache.addTask(extendedTask);
 
@@ -38,12 +38,12 @@ export class CacheOrchestratorService implements CacheStrategy {
     // }
   }
 
-  updateTask(task: Task): void {
+  updateTask(task: TaskoratorTask): void {
     const extendedTask = this.transmuterService.toExtendedTask(task);
     this.taskCache.addTask(extendedTask);
   }
 
-  getTasks(): Task[] | null {
+  getTasks(): TaskoratorTask[] | null {
     return null;
   }
 

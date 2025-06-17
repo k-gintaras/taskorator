@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,9 @@ import { SearchCreateComponent } from '../search-create/search-create.component'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationComponent } from '../notification/notification.component';
 import { FormsModule } from '@angular/forms';
+import { MatDivider } from '@angular/material/divider';
+import { MatNavList } from '@angular/material/list';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-horizontal-navigation',
@@ -22,24 +25,26 @@ import { FormsModule } from '@angular/forms';
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
+    MatDivider,
+    MatNavList,
     RouterOutlet,
     OverlordNavigatorComponent,
     SearchCreateComponent,
-    NotificationComponent,
     NotificationComponent,
   ],
   templateUrl: './horizontal-navigation.component.html',
   styleUrls: ['./horizontal-navigation.component.scss'],
 })
 export class HorizontalNavigationComponent implements OnInit {
-  navItems: { path: string; metadata: RouteMetadata }[] = [];
-  viewingChildren = false;
-  selectedFeature: string | null = null;
-  selectedChild: string | null = null;
-  isHandset = false;
-
   @ViewChild('drawer') drawer!: MatDrawer;
-  isCompact: boolean = false;
+
+  parentItems: { path: string; metadata: RouteMetadata }[] = [];
+  childItems: { path: string; metadata: RouteMetadata }[] = [];
+  isHandset = false;
+  isCompact = false;
+
+  // Just track current URL for simplicity
+  currentUrl = '';
 
   constructor(
     private navigationService: NavigationService,
@@ -48,77 +53,64 @@ export class HorizontalNavigationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Subscribe to feature and child observables
-    this.navigationService.getCurrentFeature().subscribe((feature) => {
-      this.selectedFeature = feature;
-      if (feature) {
-        this.navItems = this.navigationService
-          .getChildrenPaths(feature)
-          .map((childPath) => ({
-            path: `${feature}/${childPath}`,
-            metadata: this.navigationService.getRouteMetadata(`${childPath}`),
-          }));
-        this.viewingChildren = !!this.navItems.length;
-      } else {
-        this.showTopLevel();
-      }
-    });
+    this.parentItems = this.navigationService.getTopLevelFeatures();
 
     this.breakpointObserver
       .observe([Breakpoints.Handset])
-      .subscribe((result) => {
-        this.isHandset = result.matches;
+      .subscribe((result) => (this.isHandset = result.matches));
+
+    // Listen to route changes
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.currentUrl = (event as NavigationEnd).url;
+        this.updateChildItems();
       });
 
-    this.navigationService.getCurrentChild().subscribe((child) => {
-      this.selectedChild = child;
-    });
+    // Initialize on load
+    this.currentUrl = this.router.url;
+    this.updateChildItems();
+  }
+
+  private updateChildItems() {
+    // Find parent that matches current URL
+    const activeParent = this.parentItems.find((parent) =>
+      this.currentUrl.startsWith('/' + parent.path)
+    );
+
+    if (activeParent) {
+      const childrenPaths = this.navigationService.getChildrenPaths(
+        activeParent.path
+      );
+      this.childItems = childrenPaths.map((child) => ({
+        path: `${activeParent.path}/${child}`,
+        metadata: this.navigationService.getRouteMetadata(child),
+      }));
+    } else {
+      this.childItems = [];
+    }
+  }
+
+  onParentClick(item: { path: string; metadata: RouteMetadata }) {
+    this.router.navigate([item.path]);
+  }
+
+  onChildClick(child: { path: string; metadata: RouteMetadata }) {
+    this.router.navigate([child.path]);
+    if (this.isHandset) this.drawer.close();
+  }
+
+  // Simplified selection logic
+  isSelected(path: string): boolean {
+    return this.currentUrl.startsWith('/' + path);
+  }
+
+  toggleDrawer() {
+    this.drawer?.toggle();
   }
 
   @HostListener('window:resize', [])
   onResize() {
-    this.checkViewport();
-  }
-
-  checkViewport() {
     this.isCompact = window.innerWidth < 600;
-  }
-
-  toggleDrawer() {
-    if (this.drawer) {
-      this.drawer.toggle();
-    }
-  }
-
-  showTopLevel() {
-    this.navItems = this.navigationService.getTopLevelFeatures();
-    this.viewingChildren = false;
-  }
-
-  onNavItemClick(item: { path: string; metadata: RouteMetadata }) {
-    const childrenPaths = this.navigationService.getChildrenPaths(item.path);
-
-    if (childrenPaths.length > 0) {
-      this.navItems = childrenPaths.map((childPath) => ({
-        path: `${item.path}/${childPath}`,
-        metadata: item.metadata,
-      }));
-      this.viewingChildren = true;
-      this.router.navigate([item.path]);
-    } else {
-      this.router.navigate([item.path]);
-    }
-  }
-
-  onBackClick() {
-    this.showTopLevel();
-  }
-
-  isSelected(path: string) {
-    return this.router.url.startsWith('/' + path);
-  }
-
-  canGoBack() {
-    return this.viewingChildren;
   }
 }

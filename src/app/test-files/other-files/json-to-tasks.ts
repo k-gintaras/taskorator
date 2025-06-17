@@ -1,8 +1,8 @@
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { data as jsonData } from './tasks-json';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const convertToTaskArray = (jsonData: any[]): Task[] =>
+const convertToTaskArray = (jsonData: any[]): TaskoratorTask[] =>
   jsonData.map((item) => ({
     ...item,
     timeCreated: item.timeCreated ? new Date(item.timeCreated) : null,
@@ -12,4 +12,4 @@ const convertToTaskArray = (jsonData: any[]): Task[] =>
     tags: item.tags.split(/\s*,\s*/),
   }));
 
-export const testTasks: Task[] = convertToTaskArray(jsonData);
+export const testTasks: TaskoratorTask[] = convertToTaskArray(jsonData);

@@ -3,7 +3,7 @@ import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { TaskCacheService } from '../cache/task-cache.service';
 import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import {
   getIdFromKey,
   TaskListKey,
@@ -50,7 +50,7 @@ export class TaskListService {
    */
   private async getTaskGroupWithCache(
     taskListKey: TaskListKey,
-    fetchFn: () => Promise<Task[] | null>
+    fetchFn: () => Promise<TaskoratorTask[] | null>
   ): Promise<ExtendedTask[] | null> {
     const groupName = getIdFromKey(taskListKey);
     const cacheState = this.taskIdCache.getListCacheState(groupName);
@@ -147,7 +147,7 @@ export class TaskListService {
   }
   private async fetchMissingTasks(
     missingIds: string[],
-    fetchFn: () => Promise<Task[] | null>
+    fetchFn: () => Promise<TaskoratorTask[] | null>
   ): Promise<ExtendedTask[] | null> {
     if (missingIds.length === 0) return null;
 

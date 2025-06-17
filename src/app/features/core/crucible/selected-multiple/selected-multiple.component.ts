@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { SearchOverlordComponent } from '../../../../components/search-overlord/search-overlord.component';
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
 import { TaskSettings } from '../../../../models/settings';
-import { Task } from '../../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../../models/taskModelManager';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
 import { SelectedMultipleService } from '../../../../services/tasks/selected-multiple.service';
 import { SelectedOverlordService } from '../../../../services/tasks/selected-overlord.service';
@@ -34,10 +34,10 @@ import { TaskActions } from '../../../../services/tasks/task-action-tracker.serv
   styleUrl: './selected-multiple.component.scss',
 })
 export class SelectedMultipleComponent implements OnInit {
-  selectedTasks: Task[] = [];
+  selectedTasks: TaskoratorTask[] = [];
   selectedOverlord: string | undefined;
   settings: TaskSettings | undefined = undefined;
-  filteredTaskOptions: Observable<Task[]> | undefined;
+  filteredTaskOptions: Observable<TaskoratorTask[]> | undefined;
   selectedOverlordName: string = '';
 
   constructor(
@@ -52,7 +52,7 @@ export class SelectedMultipleComponent implements OnInit {
   ngOnInit() {
     this.selectedMultiple
       .getSelectedTasks()
-      .subscribe((selectedTasks: Task[]) => {
+      .subscribe((selectedTasks: TaskoratorTask[]) => {
         this.selectedTasks = selectedTasks;
       });
     this.loadSettings();
@@ -141,7 +141,7 @@ export class SelectedMultipleComponent implements OnInit {
     }
   }
 
-  onTaskCardClick(task: Task) {
+  onTaskCardClick(task: TaskoratorTask) {
     if (this.selectedTasks.indexOf(task) > -1) {
       this.selectedMultiple.removeSelectedTask(task);
     } else {

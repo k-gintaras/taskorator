@@ -1,4 +1,4 @@
-export interface Task {
+export interface TaskoratorTask {
   taskId: string; // Unique identifier for the task
   name: string;
   todo: string;
@@ -57,7 +57,7 @@ export const TASK_ACTIONS = [
 ];
 
 // so the UI can react to task updates a bit better
-export interface ExtendedTask extends Task {
+export interface ExtendedTask extends TaskoratorTask {
   isVisible: boolean; // For filtering visible tasks
   animationState: 'highlighted' | 'normal' | 'removed'; // For UI animations
 }
@@ -118,7 +118,7 @@ export type TaskSubtype =
 export const ROOT_TASK_ID = '128';
 export const ROOT_TASK_DESCRIPTION = 'Legends never die!';
 
-export function getDefaultTask(): Task {
+export function getDefaultTask(): TaskoratorTask {
   const now = Date.now(); // Current time in milliseconds
   return {
     taskId: '0',
@@ -145,7 +145,7 @@ export function getDefaultTask(): Task {
   };
 }
 
-export function getRootTaskObject(): Task {
+export function getRootTaskObject(): TaskoratorTask {
   const now = Date.now(); // Current time in milliseconds
   return {
     taskId: ROOT_TASK_ID,

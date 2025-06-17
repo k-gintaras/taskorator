@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TaskTreeNode, TaskTree } from '../../../models/taskTree';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +8,7 @@ import { Task } from '../../../models/taskModelManager';
 export class TreeBuilderService {
   constructor() {}
 
-  createTree(tasks: Task[]): TaskTree {
+  createTree(tasks: TaskoratorTask[]): TaskTree {
     const taskNodes = this.convertTasksToNodes(tasks);
     const root = this.findRootNode(taskNodes) || this.getDefaultRootNode();
     this.buildTree(root, taskNodes);
@@ -29,7 +29,7 @@ export class TreeBuilderService {
     };
   }
 
-  private convertTasksToNodes(tasks: Task[]): TaskTreeNode[] {
+  private convertTasksToNodes(tasks: TaskoratorTask[]): TaskTreeNode[] {
     return tasks.map((task) => {
       const treeNode: TaskTreeNode = {
         taskId: task.taskId,

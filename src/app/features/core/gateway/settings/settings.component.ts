@@ -13,7 +13,7 @@ import {
   getRootTaskObject,
   ROOT_TASK_ID,
 } from '../../../../models/taskModelManager';
-import { Task } from '../../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../../models/taskModelManager';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../../../../components/task/task-edit-popup/task-edit-popup.component';
 import { TaskUpdateService } from '../../../../services/tasks/task-update.service';
@@ -49,7 +49,7 @@ export class SettingsComponent implements OnInit {
     'todo',
   ];
   currentSettings: TaskSettings | undefined;
-  task: Task = getRootTaskObject();
+  task: TaskoratorTask = getRootTaskObject();
   user: TaskUserInfo | null = null;
   tree: string | null = null;
 
@@ -137,7 +137,7 @@ export class SettingsComponent implements OnInit {
     return this.sessionService.getAuthStrategy();
   }
 
-  editTask(t: Task) {
+  editTask(t: TaskoratorTask) {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
       data: t, // Pass the task to edit
@@ -158,7 +158,7 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  isUpdateValid(task: Task): boolean {
+  isUpdateValid(task: TaskoratorTask): boolean {
     if (task.taskId === ROOT_TASK_ID) {
       // Rule 1: Root task must never be marked as !completed
       if (task.stage !== 'completed') {
@@ -177,7 +177,7 @@ export class SettingsComponent implements OnInit {
 
     return true; // All validations passed
   }
-  saveTask(t: Task) {}
+  saveTask(t: TaskoratorTask) {}
 
   private loadCurrentSettings(): void {
     this.settingsService.getSettings().subscribe((currentSettings) => {

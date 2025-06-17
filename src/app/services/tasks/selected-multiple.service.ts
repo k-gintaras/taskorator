@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 
 /**
  * @fix @warn use ExtendedTask for ui... or extend task to have "selected" property
@@ -9,16 +9,16 @@ import { Task } from '../../models/taskModelManager';
   providedIn: 'root',
 })
 export class SelectedMultipleService {
-  private selectedTasks = new Set<Task>();
+  private selectedTasks = new Set<TaskoratorTask>();
 
   // A Subject to emit whenever tasks are selected or deselected
-  private selectedTasksUpdated = new BehaviorSubject<Task[]>([]);
+  private selectedTasksUpdated = new BehaviorSubject<TaskoratorTask[]>([]);
 
   /**
    * Add a task to the selected set and notify subscribers
    * @param task Task to add
    */
-  addSelectedTask(task: Task): void {
+  addSelectedTask(task: TaskoratorTask): void {
     this.selectedTasks.add(task);
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
   }
@@ -28,7 +28,7 @@ export class SelectedMultipleService {
     this.selectedTasksUpdated.next([]);
   }
 
-  addRemoveSelectedTask(task: Task): void {
+  addRemoveSelectedTask(task: TaskoratorTask): void {
     if (this.selectedTasks.has(task)) {
       // If the task is already in the set, remove it
       this.selectedTasks.delete(task);
@@ -40,7 +40,7 @@ export class SelectedMultipleService {
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
   }
 
-  isSelected(task: Task): boolean {
+  isSelected(task: TaskoratorTask): boolean {
     return this.selectedTasks.has(task);
   }
 
@@ -48,7 +48,7 @@ export class SelectedMultipleService {
    * Remove a task from the selected set and notify subscribers
    * @param task Task to remove
    */
-  removeSelectedTask(task: Task): void {
+  removeSelectedTask(task: TaskoratorTask): void {
     this.selectedTasks.delete(task);
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
   }
@@ -57,7 +57,7 @@ export class SelectedMultipleService {
    * Get an observable for clients to subscribe to selected task updates
    * @returns Observable<Set<Task>> of selected tasks
    */
-  getSelectedTasks(): Observable<Task[]> {
+  getSelectedTasks(): Observable<TaskoratorTask[]> {
     return this.selectedTasksUpdated.asObservable();
   }
 }

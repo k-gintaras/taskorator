@@ -1,15 +1,13 @@
+<ng-container *ngIf="showArtificer">
+  <app-artificer></app-artificer>
+</ng-container>
 <div class="task-navigator-layout">
   <div class="task-content-wrapper">
     <!-- Conditionally Render Artificer -->
-    <ng-container *ngIf="showArtificer">
-      <div class="app-artificer-container">
-        <app-artificer></app-artificer>
-      </div>
-    </ng-container>
 
     <!-- Task List -->
     <div class="task-list">
-      <app-overlord-navigator></app-overlord-navigator>
+      <!-- <app-overlord-navigator></app-overlord-navigator> -->
 
       <div *ngIf="tasks?.length === 0" class="no-tasks">
         <app-task-edit
@@ -26,6 +24,16 @@
         *ngFor="let task of tasks"
         class="task-container"
         [class.selected]="isSelected(task)"
+        [class.viewed]="getTaskStatus(task.taskId) === 'viewed'"
+        [class.updated]="getTaskStatus(task.taskId) === 'updated'"
+        [style.borderLeftColor]="getDateBasedColor(task.timeCreated)"
+        [style.borderBottom]="
+          getProgressPercent(getTreeNodeData(task)) > 0
+            ? '4px solid transparent'
+            : 'none'
+        "
+        [style.--progress-color]="'#4caf5044'"
+        [style.--progress-percent]="getProgressPercent(getTreeNodeData(task))"
       >
         <div class="left-section">
           <div class="navigation-actions">

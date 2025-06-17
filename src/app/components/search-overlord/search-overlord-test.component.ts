@@ -9,7 +9,7 @@ import { TaskTreeNode } from '../../models/taskTree';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
 
 @Component({

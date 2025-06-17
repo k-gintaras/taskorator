@@ -8,7 +8,7 @@ import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
@@ -111,7 +111,7 @@ export class SearchOverlordComponent implements OnInit {
 
     this.taskService
       .getTaskById(this.selectedOverlordId)
-      .then((task: Task | null) => {
+      .then((task: TaskoratorTask | null) => {
         if (!task) {
           /**
            * TODO:

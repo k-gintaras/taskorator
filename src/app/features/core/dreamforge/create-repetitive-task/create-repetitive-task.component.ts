@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {
   getDefaultTask,
   RepeatOptions,
-  Task,
+  TaskoratorTask,
 } from '../../../../models/taskModelManager';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { TaskUpdateService } from '../../../../services/tasks/task-update.service';
 import { MatIcon } from '@angular/material/icon';
+import { ErrorService } from '../../../../services/core/error.service';
 
 @Component({
   selector: 'app-create-repetitive-task',
@@ -29,7 +30,7 @@ import { MatIcon } from '@angular/material/icon';
   styleUrl: './create-repetitive-task.component.scss',
 })
 export class CreateRepetitiveTaskComponent {
-  task: Task = getDefaultTask(); // Start with a default task
+  task: TaskoratorTask = getDefaultTask(); // Start with a default task
 
   repeatOptions: RepeatOptions[] = [
     'never',
@@ -43,12 +44,16 @@ export class CreateRepetitiveTaskComponent {
     'yearly',
   ];
 
-  constructor(private taskService: TaskUpdateService) {}
+  constructor(
+    private taskService: TaskUpdateService,
+    private errorService: ErrorService
+  ) {}
 
   saveTask(): void {
-    // Here, you'd integrate this with your service or event bus.
-    console.log('Task created:', this.task);
-    // alert(`Repetitive Task "${this.task.name}" created successfully.`);
+    if (this.task.name.trim() === '') {
+      this.errorService.warn('Task name cannot be empty');
+      return;
+    }
     this.task.lastUpdated = 0;
     this.taskService.create(this.task);
   }

@@ -1,0 +1,50 @@
+<!-- taskorator-main.component.html -->
+<app-horizontal-navigation></app-horizontal-navigation>
+
+<div class="flex flex-col h-screen">
+  <!-- Top bar -->
+  <!-- <div
+    class="navbar bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white shadow-lg"
+  >
+    <div class="flex-1 font-bold">Taskorator ⚡</div>
+    <input type="text" placeholder="Search…" class="input input-sm mr-2 w-40" />
+    <button class="btn btn-sm btn-ghost mr-2">★</button>
+    <button class="btn btn-sm btn-ghost">⚙</button>
+  </div> -->
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Left mode picker -->
+    <aside class="w-24 bg-base-200 p-2 space-y-2 overflow-y-auto">
+      <button
+        *ngFor="let m of navModes"
+        class="btn btn-xs w-full"
+        [class.btn-primary]="m === currentMode()"
+        (click)="setMode(m)"
+      >
+        {{ m }}
+      </button>
+    </aside>
+
+    <!-- Task list -->
+    <main class="flex-1 p-4 overflow-y-auto">
+      <h2 class="text-xl mb-4">{{ parent.title }}</h2>
+
+      <ul class="space-y-2">
+        <li
+          *ngFor="let t of tasks"
+          class="card card-compact bg-base-100 shadow hover:shadow-lg transition"
+        >
+          <div class="card-body flex-row justify-between items-center">
+            <span>{{ t.title }}</span>
+            <div class="space-x-2">
+              <button class="btn btn-xs" (click)="actOn(t)">
+                {{ currentMode() }}
+              </button>
+              <button class="btn btn-xs btn-outline">➜</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </main>
+  </div>
+</div>

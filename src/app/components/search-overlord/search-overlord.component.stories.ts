@@ -8,7 +8,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'; // Use NoopAnimationsModule for simplicity
 import { TaskTreeNode } from '../../models/taskTree';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { AuthService } from '../../services/core/auth.service';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
@@ -73,7 +73,7 @@ class MockSelectedOverlordService {
 }
 
 class MockTaskService {
-  getTaskById(taskId: string): Promise<Task | null> {
+  getTaskById(taskId: string): Promise<TaskoratorTask | null> {
     if (taskId === '1') {
       return Promise.resolve({
         taskId: '1',

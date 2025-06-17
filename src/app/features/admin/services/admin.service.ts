@@ -16,7 +16,7 @@ import {
 } from '@angular/fire/firestore';
 import { TaskoratorUserProfile } from '../models/user';
 import { TaskTemplate } from '../models/template';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -44,10 +44,10 @@ export class AdminService {
    *
    * @deprecated do not use, delete, only use once to fix my tasks...
    */
-  async fetchAllTasks(): Promise<Task[]> {
+  async fetchAllTasks(): Promise<TaskoratorTask[]> {
     const taskCollectionRef = collection(this.firestore, 'tasks');
     const querySnapshot = await getDocs(taskCollectionRef);
-    return querySnapshot.docs.map((doc) => doc.data() as Task);
+    return querySnapshot.docs.map((doc) => doc.data() as TaskoratorTask);
   }
 
   async createTemplate(template: TaskTemplate): Promise<void> {

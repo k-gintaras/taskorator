@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TaskListKey, TaskListType } from '../../models/task-list-model';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskListService } from '../sync-api-cache/task-list.service';
 
 @Injectable({

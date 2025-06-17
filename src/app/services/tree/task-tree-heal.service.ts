@@ -3,7 +3,7 @@ import { TaskCacheService } from '../cache/task-cache.service';
 import { TreeService } from '../sync-api-cache/tree.service';
 import { EventBusService } from '../core/event-bus.service';
 import { getDefaultTree, TaskTree } from '../../models/taskTree';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { TreeNodeService } from './tree-node.service';
 
 @Injectable({
@@ -26,7 +26,7 @@ export class TaskTreeHealService {
   /**
    * Check if the tree needs healing.
    */
-  treeNeedsHealing(tree: TaskTree): Task[] | null {
+  treeNeedsHealing(tree: TaskTree): TaskoratorTask[] | null {
     const allTasks = this.taskCache.getAllTasks(); // Fetch all cached tasks
     const treeTasks = this.treeService.getFlattenedTree(tree); // Flattened list of tree nodes
 
@@ -94,23 +94,25 @@ export class TaskTreeHealService {
    * Subscribe to events for dynamic tree healing.
    */
   subscribeToEvents(): void {
-    this.eventBusService.onEvent<Task[]>('getTasks').subscribe((tasks) => {
-      console.log('Tasks fetched event received.');
+    this.eventBusService
+      .onEvent<TaskoratorTask[]>('getTasks')
+      .subscribe((tasks) => {
+        console.log('Tasks fetched event received.');
 
-      if (this.healingTimeout) {
-        clearTimeout(this.healingTimeout); // Clear existing timeout
-      }
-
-      this.healingTimeout = setTimeout(() => {
-        const tree = this.treeService.getLatestTree();
-        if (tree) {
-          this.healTreeIfNeeded(tree).then((healed) => {
-            if (healed) {
-              console.log('Tree was healed after tasks fetched.');
-            }
-          });
+        if (this.healingTimeout) {
+          clearTimeout(this.healingTimeout); // Clear existing timeout
         }
-      }, this.HEALING_DELAY);
-    });
+
+        this.healingTimeout = setTimeout(() => {
+          const tree = this.treeService.getLatestTree();
+          if (tree) {
+            this.healTreeIfNeeded(tree).then((healed) => {
+              if (healed) {
+                console.log('Tree was healed after tasks fetched.');
+              }
+            });
+          }
+        }, this.HEALING_DELAY);
+      });
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TaskNodeInfo, TaskTree, TaskTreeNode } from '../../models/taskTree';
 import { ROOT_TASK_ID } from '../../models/taskModelManager';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

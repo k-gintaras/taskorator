@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import {
   ExtendedTask,
   getRootTaskObject,
-  Task,
+  TaskoratorTask,
 } from '../../models/taskModelManager';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
@@ -92,7 +92,7 @@ export class SearchCreateTestComponent {
       return;
     }
 
-    const task: Task = {
+    const task: TaskoratorTask = {
       ...getRootTaskObject(),
       name: taskName.trim(),
       overlord: this.selectedOverlord?.taskId || null,

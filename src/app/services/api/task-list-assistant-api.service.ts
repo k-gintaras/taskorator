@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTree, TaskTreeNode } from '../../models/taskTree';
 import { TreeNodeService } from '../tree/tree-node.service';
 import { TASK_CONFIG } from '../../app.config';
@@ -110,10 +110,10 @@ export class TaskListAssistantService {
   }
 
   public filterTasks(
-    tasks: Task[],
+    tasks: TaskoratorTask[],
     filterCompleted: boolean,
     repeatInterval: string
-  ): Task[] {
+  ): TaskoratorTask[] {
     if (!filterCompleted) {
       return tasks;
     }

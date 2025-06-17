@@ -1,35 +1,36 @@
-.task-card {
+/* .task-card {
   display: flex;
   flex-direction: column;
   border: 1px solid #ccc;
-  border-radius: 0 0 8px 8px;
-  padding: 16px;
-  color: black;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 650px;
+  border-radius: 6px;
+  padding: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
   margin: 0 auto;
-  overflow: hidden;
+  color: #111;
   box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 6px;
 }
 
 .task-name {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
   margin: 0;
   word-break: break-word;
 }
 
 .priority {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
+  font-weight: 600;
 }
 
 .high-priority {
@@ -37,83 +38,79 @@
 }
 
 .task-body {
-  margin: 12px 0;
+  margin-bottom: 10px;
 }
 
-.description {
-  font-size: 1rem;
-  margin: 0 0 8px;
+.description,
+.why,
+.link {
+  margin: 3px 0;
+  font-size: 0.9rem;
   word-break: break-word;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
+  margin-top: 6px;
 }
 
 .tag {
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  padding: 2px 8px;
-  font-size: 0.8rem;
+  background: #f5f5f5;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
 }
 
 .statuses {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .status {
-  background-color: #e9ecef;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.8rem;
+  background: #eee;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 0.75rem;
 }
 
 .footer {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  color: #999;
+  font-size: 0.75rem;
+  color: #666;
   word-break: break-word;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 400px) {
   .task-card {
-    padding: 12px;
-    box-sizing: border-box;
+    padding: 8px;
   }
-
   .task-name {
-    font-size: 1rem;
-  }
-
-  .priority {
-    font-size: 0.8rem;
-  }
-
-  .description {
     font-size: 0.9rem;
   }
-
-  .tags {
-    gap: 2px;
+  .priority {
+    font-size: 0.75rem;
   }
-
+  .description,
+  .why,
+  .link {
+    font-size: 0.85rem;
+  }
   .tag {
-    padding: 1px 6px;
-    font-size: 0.7rem;
+    padding: 1px 5px;
+    font-size: 0.65rem;
   }
-
-  .statuses {
-    gap: 4px;
+  .status {
+    font-size: 0.65rem;
   }
-
   .footer {
     flex-direction: column;
     gap: 4px;
   }
-}
+} */

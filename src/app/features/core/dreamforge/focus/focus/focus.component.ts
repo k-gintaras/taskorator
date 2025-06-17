@@ -6,7 +6,7 @@ import {
 } from '../../../../../models/settings';
 import { TaskTree } from '../../../../../models/taskTree';
 import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
-import { Task } from '../../../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../../../models/taskModelManager';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatIcon } from '@angular/material/icon';
 import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
@@ -22,8 +22,8 @@ import { TaskListService } from '../../../../../services/sync-api-cache/task-lis
 export class FocusComponent implements OnInit {
   settings: TaskSettings = getDefaultTaskSettings();
   tree: TaskTree | undefined;
-  tasks: Task[] | [] = [];
-  selectedTasks: Task[] | [] = [];
+  tasks: TaskoratorTask[] | [] = [];
+  selectedTasks: TaskoratorTask[] | [] = [];
 
   constructor(
     private settingsService: SettingsService,
@@ -37,21 +37,23 @@ export class FocusComponent implements OnInit {
       this.settings = s;
       this.loadFocusTasks().then();
     });
-    this.selectedTasksService.getSelectedTasks().subscribe((t: Task[]) => {
-      this.selectedTasks = t;
-    });
+    this.selectedTasksService
+      .getSelectedTasks()
+      .subscribe((t: TaskoratorTask[]) => {
+        this.selectedTasks = t;
+      });
   }
 
   /**
    * @param updatedTasks come from staged task list allowing us delete them easily
    */
-  updateTasks(updatedTasks: Task[]): void {
+  updateTasks(updatedTasks: TaskoratorTask[]): void {
     this.tasks = updatedTasks;
   }
   /**
    * @param updatedTasks come from staged task list allowing us delete them easily
    */
-  updateSelectedTasks(updatedTasks: Task[]): void {
+  updateSelectedTasks(updatedTasks: TaskoratorTask[]): void {
     this.selectedTasks = updatedTasks;
   }
 

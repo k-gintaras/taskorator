@@ -4,7 +4,7 @@ import { TaskViewService } from './task-view.service';
 import {
   ExtendedTask,
   ROOT_TASK_ID,
-  Task,
+  TaskoratorTask,
 } from '../../models/taskModelManager';
 import { SelectedOverlordService } from './selected-overlord.service';
 import { TaskListKey, TaskListType } from '../../models/task-list-model';

@@ -18,6 +18,7 @@ export class ErrorService implements ErrorHandlingStrategy {
   }
 
   warn(error: string) {
+    console.log(error);
     this.snackBar.open(error, 'Close');
   }
 

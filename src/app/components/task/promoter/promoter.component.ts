@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './promoter.component.scss',
 })
 export class PromoterComponent {
-  @Input() task: Task | undefined;
+  @Input() task: TaskoratorTask | undefined;
 
   constructor(private taskService: TaskUpdateService) {}
 

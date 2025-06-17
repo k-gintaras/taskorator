@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task, ExtendedTask } from '../../models/taskModelManager';
+import { TaskoratorTask, ExtendedTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ export class TaskTransmutationService {
    * Convert a `Task` to an `ExtendedTask`.
    * Adds default properties for visibility and animation state.
    */
-  toExtendedTask(task: Task): ExtendedTask {
+  toExtendedTask(task: TaskoratorTask): ExtendedTask {
     return {
       ...task,
       isVisible: true, // Default visibility
@@ -22,7 +22,7 @@ export class TaskTransmutationService {
   /**
    * Convert an array of `Task` to an array of `ExtendedTask`.
    */
-  toExtendedTasks(tasks: Task[]): ExtendedTask[] {
+  toExtendedTasks(tasks: TaskoratorTask[]): ExtendedTask[] {
     return tasks.map((task) => this.toExtendedTask(task));
   }
 
@@ -30,7 +30,7 @@ export class TaskTransmutationService {
    * Convert an `ExtendedTask` to a `Task`.
    * Strips out additional properties like visibility and animation state.
    */
-  toTask(extendedTask: ExtendedTask): Task {
+  toTask(extendedTask: ExtendedTask): TaskoratorTask {
     const { isVisible, animationState, ...task } = extendedTask; // Remove extra properties
     return task;
   }
@@ -38,7 +38,7 @@ export class TaskTransmutationService {
   /**
    * Convert an array of `ExtendedTask` to an array of `Task`.
    */
-  toTasks(extendedTasks: ExtendedTask[]): Task[] {
+  toTasks(extendedTasks: ExtendedTask[]): TaskoratorTask[] {
     return extendedTasks.map((extendedTask) => this.toTask(extendedTask));
   }
 

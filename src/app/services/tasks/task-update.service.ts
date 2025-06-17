@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
-  Task,
+  TaskoratorTask,
   maxPriority,
   RepeatOptions,
   TaskStatus,
@@ -33,7 +33,7 @@ export class TaskUpdateService {
     private errorService: ErrorService
   ) {}
 
-  move(targetTask: Task) {
+  move(targetTask: TaskoratorTask) {
     firstValueFrom(this.selectedService.getSelectedTasks()).then(
       (selectedTasks) => {
         if (selectedTasks.length > 0 && targetTask.taskId) {
@@ -71,7 +71,11 @@ export class TaskUpdateService {
     });
   }
 
-  split(task: Task, taskOne: Task, taskTwo: Task) {
+  split(
+    task: TaskoratorTask,
+    taskOne: TaskoratorTask,
+    taskTwo: TaskoratorTask
+  ) {
     taskOne.overlord = task.taskId;
     taskTwo.overlord = task.taskId;
     const name1 = task.name;
@@ -89,21 +93,21 @@ export class TaskUpdateService {
     }
   }
 
-  create(task: Task) {
+  create(task: TaskoratorTask) {
     task.timeCreated = Date.now();
-    this.taskService.createTask(task).then((createdTask: Task) => {
+    this.taskService.createTask(task).then((createdTask: TaskoratorTask) => {
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
       this.feedback('Created: ' + ' ' + createdTask.name);
       this.actionService.recordAction(task.taskId, TaskActions.CREATED);
     });
   }
 
-  addSubtask(taskTo: Task, subtask: Task) {
+  addSubtask(taskTo: TaskoratorTask, subtask: TaskoratorTask) {
     subtask.overlord = taskTo.taskId;
     this.create(subtask);
   }
 
-  update(task: Task, action: TaskActions, subAction?: any) {
+  update(task: TaskoratorTask, action: TaskActions, subAction?: any) {
     task.lastUpdated = Date.now();
     this.taskService.updateTask(task).then(() => {
       this.feedback(task.name + ' ' + action + ' ' + (subAction || ''));
@@ -114,7 +118,7 @@ export class TaskUpdateService {
   /**
    * parent child management
    */
-  setOverlord(task: Task, overlord: Task) {
+  setOverlord(task: TaskoratorTask, overlord: TaskoratorTask) {
     task.overlord = overlord.taskId;
     this.update(task, TaskActions.MOVED, overlord.taskId);
   }
@@ -122,7 +126,7 @@ export class TaskUpdateService {
   /**
    * getting rid of tasks
    */
-  complete(task: Task) {
+  complete(task: TaskoratorTask) {
     // if (task.stage === 'completed') {
     //   task.stage = 'todo';
     //   this.log('Todo: ' + task.name);
@@ -139,19 +143,19 @@ export class TaskUpdateService {
     this.update(task, TaskActions.COMPLETED);
   }
 
-  archive(task: Task) {
+  archive(task: TaskoratorTask) {
     task.stage = 'archived';
     this.update(task, TaskActions.ARCHIVED);
     this.log('Archived: ' + task.name);
   }
 
-  delete(task: Task) {
+  delete(task: TaskoratorTask) {
     task.stage = 'deleted';
     this.update(task, TaskActions.DELETED);
     this.log('Deleted: ' + task.name + ' at ' + task.lastUpdated);
   }
 
-  renew(task: Task) {
+  renew(task: TaskoratorTask) {
     task.stage = 'todo';
     this.update(task, TaskActions.RENEWED);
     this.log('Renewed: ' + task.name);
@@ -161,13 +165,13 @@ export class TaskUpdateService {
    * basically allow remove it for a moment, maybe day, maybe month... we are not sure
    * if set seen, and lets say last updated yesterday, show it, but if today, not show it?
    */
-  setAsSeen(task: Task) {
+  setAsSeen(task: TaskoratorTask) {
     task.stage = 'seen';
     this.update(task, TaskActions.SEEN);
     this.log('Seen: ' + task.name);
   }
 
-  activate(task: Task) {
+  activate(task: TaskoratorTask) {
     task.stage = 'todo';
     this.update(task, TaskActions.ACTIVATED);
     this.log('Activated: ' + task.name);
@@ -176,7 +180,7 @@ export class TaskUpdateService {
   /**
    * increase priority will be reset beyond max
    */
-  increasePriority(task: Task) {
+  increasePriority(task: TaskoratorTask) {
     if (task.priority < maxPriority) {
       task.priority++;
     } else {
@@ -189,7 +193,7 @@ export class TaskUpdateService {
   /**
    * decrease priority will be reset beyond max
    */
-  decreasePriority(task: Task) {
+  decreasePriority(task: TaskoratorTask) {
     if (task.priority > 0) {
       task.priority--;
     } else {
@@ -202,19 +206,19 @@ export class TaskUpdateService {
   /**
    * update
    */
-  setWhy(task: Task, why: string) {
+  setWhy(task: TaskoratorTask, why: string) {
     task.why = why;
     this.update(task, TaskActions.WHY_UPDATED);
     this.log('Why updated: ' + task.name);
   }
 
-  setTodo(task: Task, todo: string) {
+  setTodo(task: TaskoratorTask, todo: string) {
     task.todo = todo;
     this.update(task, TaskActions.TODO_UPDATED);
     this.log('Todo updated: ' + task.name);
   }
 
-  setName(task: Task, name: string) {
+  setName(task: TaskoratorTask, name: string) {
     task.name = name;
     this.update(task, TaskActions.NAME_UPDATED);
     this.log('Name Updated: ' + task.name);
@@ -223,7 +227,7 @@ export class TaskUpdateService {
   /**
    * Add a tag to the specified task.
    */
-  addTag(task: Task, tag: string) {
+  addTag(task: TaskoratorTask, tag: string) {
     if (!tag || tag.trim() === '') {
       // Invalid or empty tag, so we exit early.
       return;
@@ -244,7 +248,7 @@ export class TaskUpdateService {
   /**
    * Remove a tag from the task with the specified taskId.
    */
-  removeTag(task: Task, tag: string) {
+  removeTag(task: TaskoratorTask, tag: string) {
     if (!task.tags || !tag) {
       // If tags are not initialized or the tag is invalid, we exit early.
       return;
@@ -267,13 +271,13 @@ export class TaskUpdateService {
   /**
    * images
    */
-  setImageUrl(task: Task, imageUrl: string) {
+  setImageUrl(task: TaskoratorTask, imageUrl: string) {
     task.imageUrl = imageUrl;
     this.update(task, TaskActions.IMAGE_UPDATED);
     this.log('Image url updated: ' + task.name);
   }
 
-  setImageDataUrl(task: Task, imageDataUrl: string) {
+  setImageDataUrl(task: TaskoratorTask, imageDataUrl: string) {
     task.imageDataUrl = imageDataUrl;
     this.update(task, TaskActions.IMAGE_UPDATED);
     this.log('Image updated: ' + task.name);
@@ -282,7 +286,7 @@ export class TaskUpdateService {
   /**
    * backup, github link
    */
-  setBackupLink(task: Task, url: string) {
+  setBackupLink(task: TaskoratorTask, url: string) {
     task.backupLink = url;
     this.update(task, TaskActions.BACKUP_LINK_UPDATED);
     this.log('Backup link updated: ' + task.name);
@@ -291,13 +295,13 @@ export class TaskUpdateService {
   /**
    * repetition
    */
-  setRepeat(task: Task, repeat: RepeatOptions) {
+  setRepeat(task: TaskoratorTask, repeat: RepeatOptions) {
     task.repeat = repeat;
     this.update(task, TaskActions.REPEAT_UPDATED, repeat);
     this.log('Updated repeat: ' + task.name);
   }
 
-  setTimeEnd(task: Task, timeEnd: number) {
+  setTimeEnd(task: TaskoratorTask, timeEnd: number) {
     task.timeEnd = timeEnd;
     this.update(task, TaskActions.TIME_END_UPDATED, timeEnd);
     this.log('Updated time end: ' + task.name);
@@ -306,7 +310,7 @@ export class TaskUpdateService {
   /**
    * to calculate end date or to get it once time end is calculated
    */
-  setDuration(task: Task, duration: number) {
+  setDuration(task: TaskoratorTask, duration: number) {
     task.duration = duration;
     this.update(task, TaskActions.DURATION_UPDATED, duration);
     this.log('Updated duration: ' + task.name);
@@ -315,7 +319,7 @@ export class TaskUpdateService {
   /**
    * is it some project we want to do now or later, whether is actively in progress or not
    */
-  setStatus(task: Task, status: TaskStatus) {
+  setStatus(task: TaskoratorTask, status: TaskStatus) {
     task.status = status;
     this.update(task, TaskActions.STATUS_UPDATED, status);
     this.log('Updated status: ' + task.name);
@@ -324,7 +328,7 @@ export class TaskUpdateService {
   /**
    * what is the size or magnitude of the tasks, idea, project, task, todo
    */
-  setType(task: Task, type: TaskType) {
+  setType(task: TaskoratorTask, type: TaskType) {
     task.type = type;
     this.update(task, TaskActions.TYPE_UPDATED, type);
     this.log('Updated type: ' + task.name);
@@ -333,7 +337,7 @@ export class TaskUpdateService {
   /**
    * might be used in addition to parent child relation
    */
-  setSubType(task: Task, subtype: TaskSubtype) {
+  setSubType(task: TaskoratorTask, subtype: TaskSubtype) {
     task.subtype = subtype;
     this.update(task, TaskActions.SUBTYPE_UPDATED, subtype);
     this.log('Updated subtype: ' + task.name);
@@ -342,7 +346,7 @@ export class TaskUpdateService {
   /**
    * might be used to decide what action to take, if small do now, if big split if too big, delegate
    */
-  setSize(task: Task, size: TaskSize) {
+  setSize(task: TaskoratorTask, size: TaskSize) {
     task.size = size;
     this.update(task, TaskActions.SIZE_UPDATED, size);
     this.log('Updated size: ' + task.name);

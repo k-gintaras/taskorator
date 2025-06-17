@@ -29,13 +29,22 @@
     >
       <mat-icon>save</mat-icon>
     </button>
-    <button
+    <!-- !not needed, it auto goes in once selected -->
+    <!-- <button
       mat-icon-button
       color="primary"
       (click)="goToSelectedTask()"
       aria-label="Go To Task"
     >
       <mat-icon>arrow_forward</mat-icon>
+    </button> -->
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="goBack()"
+      aria-label="Go Back"
+    >
+      <mat-icon>arrow_back</mat-icon>
     </button>
   </div>
 

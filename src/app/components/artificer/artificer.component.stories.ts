@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject, of } from 'rxjs';
 import { ArtificerService } from './artificer.service';
 import { artificerDetailList, ArtificerDetails } from './artificer.interface';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 
 class MockArtificerService {
   private actions: ArtificerDetails[] = artificerDetailList;
@@ -13,7 +13,7 @@ class MockArtificerService {
     this.actions[0]
   );
   currentAction$ = this.currentActionSubject.asObservable();
-  selectedTasks: Task[] = []; // Simulate selected tasks
+  selectedTasks: TaskoratorTask[] = []; // Simulate selected tasks
 
   // Returns available actions
   getActions(): ArtificerDetails[] {
@@ -26,35 +26,35 @@ class MockArtificerService {
   }
 
   // Simulated action methods
-  delete(task: Task): void {
+  delete(task: TaskoratorTask): void {
     console.log(`Deleted task: ${task.name}`);
   }
 
-  complete(task: Task): void {
+  complete(task: TaskoratorTask): void {
     console.log(`Completed task: ${task.name}`);
   }
 
-  refresh(task: Task): void {
+  refresh(task: TaskoratorTask): void {
     console.log(`Refreshed task: ${task.name}`);
   }
 
-  moveSelectedInto(task: Task): void {
+  moveSelectedInto(task: TaskoratorTask): void {
     console.log(`Moved selected tasks into task: ${task.name}`);
   }
 
-  split(task: Task): void {
+  split(task: TaskoratorTask): void {
     console.log(`Split task: ${task.name}`);
   }
 
-  crush(task: Task): void {
+  crush(task: TaskoratorTask): void {
     console.log(`Crushed selected tasks into task: ${task.name}`);
   }
 
-  merge(task: Task): void {
+  merge(task: TaskoratorTask): void {
     console.log(`Merged selected tasks into task: ${task.name}`);
   }
 
-  extract(task: Task): void {
+  extract(task: TaskoratorTask): void {
     console.log(`Extracted tasks from: ${task.name}`);
   }
 
@@ -67,23 +67,23 @@ class MockArtificerService {
     console.log(`Selected all tasks in the current view`);
   }
 
-  edit(task: Task): void {
+  edit(task: TaskoratorTask): void {
     console.log(`Editing task: ${task.name}`);
   }
 
-  promote(task: Task): void {
+  promote(task: TaskoratorTask): void {
     console.log(`Promoted task: ${task.name}`);
   }
 
-  demote(task: Task): void {
+  demote(task: TaskoratorTask): void {
     console.log(`Demoted task: ${task.name}`);
   }
 
-  select(task: Task): void {
+  select(task: TaskoratorTask): void {
     console.log(`Selected task: ${task.name}`);
   }
 
-  suggest(task: Task): void {
+  suggest(task: TaskoratorTask): void {
     console.log(`Suggested actions for task: ${task.name}`);
   }
 }

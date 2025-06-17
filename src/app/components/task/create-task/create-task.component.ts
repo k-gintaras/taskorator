@@ -6,7 +6,10 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Task, getDefaultTask } from '../../../models/taskModelManager';
+import {
+  TaskoratorTask,
+  getDefaultTask,
+} from '../../../models/taskModelManager';
 import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
 import { NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -73,7 +76,7 @@ export class CreateTaskComponent {
 
   async createTask(): Promise<void> {
     if (this.taskForm.valid) {
-      const task: Task = getDefaultTask();
+      const task: TaskoratorTask = getDefaultTask();
       const overlord: string | null =
         this.selectedOverlordService.getSelectedOverlord();
 

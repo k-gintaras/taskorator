@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { GptTasksService } from '../services/gpt-tasks.service';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { CommonModule, NgFor } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
@@ -26,11 +26,11 @@ export class GptTasksComponent {
   //   this.gptTaskService.addTask(task);
   // }
 
-  removeTask(task: Task) {
+  removeTask(task: TaskoratorTask) {
     this.gptTaskService.removeTask(task.taskId);
   }
 
-  approveTask(task: Task) {
+  approveTask(task: TaskoratorTask) {
     if (task.name.trim().length > 0) {
       this.taskService.createTask(task);
       this.removeTask(task);

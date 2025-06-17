@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ROOT_TASK_ID, Task } from '../../models/taskModelManager';
+import { ROOT_TASK_ID, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTree, TaskTreeNode } from '../../models/taskTree';
 import { TaskTreeNodeToolsService } from './task-tree-node-tools.service';
 
@@ -9,7 +9,10 @@ import { TaskTreeNodeToolsService } from './task-tree-node-tools.service';
 export class TreeNodeService {
   constructor(private treeTools: TaskTreeNodeToolsService) {}
 
-  async createTasks(tree: TaskTree, tasks: Task[]): Promise<string[]> {
+  async createTasks(
+    tree: TaskTree,
+    tasks: TaskoratorTask[]
+  ): Promise<string[]> {
     console.log('creating spam ???');
     const createdTasks: string[] = [];
     const uniqueTasks = tasks.filter(
@@ -25,7 +28,10 @@ export class TreeNodeService {
     return createdTasks;
   }
 
-  async updateTasks(tree: TaskTree, tasks: Task[]): Promise<string[]> {
+  async updateTasks(
+    tree: TaskTree,
+    tasks: TaskoratorTask[]
+  ): Promise<string[]> {
     console.log('updating spam ???');
 
     const updatedTasks: string[] = [];
@@ -43,7 +49,7 @@ export class TreeNodeService {
    */
   private async createOrUpdateTask(
     tree: TaskTree,
-    task: Task,
+    task: TaskoratorTask,
     action: 'create' | 'update'
   ): Promise<boolean> {
     const isUpdate = action === 'update';
@@ -59,8 +65,20 @@ export class TreeNodeService {
           );
           return false; // No modification occurred
         }
+
+        // Check for deletion first
+        if (task.stage === 'deleted') {
+          return this.removeTaskFromTree(tree, targetNode);
+        }
+
         // Update the existing node
+        const oldStage = targetNode.stage; // Store old stage
+
         const wasUpdated = this.updateExistingNode(targetNode, task);
+        // If stage changed, update parent counts
+        if (oldStage !== task.stage) {
+          this.updateNodeCounts(tree, targetNode);
+        }
 
         // Handle potential movement
         if (targetNode.overlord !== task.overlord) {
@@ -92,7 +110,10 @@ export class TreeNodeService {
   /**
    * Determine the parent node for a given task.
    */
-  private getParentNode(tree: TaskTree, task: Task): TaskTreeNode | null {
+  private getParentNode(
+    tree: TaskTree,
+    task: TaskoratorTask
+  ): TaskTreeNode | null {
     return task.overlord
       ? task.overlord === ROOT_TASK_ID
         ? tree.primarch
@@ -103,7 +124,7 @@ export class TreeNodeService {
   /**
    * Create a new TaskTreeNode.
    */
-  private createNewNode(task: Task): TaskTreeNode {
+  private createNewNode(task: TaskoratorTask): TaskTreeNode {
     return {
       taskId: task.taskId,
       name: task.name,
@@ -119,7 +140,10 @@ export class TreeNodeService {
   /**
    * Update an existing TaskTreeNode.
    */
-  private updateExistingNode(node: TaskTreeNode, task: Task): boolean {
+  private updateExistingNode(
+    node: TaskTreeNode,
+    task: TaskoratorTask
+  ): boolean {
     let wasUpdated = false;
 
     if (node.name !== task.name) {
@@ -206,9 +230,12 @@ export class TreeNodeService {
   /**
    * Move a task to the abyss.
    */
-  private moveToAbyss(tree: TaskTree, task: Task | TaskTreeNode): void {
+  private moveToAbyss(
+    tree: TaskTree,
+    task: TaskoratorTask | TaskTreeNode
+  ): void {
     const newNode =
-      'children' in task ? task : this.createNewNode(task as Task);
+      'children' in task ? task : this.createNewNode(task as TaskoratorTask);
 
     // Check if the task already exists in the abyss
     const isTaskInAbyss = tree.abyss.some(
@@ -245,21 +272,89 @@ export class TreeNodeService {
     tree.connected = tree.abyss.length === 0; // Update connection status
   }
 
+  // /**
+  //  * Update counts for a node and its ancestors.
+  //  */
+  // private updateNodeCounts(tree: TaskTree, node: TaskTreeNode): void {
+  //   const visitedNodes = new Set<string>();
+  //   let currentNode: TaskTreeNode | null = node;
+  //   while (currentNode && !visitedNodes.has(currentNode.taskId)) {
+  //     visitedNodes.add(currentNode.taskId);
+  //     currentNode.completedChildrenCount = currentNode.children.filter(
+  //       (child) => child.stage === 'completed'
+  //     ).length;
+  //     currentNode.childrenCount = currentNode.children.length;
+  //     currentNode = currentNode.overlord
+  //       ? this.treeTools.findNodeById(tree.primarch, currentNode.overlord)
+  //       : null;
+  //   }
+  // }
+
   /**
-   * Update counts for a node and its ancestors.
+   * Update counts for a node's parent only.
    */
-  private updateNodeCounts(tree: TaskTree, node: TaskTreeNode): void {
-    const visitedNodes = new Set<string>();
-    let currentNode: TaskTreeNode | null = node;
-    while (currentNode && !visitedNodes.has(currentNode.taskId)) {
-      visitedNodes.add(currentNode.taskId);
-      currentNode.completedChildrenCount = currentNode.children.filter(
-        (child) => child.stage === 'completed'
-      ).length;
-      currentNode.childrenCount = currentNode.children.length;
-      currentNode = currentNode.overlord
-        ? this.treeTools.findNodeById(tree.primarch, currentNode.overlord)
-        : null;
+  private updateNodeCounts(tree: TaskTree, childNode: TaskTreeNode): void {
+    if (!childNode.overlord) return;
+
+    const parent = this.treeTools.findNodeById(
+      tree.primarch,
+      childNode.overlord
+    );
+    if (!parent) return;
+
+    parent.completedChildrenCount = parent.children.filter(
+      (child) => child.stage === 'completed'
+    ).length;
+    parent.childrenCount = parent.children.length;
+  }
+
+  async deleteTasks(tree: TaskTree, taskIds: string[]): Promise<string[]> {
+    const deletedTasks: string[] = [];
+
+    for (const taskId of taskIds) {
+      const node = this.treeTools.findNodeById(tree.primarch, taskId);
+      if (!node) continue;
+
+      // Orphan the children - they'll go to abyss via your repair mechanism
+      for (const child of node.children) {
+        child.overlord = null; // or some invalid parent ID
+      }
+
+      // Remove from parent if it has one
+      if (node.overlord) {
+        const parent = this.treeTools.findNodeById(
+          tree.primarch,
+          node.overlord
+        );
+        if (parent) {
+          parent.children = parent.children.filter((c) => c.taskId !== taskId);
+          this.updateNodeCounts(tree, parent);
+        }
+      }
+
+      tree.totalTasks--;
+      deletedTasks.push(taskId);
     }
+
+    return deletedTasks;
+  }
+
+  private removeTaskFromTree(tree: TaskTree, node: TaskTreeNode): boolean {
+    // Orphan children - repair mechanism will handle them
+    node.children.forEach((child) => (child.overlord = null));
+
+    // Remove from parent
+    if (node.overlord) {
+      const parent = this.treeTools.findNodeById(tree.primarch, node.overlord);
+      if (parent) {
+        parent.children = parent.children.filter(
+          (c) => c.taskId !== node.taskId
+        );
+        this.updateNodeCounts(tree, parent);
+      }
+    }
+
+    tree.totalTasks--;
+    return true;
   }
 }

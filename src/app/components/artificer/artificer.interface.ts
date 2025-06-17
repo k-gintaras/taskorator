@@ -1,27 +1,27 @@
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 
 // likely will perform actions on selected tasks on click
 // another idea was to replace all task buttons with current "action" (probably bad idea)
 // improvement suggestions welcome to make it less than 2 clicks...
 // i.e. we select task action mode... then we can blast all tasks with it... somehow
 export interface Artificer {
-  delete(task: Task): void;
-  complete(task: Task): void;
-  refresh(task: Task): void; // just make task back into TODO
-  moveSelectedInto(task: Task): void; // move selected tasks into this task
-  split(task: Task): void; // will delete it and create 2 new (or... create 2 inside it?)
-  crush(task: Task): void; // will move them into 1 new
-  merge(task: Task): void; // will delete all selected and create 1 new
-  extract(task: Task): void; // extract inside tasks and make them selected?
+  delete(task: TaskoratorTask): void;
+  complete(task: TaskoratorTask): void;
+  refresh(task: TaskoratorTask): void; // just make task back into TODO
+  moveSelectedInto(task: TaskoratorTask): void; // move selected tasks into this task
+  split(task: TaskoratorTask): void; // will delete it and create 2 new (or... create 2 inside it?)
+  crush(task: TaskoratorTask): void; // will move them into 1 new
+  merge(task: TaskoratorTask): void; // will delete all selected and create 1 new
+  extract(task: TaskoratorTask): void; // extract inside tasks and make them selected?
   clearSelected(): void; // clears all selected tasks
   selectAll(): void; // selects current navigation view tasks
-  edit(task: Task): void; // opens edit menu?
-  promote(task: Task): void;
-  demote(task: Task): void;
-  select(task: Task): void;
-  suggest(task: Task): void;
-  mass(task: Task): void;
-  moveToParent(task: Task): void;
+  edit(task: TaskoratorTask): void; // opens edit menu?
+  promote(task: TaskoratorTask): void;
+  demote(task: TaskoratorTask): void;
+  select(task: TaskoratorTask): void;
+  suggest(task: TaskoratorTask): void;
+  mass(task: TaskoratorTask): void;
+  moveToParent(task: TaskoratorTask): void;
 }
 
 export interface ArtificerDetails {

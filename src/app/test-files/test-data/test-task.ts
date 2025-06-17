@@ -7,7 +7,7 @@ import {
   TaskType,
   TaskSubtype,
   TaskSize,
-  Task,
+  TaskoratorTask,
 } from '../../models/taskModelManager';
 
 // Utility to generate random data
@@ -19,7 +19,9 @@ export function getRandomTask() {
   return generateRandomTask();
 }
 
-export function getDefaultTaskCustomized(overrides: Partial<Task> = {}): Task {
+export function getDefaultTaskCustomized(
+  overrides: Partial<TaskoratorTask> = {}
+): TaskoratorTask {
   // Use the existing getDefaultTask as the base and apply overrides
   const baseTask = getDefaultTask();
   return {
@@ -31,15 +33,17 @@ export function getDefaultTaskCustomized(overrides: Partial<Task> = {}): Task {
 // Generate a random task
 export function generateRandomTask(
   overlord: string | null = ROOT_TASK_ID
-): Task {
+): TaskoratorTask {
   const now = Date.now();
+  const maxOffsetMs = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+  const randomOffset = Math.floor(Math.random() * maxOffsetMs);
   return {
     ...getDefaultTask(),
     taskId: Math.floor(Math.random() * 1000000).toString(),
     name: `Task ${Math.floor(Math.random() * 1000)} ` + generateRandomName(),
     todo: `Do something important ${Math.floor(Math.random() * 10)}`,
     why: `Because ${Math.floor(Math.random() * 10)}`,
-    timeCreated: now,
+    timeCreated: now - randomOffset,
     lastUpdated: now,
     timeEnd: Math.random() > 0.5 ? now + 3600000 : null, // 1 hour from now or null
     duration: Math.floor(Math.random() * 240), // Up to 4 hours
@@ -80,7 +84,7 @@ export function generateRandomName() {
   return s;
 }
 
-export function getRandomTasks(): Task[] {
+export function getRandomTasks(): TaskoratorTask[] {
   const tasks = [];
   for (let i = 0; i < 10; i++) {
     const t = generateRandomTask();
@@ -94,8 +98,8 @@ export function generateTaskTree(
   rootId: string,
   depth: number,
   breadth: number
-): Task[] {
-  const tasks: Task[] = [];
+): TaskoratorTask[] {
+  const tasks: TaskoratorTask[] = [];
   const queue: { parentId: string; currentDepth: number }[] = [
     { parentId: rootId, currentDepth: 0 },
   ];

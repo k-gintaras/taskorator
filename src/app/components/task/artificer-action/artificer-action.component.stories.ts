@@ -6,7 +6,7 @@ import { ArtificerService } from '../../artificer/artificer.service';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
 import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 
 // Mock Services
@@ -19,37 +19,37 @@ class MockArtificerService {
 }
 
 class MockTaskUpdateService {
-  complete(task: Task) {
+  complete(task: TaskoratorTask) {
     console.log('Mock: Completed task:', task);
   }
-  delete(task: Task) {
+  delete(task: TaskoratorTask) {
     console.log('Mock: Deleted task:', task);
   }
-  increasePriority(task: Task) {
+  increasePriority(task: TaskoratorTask) {
     console.log('Mock: Increased priority:', task);
   }
-  decreasePriority(task: Task) {
+  decreasePriority(task: TaskoratorTask) {
     console.log('Mock: Decreased priority:', task);
   }
-  renew(task: Task) {
+  renew(task: TaskoratorTask) {
     console.log('Mock: Renewed task:', task);
   }
-  move(task: Task) {
+  move(task: TaskoratorTask) {
     console.log('Mock: Moved task:', task);
   }
 }
 
 class MockSelectedMultipleService {
-  addRemoveSelectedTask(task: Task) {
+  addRemoveSelectedTask(task: TaskoratorTask) {
     console.log('Mock: Selected/Unselected task:', task);
   }
-  isSelected(task: Task): boolean {
+  isSelected(task: TaskoratorTask): boolean {
     return false;
   }
 }
 
 class MockGptSuggestService {
-  suggestTasksForTask(task: Task) {
+  suggestTasksForTask(task: TaskoratorTask) {
     console.log('Mock: Suggested tasks for:', task);
   }
 }
@@ -109,6 +109,8 @@ Default.args = {
     overlord: '1',
     childrenCount: 0,
     completedChildrenCount: 0,
-    isCompleted: false,
+    stage: 'todo',
+    taskId: '',
+    connected: false,
   },
 };

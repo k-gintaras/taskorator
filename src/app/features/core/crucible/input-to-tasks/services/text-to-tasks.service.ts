@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
-import { getDefaultTask, Task } from '../../../../../models/taskModelManager';
+import {
+  getDefaultTask,
+  TaskoratorTask,
+} from '../../../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TextToTasksService {
-  getLinesToTaskLikeObjects(text: string, isShortened: boolean): Task[] {
-    const tasks: Task[] = [];
+  getLinesToTaskLikeObjects(
+    text: string,
+    isShortened: boolean
+  ): TaskoratorTask[] {
+    const tasks: TaskoratorTask[] = [];
     const listData = text
       .split('\n')
       .map((line) => line.trim())
@@ -38,7 +44,7 @@ export class TextToTasksService {
       }
 
       // Create and push the new task
-      const task: Task = this.processTask(name, todo);
+      const task: TaskoratorTask = this.processTask(name, todo);
       task.type = 'note';
       tasks.push(task);
     });
@@ -57,15 +63,15 @@ export class TextToTasksService {
     return null;
   }
 
-  getCodeToTaskObjects(text: string): Task[] {
-    const tasks: Task[] = [];
+  getCodeToTaskObjects(text: string): TaskoratorTask[] {
+    const tasks: TaskoratorTask[] = [];
     const listData = text
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
 
     listData.forEach((line) => {
-      const task: Task = this.processTask(line, 'assign parent');
+      const task: TaskoratorTask = this.processTask(line, 'assign parent');
       task.type = 'code';
       tasks.push(task);
     });
@@ -79,7 +85,7 @@ export class TextToTasksService {
     return spaceCount > commasCount ? ' ' : ',';
   }
 
-  getLineToTaskObject(text: string, isShortened: boolean): Task {
+  getLineToTaskObject(text: string, isShortened: boolean): TaskoratorTask {
     const separator = this.getSeparator(text);
     const taskArr = text.split(separator);
     let name = '';

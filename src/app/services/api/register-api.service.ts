@@ -11,7 +11,7 @@ import {
   TaskUserInfo,
 } from '../../models/service-strategies/user';
 import { TaskSettings } from '../../models/settings';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTree } from '../../models/taskTree';
 import { AuthService } from '../core/auth.service';
 import {

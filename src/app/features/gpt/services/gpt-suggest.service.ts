@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GptTasksService } from './gpt-tasks.service';
 import { GptRequestService } from './gpt-request.service';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskListService } from '../../../services/sync-api-cache/task-list.service';
 import { TreeService } from '../../../services/sync-api-cache/tree.service';
 
@@ -19,7 +19,7 @@ export class GptSuggestService {
     private gptTasksService: GptTasksService
   ) {}
 
-  async suggestTasksForTask(task: Task): Promise<string[]> {
+  async suggestTasksForTask(task: TaskoratorTask): Promise<string[]> {
     // if (!taskId || !taskTree) throw new Error('Task ID or Task Tree missing.');
 
     // const task = await this.taskService.getTaskById(taskId);
@@ -37,7 +37,9 @@ export class GptSuggestService {
     // return ['taskList'];
   }
 
-  private async getRelatedTasks(task: Task): Promise<Task[]> {
+  private async getRelatedTasks(
+    task: TaskoratorTask
+  ): Promise<TaskoratorTask[]> {
     if (!task.overlord) return [];
     const tasks = await this.taskListService.getOverlordTasks(task.overlord);
     return tasks?.filter((t) => t.stage !== 'completed') || [];
@@ -45,9 +47,9 @@ export class GptSuggestService {
 
   private generateGptRequest(
     treePath: string,
-    relatedTasks: Task[],
+    relatedTasks: TaskoratorTask[],
     userInput: string,
-    task: Task
+    task: TaskoratorTask
   ): string {
     const parts: string[] = [this.mainPrompt];
 
@@ -64,14 +66,20 @@ export class GptSuggestService {
     return parts.join('. ');
   }
 
-  private addGeneratedTasksToGptService(taskList: string[], parentTask: Task) {
+  private addGeneratedTasksToGptService(
+    taskList: string[],
+    parentTask: TaskoratorTask
+  ) {
     taskList.forEach((taskString) => {
       const newTask = this.createTaskFromResponse(taskString, parentTask);
       this.gptTasksService.addTask(newTask);
     });
   }
 
-  private createTaskFromResponse(response: string, parentTask: Task): Task {
+  private createTaskFromResponse(
+    response: string,
+    parentTask: TaskoratorTask
+  ): TaskoratorTask {
     const task = { ...parentTask };
     const cleanInput = response.replace(/^\d+\.\s*/, '').trim();
     const splitIndex = cleanInput.indexOf(':');

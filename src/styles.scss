@@ -7,17 +7,11 @@
 @import "./styles/lists";
 @import "./styles/tasks";
 @import "./styles/globals";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html,
 body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: $background-color;
+  @apply h-full m-0 p-0;
 }
-
-// TODO: allow debug element size styles
-// * {
-//   outline: 1px solid red; // Adds a red outline to all elements
-// }

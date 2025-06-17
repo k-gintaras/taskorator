@@ -10,13 +10,13 @@ import { TaskTreeNode } from '../../models/taskTree';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskService } from '../../services/sync-api-cache/task.service';
-import { getDefaultTask, Task } from '../../models/taskModelManager';
+import { getDefaultTask, TaskoratorTask } from '../../models/taskModelManager';
 import { MatIcon } from '@angular/material/icon';
 import { getRandomTask } from '../../test-files/test-data/test-task';
 
 // Mock Services
 class MockTaskService {
-  createTask(task: Task) {
+  createTask(task: TaskoratorTask) {
     console.log(task.name + ' created');
     return Promise.resolve(task);
   }
@@ -33,29 +33,32 @@ class MockTaskSearchService {
     {
       taskId: '1',
       name: 'Root Task',
-      isCompleted: false,
+      stage: 'todo',
       overlord: null,
       children: [],
       childrenCount: 0,
       completedChildrenCount: 0,
+      connected: false,
     },
     {
       taskId: '2',
       name: 'Child Task 1',
-      isCompleted: false,
+      stage: 'todo',
       overlord: '1',
       children: [],
       childrenCount: 0,
       completedChildrenCount: 0,
+      connected: false,
     },
     {
       taskId: '3',
       name: 'Child Task 2',
-      isCompleted: true,
+      stage: 'todo',
       overlord: '1',
       children: [],
       childrenCount: 0,
       completedChildrenCount: 0,
+      connected: false,
     },
   ];
 

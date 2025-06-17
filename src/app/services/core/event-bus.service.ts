@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskListKey } from '../../models/task-list-model';
 
 /**

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { getDefaultTask, Task } from '../../models/taskModelManager';
+import { getDefaultTask, TaskoratorTask } from '../../models/taskModelManager';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
@@ -22,7 +22,7 @@ import { LatestCreatedTaskListComponent } from '../core/sentinel/lists/latest-cr
 })
 export class NextTaskManagerComponent implements OnInit {
   newTaskName: string = '';
-  latestNextTasks: Task[] = [];
+  latestNextTasks: TaskoratorTask[] = [];
   initialized: boolean = false;
 
   constructor(
@@ -40,7 +40,7 @@ export class NextTaskManagerComponent implements OnInit {
   }
 
   createNextTask(): void {
-    const newTask: Task = getDefaultTask();
+    const newTask: TaskoratorTask = getDefaultTask();
 
     (newTask.name = this.newTaskName),
       (newTask.type = 'next'),

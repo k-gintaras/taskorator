@@ -7,7 +7,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { TaskEditComponent } from '../../task-edit/task-edit.component';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
@@ -26,14 +26,14 @@ import { MatIcon } from '@angular/material/icon';
 export class TaskEditPopupComponent {
   constructor(
     public dialogRef: MatDialogRef<TaskEditPopupComponent>,
-    @Inject(MAT_DIALOG_DATA) public task: Task
+    @Inject(MAT_DIALOG_DATA) public task: TaskoratorTask
   ) {}
 
   onCancel(): void {
     this.dialogRef.close();
   }
 
-  onSave(task: Task): void {
+  onSave(task: TaskoratorTask): void {
     console.log('Saving task:', task);
     this.dialogRef.close(task);
   }

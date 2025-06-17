@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { getRandomTask } from '../../test-files/test-data/test-task';
-import { getDefaultTask, Task } from '../../models/taskModelManager';
+import { getDefaultTask, TaskoratorTask } from '../../models/taskModelManager';
 import { FormsModule } from '@angular/forms';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import {
@@ -19,7 +19,7 @@ import { NgIf } from '@angular/common';
 })
 export class TaskEditComponent {
   // @Input() task: Task = getRandomTask();
-  @Input() task: Task = getDefaultTask();
+  @Input() task: TaskoratorTask = getDefaultTask();
   @Input() isPopup: boolean = true;
 
   // Display values for duration and end time
@@ -38,7 +38,7 @@ export class TaskEditComponent {
       : null; // Convert to minutes
   }
 
-  onSave(t: Task) {
+  onSave(t: TaskoratorTask) {
     if (t) {
       const taskAction: TaskActions = TaskActions.UPDATED;
       this.taskUpdateService.update(t, taskAction);

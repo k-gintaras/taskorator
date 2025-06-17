@@ -11,7 +11,7 @@ import {
   getDoc,
   QueryConstraint,
 } from '@angular/fire/firestore';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 import { TASK_CONFIG } from '../../app.config';
 import { AuthService } from '../core/auth.service';
 import { TaskListApiStrategy } from '../../models/service-strategies/task-list-strategy.interface';
@@ -63,7 +63,7 @@ export class TaskListApiService implements TaskListApiStrategy {
     }
   }
 
-  async getFocusTasks(): Promise<Task[] | null> {
+  async getFocusTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     const settings = await this.getSettings(userId);
     return settings?.focusTaskIds
@@ -71,7 +71,7 @@ export class TaskListApiService implements TaskListApiStrategy {
       : null;
   }
 
-  async getFavoriteTasks(): Promise<Task[] | null> {
+  async getFavoriteTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     const settings = await this.getSettings(userId);
     return settings?.favoriteTaskIds
@@ -79,7 +79,7 @@ export class TaskListApiService implements TaskListApiStrategy {
       : null;
   }
 
-  async getFrogTasks(): Promise<Task[] | null> {
+  async getFrogTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     const settings = await this.getSettings(userId);
     return settings?.frogTaskIds
@@ -87,7 +87,7 @@ export class TaskListApiService implements TaskListApiStrategy {
       : null;
   }
 
-  getTasksByType(taskListKey: TaskListKey): Promise<Task[] | null> {
+  getTasksByType(taskListKey: TaskListKey): Promise<TaskoratorTask[] | null> {
     switch (taskListKey.type) {
       case 'daily':
         return this.getDailyTasks();
@@ -116,7 +116,7 @@ export class TaskListApiService implements TaskListApiStrategy {
     }
   }
 
-  async getSessionTasks(sessionId: string): Promise<Task[] | null> {
+  async getSessionTasks(sessionId: string): Promise<TaskoratorTask[] | null> {
     const session = await this.getSession(sessionId);
     return session?.taskIds ? this.getTasksFromIds(session.taskIds) : null;
   }
@@ -199,7 +199,7 @@ export class TaskListApiService implements TaskListApiStrategy {
     return tasksToCrush.length > 0 ? tasksToCrush : null;
   }
 
-  async getTasksToSplit(): Promise<Task[] | null> {
+  async getTasksToSplit(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     const nodes: TaskTreeNode[] | null = await this.getTaskIdsToSplit(userId);
     if (!nodes) return null;
@@ -207,7 +207,7 @@ export class TaskListApiService implements TaskListApiStrategy {
     return this.getTasksFromIds(ids);
   }
 
-  async getTasksToCrush(): Promise<Task[] | null> {
+  async getTasksToCrush(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     const nodes: TaskTreeNode[] | null = await this.getTaskIdsToCrush(userId);
     if (!nodes) return null;
@@ -218,7 +218,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves the latest tasks ordered by creation time.
    */
-  async getLatestCreatedTasks(): Promise<Task[] | null> {
+  async getLatestCreatedTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.queryTasks(userId, [
@@ -231,7 +231,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves the latest updated tasks.
    */
-  async getLatestUpdatedTasks(): Promise<Task[] | null> {
+  async getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.queryTasks(userId, [
@@ -243,7 +243,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves overlord tasks with optional filters.
    */
-  async getOverlordTasks(taskId: string): Promise<Task[] | null> {
+  async getOverlordTasks(taskId: string): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     const constraints = [
@@ -257,7 +257,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves daily repeating tasks.
    */
-  async getDailyTasks(): Promise<Task[] | null> {
+  async getDailyTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.getRepeatingTasks(userId, 'daily');
@@ -266,7 +266,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves weekly repeating tasks.
    */
-  async getWeeklyTasks(): Promise<Task[] | null> {
+  async getWeeklyTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.getRepeatingTasks(userId, 'weekly');
@@ -275,7 +275,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves monthly repeating tasks.
    */
-  async getMonthlyTasks(): Promise<Task[] | null> {
+  async getMonthlyTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.getRepeatingTasks(userId, 'monthly');
@@ -284,7 +284,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves yearly repeating tasks.
    */
-  async getYearlyTasks(): Promise<Task[] | null> {
+  async getYearlyTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     return this.getRepeatingTasks(userId, 'yearly');
@@ -294,7 +294,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   async getRepeatingTasks(
     userId: string,
     repeatInterval: string
-  ): Promise<Task[] | null> {
+  ): Promise<TaskoratorTask[] | null> {
     const queryConstraints: QueryConstraint[] = [
       where('repeat', '==', repeatInterval),
       limit(TASK_CONFIG.TASK_LIST_LIMIT),
@@ -305,7 +305,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   async getTasksWithConstraints(
     userId: string,
     queryConstraints: QueryConstraint[]
-  ): Promise<Task[] | null> {
+  ): Promise<TaskoratorTask[] | null> {
     try {
       const tasksCollection = collection(
         this.firestore,
@@ -316,7 +316,7 @@ export class TaskListApiService implements TaskListApiStrategy {
 
       if (!querySnapshot.empty) {
         const tasks = querySnapshot.docs.map(
-          (doc) => ({ taskId: doc.id, ...doc.data() } as Task)
+          (doc) => ({ taskId: doc.id, ...doc.data() } as TaskoratorTask)
         );
         return tasks;
       } else {
@@ -331,7 +331,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   /**
    * Retrieves tasks by their IDs.
    */
-  async getTasksFromIds(taskIds: string[]): Promise<Task[] | null> {
+  async getTasksFromIds(taskIds: string[]): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     if (taskIds.length === 0) {
@@ -339,7 +339,7 @@ export class TaskListApiService implements TaskListApiStrategy {
       return null;
     }
 
-    const tasks: Task[] = [];
+    const tasks: TaskoratorTask[] = [];
     const tasksCollection = collection(this.firestore, `users/${userId}/tasks`);
 
     try {
@@ -366,7 +366,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   private async queryTasks(
     userId: string,
     constraints: any[]
-  ): Promise<Task[] | null> {
+  ): Promise<TaskoratorTask[] | null> {
     const tasksCollection = collection(this.firestore, `users/${userId}/tasks`);
     try {
       const querySnapshot = await this.executeQuery(
@@ -383,7 +383,7 @@ export class TaskListApiService implements TaskListApiStrategy {
   private async executeQuery(
     collectionRef: any,
     constraints: any[]
-  ): Promise<Task[]> {
+  ): Promise<TaskoratorTask[]> {
     try {
       const tasksQuery = query(collectionRef, ...constraints);
       const querySnapshot = await getDocs(tasksQuery);
@@ -391,7 +391,7 @@ export class TaskListApiService implements TaskListApiStrategy {
         .map((doc) => {
           const data = doc.data();
           if (data) {
-            return { taskId: doc.id, ...data } as Task;
+            return { taskId: doc.id, ...data } as TaskoratorTask;
           } else {
             console.warn(
               `TaskListApiService.executeQuery: Missing data for doc ${doc.id}`
@@ -399,7 +399,7 @@ export class TaskListApiService implements TaskListApiStrategy {
             return null; // Fallback for missing data
           }
         })
-        .filter((task): task is Task => task !== null); // Filter out null values
+        .filter((task): task is TaskoratorTask => task !== null); // Filter out null values
     } catch (error) {
       this.handleError('executeQuery', error);
       return [];

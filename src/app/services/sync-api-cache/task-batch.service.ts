@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskTransmutationService } from '../tasks/task-transmutation.service';
@@ -40,7 +40,7 @@ export class TaskBatchService {
    * Create a batch of tasks, update the cache, and cache their IDs.
    */
   async createTaskBatch(
-    tasks: Task[],
+    tasks: TaskoratorTask[],
     overlordId: string
   ): Promise<ExtendedTask[] | null> {
     try {
@@ -49,7 +49,7 @@ export class TaskBatchService {
       // }
 
       // Create tasks via API
-      const createdTasks: Task[] | null =
+      const createdTasks: TaskoratorTask[] | null =
         await this.ensureApiService().createTasks(tasks);
       if (!createdTasks) {
         console.warn('No tasks were created.');
@@ -85,7 +85,7 @@ export class TaskBatchService {
    * Update a batch of tasks, refresh cache, and notify listeners.
    */
   async updateTaskBatch(
-    tasks: Task[],
+    tasks: TaskoratorTask[],
     action: TaskActions,
     subAction?: any
   ): Promise<void> {

@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Task, ExtendedTask } from '../../../../../models/taskModelManager';
+import {
+  TaskoratorTask,
+  ExtendedTask,
+} from '../../../../../models/taskModelManager';
 import { InputToTasksService } from '../services/input-to-tasks.service';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatFormField } from '@angular/material/form-field';
@@ -29,7 +32,7 @@ import { TaskBatchService } from '../../../../../services/sync-api-cache/task-ba
 })
 export class InputToTasksComponent implements OnInit {
   inputText = '';
-  tasks: Task[] = [];
+  tasks: TaskoratorTask[] = [];
   taskSummary: {
     taskCount: number;
     uniqueTaskCount: number;
@@ -39,12 +42,12 @@ export class InputToTasksComponent implements OnInit {
     uniqueTaskCount: 0,
     inputType: TextType.UNKNOWN,
   };
-  selectedOverlord: Task | null = null;
+  selectedOverlord: TaskoratorTask | null = null;
   isAutoParse = true;
   isFunctionsWithTypes = true;
   isLongNamesShortened: boolean = true;
   isFilterUniques: boolean = true;
-  @Input() overlord: Task | null = null;
+  @Input() overlord: TaskoratorTask | null = null;
 
   constructor(
     private inputToTasksService: InputToTasksService,
@@ -133,7 +136,7 @@ export class InputToTasksComponent implements OnInit {
     }
   }
 
-  importToOverlord(overlord: Task) {
+  importToOverlord(overlord: TaskoratorTask) {
     this.tasks.forEach((t) => {
       if (this.selectedOverlord?.taskId) t.overlord = overlord.taskId;
     });
@@ -143,7 +146,7 @@ export class InputToTasksComponent implements OnInit {
   /**
    * @param updatedTasks come from staged task list allowing us delete them easily
    */
-  updateTasks(updatedTasks: Task[]): void {
+  updateTasks(updatedTasks: TaskoratorTask[]): void {
     this.tasks = updatedTasks;
   }
 

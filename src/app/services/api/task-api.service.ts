@@ -15,7 +15,7 @@ import {
 } from '@angular/fire/firestore';
 import {
   ROOT_TASK_ID,
-  Task,
+  TaskoratorTask,
   getDefaultTask,
 } from '../../models/taskModelManager';
 import { TaskApiStrategy } from '../../models/service-strategies/task-strategy.interface';
@@ -38,7 +38,7 @@ export class TaskApiService implements TaskApiStrategy {
     return userId;
   }
 
-  async getTasks(): Promise<Task[] | null> {
+  async getTasks(): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
     throw new Error(
       'Can not just get tasks as non admin. Not implemented yet anyway.'
@@ -53,11 +53,11 @@ export class TaskApiService implements TaskApiStrategy {
     console.warn(`TaskApiService.${method}:`, error);
   }
 
-  private ensureOverlord(task: Task): Task {
+  private ensureOverlord(task: TaskoratorTask): TaskoratorTask {
     return { ...task, overlord: task.overlord ?? getDefaultTask().overlord };
   }
 
-  async createTask(task: Task): Promise<Task | null> {
+  async createTask(task: TaskoratorTask): Promise<TaskoratorTask | null> {
     const userId = this.getUserId();
 
     const taskCollection = this.getTaskCollection(userId);
@@ -74,9 +74,9 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async createTaskWithCustomId(
-    task: Task,
+    task: TaskoratorTask,
     taskId: string
-  ): Promise<Task | null> {
+  ): Promise<TaskoratorTask | null> {
     const userId = this.getUserId();
 
     const taskCollection = this.getTaskCollection(userId);
@@ -92,7 +92,7 @@ export class TaskApiService implements TaskApiStrategy {
     }
   }
 
-  async updateTask(task: Task): Promise<boolean> {
+  async updateTask(task: TaskoratorTask): Promise<boolean> {
     const userId = this.getUserId();
 
     if (!task.taskId) {
@@ -130,7 +130,7 @@ export class TaskApiService implements TaskApiStrategy {
     }
   }
 
-  async getTaskById(taskId: string): Promise<Task | null> {
+  async getTaskById(taskId: string): Promise<TaskoratorTask | null> {
     const userId = this.getUserId();
 
     const taskDocRef = doc(this.getTaskCollection(userId), taskId);
@@ -138,7 +138,7 @@ export class TaskApiService implements TaskApiStrategy {
     try {
       const snapshot = await getDoc(taskDocRef);
       if (snapshot.exists()) {
-        return { taskId: snapshot.id, ...snapshot.data() } as Task;
+        return { taskId: snapshot.id, ...snapshot.data() } as TaskoratorTask;
       } else {
         console.warn(`TaskApiService.getTaskById: Task ${taskId} not found`);
         // this is custom repair mechanism if task 128 deleted, which is root...
@@ -175,12 +175,12 @@ export class TaskApiService implements TaskApiStrategy {
     }
   }
 
-  async createTasks(tasks: Task[]): Promise<Task[] | null> {
+  async createTasks(tasks: TaskoratorTask[]): Promise<TaskoratorTask[] | null> {
     const userId = this.getUserId();
 
     const batch = writeBatch(this.firestore);
     const taskCollection = this.getTaskCollection(userId);
-    const newTasks: Task[] = [];
+    const newTasks: TaskoratorTask[] = [];
 
     try {
       tasks.forEach((task) => {
@@ -198,7 +198,7 @@ export class TaskApiService implements TaskApiStrategy {
     }
   }
 
-  async updateTasks(tasks: Task[]): Promise<boolean> {
+  async updateTasks(tasks: TaskoratorTask[]): Promise<boolean> {
     const userId = this.getUserId();
 
     const batch = writeBatch(this.firestore);
@@ -234,7 +234,7 @@ export class TaskApiService implements TaskApiStrategy {
    * @param overlordId
    * @returns super overlord if we pass task.overlord or overlord if we pass task.taskId
    */
-  async getSuperOverlord(overlordId: string): Promise<Task | null> {
+  async getSuperOverlord(overlordId: string): Promise<TaskoratorTask | null> {
     const userId = this.getUserId();
 
     const overlordDocRef = doc(this.getTaskCollection(userId), overlordId);
@@ -248,7 +248,7 @@ export class TaskApiService implements TaskApiStrategy {
         return null;
       }
 
-      const overlord = overlordSnapshot.data() as Task;
+      const overlord = overlordSnapshot.data() as TaskoratorTask;
       if (!overlord.overlord) {
         console.warn(
           `TaskApiService.getSuperOverlord: Overlord ${overlordId} has no parent`
@@ -266,7 +266,7 @@ export class TaskApiService implements TaskApiStrategy {
         ? ({
             taskId: superOverlordSnapshot.id,
             ...superOverlordSnapshot.data(),
-          } as Task)
+          } as TaskoratorTask)
         : null;
     } catch (error) {
       this.handleError('getSuperOverlord', error);

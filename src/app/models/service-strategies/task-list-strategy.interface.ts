@@ -1,19 +1,19 @@
 import { TaskListKey } from '../task-list-model';
-import { Task } from '../taskModelManager';
+import { TaskoratorTask } from '../taskModelManager';
 export interface TaskListApiStrategy {
-  getLatestCreatedTasks(): Promise<Task[] | null>;
-  getLatestUpdatedTasks(): Promise<Task[] | null>;
-  getOverlordTasks(taskId: string): Promise<Task[] | null>; // same as overlord tasks but we move here for cleanliness
-  getSessionTasks(sessionId: string): Promise<Task[] | null>; // same as overlord tasks but we move here for cleanliness
-  getDailyTasks(): Promise<Task[] | null>;
-  getWeeklyTasks(): Promise<Task[] | null>;
-  getMonthlyTasks(): Promise<Task[] | null>;
-  getYearlyTasks(): Promise<Task[] | null>;
-  getFocusTasks(): Promise<Task[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
-  getFavoriteTasks(): Promise<Task[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
-  getFrogTasks(): Promise<Task[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
-  getTasksToSplit(): Promise<Task[] | null>; // big tasks, tasks that are not deep in tree? figure it out... to make tasks more doable to make project progress
-  getTasksToCrush(): Promise<Task[] | null>; // small tasks, tasks that are many in 1 parent use tree to find, to make lists and tasks more organized
-  getTasksByType(taskListType: TaskListKey): Promise<Task[] | null>;
-  getTasksFromIds(taskIds: string[]): Promise<Task[] | null>;
+  getLatestCreatedTasks(): Promise<TaskoratorTask[] | null>;
+  getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null>;
+  getOverlordTasks(taskId: string): Promise<TaskoratorTask[] | null>; // same as overlord tasks but we move here for cleanliness
+  getSessionTasks(sessionId: string): Promise<TaskoratorTask[] | null>; // same as overlord tasks but we move here for cleanliness
+  getDailyTasks(): Promise<TaskoratorTask[] | null>;
+  getWeeklyTasks(): Promise<TaskoratorTask[] | null>;
+  getMonthlyTasks(): Promise<TaskoratorTask[] | null>;
+  getYearlyTasks(): Promise<TaskoratorTask[] | null>;
+  getFocusTasks(): Promise<TaskoratorTask[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
+  getFavoriteTasks(): Promise<TaskoratorTask[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
+  getFrogTasks(): Promise<TaskoratorTask[] | null>; // or getTasksFrom  Array(focusTasks:string[])... api allow access it maybe as we can read tree...
+  getTasksToSplit(): Promise<TaskoratorTask[] | null>; // big tasks, tasks that are not deep in tree? figure it out... to make tasks more doable to make project progress
+  getTasksToCrush(): Promise<TaskoratorTask[] | null>; // small tasks, tasks that are many in 1 parent use tree to find, to make lists and tasks more organized
+  getTasksByType(taskListType: TaskListKey): Promise<TaskoratorTask[] | null>;
+  getTasksFromIds(taskIds: string[]): Promise<TaskoratorTask[] | null>;
 }

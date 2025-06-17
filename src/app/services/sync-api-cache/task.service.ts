@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskValidatorService } from '../core/task-validator.service';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
+import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskCacheService } from '../cache/task-cache.service';
 import { TaskTransmutationService } from '../tasks/task-transmutation.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
@@ -31,7 +31,7 @@ export class TaskService {
   /**
    * Create a single task.
    */
-  async createTask(task: Task): Promise<ExtendedTask> {
+  async createTask(task: TaskoratorTask): Promise<ExtendedTask> {
     try {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
@@ -62,7 +62,7 @@ export class TaskService {
   /**
    * Update a task
    */
-  async updateTask(task: Task): Promise<void> {
+  async updateTask(task: TaskoratorTask): Promise<void> {
     try {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
@@ -122,7 +122,7 @@ export class TaskService {
   /**
    * Set the latest task and cache it as an ExtendedTask.
    */
-  async setLatestTask(task: Task): Promise<void> {
+  async setLatestTask(task: TaskoratorTask): Promise<void> {
     this.latestTaskId = task.taskId;
     const extendedTask = this.transmutatorService.toExtendedTask(task); // Convert to ExtendedTask
     this.taskCache.addTask(extendedTask); // Cache the ExtendedTask

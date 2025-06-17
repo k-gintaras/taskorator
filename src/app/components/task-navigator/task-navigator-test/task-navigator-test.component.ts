@@ -3,7 +3,7 @@ import { ExtendedTask } from '../../../models/taskModelManager';
 import { TaskNodeInfo } from '../../../models/taskTree';
 import { TreeService } from '../../../services/sync-api-cache/tree.service';
 import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { getRandomTasks } from '../../../test-files/test-data/test-task';
 import { TaskTransmutationService } from '../../../services/tasks/task-transmutation.service';
 import { ArtificerActionComponentTest } from '../../task/artificer-action/artificer-action-test.component';
+import { ColorService } from '../../../services/utils/color.service';
 
 @Component({
   selector: 'app-task-navigator-test',
@@ -27,7 +28,7 @@ import { ArtificerActionComponentTest } from '../../task/artificer-action/artifi
     OverlordNavigatorComponentTest,
     ArtificerActionComponentTest,
   ],
-  templateUrl: './task-navigator-test.component.html',
+  templateUrl: '../task-navigator.component.html',
   styleUrl: '../task-navigator.component.scss',
 })
 export class TaskNavigatorTestComponent {
@@ -35,14 +36,16 @@ export class TaskNavigatorTestComponent {
   tasks: ExtendedTask[] | null = null; // Support any list of tasks
   selectedOverlord: ExtendedTask | undefined;
   errorMessage: string | null = null;
-  selectedTasks: Task[] = [];
+  selectedTasks: TaskoratorTask[] = [];
+  MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000; // 365 days
 
   constructor(
     // private navigatorService: TaskNavigatorUltraService,
     private treeService: TreeService,
     private selectedMultiple: SelectedMultipleService,
     // private viewService: TaskViewService,
-    private transmute: TaskTransmutationService
+    private transmute: TaskTransmutationService,
+    private colorService: ColorService
   ) {}
 
   ngOnInit(): void {
@@ -67,7 +70,7 @@ export class TaskNavigatorTestComponent {
     //   },
     // });
 
-    const tasks: Task[] = getRandomTasks();
+    const tasks: TaskoratorTask[] = getRandomTasks();
     const originalListGroup: TaskListKey = {
       type: TaskListType.DAILY,
       data: '',
@@ -78,7 +81,7 @@ export class TaskNavigatorTestComponent {
 
     this.selectedMultiple
       .getSelectedTasks()
-      .subscribe((selectedTasks: Task[]) => {
+      .subscribe((selectedTasks: TaskoratorTask[]) => {
         this.selectedTasks = selectedTasks;
       });
   }
@@ -165,5 +168,36 @@ export class TaskNavigatorTestComponent {
   private logError(message: string): void {
     console.error(message);
     this.errorMessage = message;
+  }
+
+  getAgeRatio(task: TaskoratorTask): number {
+    const ageMs = Date.now() - task.timeCreated;
+    return Math.min(ageMs / this.MAX_AGE_MS, 1);
+  }
+
+  getAgeColor(ageRatio: number): string {
+    // interpolate between green (#4caf50) and gray (#999999)
+    const green = { r: 76, g: 175, b: 80 };
+    const gray = { r: 153, g: 153, b: 153 };
+
+    const r = Math.round(green.r + ageRatio * (gray.r - green.r));
+    const g = Math.round(green.g + ageRatio * (gray.g - green.g));
+    const b = Math.round(green.b + ageRatio * (gray.b - green.b));
+
+    return `rgb(${r},${g},${b})`;
+  }
+
+  canShowInfo(): boolean {
+    if (!this.tasks) return false;
+    if (!this.selectedOverlord) return false;
+    if (this.tasks.length === 0) return false;
+    return true;
+  }
+
+  getDateBasedColor(timestamp: number): string {
+    return this.colorService.getDateBasedColor(timestamp);
+  }
+  getProgressPercent(node: TaskNodeInfo | null): number {
+    return this.colorService.getProgressPercent(node);
   }
 }

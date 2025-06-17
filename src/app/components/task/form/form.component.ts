@@ -5,7 +5,7 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 
 @Component({
@@ -16,7 +16,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
   styleUrl: './form.component.scss',
 })
 export class FormComponent {
-  @Input() taskToClone?: Task; // Optional task to initialize form with
+  @Input() taskToClone?: TaskoratorTask; // Optional task to initialize form with
   taskForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
@@ -36,7 +36,7 @@ export class FormComponent {
   }
 
   // Populate form fields based on the given task
-  initializeFormWithTask(task: Task): void {
+  initializeFormWithTask(task: TaskoratorTask): void {
     this.taskForm.patchValue({
       name: '', // Keep name empty for user to specify a unique name
       todo: task.todo || '',
@@ -46,7 +46,7 @@ export class FormComponent {
   }
 
   // Get the form values to create or update a task
-  getTaskDetails(): Partial<Task> {
+  getTaskDetails(): Partial<TaskoratorTask> {
     return this.taskForm.value;
   }
 }

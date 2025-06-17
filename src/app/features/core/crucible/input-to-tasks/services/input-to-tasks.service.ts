@@ -6,7 +6,7 @@ import {
   TextType,
   TextTypeDetectorService,
 } from './text-type-detector.service';
-import { Task } from '../../../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ import { Task } from '../../../../../models/taskModelManager';
 export class InputToTasksService {
   private currentInput: string = '';
   private inputType: TextType | null = null;
-  private tasks: Task[] = [];
+  private tasks: TaskoratorTask[] = [];
 
   constructor(
     private textTypeService: TextTypeDetectorService,
@@ -42,7 +42,7 @@ export class InputToTasksService {
   /**
    * Gets the parsed tasks.
    */
-  getTasks(): Task[] {
+  getTasks(): TaskoratorTask[] {
     return this.tasks;
   }
 
@@ -68,12 +68,12 @@ export class InputToTasksService {
   parseTasks(
     isFunctionsWithTypes: boolean,
     isLongNamesShortened: boolean
-  ): Task[] {
+  ): TaskoratorTask[] {
     if (!this.currentInput || !this.inputType) {
       console.warn('No input set or invalid input type');
       return [];
     }
-    let t: Task[] = [];
+    let t: TaskoratorTask[] = [];
     switch (this.inputType) {
       case TextType.CSV:
         t = this.csvService.getCsvToTaskLikeObjects(this.currentInput);

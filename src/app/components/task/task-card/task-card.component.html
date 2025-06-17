@@ -1,42 +1,75 @@
-<div *ngIf="task" class="task-card">
-  <div class="header">
-    <h3 class="task-name">{{ task.name }}</h3>
-    <span class="priority" [class.high-priority]="task.priority > 7"
-      >Priority: {{ task.priority }}</span
-    >
-  </div>
-  <div class="task-body">
-    <p class="description" *ngIf="task.todo">{{ task.todo }}</p>
-    <p class="why" *ngIf="task.why">Reason: {{ task.why }}</p>
-    <p class="link" *ngIf="task.backupLink">
-      <a href="{{ task.backupLink }}">Link: </a>
-    </p>
-    <div *ngIf="thereIsTags()" class="tags">
-      <span *ngFor="let tag of task.tags" class="tag">{{ tag }}</span>
-    </div>
-    <div class="statuses">
-      <span class="status" *ngIf="task.status">Status: {{ task.status }}</span>
-      <span class="status" *ngIf="task.stage">Stage: {{ task.stage }}</span>
-      <span class="status" *ngIf="task.duration"
-        >Duration: {{ task.duration }}</span
+<div
+  *ngIf="task"
+  class="card bg-white shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 border-primary"
+>
+  <div class="card-body p-4">
+    <!-- header -->
+    <div class="flex justify-between items-start mb-2">
+      <h3 class="text-lg font-bold break-words leading-snug text-gray-900">
+        {{ task.name }}
+      </h3>
+
+      <span
+        class="badge badge-sm"
+        [ngClass]="task.priority > 7 ? 'badge-error' : 'badge-info'"
       >
-      <span class="status" *ngIf="task.type">Type: {{ task.type }}</span>
-      <span class="status" *ngIf="task.subtype"
-        >Subtype: {{ task.subtype }}</span
-      >
-      <span class="status" *ngIf="task.size">Size: {{ task.size }}</span>
-      <span class="status" *ngIf="task.owner">Owner: {{ task.owner }}</span>
+        P: {{ task.priority }}
+      </span>
     </div>
-  </div>
-  <div class="footer">
-    <span class="timestamp"
-      >Created: {{ task.timeCreated | date : "short" }}</span
+
+    <!-- task details -->
+    <div class="space-y-1 text-sm text-gray-700">
+      <p *ngIf="task.todo">{{ task.todo }}</p>
+      <p *ngIf="task.why" class="italic text-gray-600">
+        Reason: {{ task.why }}
+      </p>
+      <a
+        *ngIf="task.backupLink"
+        [href]="task.backupLink"
+        class="link link-primary"
+        >Link</a
+      >
+
+      <div *ngIf="thereIsTags()" class="flex flex-wrap gap-1 pt-1">
+        <span *ngFor="let tag of task.tags" class="badge badge-info badge-xs">{{
+          tag
+        }}</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2 pt-1 text-gray-600">
+        <span *ngIf="task.status" class="badge badge-outline badge-xs"
+          >Status: {{ task.status }}</span
+        >
+        <span *ngIf="task.stage" class="badge badge-outline badge-xs"
+          >Stage: {{ task.stage }}</span
+        >
+        <span *ngIf="task.duration" class="badge badge-outline badge-xs"
+          >Dur: {{ task.duration }}</span
+        >
+        <span *ngIf="task.type" class="badge badge-outline badge-xs"
+          >Type: {{ task.type }}</span
+        >
+        <span *ngIf="task.subtype" class="badge badge-outline badge-xs"
+          >Subtype: {{ task.subtype }}</span
+        >
+        <span *ngIf="task.size" class="badge badge-outline badge-xs"
+          >Size: {{ task.size }}</span
+        >
+        <span *ngIf="task.owner" class="badge badge-outline badge-xs"
+          >Owner: {{ task.owner }}</span
+        >
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div
+      class="mt-3 flex flex-wrap gap-3 text-xs text-gray-400 justify-between"
     >
-    <span class="timestamp"
-      >Updated: {{ task.lastUpdated | date : "short" }}</span
-    >
-    <span *ngIf="task.timeEnd" class="deadline"
-      >Deadline: {{ task.timeEnd | date : "short" }}</span
-    >
+      <span>Created: {{ task.timeCreated | date : "short" }}</span>
+      <span>Updated: {{ task.lastUpdated | date : "short" }}</span>
+      <span *ngIf="task.timeEnd"
+        >Deadline: {{ task.timeEnd | date : "short" }}</span
+      >
+    </div>
   </div>
 </div>

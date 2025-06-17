@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { getDefaultTask, Task } from '../../../models/taskModelManager';
+import {
+  getDefaultTask,
+  TaskoratorTask,
+} from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
 import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
 import { TreeService } from '../../../services/sync-api-cache/tree.service';
@@ -112,7 +115,7 @@ export class GptCreateComponent implements OnInit {
     }
   }
 
-  getTaskFromResponse(t: string, overlord: Task): Task {
+  getTaskFromResponse(t: string, overlord: TaskoratorTask): TaskoratorTask {
     const task = getDefaultTask();
     if (!overlord) return task;
 
@@ -142,9 +145,9 @@ export class GptCreateComponent implements OnInit {
 
   private generatePromptRequest(
     treeChain: string,
-    tasks: Task[],
+    tasks: TaskoratorTask[],
     currentInput: string,
-    overlord: Task
+    overlord: TaskoratorTask
   ): string {
     const mainPrompt = this.getMainPrompt();
     const parts: string[] = [mainPrompt];
@@ -177,7 +180,10 @@ export class GptCreateComponent implements OnInit {
     return 'Please give me a list of tasks each on a new line. Try to suggest useful ideas without just mentioning what is in the request. Here is additional information for context: ';
   }
 
-  private async getTreeChain(overlord: Task, tree: TaskTree): Promise<string> {
+  private async getTreeChain(
+    overlord: TaskoratorTask,
+    tree: TaskTree
+  ): Promise<string> {
     if (!tree || !overlord) {
       return '';
     }
@@ -185,7 +191,9 @@ export class GptCreateComponent implements OnInit {
     return this.treeService.findPathStringToTask(overlord.taskId);
   }
 
-  private async getOverlordChildren(overlord: Task): Promise<Task[]> {
+  private async getOverlordChildren(
+    overlord: TaskoratorTask
+  ): Promise<TaskoratorTask[]> {
     if (!overlord) {
       return [];
     }

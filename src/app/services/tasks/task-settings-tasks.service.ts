@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 /**
  * @fix or @deprecated use ExtendedTask for ui... or extend task to have "selected" property
  */
@@ -23,7 +23,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async addTaskToFocus(task: Task) {
+  async addTaskToFocus(task: TaskoratorTask) {
     if (!this.settings) return;
 
     if (!this.settings.focusTaskIds.includes(task.taskId)) {
@@ -33,7 +33,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async removeTaskFromFocus(task: Task) {
+  async removeTaskFromFocus(task: TaskoratorTask) {
     if (!this.settings) return;
 
     const index = this.settings.focusTaskIds.indexOf(task.taskId);
@@ -44,7 +44,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async addTaskToFrogs(task: Task) {
+  async addTaskToFrogs(task: TaskoratorTask) {
     if (!this.settings) return;
 
     if (!this.settings.frogTaskIds.includes(task.taskId)) {
@@ -54,7 +54,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async removeTaskFromFrogs(task: Task) {
+  async removeTaskFromFrogs(task: TaskoratorTask) {
     if (!this.settings) return;
 
     const index = this.settings.frogTaskIds.indexOf(task.taskId);
@@ -65,7 +65,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async addTaskToFavorites(task: Task) {
+  async addTaskToFavorites(task: TaskoratorTask) {
     if (!this.settings) return;
 
     if (!this.settings.favoriteTaskIds.includes(task.taskId)) {
@@ -75,7 +75,7 @@ export class TaskSettingsTasksService {
     }
   }
 
-  async removeTaskFromFavorites(task: Task) {
+  async removeTaskFromFavorites(task: TaskoratorTask) {
     if (!this.settings) return;
 
     const index = this.settings.favoriteTaskIds.indexOf(task.taskId);

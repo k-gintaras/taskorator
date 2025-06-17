@@ -12,109 +12,143 @@ import { TaskViewService } from '../../services/tasks/task-view.service';
 import { SelectedMultipleService } from '../../services/tasks/selected-multiple.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
-import { ExtendedTask, Task } from '../../models/taskModelManager';
-import { TaskNavigatorTestComponent } from './task-navigator-test/task-navigator-test.component';
+import { ColorService } from '../../services/utils/color.service';
+import { TaskStatusService } from '../../services/tasks/task-status.service';
+import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { TaskService } from '../../services/sync-api-cache/task.service';
+import { ErrorService } from '../../services/core/error.service';
+import { ExtendedTask } from '../../models/taskModelManager';
+import { getRandomTasks } from '../../test-files/test-data/test-task';
+import { GptSuggestService } from '../../features/gpt/services/gpt-suggest.service';
+import { GptRequestService } from '../../features/gpt/services/gpt-request.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TaskNodeInfo } from '../../models/taskTree';
 
-// Mock Services
-class MockTaskViewService {
-  tasks$ = of([
-    {
-      taskId: '1',
-      name: 'Task 1',
-      todo: 'Do this task',
-      why: 'Because it’s important',
-      timeCreated: Date.now(),
-      lastUpdated: Date.now(),
-      timeEnd: null,
-      duration: 30,
-      overlord: '128',
-      repeat: 'once',
-      status: 'active',
-      stage: 'todo',
-      type: 'task',
-      subtype: '',
-      size: 'do now',
-      owner: '',
-      priority: 5,
-      backupLink: '',
-      imageUrl: null,
-      imageDataUrl: null,
-      tags: ['tag1'],
-    },
-  ] as ExtendedTask[]);
+// ✅ Mocks
+
+class MockSelectedOverlordService {
+  getSelectedOverlordObservable() {
+    return of(null);
+  }
 }
 
-// class MockSelectedMultipleService {
-//   getSelectedTasks() {
-//     return of([]);
-//   }
-// }
+class MockGptSuggestService {}
+class MockGptRequestService {}
+
+class MockTaskViewService {
+  tasks$ = of(
+    getRandomTasks().map((t) => ({
+      ...t,
+      tags: ['tag-' + Math.floor(Math.random() * 10)],
+      priority: Math.floor(Math.random() * 10),
+    }))
+  );
+}
+
+class MockSelectedMultipleService {
+  getSelectedTasks() {
+    return of([]);
+  }
+}
 
 class MockTaskNavigatorUltraService {
   async next(taskId: string) {
     console.log(`Navigated to next tasks of ${taskId}`);
   }
-
   async backToStart() {
-    console.log('Navigated back to the start');
+    console.log('Navigated back to start');
   }
-
   async backToPrevious() {
-    console.log('Navigated back to the previous tasks');
+    console.log('Navigated back to previous');
   }
 }
 
 class MockTreeService {
-  getTaskTreeData(taskId: string) {
-    return {
-      taskId: taskId,
-      name: `Task ${taskId}`,
-      children: [],
-      isCompleted: false,
-      overlord: null,
-      childrenCount: 0,
-      completedChildrenCount: 0,
-    };
+  getTaskTreeData() {
+    return null;
   }
 }
 
-// Story Configuration
+class MockColorService {
+  getDateBasedColor(timestamp: number): string {
+    // simple light pastel cycling
+    const colors = ['#fca5a5', '#fdba74', '#fcd34d', '#86efac', '#93c5fd'];
+    return colors[timestamp % colors.length];
+  }
+
+  getProgressPercent(): number {
+    return Math.floor(Math.random() * 100);
+  }
+
+  getAgeColor(): string {
+    return '#999'; // gray fallback
+  }
+}
+class MockTaskStatusService {
+  getStatus(id: string): string {
+    return 'normal';
+  }
+
+  getProgressPercent(node: TaskNodeInfo | null): number {
+    let percent = Math.floor(Math.random() * 100);
+    // prevent ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => {}, 0);
+    return percent;
+  }
+
+  getAgeColor(): string {
+    return '#999'; // gray fallback
+  }
+}
+
+class DummyService {}
+
+// ✅ Story Config
 export default {
   title: 'Components/Task Navigator',
-  component: TaskNavigatorTestComponent,
+  component: TaskNavigatorComponent,
   decorators: [
     moduleMetadata({
       imports: [
+        CommonModule,
         MatCardModule,
         MatIconModule,
-        CommonModule,
+        HttpClientTestingModule, // ⬅ satisfies HttpClient if anything still needs it
         TaskMiniComponent,
-        ArtificerActionComponent,
         ArtificerComponent,
+        ArtificerActionComponent,
         OverlordNavigatorComponent,
       ],
       providers: [
         { provide: TaskViewService, useClass: MockTaskViewService },
         {
-          provide: SelectedMultipleService,
-          useClass: SelectedMultipleService,
-        },
-        {
           provide: TaskNavigatorUltraService,
           useClass: MockTaskNavigatorUltraService,
         },
         { provide: TreeService, useClass: MockTreeService },
+        {
+          provide: SelectedOverlordService,
+          useClass: MockSelectedOverlordService,
+        },
+        { provide: GptSuggestService, useClass: MockGptSuggestService },
+        { provide: GptRequestService, useClass: MockGptRequestService },
+        // unchanged dummies
+        { provide: ColorService, useClass: DummyService },
+        { provide: TaskStatusService, useClass: MockTaskStatusService },
+        { provide: TaskService, useClass: DummyService },
+        { provide: ErrorService, useClass: DummyService },
+        { provide: ColorService, useClass: MockColorService },
       ],
     }),
   ],
 } as Meta<TaskNavigatorComponent>;
 
-// Story Template
+// ✅ Template
 const Template: StoryFn<TaskNavigatorComponent> = (args) => ({
   props: args,
 });
 
-// Default Story
+// ✅ Default Story
 export const Default = Template.bind({});
 Default.args = {
   showArtificer: true,

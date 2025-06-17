@@ -256,7 +256,7 @@ export const defaultTaskLists: TaskListRules[] = [
     description: 'Tasks associated with a specific overlord',
     rules: {
       filter: (task) => task.stage === 'todo' && task.taskId !== ROOT_TASK_ID, // Filter tasks that have an overlord
-      sorter: (a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0), // Most recent first
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0), // Most recent first
       permissions: {
         canAdd: true,
         canMove: true,

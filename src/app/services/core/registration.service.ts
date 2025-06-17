@@ -3,7 +3,7 @@ import { TreeNodeService } from '../tree/tree-node.service';
 import { getDefaultScore } from '../../models/score';
 import { getDefaultTaskSettings, TaskSettings } from '../../models/settings';
 import {
-  Task,
+  TaskoratorTask,
   getRootTaskObject,
   ROOT_TASK_ID,
   getDefaultTask,
@@ -174,14 +174,14 @@ export class RegistrationService {
     }
   }
 
-  private getInitialTask(): Task {
+  private getInitialTask(): TaskoratorTask {
     const task = getRootTaskObject();
     task.taskId = ROOT_TASK_ID;
     return task;
   }
 
-  private getAdditionalTasks(parent: Task): Task[] {
-    const additionalTasks: Task[] = [
+  private getAdditionalTasks(parent: TaskoratorTask): TaskoratorTask[] {
+    const additionalTasks: TaskoratorTask[] = [
       getDefaultTask(),
       getDefaultTask(),
       getDefaultTask(),
@@ -197,7 +197,7 @@ export class RegistrationService {
     additionalTasks[1].taskId = '212121';
     additionalTasks[2].taskId = '313131';
 
-    additionalTasks.forEach((t: Task) => {
+    additionalTasks.forEach((t: TaskoratorTask) => {
       t.overlord = parent.taskId;
     });
 
@@ -215,7 +215,7 @@ export class RegistrationService {
     return getDefaultScore();
   }
 
-  private getBaseTree(initialTask: Task): TaskTree {
+  private getBaseTree(initialTask: TaskoratorTask): TaskTree {
     const baseTree: TaskTree = getDefaultTree();
     baseTree.primarch.taskId = initialTask.taskId;
     baseTree.primarch.name = initialTask.name;

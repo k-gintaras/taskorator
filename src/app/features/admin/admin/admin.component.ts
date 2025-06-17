@@ -3,7 +3,10 @@ import { TaskTemplate } from '../models/template';
 import { AdminService } from '../services/admin.service';
 import { NgFor, NgIf } from '@angular/common';
 import { TreeNodeService } from '../../../services/tree/tree-node.service';
-import { getDefaultTask, Task } from '../../../models/taskModelManager';
+import {
+  getDefaultTask,
+  TaskoratorTask,
+} from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
 import { LocalSqliteService } from '../services/local-sqlite.service';
 import { TreeBuilderService } from '../services/tree-builder.service';
@@ -171,7 +174,7 @@ export class AdminComponent {
   }
 
   sqliteTest() {
-    this.localSqlite.getTaskData().subscribe((tasks: Task[]) => {
+    this.localSqlite.getTaskData().subscribe((tasks: TaskoratorTask[]) => {
       if (!tasks) {
         console.log('could not get tasks');
         return;
@@ -199,7 +202,7 @@ export class AdminComponent {
           this.taskBatchService.createTaskBatch(noRootTasks, '128').then();
           this.taskListService
             .getOverlordTasks('128')
-            .then((result: Task[] | null) => {
+            .then((result: TaskoratorTask[] | null) => {
               console.log('WHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT');
               console.log(result);
             });
@@ -210,30 +213,32 @@ export class AdminComponent {
   }
 
   fixMissingTasks() {
-    this.taskListService.getOverlordTasks('0').then((tasks: Task[] | null) => {
-      this.taskService
-        .getTaskById('vuLn7N0EOlUcYkz0ObX6')
-        .then((task: Task | null) => {
-          if (!tasks) return;
-          if (!task) return;
-          console.log(
-            'task found ++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-          );
+    this.taskListService
+      .getOverlordTasks('0')
+      .then((tasks: TaskoratorTask[] | null) => {
+        this.taskService
+          .getTaskById('vuLn7N0EOlUcYkz0ObX6')
+          .then((task: TaskoratorTask | null) => {
+            if (!tasks) return;
+            if (!task) return;
+            console.log(
+              'task found ++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+            );
 
-          tasks.forEach((t: Task) => {
-            t.overlord = task.taskId;
+            tasks.forEach((t: TaskoratorTask) => {
+              t.overlord = task.taskId;
+            });
+            this.taskBatchService.updateTaskBatch(tasks, TaskActions.MOVED);
+            console.log(
+              'TASKS FIXED AND UPDATED.................................................'
+            );
           });
-          this.taskBatchService.updateTaskBatch(tasks, TaskActions.MOVED);
-          console.log(
-            'TASKS FIXED AND UPDATED.................................................'
-          );
-        });
-    });
+      });
   }
 
   private cleanTasks() {}
 
-  private filterTasks(tasks: Task[]): Task[] {
+  private filterTasks(tasks: TaskoratorTask[]): TaskoratorTask[] {
     // remap parents
 
     // Find task with taskId === '128' and change it to '0'
@@ -311,7 +316,7 @@ export class AdminComponent {
     });
   }
 
-  normalizeTask(task: any): Task {
+  normalizeTask(task: any): TaskoratorTask {
     return {
       timeCreated: new Date(task.timeCreated.seconds * 1000),
       timeEnd: task.timeEnd ? new Date(task.timeEnd.seconds * 1000) : null,

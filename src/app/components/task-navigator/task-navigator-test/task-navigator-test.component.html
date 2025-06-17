@@ -19,7 +19,15 @@
         </button> -->
       </div>
 
-      <div *ngFor="let task of tasks" class="task-container">
+      <div
+        *ngFor="let task of tasks"
+        class="task-container"
+        [attr.data-age-ratio]="getAgeRatio(task).toFixed(2)"
+        [style.borderLeftColor]="getAgeColor(getAgeRatio(task))"
+        [style.boxShadow]="
+          getAgeRatio(task) < 0.1 ? '0 0 6px rgba(76,175,80,0.5)' : 'none'
+        "
+      >
         <div class="left-section">
           <div class="navigation-actions">
             <!-- <button class="task-btn" (click)="onPrevious(task)">

@@ -5,7 +5,7 @@ import { TreeApiStrategy } from './tree-strategy.interface';
 import { RegisterUserResult, TaskUserInfo } from './user';
 import { Score } from '../score';
 import { TaskSettings } from '../settings';
-import { Task } from '../taskModelManager';
+import { TaskoratorTask } from '../taskModelManager';
 import { TaskTree } from '../taskTree';
 import { TaskListApiStrategy } from './task-list-strategy.interface';
 import { RegistrationApiStrategy } from './registration-strategy';

@@ -2,11 +2,11 @@ import { Score } from '../score';
 import { TaskSettings } from '../settings';
 import { TaskTree } from '../taskTree';
 import { RegisterUserResult, TaskUserInfo } from './user';
-import { Task } from '../taskModelManager';
+import { TaskoratorTask } from '../taskModelManager';
 
 export interface RegistrationData {
-  initialTask: Task;
-  additionalTasks: Task[];
+  initialTask: TaskoratorTask;
+  additionalTasks: TaskoratorTask[];
   settings: TaskSettings;
   score: Score;
   tree: TaskTree;

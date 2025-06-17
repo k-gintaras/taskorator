@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskMiniComponent } from '../task-mini/task-mini.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,17 +14,17 @@ import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.compo
   styleUrls: ['./staged-task-list.component.scss'],
 })
 export class StagedTaskListComponent {
-  @Input() tasks: Task[] = [];
-  @Output() tasksChange = new EventEmitter<Task[]>(); // Notify parent about changes
+  @Input() tasks: TaskoratorTask[] = [];
+  @Output() tasksChange = new EventEmitter<TaskoratorTask[]>(); // Notify parent about changes
 
   constructor(private dialog: MatDialog) {}
 
-  deleteTask(t: Task): void {
+  deleteTask(t: TaskoratorTask): void {
     this.tasks = this.tasks.filter((task) => task.taskId !== t.taskId);
     this.tasksChange.emit(this.tasks); // Emit the updated tasks list
   }
 
-  editTask(task: Task): void {
+  editTask(task: TaskoratorTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
       data: task, // Pass the task to edit

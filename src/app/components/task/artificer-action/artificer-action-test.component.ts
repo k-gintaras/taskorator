@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
@@ -18,7 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './artificer-action.component.scss',
 })
 export class ArtificerActionComponentTest {
-  @Input() task: Task | undefined;
+  @Input() task: TaskoratorTask | undefined;
   currentAction!: ArtificerDetails;
   @Input() treeNode: TaskNodeInfo | undefined;
 
@@ -121,7 +121,7 @@ export class ArtificerActionComponentTest {
     }
   }
 
-  editTask(task: Task): void {
+  editTask(task: TaskoratorTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
       data: task, // Pass the task to edit

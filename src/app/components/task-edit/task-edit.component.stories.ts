@@ -11,14 +11,14 @@ import { getRandomTask } from '../../test-files/test-data/test-task';
 import { TaskActions } from '../../services/tasks/task-action-tracker.service';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { MatIcon } from '@angular/material/icon';
-import { Task } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../models/taskModelManager';
 
 // Mock Services
 class MockTaskService {
   getTaskDetails() {
     return of(getRandomTask());
   }
-  update(task: Task, action: TaskActions) {
+  update(task: TaskoratorTask, action: TaskActions) {
     console.log('task Saved');
     console.log(task.name);
     console.log(action);

@@ -1,4 +1,4 @@
-import { Task } from '../../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 export interface TaskTemplate {
   id: string; // Unique identifier for the template
@@ -7,7 +7,7 @@ export interface TaskTemplate {
   authorName: string; // Name of the author, for easier display without additional queries
   isPublic: boolean; // True if the template is publicly available
   price?: number; // Optional price, relevant if the template is for sale
-  tasks: Task[]; // Array of tasks associated with this template
+  tasks: TaskoratorTask[]; // Array of tasks associated with this template
 }
 
 export const getBaseTemplate = () => {
