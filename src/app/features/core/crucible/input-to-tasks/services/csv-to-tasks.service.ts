@@ -61,7 +61,10 @@ export class CsvToTasksService {
       }
     }
 
-    if (token) result.push(token);
+    // Updated splitCsvLine so the final token is always included, even if empty
+    // if (token) result.push(token);
+
+    result.push(token);
 
     return result;
   }

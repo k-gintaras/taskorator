@@ -76,6 +76,7 @@ export class SessionManagerService {
       this.authStrategy = this.offlineAuth;
       this.apiStrategy = this.localStorageApi;
       this.offlineAuth.initialize(); // init here, so we don't login by accident
+      await this.offlineAuth.login();
       this.user = await this.waitForLogin();
 
       if (!this.user) {

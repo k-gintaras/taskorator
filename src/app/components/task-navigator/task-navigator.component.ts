@@ -48,7 +48,7 @@ import {
     TaskCardComponent,
   ],
   selector: 'app-task-navigator',
-  templateUrl: './task-navigator.component.html',
+  templateUrl: './task-navigator.component.tailwind.html',
   styleUrls: ['./task-navigator.component.scss'],
 })
 export class TaskNavigatorComponent implements OnInit {

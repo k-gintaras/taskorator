@@ -35,9 +35,9 @@
   margin-right: 10px;
 }
 
-.selected {
+/* .selected {
   background-color: #2175ad;
-}
+} */
 
 /* Mini Task Styles */
 .mini-task {
@@ -94,13 +94,6 @@
     max-width: calc(100% - 70px);
     overflow-wrap: break-word;
   }
-
-  .app-artificer {
-    position: relative;
-    width: 50px; /* Reduced size for medium screens */
-    height: auto;
-  }
-
   .task-container {
     padding: 8px;
   }
@@ -135,10 +128,6 @@
   .task-list {
     padding: 5px;
     max-width: calc(100% - 70px);
-  }
-
-  .app-artificer {
-    width: 60px;
   }
 
   .task-container {

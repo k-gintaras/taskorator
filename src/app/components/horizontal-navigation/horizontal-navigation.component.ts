@@ -15,11 +15,13 @@ import { FormsModule } from '@angular/forms';
 import { MatDivider } from '@angular/material/divider';
 import { MatNavList } from '@angular/material/list';
 import { filter } from 'rxjs/operators';
+import { ArtificerComponent } from '../artificer/artificer.component';
 
 @Component({
   selector: 'app-horizontal-navigation',
   standalone: true,
   imports: [
+    ArtificerComponent,
     CommonModule,
     MatSidenavModule,
     MatButtonModule,
@@ -42,6 +44,7 @@ export class HorizontalNavigationComponent implements OnInit {
   childItems: { path: string; metadata: RouteMetadata }[] = [];
   isHandset = false;
   isCompact = false;
+  showArtificer = true;
 
   // Just track current URL for simplicity
   currentUrl = '';

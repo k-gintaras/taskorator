@@ -1,25 +1,14 @@
-<!-- old vertical one, not a good idea on mobile and in general, it is not  -->
-<!-- <div class="app-artificer">
-    <div
-      *ngFor="let action of actions"
-      (click)="selectAction(action)"
-      class="task-btn artificer-button"
-      [ngClass]="getActionClasses(action)"
-    >
-      <mat-icon>{{ action.icon }}</mat-icon>
-    </div>
-  </div> -->
-<!-- ! Form from function, wasting vertical space to be pretty and handy, makes it harder to read tasks that become shorter -->
 <div
-  class="sticky top-0 z-30 bg-violet-100 border-b border-base-300 flex flex-wrap gap-2 px-4 py-2"
+  class="bg-white flex flex-wrap justify-center items-center gap-2 px-4 py-2"
 >
-  <div
+  <button
     *ngFor="let action of actions"
     (click)="selectAction(action)"
-    class="btn task-btn btn-square btn-sm btn-ghost flex items-center justify-center"
-    [ngClass]="getActionClasses(action)"
-    style="min-width: 2.5rem; min-height: 2.5rem"
+    [ngClass]="[
+      'flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2 transition-colors duration-200',
+      getActionClass(action)
+    ]"
   >
-    <mat-icon>{{ action.icon }}</mat-icon>
-  </div>
+    <mat-icon class="text-xl">{{ action.icon }}</mat-icon>
+  </button>
 </div>

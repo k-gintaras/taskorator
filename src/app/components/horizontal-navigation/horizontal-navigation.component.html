@@ -16,44 +16,51 @@
     #drawer
     [mode]="isHandset ? 'over' : 'side'"
     [opened]="!isHandset || drawer.opened"
-    class="!w-[320px] lg:!w-[400px] max-w-full bg-base-100bg-headerMain"
+    class="bg-secondary !w-[320px] lg:!w-[400px] max-w-full bg-base-100bg-headerMain flex flex-col"
   >
-    <div class="flex h-full w-full overflow-hidden bg-secondary">
-      <!-- Parent list -->
-      <ul class="w-1/2 overflow-y-auto p-2 break-words">
-        <li
-          *ngFor="let item of parentItems"
-          class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
-          [class.bg-primary]="isSelected(item.path)"
-          [class.text-white]="isSelected(item.path)"
-          (click)="onParentClick(item)"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>{{ item.metadata.icon || "folder" }}</mat-icon>
-            <span class="whitespace-normal break-words text-grey">{{
-              item.metadata.title
-            }}</span>
-          </div>
-        </li>
-      </ul>
+    <div class="flex flex-1 flex-col bg-secondary">
+      <!-- Upper half: two lists side by side -->
+      <div class="flex flex-1 overflow-hidden">
+        <!-- Parent list -->
+        <ul class="w-1/2 overflow-y-auto p-2 break-words">
+          <li
+            *ngFor="let item of parentItems"
+            class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
+            [class.bg-primary]="isSelected(item.path)"
+            [class.text-white]="isSelected(item.path)"
+            (click)="onParentClick(item)"
+          >
+            <div class="flex items-center gap-2">
+              <mat-icon>{{ item.metadata.icon || "folder" }}</mat-icon>
+              <span class="whitespace-normal break-words text-grey">
+                {{ item.metadata.title }}
+              </span>
+            </div>
+          </li>
+        </ul>
 
-      <!-- Child list -->
-      <ul class="w-1/2 overflow-y-auto break-words">
-        <li
-          *ngFor="let child of childItems"
-          class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
-          [class.bg-primary]="isSelected(child.path)"
-          [class.text-white]="isSelected(child.path)"
-          (click)="onChildClick(child)"
-        >
-          <div class="flex items-center gap-2">
-            <!-- <mat-icon>chevron_right</mat-icon> -->
-            <span class="whitespace-normal break-words">{{
-              child.metadata.altName || child.metadata.title
-            }}</span>
-          </div>
-        </li>
-      </ul>
+        <!-- Child list -->
+        <ul class="w-1/2 overflow-y-auto p-2 break-words">
+          <li
+            *ngFor="let child of childItems"
+            class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
+            [class.bg-primary]="isSelected(child.path)"
+            [class.text-white]="isSelected(child.path)"
+            (click)="onChildClick(child)"
+          >
+            <div class="flex items-center gap-2">
+              <span class="whitespace-normal break-words">
+                {{ child.metadata.altName || child.metadata.title }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Artificer buttons below both lists -->
+      <ng-container *ngIf="showArtificer">
+        <app-artificer></app-artificer>
+      </ng-container>
     </div>
   </mat-sidenav>
 

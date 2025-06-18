@@ -15,3 +15,6 @@ html,
 body {
   @apply h-full m-0 p-0;
 }
+.selected {
+  @apply bg-secondary text-white;
+}

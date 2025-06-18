@@ -43,4 +43,10 @@ export class ArtificerComponent {
       [action.colorClass]: true,
     };
   }
+
+  getActionClass(action: ArtificerDetails) {
+    const selected = action === this.currentAction ? ' selected' : '';
+    const classs = action.colorClass ? ` ${action.colorClass}` : '';
+    return selected + ' ' + classs;
+  }
 }

@@ -48,10 +48,10 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 10px 10px 20px;
+  /* padding: 10px 10px 10px 20px; */
   background-color: $header-secondary-color; /* Match toolbar color */
   color: $header-text-color; /* Ensure readability */
-  gap: 10px;
+  /* gap: 10px; */
 
   @media (max-width: 600px) {
     flex-direction: column;
@@ -109,24 +109,6 @@
     width: 100%;
     justify-content: flex-end;
   }
-}
-
-.app-artificer-container {
-  position: sticky;
-  padding: 0;
-}
-.app-artificer {
-  left: 0;
-  z-index: 1000;
-  width: 38px; /* Keep the width compact */
-  background-color: white;
-  margin: 0;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px; /* Space between buttons */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow for visibility */
 }
 
 .task-navigator-layout {

@@ -27,4 +27,9 @@ describe('CsvToTasksService', () => {
     const separator = service.getSeparator(input.split('\n'));
     expect(separator).toBe('\t');
   });
+
+  it('should handle trailing comma', () => {
+    const tokens = service.splitCsvLine('a,b,', ',');
+    expect(tokens).toEqual(['a', 'b', '']);
+  });
 });
