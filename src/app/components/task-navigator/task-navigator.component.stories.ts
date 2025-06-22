@@ -10,7 +10,7 @@ import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navig
 import { of } from 'rxjs';
 import { TaskViewService } from '../../services/tasks/task-view.service';
 import { SelectedMultipleService } from '../../services/tasks/selected-multiple.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { ColorService } from '../../services/utils/color.service';
 import { TaskStatusService } from '../../services/tasks/task-status.service';

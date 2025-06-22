@@ -1,0 +1,47 @@
+<div
+  class="flex items-center gap-1 text-xs text-gray-600 px-2 py-1 bg-gray-50 rounded-md overflow-x-auto"
+>
+  <!-- Back/Forward buttons -->
+  <button
+    *ngIf="canGoBack"
+    (click)="goBack()"
+    class="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+    title="Go back"
+  >
+    ←
+  </button>
+
+  <!-- Breadcrumb trail -->
+  <div class="flex items-center gap-1 min-w-0">
+    <ng-container
+      *ngFor="let crumb of breadcrumbs; let i = index; let last = last"
+    >
+      <!-- Clickable previous breadcrumbs -->
+      <a
+        *ngIf="!last && i > 0"
+        [routerLink]="getRouteUrl(crumb)"
+        class="hover:text-blue-600 hover:underline truncate max-w-[120px] text-left cursor-pointer"
+        [title]="crumb.displayName"
+      >
+        {{ crumb.displayName }}
+      </a>
+
+      <!-- Current breadcrumb (not clickable) -->
+      <span
+        *ngIf="last"
+        class="font-medium text-gray-900 truncate max-w-[120px]"
+        [title]="crumb.displayName"
+      >
+        {{ crumb.displayName }}
+      </span>
+
+      <!-- Separator -->
+      <span *ngIf="!last && i > 0" class="text-gray-400 flex-shrink-0">›</span>
+    </ng-container>
+  </div>
+
+  <!-- Current location indicator if no breadcrumbs -->
+  <span *ngIf="breadcrumbs.length === 0" class="text-gray-500 italic">
+    No navigation history
+  </span>
+</div>

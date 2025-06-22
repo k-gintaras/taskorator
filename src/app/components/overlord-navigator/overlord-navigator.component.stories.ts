@@ -8,7 +8,7 @@ import { TaskListRules } from '../../models/task-list-model';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
 import { SelectedListService } from '../../services/tasks/selected-list.service';
 import { TaskListRulesService } from '../../services/tasks/task-list-rules.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 

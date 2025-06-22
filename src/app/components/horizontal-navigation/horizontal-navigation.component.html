@@ -15,14 +15,13 @@
   <mat-sidenav
     #drawer
     [mode]="isHandset ? 'over' : 'side'"
-    [opened]="!isHandset || drawer.opened"
-    class="bg-secondary !w-[320px] lg:!w-[400px] max-w-full bg-base-100bg-headerMain flex flex-col"
+    [opened]="!isHandset"
+    class="bg-secondary !w-[280px] lg:!w-[320px] max-w-full flex flex-col"
   >
-    <div class="flex flex-1 flex-col bg-secondary">
-      <!-- Upper half: two lists side by side -->
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Parent list -->
-        <ul class="w-1/2 overflow-y-auto p-2 break-words">
+    <div class="flex flex-col flex-1 h-full">
+      <!-- Top container: parent + child lists side by side -->
+      <div class="flex flex-1 overflow-hidden border-b border-gray-300">
+        <ul class="w-1/2 overflow-y-auto p-2">
           <li
             *ngFor="let item of parentItems"
             class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
@@ -39,8 +38,7 @@
           </li>
         </ul>
 
-        <!-- Child list -->
-        <ul class="w-1/2 overflow-y-auto p-2 break-words">
+        <ul class="w-1/2 overflow-y-auto p-2">
           <li
             *ngFor="let child of childItems"
             class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
@@ -57,10 +55,13 @@
         </ul>
       </div>
 
-      <!-- Artificer buttons below both lists -->
-      <ng-container *ngIf="showArtificer">
-        <app-artificer></app-artificer>
-      </ng-container>
+      <!-- Bottom container: artificer and extra buttons -->
+      <div class="flex-shrink-0 p-2">
+        <ng-container *ngIf="showArtificer">
+          <app-artificer></app-artificer>
+        </ng-container>
+        <!-- Add other button components here if needed -->
+      </div>
     </div>
   </mat-sidenav>
 

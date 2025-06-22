@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';

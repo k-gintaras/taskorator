@@ -114,6 +114,6 @@ export class HorizontalNavigationComponent implements OnInit {
 
   @HostListener('window:resize', [])
   onResize() {
-    this.isCompact = window.innerWidth < 600;
+    this.isCompact = window.innerWidth < 1000;
   }
 }

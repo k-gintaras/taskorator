@@ -1,58 +1,41 @@
-<!-- <div *ngIf="showArtificer">
-  <app-artificer></app-artificer>
-</div> -->
-<div class="flex flex-col md:flex-row h-screen">
-  <!-- Artificer sidebar - vertical on md+, horizontal sticky top on mobile -->
+<div class="w-full sm:w-[600px] sm:mx-auto p-4 rounded-md box-border">
+  <div *ngIf="canShowInfo()" class="pb-3">
+    <app-task-card [task]="selectedOverlord"></app-task-card>
+  </div>
 
-  <!-- Task list main area -->
   <div
-    class="flex-1 overflow-y-auto p-4 space-y-4 bg-base-700"
-    style="min-width: 0px; width: 600px"
+    *ngFor="let task of tasks"
+    [class.selected]="isSelected(task)"
+    [class.viewed]="getTaskStatus(task.taskId) === 'viewed'"
+    [class.updated]="getTaskStatus(task.taskId) === 'updated'"
+    [style.borderLeftColor]="getDateBasedColor(task.timeCreated)"
+    [style.borderBottom]="
+      getProgressPercent(getTreeNodeData(task)) > 0
+        ? '4px solid transparent'
+        : 'none'
+    "
+    [style.--progress-color]="'#4caf5044'"
+    [style.--progress-percent]="getProgressPercent(getTreeNodeData(task))"
+    class="flex items-center justify-between rounded-md p-3 mb-3 border border-gray-300 box-border cursor-pointer w-full"
   >
-    <div *ngIf="tasks?.length === 0" class="text-center text-gray-500 mt-20">
-      <app-task-edit
-        [task]="selectedOverlord"
-        [isPopup]="false"
-      ></app-task-edit>
-      <p class="mt-4">No other tasks yet.</p>
-    </div>
-
-    <div *ngIf="canShowInfo()" class="mb-4">
-      <app-task-card [task]="selectedOverlord"></app-task-card>
-    </div>
-
-    <div
-      *ngFor="let task of tasks"
-      class="flex items-center border rounded-lg p-3 shadow-sm"
-      [class.border-primary]="isSelected(task)"
-      [class.bg-primary]="isSelected(task)"
-      [class.text-white]="isSelected(task)"
-      [style.borderLeftColor]="getDateBasedColor(task.timeCreated)"
+    <button
+      class="btn btn-sm btn-circle flex-shrink-0"
+      (click)="onNext(task); $event.stopPropagation()"
     >
-      <!-- Left: navigation button -->
-      <button
-        class="btn btn-square btn-ghost text-lg shrink-0 mr-3"
-        (click)="onNext(task)"
-        aria-label="Next Task"
-      >
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
 
-      <!-- Middle: Task mini info and optionally more -->
-      <div class="flex-1 min-w-0">
-        <app-task-mini [task]="task"></app-task-mini>
-        <div *ngIf="isShowMoreEnabled()" class="text-xs text-gray-600 truncate">
-          {{ task.why }} - {{ task.todo }}
-        </div>
-      </div>
-
-      <!-- Right: Artificer actions for this task -->
-      <div class="ml-3 shrink-0">
-        <app-artificer-action
-          [treeNode]="getTreeNodeData(task)"
-          [task]="task"
-        ></app-artificer-action>
+    <div class="flex-1 px-3 break-words whitespace-normal">
+      <app-task-mini [task]="task"></app-task-mini>
+      <div *ngIf="isShowMoreEnabled()" class="show-more">
+        {{ task.why }} - {{ task.todo }}
       </div>
     </div>
+
+    <app-artificer-action
+      [treeNode]="getTreeNodeData(task)"
+      [task]="task"
+      class="flex-shrink-0"
+    ></app-artificer-action>
   </div>
 </div>

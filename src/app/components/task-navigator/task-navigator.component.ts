@@ -15,7 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { SelectedMultipleService } from '../../services/tasks/selected-multiple.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
 import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';

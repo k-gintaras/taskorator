@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 import {
   TaskListRules,

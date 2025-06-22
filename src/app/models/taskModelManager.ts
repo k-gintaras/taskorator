@@ -116,6 +116,7 @@ export type TaskSubtype =
   | 'list';
 
 export const ROOT_TASK_ID = '128';
+export const ROOT_TASK_NAME = 'Primarch';
 export const ROOT_TASK_DESCRIPTION = 'Legends never die!';
 
 export function getDefaultTask(): TaskoratorTask {
@@ -149,7 +150,7 @@ export function getRootTaskObject(): TaskoratorTask {
   const now = Date.now(); // Current time in milliseconds
   return {
     taskId: ROOT_TASK_ID,
-    name: 'Primarch',
+    name: ROOT_TASK_NAME,
     todo: '',
     why: ROOT_TASK_DESCRIPTION,
     timeCreated: now,

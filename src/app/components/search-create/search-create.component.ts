@@ -18,7 +18,7 @@ import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { Router } from '@angular/router';
 
 @Component({

@@ -8,6 +8,7 @@ export const appConfig: ApplicationConfig = {
 
 export const OTHER_CONFIG = {
   APP_TITLE: 'taskorator',
+  OFFLINE_TESTING: false,
   REPAIR_TREE: true,
   TREE_UPDATE_FREQUENCY: 500,
   OFFLINE_USER_LOGIN_ID: 'OfflineLoginUserId3',

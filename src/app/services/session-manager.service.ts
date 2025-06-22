@@ -18,6 +18,7 @@ import { RegistrationService } from './core/registration.service';
 import { TaskTreeHealService } from './tree/task-tree-heal.service';
 import { TaskBatchService } from './sync-api-cache/task-batch.service';
 import { NavigationService } from './navigation.service';
+import { OTHER_CONFIG } from '../app.config';
 
 @Injectable({ providedIn: 'root' })
 export class SessionManagerService {
@@ -58,6 +59,11 @@ export class SessionManagerService {
    */
   async initialize(mode: 'online' | 'offline'): Promise<void> {
     if (this.isInitialized) return;
+
+    const isTestingSimple = OTHER_CONFIG.OFFLINE_TESTING;
+    if (isTestingSimple) {
+      mode = 'offline';
+    }
 
     if (mode === 'online') {
       this.authStrategy = this.firebaseAuth;

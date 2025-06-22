@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ROOT_TASK_ID } from '../../../../../models/taskModelManager';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
-import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigator-ultra.service';
+import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigation/task-navigator-ultra.service';
 import {
   TaskListType,
   TaskListKey,

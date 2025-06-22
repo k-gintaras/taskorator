@@ -8,6 +8,7 @@ export interface TaskListRules {
   description: string; // Optional description for the list
   // tasks: string[]; // Array of task IDs // we don't really want to make this list into an angular app wich its own cache and stuffs
   rules: ListRules; // Optional rules for this list
+  autoRefresh: boolean;
 }
 
 export enum TaskListType {
@@ -93,6 +94,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'weekly',
@@ -105,7 +107,6 @@ export const defaultTaskLists: TaskListRules[] = [
 
         const { startTime, endTime } = calculatePeriodTimes('weekly');
         // Check if the task falls outside the current daily period
-
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
       sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
@@ -117,6 +118,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'monthly',
@@ -140,6 +142,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'yearly',
@@ -163,6 +166,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'focus',
@@ -180,6 +184,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'frog',
@@ -197,6 +202,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'favorites',
@@ -214,6 +220,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'latestCreated',
@@ -231,6 +238,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'latestUpdated',
@@ -248,6 +256,7 @@ export const defaultTaskLists: TaskListRules[] = [
       },
     },
     parent: '',
+    autoRefresh: true,
   },
   {
     id: 'overlord_*', // The * indicates this is a dynamic ID pattern
@@ -264,7 +273,8 @@ export const defaultTaskLists: TaskListRules[] = [
         canComplete: true,
       },
     },
-    parent: '', // Can be set to the specific overlord ID when used
+    parent: '',
+    autoRefresh: true,
   },
   {
     id: 'session_*', // The * indicates this is a dynamic ID pattern
@@ -281,7 +291,8 @@ export const defaultTaskLists: TaskListRules[] = [
         canComplete: true,
       },
     },
-    parent: '', // Can be set to the specific session ID when used
+    parent: '',
+    autoRefresh: true,
   },
 ];
 

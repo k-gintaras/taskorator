@@ -1,113 +1,65 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import {
-  TaskActions,
-  TaskAction,
-  TaskActionTrackerService,
-} from './task-action-tracker.service';
 import { ExtendedTask } from '../../models/taskModelManager';
-import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { TaskListKey, TaskListRules } from '../../models/task-list-model';
 import { TaskListRulesService } from './task-list-rules.service';
-import { SelectedListService } from './selected-list.service';
-import { TaskListSimpleService } from './task-list-simple.service';
-import { TaskListService } from '../sync-api-cache/task-list.service';
 
+/**
+ * Service responsible for applying display rules to task lists.
+ *
+ * This service takes raw task data and applies sorting, filtering,
+ * and display rules specific to each list type. For example:
+ * - Root tasks sorted by priority
+ * - Created tasks sorted by date
+ * - Focus tasks with certain filters applied
+ *
+ * Usage in components:
+ * 1. Get raw tasks from TaskListDataService
+ * 2. Apply display rules using this service
+ * 3. Display the processed tasks
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class TaskViewService {
-  private tasks: ExtendedTask[] = [];
-  private tasksSubject = new BehaviorSubject<ExtendedTask[]>([]);
-  tasks$ = this.tasksSubject.asObservable();
-  currentTaskListKey: TaskListKey | null = null;
-  currentTaskListRules: TaskListRules | null = null;
-
-  constructor(
-    private actionTracker: TaskActionTrackerService,
-    private taskListRulesService: TaskListRulesService,
-    private selectedList: SelectedListService,
-    private taskListSimpleService: TaskListSimpleService
-  ) {
-    this.initializeActionListener();
-  }
+  constructor(private taskListRulesService: TaskListRulesService) {}
 
   /**
-   * Set the current task list group and refresh the view.
-   * @param taskListGroup - The group name of the task list.
+   * Apply display rules to a list of tasks
+   *
+   * @param taskListKey - The type of list to get rules for
+   * @param tasks - Raw tasks to process
+   * @returns Processed tasks with rules applied (sorted, filtered, etc.)
    */
-  setTasksListGroup(taskListKey: TaskListKey): void {
-    this.currentTaskListKey = taskListKey;
-    this.selectedList.setSelectedListKey(taskListKey);
-    this.updateCurrentList();
-  }
-
-  /**
-   * Refresh the current task list from the cache and apply rules.
-   */
-  private async updateCurrentList(): Promise<void> {
-    if (!this.currentTaskListKey) {
-      this.tasks = [];
-      this.tasksSubject.next(this.tasks);
-      return;
+  applyDisplayRules(
+    taskListKey: TaskListKey,
+    tasks: ExtendedTask[]
+  ): ExtendedTask[] {
+    if (!tasks || tasks.length === 0) {
+      return [];
     }
 
-    // let tasks = [...this.taskIdService.getTasks(ids), ...cachedTasks];
-    console.log('Fetching tasks for list key:', this.currentTaskListKey);
-
-    let tasks = await this.taskListSimpleService.getList(
-      this.currentTaskListKey
-    );
-    if (!tasks) return;
-
-    // Apply rules to tasks using TaskListManagerService
-    tasks = this.taskListRulesService.applyRulesToList(
-      this.currentTaskListKey,
-      tasks
-    );
-
-    this.currentTaskListRules = this.taskListRulesService.getList(
-      this.currentTaskListKey
-    );
-
-    this.tasks = tasks;
-    this.tasksSubject.next(this.tasks);
+    // Apply the rules defined for this list type
+    return this.taskListRulesService.applyRulesToList(taskListKey, tasks);
   }
 
   /**
-   * Listen for task actions and react accordingly.
+   * Get the display rules for a specific list type
+   *
+   * @param taskListKey - The list type to get rules for
+   * @returns The rules object containing sort/filter/display preferences
    */
-  private initializeActionListener(): void {
-    this.actionTracker.lastAction$.subscribe((action) => {
-      if (action) {
-        this.reactToAction(action);
-      }
-    });
+  getDisplayRules(taskListKey: TaskListKey): TaskListRules | null {
+    return this.taskListRulesService.getList(taskListKey);
   }
 
   /**
-   * React to a task action by refreshing or modifying the current list.
-   * @param action - The task action to handle.
+   * Check if a task list should auto-refresh based on its rules
+   *
+   * @param taskListKey - The list type to check
+   * @returns Whether this list type should auto-refresh on task actions
    */
-  private reactToAction(action: TaskAction): void {
-    // Refresh the list to account for additions, removals, or moves
-    if (this.currentTaskListKey) {
-      this.updateCurrentList();
-    }
-
-    // // Apply additional filtering or sorting based on the action
-    // switch (action.action) {
-    //   case TaskActions.PRIORITY_INCREASED:
-    //   case TaskActions.PRIORITY_DECREASED:
-    //     this.sortTasksByPriority();
-    //     break;
-    //   case TaskActions.COMPLETED:
-    //   case TaskActions.DELETED:
-    //   case TaskActions.SEEN:
-    //     this.refreshCurrentTaskList();
-    //     break;
-    //   default:
-    //     break;
-    // }
+  shouldAutoRefresh(taskListKey: TaskListKey): boolean {
+    const rules = this.getDisplayRules(taskListKey);
+    return rules?.autoRefresh ?? false;
   }
 }
