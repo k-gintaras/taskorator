@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigation/task-navigator-ultra.service';
+import { TaskNavigatorService } from '../../../../../services/tasks/task-navigation/task-navigator.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 import {
   TaskListRules,
@@ -21,7 +21,7 @@ export class LatestCreatedTaskListComponent implements OnInit {
   taskListRules: TaskListRules | null = null;
 
   constructor(
-    private navigatorService: TaskNavigatorUltraService,
+    private navigatorService: TaskNavigatorService,
     private taskListRulesService: TaskListRulesService
   ) {}
 

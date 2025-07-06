@@ -10,7 +10,6 @@ import {
   TaskListSubtype,
 } from '../../../models/task-list-model';
 import { TaskListRulesService } from '../../../services/tasks/task-list-rules.service';
-import { TaskNavigatorUltraService } from '../../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
 import { TaskNavigatorHistoryService } from '../../../services/tasks/task-navigation/task-navigator-history.service';
 

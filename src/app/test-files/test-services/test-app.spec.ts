@@ -54,7 +54,11 @@ describe('SessionManagerService', () => {
 
     mockAuthOfflineService.getCurrentUser.and.returnValue(of(mockOfflineUser));
     mockAuthOfflineService.isAuthenticated.and.returnValue(true);
-    mockAuthOfflineService.login.and.returnValue(Promise.resolve()); // Mock login
+    const fakeLoginResult = { userId: mockOfflineUser.uid, isNewUser: true };
+
+    mockAuthOfflineService.login.and.returnValue(
+      Promise.resolve(fakeLoginResult)
+    ); // at both lines 57 & 120
     mockAuthOfflineService.isAuthenticated.and.returnValue(true);
     mockAuthOfflineService.getCurrentUser.and.returnValue(of(mockOfflineUser));
 
@@ -117,7 +121,11 @@ describe('SessionManagerService', () => {
 
   it('should initialize correctly in offline mode', async () => {
     // Configure mocks
-    mockAuthOfflineService.login.and.returnValue(Promise.resolve()); // Mock successful login
+    const fakeLoginResult = { userId: mockOfflineUser.uid, isNewUser: true };
+
+    mockAuthOfflineService.login.and.returnValue(
+      Promise.resolve(fakeLoginResult)
+    ); // at both lines 57 & 120
     mockAuthOfflineService.isAuthenticated.and.returnValue(true);
     mockAuthOfflineService.getCurrentUser.and.returnValue(of(mockOfflineUser));
 
