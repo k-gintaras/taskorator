@@ -7,7 +7,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskoratorTask } from '../../models/taskModelManager';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
@@ -121,7 +121,11 @@ export class SearchOverlordComponent implements OnInit {
           console.error('Task not found for ID:', this.selectedOverlordId);
           return;
         }
-        this.selectedOverlordService.setSelectedOverlord(task.taskId);
+        this.selectedOverlordService.setSelectedOverlord({
+          ...task,
+          isVisible: true,
+          animationState: 'normal',
+        });
       });
   }
 }

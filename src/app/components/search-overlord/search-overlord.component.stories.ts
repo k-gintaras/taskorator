@@ -12,7 +12,7 @@ import { TaskoratorTask } from '../../models/taskModelManager';
 import { AuthService } from '../../services/core/auth.service';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 
 // Mock Services

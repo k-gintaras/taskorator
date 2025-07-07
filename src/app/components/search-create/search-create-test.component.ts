@@ -11,7 +11,7 @@ import {
   TaskoratorTask,
 } from '../../models/taskModelManager';
 import { TaskService } from '../../services/sync-api-cache/task.service';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';

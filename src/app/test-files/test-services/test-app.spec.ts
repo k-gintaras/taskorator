@@ -42,15 +42,19 @@ describe('SessionManagerService', () => {
 
   beforeEach(() => {
     mockAuthService = jasmine.createSpyObj('AuthService', [
+      'initialize', // ← add this
       'isAuthenticated',
       'getCurrentUser',
     ]);
+    mockAuthService.initialize.and.returnValue(undefined);
 
     mockAuthOfflineService = jasmine.createSpyObj('AuthOfflineService', [
+      'initialize', // ← add this
       'login',
       'getCurrentUser',
       'isAuthenticated',
     ]);
+    mockAuthOfflineService.initialize.and.returnValue(undefined);
 
     mockAuthOfflineService.getCurrentUser.and.returnValue(of(mockOfflineUser));
     mockAuthOfflineService.isAuthenticated.and.returnValue(true);

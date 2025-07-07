@@ -8,7 +8,7 @@ import {
   TaskSubtype,
   TaskSize,
 } from '../../models/taskModelManager';
-import { SelectedMultipleService } from './selected-multiple.service';
+import { SelectedMultipleService } from './selected/selected-multiple.service';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';

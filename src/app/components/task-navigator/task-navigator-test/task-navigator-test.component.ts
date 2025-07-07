@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { ExtendedTask } from '../../../models/taskModelManager';
 import { TaskNodeInfo } from '../../../models/taskTree';
 import { TreeService } from '../../../services/sync-api-cache/tree.service';
-import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';

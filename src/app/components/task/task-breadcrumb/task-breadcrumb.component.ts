@@ -1,14 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TaskNavigatorUltraService } from '../../../services/tasks/task-navigation/task-navigator-ultra.service';
 import {
   NavigationEntry,
   TaskNavigatorHistoryService,
 } from '../../../services/tasks/task-navigation/task-navigator-history.service';
 import { NgFor, NgIf } from '@angular/common';
 import { TaskListRouterService } from '../../../services/tasks/task-navigation/task-list-router.service';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { TaskListKey } from '../../../models/task-list-model';
+import { getOverlordPlaceholder } from '../../../services/tasks/task-list/task-list-overlord-placeholders';
+import { TaskListSimpleService } from '../../../services/tasks/task-list/task-list-simple.service';
+import { TaskNavigatorDataService } from '../../../services/tasks/task-navigation/task-navigator-data.service';
+import { TaskNavigatorService } from '../../../services/tasks/task-navigation/task-navigator.service';
 
 @Component({
   selector: 'app-task-breadcrumb',
@@ -25,7 +29,8 @@ export class TaskBreadcrumbComponent implements OnInit, OnDestroy {
 
   constructor(
     private taskNavigationHistoryService: TaskNavigatorHistoryService,
-    private taskListRouteService: TaskListRouterService
+    private taskListRouteService: TaskListRouterService,
+    private taskNavigatorService: TaskNavigatorService
   ) {}
 
   ngOnInit(): void {
@@ -34,6 +39,10 @@ export class TaskBreadcrumbComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.updateBreadcrumbs();
+        console.log(
+          'Breadcrumbs updated:',
+          this.breadcrumbs.map((entry) => entry.displayName)
+        );
       });
 
     // Initial load
@@ -46,18 +55,15 @@ export class TaskBreadcrumbComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.taskNavigationHistoryService.goBack();
+    const entry = this.taskNavigationHistoryService.goBack();
+    if (entry) {
+      this.jumpToEntry(entry);
+    }
   }
 
   jumpToEntry(entry: NavigationEntry): void {
-    // this.taskNavigationHistoryService.jumpToEntry(entry);
-    // // Manually trigger navigation to update the view
-    // this.taskNavigationHistoryService['updateView'](entry.taskListKey);
-    // if (entry.taskId) {
-    //   this.taskNavigationHistoryService['selectedOverlord'].setSelectedOverlord(
-    //     entry.taskId
-    //   );
-    // }
+    this.taskNavigatorService.navigateToList(entry.taskListKey);
+    this.taskNavigationHistoryService.jumpToEntry(entry);
   }
 
   private updateBreadcrumbs(): void {
@@ -66,11 +72,6 @@ export class TaskBreadcrumbComponent implements OnInit, OnDestroy {
   }
 
   getRouteUrl(entry: NavigationEntry): string {
-    if (entry.taskListKey.type !== 'overlord') {
-      // it is a generated task list, we cannot navigate back to it, because this list of tasks does not have parent task..., we must use use URL to get there
-    }
     return this.taskListRouteService.getRouteUrl(entry.taskListKey);
   }
-
-  // TODO: if
 }

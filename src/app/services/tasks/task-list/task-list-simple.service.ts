@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
-import { TaskListKey, TaskListType } from '../../models/task-list-model';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
-import { TaskListService } from '../sync-api-cache/task-list.service';
+import { TaskListKey, TaskListType } from '../../../models/task-list-model';
+import { ExtendedTask, TaskoratorTask } from '../../../models/taskModelManager';
+import { TaskListService } from '../../sync-api-cache/task-list.service';
+import { TaskService } from '../../sync-api-cache/task.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskListSimpleService {
-  constructor(private taskListService: TaskListService) {}
+  constructor(
+    private taskListService: TaskListService,
+    private taskService: TaskService
+  ) {}
 
   /**
    * Get tasks for any task list type
@@ -35,6 +39,9 @@ export class TaskListSimpleService {
           return this.taskListService.getLatestTasks();
         case TaskListType.OVERLORD:
           return this.taskListService.getOverlordTasks(taskListKey.data);
+        case TaskListType.SUPER_OVERLORD:
+          return this.getSuperOverlordTasks(taskListKey.data);
+
         // Add new list types here without touching navigation logic
         // case TaskListType.PRIORITY:
         //   return this.taskListService.getPriorityTasks();
@@ -50,12 +57,10 @@ export class TaskListSimpleService {
     }
   }
 
-  async getTaskChildren(taskId: string): Promise<ExtendedTask[] | null> {
-    try {
-      return await this.taskListService.getOverlordTasks(taskId);
-    } catch (error) {
-      console.error('Failed to get task children:', error);
-      return null;
-    }
+  async getSuperOverlordTasks(taskId: string): Promise<ExtendedTask[] | null> {
+    const superOverlord = await this.taskService.getSuperOverlord(taskId);
+    return superOverlord?.overlord
+      ? this.taskListService.getOverlordTasks(superOverlord.overlord)
+      : null;
   }
 }

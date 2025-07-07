@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { Router } from '@angular/router';
-
+/**
+ * ez to find out how to get to task list through url
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -93,6 +95,9 @@ export class TaskListRouterService {
       [TaskListType.FAVORITE]: this.getRouteUrlByType(TaskListType.FAVORITE),
       [TaskListType.SESSION]: this.getRouteUrlByType(TaskListType.SESSION),
       [TaskListType.OVERLORD]: this.getRouteUrlByType(TaskListType.OVERLORD),
+      [TaskListType.SUPER_OVERLORD]: this.getRouteUrlByType(
+        TaskListType.SUPER_OVERLORD
+      ),
     };
   }
 

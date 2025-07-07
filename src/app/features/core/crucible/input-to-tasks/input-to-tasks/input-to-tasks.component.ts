@@ -14,6 +14,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TextType } from '../services/text-type-detector.service';
 import { TaskUtilityService } from '../../../../../services/tasks/task-utility.service';
 import { TaskBatchService } from '../../../../../services/sync-api-cache/task-batch.service';
+import { SelectedOverlordService } from '../../../../../services/tasks/selected/selected-overlord.service';
 
 @Component({
   selector: 'app-input-to-tasks',
@@ -51,7 +52,7 @@ export class InputToTasksComponent implements OnInit {
 
   constructor(
     private inputToTasksService: InputToTasksService,
-    private utilityService: TaskUtilityService,
+    private selectedOverlordService: SelectedOverlordService,
     private taskBatchService: TaskBatchService
   ) {}
 
@@ -59,10 +60,13 @@ export class InputToTasksComponent implements OnInit {
     this.selectedOverlord = { name: 'Default Overlord' } as ExtendedTask;
 
     if (!this.overlord) {
-      this.utilityService.getSelectedOverlord().subscribe((t) => {
-        if (!t) return;
-        this.selectedOverlord = t;
-      });
+      this.selectedOverlordService
+        .getSelectedOverlordObservable()
+        .subscribe((overlord: ExtendedTask | null) => {
+          if (overlord) {
+            this.selectedOverlord = overlord;
+          }
+        });
     }
     if (this.overlord) {
       this.setNewOverlord();

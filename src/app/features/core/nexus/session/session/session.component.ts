@@ -11,8 +11,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
-import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigation/task-navigator-ultra.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected/selected-multiple.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
@@ -50,9 +49,7 @@ export class SessionComponent implements OnInit, OnDestroy {
 
   constructor(
     private taskSessionService: TaskSessionService,
-    private selectedMultipleService: SelectedMultipleService,
-    private navigatorService: TaskNavigatorUltraService,
-    private taskListService: TaskListService
+    private selectedMultipleService: SelectedMultipleService
   ) {}
 
   ngOnInit(): void {

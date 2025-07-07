@@ -22,6 +22,7 @@ export enum TaskListType {
   FROG = 'frog',
   FAVORITE = 'favorite',
   OVERLORD = 'overlord',
+  SUPER_OVERLORD = 'superOverlord',
   SESSION = 'session',
 }
 

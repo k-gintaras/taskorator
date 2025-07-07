@@ -6,7 +6,7 @@ import {
   getDefaultTaskSettings,
 } from '../../../../../models/settings';
 import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
-import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected/selected-multiple.service';
 import { TaskoratorTask } from '../../../../../models/taskModelManager';
 import { MatIcon } from '@angular/material/icon';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';

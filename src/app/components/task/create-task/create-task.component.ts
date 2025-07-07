@@ -10,7 +10,7 @@ import {
   TaskoratorTask,
   getDefaultTask,
 } from '../../../models/taskModelManager';
-import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
 import { NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';

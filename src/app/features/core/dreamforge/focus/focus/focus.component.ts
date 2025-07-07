@@ -9,7 +9,7 @@ import { SettingsService } from '../../../../../services/sync-api-cache/settings
 import { TaskoratorTask } from '../../../../../models/taskModelManager';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatIcon } from '@angular/material/icon';
-import { SelectedMultipleService } from '../../../../../services/tasks/selected-multiple.service';
+import { SelectedMultipleService } from '../../../../../services/tasks/selected/selected-multiple.service';
 import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
 @Component({

@@ -2,20 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatOption } from '@angular/material/core';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatSelect } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { Observable } from 'rxjs';
 import { SearchOverlordComponent } from '../../../../components/search-overlord/search-overlord.component';
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
 import { TaskSettings } from '../../../../models/settings';
-import { TaskoratorTask } from '../../../../models/taskModelManager';
+import {
+  ExtendedTask,
+  TaskoratorTask,
+} from '../../../../models/taskModelManager';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
-import { SelectedMultipleService } from '../../../../services/tasks/selected-multiple.service';
-import { SelectedOverlordService } from '../../../../services/tasks/selected-overlord.service';
+import { SelectedMultipleService } from '../../../../services/tasks/selected/selected-multiple.service';
+import { SelectedOverlordService } from '../../../../services/tasks/selected/selected-overlord.service';
 import { TaskSettingsTasksService } from '../../../../services/tasks/task-settings-tasks.service';
-import { TaskService } from '../../../../services/sync-api-cache/task.service';
 import { TaskBatchService } from '../../../../services/sync-api-cache/task-batch.service';
 import { TaskActions } from '../../../../services/tasks/task-action-tracker.service';
 
@@ -35,14 +34,12 @@ import { TaskActions } from '../../../../services/tasks/task-action-tracker.serv
 })
 export class SelectedMultipleComponent implements OnInit {
   selectedTasks: TaskoratorTask[] = [];
-  selectedOverlord: string | undefined;
+  selectedOverlord: ExtendedTask | null = null;
   settings: TaskSettings | undefined = undefined;
   filteredTaskOptions: Observable<TaskoratorTask[]> | undefined;
-  selectedOverlordName: string = '';
 
   constructor(
     private selectedMultiple: SelectedMultipleService,
-    private taskService: TaskService,
     private taskBatchService: TaskBatchService,
     private settingsService: SettingsService,
     private selectedOverlordService: SelectedOverlordService,
@@ -58,13 +55,10 @@ export class SelectedMultipleComponent implements OnInit {
     this.loadSettings();
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((t: string | null) => {
-        if (!t) return;
-        this.selectedOverlord = t;
-
-        this.taskService.getTaskById(this.selectedOverlord).then((t) => {
-          this.selectedOverlordName = t?.name || '';
-        });
+      .subscribe((overlord: ExtendedTask | null) => {
+        if (overlord) {
+          this.selectedOverlord = overlord;
+        }
       });
   }
 
@@ -157,7 +151,7 @@ export class SelectedMultipleComponent implements OnInit {
     }
 
     this.selectedTasks.forEach((task) => {
-      task.overlord = o;
+      task.overlord = o.taskId;
     });
 
     this.taskBatchService

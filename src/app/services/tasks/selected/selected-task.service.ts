@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { TaskoratorTask } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 /**
  * @fix @deprecated use SelectedMultipleService and just get last selected task or not?
  */

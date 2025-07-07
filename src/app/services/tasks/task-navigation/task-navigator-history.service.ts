@@ -3,6 +3,9 @@ import { BehaviorSubject } from 'rxjs';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { ROOT_TASK_ID, ROOT_TASK_NAME } from '../../../models/taskModelManager';
 
+/**
+ * @deprecated Use task path, this is too complicated and not needed at least for now
+ */
 export interface NavigationEntry {
   taskListKey: TaskListKey;
   taskId?: string; // The specific task that was selected/viewed
@@ -10,7 +13,6 @@ export interface NavigationEntry {
   timestamp: Date;
   displayName?: string; // For breadcrumb display
 }
-
 @Injectable({
   providedIn: 'root',
 })

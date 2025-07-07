@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskNavigatorUltraService } from '../../../../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
 import {
   TaskListRules,
@@ -7,7 +6,10 @@ import {
   TaskListType,
   TaskListSubtype,
 } from '../../../../../models/task-list-model';
-import { TaskListRulesService } from '../../../../../services/tasks/task-list-rules.service';
+import { TaskListCoordinatorService } from '../../../../../services/tasks/task-list/task-list-coordinator.service';
+import { TaskNavigatorDataService } from '../../../../../services/tasks/task-navigation/task-navigator-data.service';
+import { getOverlordPlaceholder } from '../../../../../services/tasks/task-list/task-list-overlord-placeholders';
+import { SelectedOverlordService } from '../../../../../services/tasks/selected/selected-overlord.service';
 
 @Component({
   selector: 'app-focus-task-list',
@@ -21,8 +23,9 @@ export class FocusTaskListComponent implements OnInit {
   taskListRules: TaskListRules | null = null;
 
   constructor(
-    private navigatorService: TaskNavigatorUltraService,
-    private taskListRulesService: TaskListRulesService
+    private taskListCoordinatorService: TaskListCoordinatorService,
+    private navigatorDataService: TaskNavigatorDataService,
+    private selectedOverlordService: SelectedOverlordService
   ) {}
 
   async ngOnInit() {
@@ -35,11 +38,15 @@ export class FocusTaskListComponent implements OnInit {
         type: TaskListType.FOCUS,
         data: TaskListSubtype.SETTINGS,
       };
-      this.taskListRules = this.taskListRulesService.getList(taskListKey);
-      this.navigatorService.loadAndInitializeTasks(taskListKey);
+      const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
+        taskListKey
+      );
+      const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
+      this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
+      this.navigatorDataService.setTasks(tasks, taskListKey);
       this.errorMessage = '';
     } catch (error) {
-      this.errorMessage = 'Failed to load daily tasks.';
+      this.errorMessage = 'Failed to load focus tasks.';
       console.error(error);
     }
   }

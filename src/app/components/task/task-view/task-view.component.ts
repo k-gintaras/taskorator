@@ -9,9 +9,10 @@ import {
   TaskListType,
   TaskListSubtype,
 } from '../../../models/task-list-model';
-import { TaskListRulesService } from '../../../services/tasks/task-list-rules.service';
-import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
 import { TaskNavigatorHistoryService } from '../../../services/tasks/task-navigation/task-navigator-history.service';
+import { TaskListCoordinatorService } from '../../../services/tasks/task-list/task-list-coordinator.service';
+import { TaskNavigatorDataService } from '../../../services/tasks/task-navigation/task-navigator-data.service';
 
 @Component({
   standalone: true,
@@ -34,8 +35,9 @@ export class TaskViewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private taskService: TaskService,
-    private taskListRulesService: TaskListRulesService,
     private navigatorHistoryService: TaskNavigatorHistoryService,
+    private taskListCoordinatorService: TaskListCoordinatorService,
+    private navigatorDataService: TaskNavigatorDataService,
     private selectedOverlordService: SelectedOverlordService
   ) {}
 
@@ -60,13 +62,18 @@ export class TaskViewComponent implements OnInit {
   }
 
   private async loadTask(taskId: string) {
-    try {
-      this.task = await this.taskService.getTaskById(taskId);
-      this.errorMessage = '';
-    } catch (error) {
-      this.errorMessage = 'Failed to load task.';
-      console.error(error);
-    }
+    this.task = await this.taskService.getTaskById(taskId);
+    if (!this.task) return; // TODO: prolly error m8
+
+    const taskListKey: TaskListKey = {
+      type: TaskListType.OVERLORD,
+      data: this.task?.taskId || ROOT_TASK_ID,
+    };
+    const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
+      taskListKey
+    );
+    this.selectedOverlordService.setSelectedOverlord(this.task);
+    this.navigatorDataService.setTasks(tasks, taskListKey);
   }
 
   private updateNavigationHistory(taskId: string) {

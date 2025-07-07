@@ -4,8 +4,8 @@ import { TaskoratorTask } from '../../../models/taskModelManager';
 import { completeButtonColorMap } from '../../../models/colors';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
-import { SelectedTaskService } from '../../../services/tasks/selected-task.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
+import { SelectedTaskService } from '../../../services/tasks/selected/selected-task.service';
 
 @Component({
   selector: 'app-task-mini',

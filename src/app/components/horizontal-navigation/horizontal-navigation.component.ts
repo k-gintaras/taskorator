@@ -76,22 +76,26 @@ export class HorizontalNavigationComponent implements OnInit {
   }
 
   private updateChildItems() {
-    // Find parent that matches current URL
-    const activeParent = this.parentItems.find((parent) =>
-      this.currentUrl.startsWith('/' + parent.path)
+    const activeParent = this.parentItems.find((p) =>
+      this.currentUrl.startsWith('/' + p.path)
     );
-
-    if (activeParent) {
-      const childrenPaths = this.navigationService.getChildrenPaths(
-        activeParent.path
-      );
-      this.childItems = childrenPaths.map((child) => ({
-        path: `${activeParent.path}/${child}`,
-        metadata: this.navigationService.getRouteMetadata(child),
-      }));
-    } else {
+    if (!activeParent) {
       this.childItems = [];
+      return;
     }
+
+    this.childItems = this.navigationService
+      .getChildrenPaths(activeParent.path)
+      // drop routes like "tasks/:taskId" or anything without metadata
+      .filter(
+        (child) =>
+          !child.includes(':') &&
+          !!this.navigationService.getRouteMetadata(child)
+      )
+      .map((child) => ({
+        path: `${activeParent.path}/${child}`,
+        metadata: this.navigationService.getRouteMetadata(child)!,
+      }));
   }
 
   onParentClick(item: { path: string; metadata: RouteMetadata }) {

@@ -1,17 +1,8 @@
-<ng-container *ngIf="showArtificer">
-  <app-artificer></app-artificer>
-</ng-container>
 <div class="task-navigator-layout">
+  <app-task-card [task]="currentOverlord"></app-task-card>
   <div class="task-content-wrapper">
-    <!-- Conditionally Render Artificer -->
-    <!-- ! removed old version, wasting horizontal space really -->
-    <!-- <ng-container *ngIf="showArtificer">
-      <app-artificer></app-artificer>
-    </ng-container> -->
     <!-- Task List -->
     <div class="task-list">
-      <!-- <app-overlord-navigator></app-overlord-navigator> -->
-
       <div *ngIf="tasks?.length === 0" class="no-tasks">
         <app-task-edit
           [task]="selectedOverlord"
@@ -40,9 +31,6 @@
       >
         <div class="left-section">
           <div class="navigation-actions">
-            <!-- <button class="task-btn" (click)="onPrevious(task)">
-              <mat-icon>arrow_back</mat-icon>
-            </button> -->
             <button class="task-btn" (click)="onNext(task)">
               <mat-icon>arrow_forward</mat-icon>
             </button>

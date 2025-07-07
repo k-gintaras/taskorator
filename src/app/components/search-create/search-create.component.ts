@@ -13,12 +13,11 @@ import {
   TaskoratorTask,
 } from '../../models/taskModelManager';
 import { TaskService } from '../../services/sync-api-cache/task.service';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -50,7 +49,6 @@ export class SearchCreateComponent {
     private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
     private taskSearchService: SearchTasksService,
-    private taskNavigator: TaskNavigatorUltraService,
     private router: Router
   ) {}
 
@@ -73,20 +71,12 @@ export class SearchCreateComponent {
     // Watch for selected overlord changes
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((taskId: string | null) => {
-        if (!taskId) return;
-        this.taskService.getTaskById(taskId).then((task) => {
-          if (!task) return;
-          this.selectedOverlord = task;
-        });
+      .subscribe((overlord: ExtendedTask | null) => {
+        if (overlord) {
+          this.selectedOverlord = overlord;
+        }
       });
   }
-
-  // onSelectTask(task: TaskTreeNode): void {
-  //   this.selectedOverlordService.setSelectedOverlord(task.taskId); // Select task as overlord
-  //   this.navigatorService.next(task.taskId);
-  //   this.resetState();
-  // }
 
   onSelectTask(task: TaskTreeNode): void {
     this.router.navigate(['/tasks', task.taskId]);
@@ -133,6 +123,6 @@ export class SearchCreateComponent {
 
   goBack(): void {
     if (!this.selectedOverlord) return;
-    this.taskNavigator.backToPrevious();
+    // TODO: can go back in searchcreate???
   }
 }

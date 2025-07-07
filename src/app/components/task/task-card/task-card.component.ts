@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { getDefaultTask } from '../../../models/taskModelManager';
-import { TaskoratorTask } from '../../../models/taskModelManager';
+import { ExtendedTask, getDefaultTask } from '../../../models/taskModelManager';
 import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { TaskBreadcrumbComponent } from '../task-breadcrumb/task-breadcrumb.component';
 
@@ -12,7 +11,11 @@ import { TaskBreadcrumbComponent } from '../task-breadcrumb/task-breadcrumb.comp
   styleUrl: './task-card.component.scss',
 })
 export class TaskCardComponent {
-  @Input() task: TaskoratorTask = getDefaultTask();
+  @Input() task: ExtendedTask | null = {
+    ...getDefaultTask(),
+    isVisible: true,
+    animationState: 'normal',
+  };
 
   thereIsTags() {
     const task = this.task;

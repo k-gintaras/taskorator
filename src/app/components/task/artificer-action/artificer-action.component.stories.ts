@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { of } from 'rxjs';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
-import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
 import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { ArtificerDetails } from '../../artificer/artificer.interface';

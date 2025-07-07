@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SearchOverlordComponent } from '../../search-overlord/search-overlord.component';
 import { TaskService } from '../../../services/sync-api-cache/task.service';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
-import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
 
 // Mock Services
 class MockTaskService {

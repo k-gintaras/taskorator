@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { TaskoratorTask } from '../../models/taskModelManager';
+import { TaskoratorTask } from '../../../models/taskModelManager';
 
 /**
  * @fix @warn use ExtendedTask for ui... or extend task to have "selected" property

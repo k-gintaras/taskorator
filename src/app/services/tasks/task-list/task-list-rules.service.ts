@@ -3,8 +3,8 @@ import {
   TaskListRules,
   defaultTaskLists,
   TaskListKey,
-} from '../../models/task-list-model';
-import { ExtendedTask } from '../../models/taskModelManager';
+} from '../../../models/task-list-model';
+import { ExtendedTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',

@@ -4,7 +4,7 @@ import {
   TaskoratorTask,
 } from '../../../models/taskModelManager';
 import { TaskTree } from '../../../models/taskTree';
-import { SelectedOverlordService } from '../../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
 import { TreeService } from '../../../services/sync-api-cache/tree.service';
 import { CurrentInputService } from '../../../services/current-input.service';
 import { GptRequestService } from '../services/gpt-request.service';

@@ -4,6 +4,10 @@ import { TaskService } from '../../sync-api-cache/task.service';
 import { TaskListRouterService } from './task-list-router.service';
 import { TaskUsageService } from '../task-usage.service';
 import { TaskListKey } from '../../../models/task-list-model';
+import { SelectedOverlordService } from '../selected/selected-overlord.service';
+import { ExtendedTask, ROOT_TASK_ID } from '../../../models/taskModelManager';
+import { TaskPathService } from './task-path.service';
+import { ErrorService } from '../../core/error.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +17,10 @@ export class TaskNavigatorService {
     private router: Router,
     private taskService: TaskService,
     private taskListRouter: TaskListRouterService,
-    private taskUsageService: TaskUsageService
+    private taskUsageService: TaskUsageService,
+    private selectedOverlordService: SelectedOverlordService,
+    private taskPathService: TaskPathService,
+    private errorService: ErrorService
   ) {}
 
   /**
@@ -23,9 +30,16 @@ export class TaskNavigatorService {
   async navigateToTask(taskId: string): Promise<void> {
     const currentUrl = this.router.url;
     const context = this.taskListRouter.extractContextFromUrl(currentUrl);
+    const task: ExtendedTask | null = await this.taskService.getTaskById(
+      taskId
+    );
 
-    // Track task usage
-    this.taskUsageService.incrementTaskView(taskId);
+    if (!task) {
+      this.errorService.error(`Task with ID ${taskId} not found.`);
+      return;
+    }
+
+    this.processData(task);
 
     if (context.listContext) {
       // Stay within the current list context
@@ -38,10 +52,23 @@ export class TaskNavigatorService {
     }
   }
 
+  processData(task: ExtendedTask) {
+    this.selectedOverlordService.setSelectedOverlord(task);
+
+    // where we are at in tree
+    const currentPath = this.taskPathService.getCurrentPath();
+    const newPath = [...currentPath, task.name];
+    this.taskPathService.setPath(newPath);
+
+    // Track task usage
+    this.taskUsageService.incrementTaskView(task.taskId);
+  }
+
   /**
    * Navigate to task's parent (go up one level)
    */
   async navigateToParent(taskId: string): Promise<void> {
+    // when we dont know parent, just go to root or just back
     try {
       const superOverlord = await this.taskService.getSuperOverlord(taskId);
 
@@ -64,16 +91,12 @@ export class TaskNavigatorService {
     const currentUrl = this.router.url;
     const context = this.taskListRouter.extractContextFromUrl(currentUrl);
 
+    // attempt to go back to list like daily task, otherwise just go to tree root
     if (context.listContext) {
       // Go back to the list
       this.router.navigate([`/sentinel/${context.listContext}`]);
     } else {
-      // Fallback to browser back or home
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        this.router.navigate(['/sentinel']);
-      }
+      this.navigateToTheBeginning();
     }
   }
 
@@ -83,6 +106,10 @@ export class TaskNavigatorService {
   navigateToList(taskListKey: TaskListKey): void {
     const url = this.taskListRouter.getRouteUrl(taskListKey);
     this.router.navigate([url]);
+  }
+
+  private async navigateToTheBeginning(): Promise<void> {
+    this.router.navigate([`/sentinel/tasks/${ROOT_TASK_ID}`]);
   }
 
   /**

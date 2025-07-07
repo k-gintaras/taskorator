@@ -6,7 +6,7 @@ import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { TaskNodeInfo } from '../../../models/taskTree';
-import { SelectedMultipleService } from '../../../services/tasks/selected-multiple.service';
+import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
 import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';

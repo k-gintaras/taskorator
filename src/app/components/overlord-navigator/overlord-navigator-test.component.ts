@@ -1,15 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { ExtendedTask, getRootTaskObject } from '../../models/taskModelManager';
 import { SearchOverlordComponent } from '../search-overlord/search-overlord.component';
-import { TaskListRulesService } from '../../services/tasks/task-list-rules.service';
+import { TaskListRulesService } from '../../services/tasks/task-list/task-list-rules.service';
 import { TaskViewService } from '../../services/tasks/task-view.service';
 import { TaskListKey, TaskListRules } from '../../models/task-list-model';
-import { SelectedListService } from '../../services/tasks/selected-list.service';
+import { SelectedListService } from '../../services/tasks/selected/selected-list.service';
 
 @Component({
   standalone: true,

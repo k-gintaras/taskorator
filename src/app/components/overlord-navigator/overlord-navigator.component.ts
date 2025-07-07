@@ -1,15 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
-import { TaskNavigatorUltraService } from '../../services/tasks/task-navigation/task-navigator-ultra.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { ExtendedTask } from '../../models/taskModelManager';
 import { SearchOverlordComponent } from '../search-overlord/search-overlord.component';
-import { TaskListRulesService } from '../../services/tasks/task-list-rules.service';
-import { TaskViewService } from '../../services/tasks/task-view.service';
+import { TaskListRulesService } from '../../services/tasks/task-list/task-list-rules.service';
 import { TaskListKey, TaskListRules } from '../../models/task-list-model';
-import { SelectedListService } from '../../services/tasks/selected-list.service';
+import { SelectedListService } from '../../services/tasks/selected/selected-list.service';
 
 @Component({
   standalone: true,
@@ -23,7 +21,6 @@ export class OverlordNavigatorComponent implements OnInit {
   selectedList: TaskListRules | null = null;
 
   constructor(
-    private taskNavigator: TaskNavigatorUltraService,
     private selectedOverlordService: SelectedOverlordService,
     private taskService: TaskService,
     private selectedListService: SelectedListService,
@@ -33,11 +30,10 @@ export class OverlordNavigatorComponent implements OnInit {
   ngOnInit(): void {
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((id: string | null) => {
-        if (id)
-          this.taskService.getTaskById(id).then((o: ExtendedTask | null) => {
-            this.selectedOverlord = o;
-          });
+      .subscribe((overlord: ExtendedTask | null) => {
+        if (overlord) {
+          this.selectedOverlord = overlord;
+        }
       });
 
     this.selectedListService.selectedListKey$.subscribe(
@@ -49,22 +45,23 @@ export class OverlordNavigatorComponent implements OnInit {
     );
   }
 
+  // TODO: get rid of this component OR... expand to use breadcrumbs??? or simplify ???
   goToSuperParent(): void {
     if (!this.selectedOverlord) return;
-    this.taskNavigator.previous(this.selectedOverlord.taskId);
+    // this.taskNavigator.previous(this.selectedOverlord.taskId);
   }
 
   goBack(): void {
     if (!this.selectedOverlord) return;
-    this.taskNavigator.backToPrevious();
+    // this.taskNavigator.backToPrevious();
   }
 
   goToOverlord(): void {
     if (!this.selectedOverlord) return;
-    this.taskNavigator.next(this.selectedOverlord.taskId);
+    // this.taskNavigator.next(this.selectedOverlord.taskId);
   }
 
   goToRoot(): void {
-    this.taskNavigator.backToStart();
+    // this.taskNavigator.backToStart();
   }
 }

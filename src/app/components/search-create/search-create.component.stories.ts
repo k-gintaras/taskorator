@@ -7,7 +7,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
-import { SelectedOverlordService } from '../../services/tasks/selected-overlord.service';
+import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { getDefaultTask, TaskoratorTask } from '../../models/taskModelManager';
