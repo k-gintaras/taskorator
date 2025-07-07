@@ -100,6 +100,12 @@ export class TaskNavigatorService {
     }
   }
 
+  navigateToCurrentParent(): void {
+    this.navigateToParent(
+      this.selectedOverlordService.getSelectedOverlord()?.taskId || ROOT_TASK_ID
+    );
+  }
+
   /**
    * Navigate to a specific task list
    */
