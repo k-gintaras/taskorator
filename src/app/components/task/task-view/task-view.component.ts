@@ -10,7 +10,6 @@ import {
   TaskListSubtype,
 } from '../../../models/task-list-model';
 import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
-import { TaskNavigatorHistoryService } from '../../../services/tasks/task-navigation/task-navigator-history.service';
 import { TaskListCoordinatorService } from '../../../services/tasks/task-list/task-list-coordinator.service';
 import { TaskNavigatorDataService } from '../../../services/tasks/task-navigation/task-navigator-data.service';
 
@@ -35,7 +34,6 @@ export class TaskViewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private taskService: TaskService,
-    private navigatorHistoryService: TaskNavigatorHistoryService,
     private taskListCoordinatorService: TaskListCoordinatorService,
     private navigatorDataService: TaskNavigatorDataService,
     private selectedOverlordService: SelectedOverlordService
@@ -56,7 +54,6 @@ export class TaskViewComponent implements OnInit {
 
       if (taskId) {
         await this.loadTask(taskId);
-        this.updateNavigationHistory(taskId);
       }
     });
   }
@@ -74,20 +71,6 @@ export class TaskViewComponent implements OnInit {
     );
     this.selectedOverlordService.setSelectedOverlord(this.task);
     this.navigatorDataService.setTasks(tasks, taskListKey);
-  }
-
-  private updateNavigationHistory(taskId: string) {
-    if (this.listContext && this.taskListType) {
-      // Create appropriate TaskListKey based on context
-      const taskListKey = this.createTaskListKeyFromContext();
-
-      // Update navigation history with context
-      this.navigatorHistoryService.pushNavigation(
-        taskListKey,
-        taskId,
-        this.task?.name || taskId
-      );
-    }
   }
 
   private createTaskListKeyFromContext(): TaskListKey {

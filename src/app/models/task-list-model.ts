@@ -229,7 +229,8 @@ export const defaultTaskLists: TaskListRules[] = [
     type: TaskListType.LATEST_CREATED,
     description: 'Most recently created or updated tasks',
     rules: {
-      filter: (task) => task.taskId !== ROOT_TASK_ID, // don't show root when it is updated, as it might seem as normal task...
+      filter: (task) =>
+        task.taskId !== ROOT_TASK_ID && task.stage != 'completed', // don't show root when it is updated, as it might seem as normal task...
       sorter: (a, b) => (b.timeCreated || 0) - (a.timeCreated || 0), // Most recent first
       permissions: {
         canAdd: false, // we don't know which overlord to add it to

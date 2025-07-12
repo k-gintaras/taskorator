@@ -4,9 +4,10 @@ import { RouterLink } from '@angular/router';
 import { TaskNavigatorDataService } from '../../../services/tasks/task-navigation/task-navigator-data.service';
 import { TaskNavigatorService } from '../../../services/tasks/task-navigation/task-navigator.service';
 import { TaskPathService } from '../../../services/tasks/task-navigation/task-path.service';
-import { TaskListRouterService } from '../../../services/tasks/task-navigation/task-list-router.service';
 import { Observable, map } from 'rxjs';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
+import { combineLatest } from 'rxjs';
+import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
 
 @Component({
   selector: 'app-task-breadcrumb',
@@ -15,29 +16,43 @@ import { TaskListKey, TaskListType } from '../../../models/task-list-model';
   templateUrl: './task-breadcrumb.component.html',
   styleUrl: './task-breadcrumb.component.scss',
 })
-export class TaskBreadcrumbComponent implements OnInit {
-  currentPath$: Observable<string[]>;
-  canGoBack$: Observable<boolean>;
+export class TaskBreadcrumbComponent {
   currentListKey$: Observable<TaskListKey | null>;
+  currentPath$: Observable<{ id: string; name: string }[]>;
 
   constructor(
     private navigatorDataService: TaskNavigatorDataService,
     private navigatorService: TaskNavigatorService,
     private taskPathService: TaskPathService,
-    private taskListRouter: TaskListRouterService
+    private selectedOverlordService: SelectedOverlordService
   ) {
-    this.currentPath$ = this.taskPathService.currentPath$;
-    this.canGoBack$ = this.currentPath$.pipe(map((path) => path.length > 1));
     this.currentListKey$ = this.navigatorDataService.currentListKey$;
-  }
 
-  ngOnInit(): void {
-    // No manual subscriptions needed - template handles reactivity
+    this.currentPath$ = combineLatest([
+      this.taskPathService.currentPath$,
+      this.selectedOverlordService.getSelectedOverlordObservable(),
+    ]).pipe(
+      map(([path, selectedOverlord]) => {
+        if (path.length > 0) {
+          return path;
+        }
+        if (selectedOverlord) {
+          return [{ id: selectedOverlord.taskId, name: selectedOverlord.name }];
+        }
+        // fallback: empty array
+        return [];
+      })
+    );
   }
 
   async goBack(): Promise<void> {
     // Use navigator service to go back one level
-    await this.navigatorService.navigateToCurrentParent();
+    await this.navigatorService.navigateUp();
+  }
+
+  jumpTo(id: string) {
+    // this.taskPathService.removePath(id);
+    this.navigatorService.navigateOutOfTask(id);
   }
 
   jumpToListRoot(): void {
@@ -72,7 +87,7 @@ export class TaskBreadcrumbComponent implements OnInit {
       case TaskListType.SESSION:
         return ' Session';
       case TaskListType.OVERLORD:
-        return ' Tasks';
+        return ' Root Tasks';
       default:
         return ' Tasks';
     }

@@ -15,11 +15,9 @@ import { TaskListSimpleService } from '../task-list/task-list-simple.service';
 export class TaskNavigatorDataService {
   private currentTasksSubject = new BehaviorSubject<ExtendedTask[]>([]);
   private currentListKeySubject = new BehaviorSubject<TaskListKey | null>(null);
-  private currentPathSubject = new BehaviorSubject<string[]>([]); // ✨ Track path
 
   currentTasks$ = this.currentTasksSubject.asObservable();
   currentListKey$ = this.currentListKeySubject.asObservable();
-  currentPath$ = this.currentPathSubject.asObservable(); // ✨ Expose path
 
   constructor(
     private taskActionService: TaskActionTrackerService,
@@ -70,13 +68,5 @@ export class TaskNavigatorDataService {
 
   getCurrentListKey(): TaskListKey | null {
     return this.currentListKeySubject.value;
-  }
-
-  getCurrentPath(): string[] {
-    return this.currentPathSubject.value;
-  }
-
-  getTreeDepth(): number {
-    return this.currentPathSubject.value.length;
   }
 }

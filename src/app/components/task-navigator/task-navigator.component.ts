@@ -88,7 +88,7 @@ export class TaskNavigatorComponent implements OnInit {
 
   async onNext(task: ExtendedTask): Promise<void> {
     try {
-      await this.navigatorService.navigateToTask(task.taskId);
+      await this.navigatorService.navigateInToTask(task.taskId);
       this.taskStatusService.setStatus(task.taskId, 'viewed');
     } catch (error: any) {
       this.errorService.warn('Failed to navigate to next tasks.');

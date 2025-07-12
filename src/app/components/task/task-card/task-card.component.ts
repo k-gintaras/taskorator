@@ -17,6 +17,8 @@ export class TaskCardComponent {
     animationState: 'normal',
   };
 
+  @Input() ifShowExtra: boolean = false;
+
   thereIsTags() {
     const task = this.task;
     return task?.tags && task.tags.length > 0 && Array.isArray(task.tags);

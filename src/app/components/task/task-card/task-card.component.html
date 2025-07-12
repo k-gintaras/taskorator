@@ -3,8 +3,11 @@
   class="card bg-white shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 border-primary min-h-[280px] flex flex-col"
 >
   <div class="card-body p-4 flex flex-col flex-1">
-    <!-- Header - Fixed height -->
-    <div class="flex justify-between items-start mb-3 min-h-[32px]">
+    <!-- Header -->
+    <div
+      class="flex justify-between items-start mb-3 min-h-[32px]"
+      *ngIf="ifShowExtra; else minimalHeader"
+    >
       <h3
         class="text-lg font-bold break-words leading-tight text-gray-900 flex-1 pr-2"
       >
@@ -20,8 +23,11 @@
         P: {{ task.priority }}
       </span>
     </div>
+    <ng-template #minimalHeader>
+      <app-task-breadcrumb></app-task-breadcrumb>
+    </ng-template>
 
-    <!-- Main content - Flexible but constrained -->
+    <!-- Main content -->
     <div class="flex-1 space-y-2 text-sm text-gray-700 min-h-[60px]">
       <div *ngIf="task.todo" class="max-h-[60px] overflow-y-auto">
         <p class="leading-relaxed">{{ task.todo }}</p>
@@ -33,7 +39,7 @@
       </div>
 
       <a
-        *ngIf="task.backupLink"
+        *ngIf="ifShowExtra && task.backupLink"
         [href]="task.backupLink"
         class="link link-primary block truncate"
       >
@@ -41,44 +47,47 @@
       </a>
     </div>
 
-    <!-- Tags - Fixed height section -->
-    <div class="min-h-[24px] mb-2">
-      <div *ngIf="thereIsTags()" class="flex flex-wrap gap-1">
-        <span *ngFor="let tag of task.tags" class="badge badge-info badge-xs">
-          {{ tag }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Metadata badges - Fixed height -->
-    <div class="min-h-[48px] mb-3">
-      <div class="flex flex-wrap gap-1 text-gray-600">
-        <span *ngIf="task.status" class="badge badge-outline badge-xs">
-          Status: {{ task.status }}
-        </span>
-        <span *ngIf="task.stage" class="badge badge-outline badge-xs">
-          Stage: {{ task.stage }}
-        </span>
-        <span *ngIf="task.duration" class="badge badge-outline badge-xs">
-          Dur: {{ task.duration }}
-        </span>
-        <span *ngIf="task.type" class="badge badge-outline badge-xs">
-          Type: {{ task.type }}
-        </span>
-        <span *ngIf="task.subtype" class="badge badge-outline badge-xs">
-          Subtype: {{ task.subtype }}
-        </span>
-        <span *ngIf="task.size" class="badge badge-outline badge-xs">
-          Size: {{ task.size }}
-        </span>
-        <span *ngIf="task.owner" class="badge badge-outline badge-xs">
-          Owner: {{ task.owner }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Footer - Fixed at bottom -->
+    <!-- Tags -->
     <div
+      *ngIf="ifShowExtra && thereIsTags()"
+      class="min-h-[24px] mb-2 flex flex-wrap gap-1"
+    >
+      <span *ngFor="let tag of task.tags" class="badge badge-info badge-xs">
+        {{ tag }}
+      </span>
+    </div>
+
+    <!-- Metadata badges -->
+    <div
+      *ngIf="ifShowExtra"
+      class="min-h-[48px] mb-3 flex flex-wrap gap-1 text-gray-600"
+    >
+      <span *ngIf="task.status" class="badge badge-outline badge-xs">
+        Status: {{ task.status }}
+      </span>
+      <span *ngIf="task.stage" class="badge badge-outline badge-xs">
+        Stage: {{ task.stage }}
+      </span>
+      <span *ngIf="task.duration" class="badge badge-outline badge-xs">
+        Dur: {{ task.duration }}
+      </span>
+      <span *ngIf="task.type" class="badge badge-outline badge-xs">
+        Type: {{ task.type }}
+      </span>
+      <span *ngIf="task.subtype" class="badge badge-outline badge-xs">
+        Subtype: {{ task.subtype }}
+      </span>
+      <span *ngIf="task.size" class="badge badge-outline badge-xs">
+        Size: {{ task.size }}
+      </span>
+      <span *ngIf="task.owner" class="badge badge-outline badge-xs">
+        Owner: {{ task.owner }}
+      </span>
+    </div>
+
+    <!-- Footer -->
+    <div
+      *ngIf="ifShowExtra"
       class="flex flex-wrap gap-3 text-xs text-gray-400 justify-between pt-2 border-t border-gray-100 mt-auto"
     >
       <span>Created: {{ task.timeCreated | date : "short" }}</span>

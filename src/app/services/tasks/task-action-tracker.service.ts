@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export enum TaskActions {
+  // other actions
+  VIEWED = 'viewed',
+  // actual actions
   SELECTED = 'selected',
   MOVED = 'moved',
   CREATED = 'created',
