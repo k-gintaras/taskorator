@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ExtendedTask } from '../../../models/taskModelManager';
+import { UiTask } from '../../../models/taskModelManager';
 import { TaskService } from '../../sync-api-cache/task.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedOverlordService {
-  private selectedOverlord = new BehaviorSubject<ExtendedTask | null>(null);
+  private selectedOverlord = new BehaviorSubject<UiTask | null>(null);
 
   constructor(private taskService: TaskService) {}
 
-  getSelectedOverlordObservable(): Observable<ExtendedTask | null> {
+  getSelectedOverlordObservable(): Observable<UiTask | null> {
     return this.selectedOverlord.asObservable();
   }
 
-  getSelectedOverlord(): ExtendedTask | null {
+  getSelectedOverlord(): UiTask | null {
     return this.selectedOverlord.value;
   }
 
@@ -24,7 +24,7 @@ export class SelectedOverlordService {
   }
 
   // Set by full task object
-  setSelectedOverlord(task: ExtendedTask | null) {
+  setSelectedOverlord(task: UiTask | null) {
     this.selectedOverlord.next(task);
   }
 

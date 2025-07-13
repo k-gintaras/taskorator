@@ -1,4 +1,4 @@
-import { ExtendedTask, ROOT_TASK_ID } from './taskModelManager';
+import { UiTask, ROOT_TASK_ID } from './taskModelManager';
 
 export interface TaskListRules {
   id: string; // Unique identifier for the list
@@ -53,8 +53,8 @@ export interface TaskListKey {
 }
 
 export interface ListRules {
-  filter: (task: ExtendedTask) => boolean; // A filter function for tasks
-  sorter: (a: ExtendedTask, b: ExtendedTask) => number; // A sort function
+  filter: (task: UiTask) => boolean; // A filter function for tasks
+  sorter: (a: UiTask, b: UiTask) => number; // A sort function
   permissions: ListPermissions; // Permissions for actions
 }
 
@@ -299,10 +299,10 @@ export const defaultTaskLists: TaskListRules[] = [
 ];
 
 function filterTasks(
-  tasks: ExtendedTask[],
+  tasks: UiTask[],
   filterCompleted: boolean,
   repeatInterval: string
-): ExtendedTask[] {
+): UiTask[] {
   if (!filterCompleted) return tasks;
 
   const { startTime, endTime } = calculatePeriodTimes(repeatInterval);

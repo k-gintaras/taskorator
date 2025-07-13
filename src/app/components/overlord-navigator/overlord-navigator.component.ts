@@ -3,7 +3,7 @@ import { SelectedOverlordService } from '../../services/tasks/selected/selected-
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
-import { ExtendedTask } from '../../models/taskModelManager';
+import { UiTask } from '../../models/taskModelManager';
 import { SearchOverlordComponent } from '../search-overlord/search-overlord.component';
 import { TaskListRulesService } from '../../services/tasks/task-list/task-list-rules.service';
 import { TaskListKey, TaskListRules } from '../../models/task-list-model';
@@ -17,7 +17,7 @@ import { SelectedListService } from '../../services/tasks/selected/selected-list
   styleUrls: ['./overlord-navigator.component.scss'],
 })
 export class OverlordNavigatorComponent implements OnInit {
-  selectedOverlord: ExtendedTask | null = null;
+  selectedOverlord: UiTask | null = null;
   selectedList: TaskListRules | null = null;
 
   constructor(
@@ -30,7 +30,7 @@ export class OverlordNavigatorComponent implements OnInit {
   ngOnInit(): void {
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((overlord: ExtendedTask | null) => {
+      .subscribe((overlord: UiTask | null) => {
         if (overlord) {
           this.selectedOverlord = overlord;
         }

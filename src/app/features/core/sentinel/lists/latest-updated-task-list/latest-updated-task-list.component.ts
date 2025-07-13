@@ -38,9 +38,7 @@ export class LatestUpdatedTaskListComponent implements OnInit {
         type: TaskListType.LATEST_UPDATED,
         data: TaskListSubtype.API,
       };
-      const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
-        taskListKey
-      );
+      const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
       const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
       this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
       this.navigatorDataService.setTasks(tasks, taskListKey);

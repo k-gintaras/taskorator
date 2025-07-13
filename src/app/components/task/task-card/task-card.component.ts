@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ExtendedTask, getDefaultTask } from '../../../models/taskModelManager';
+import { UiTask, getDefaultTask } from '../../../models/taskModelManager';
 import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { TaskBreadcrumbComponent } from '../task-breadcrumb/task-breadcrumb.component';
 
@@ -11,10 +11,20 @@ import { TaskBreadcrumbComponent } from '../task-breadcrumb/task-breadcrumb.comp
   styleUrl: './task-card.component.scss',
 })
 export class TaskCardComponent {
-  @Input() task: ExtendedTask | null = {
+  @Input() task: UiTask | null = {
     ...getDefaultTask(),
-    isVisible: true,
-    animationState: 'normal',
+    isSelected: false,
+    isRecentlyViewed: false,
+    completionPercent: 0,
+    color: '',
+    views: 0,
+    isRecentlyUpdated: false,
+    isRecentlyCreated: false,
+    children: 0,
+    completedChildren: 0,
+    secondaryColor: '',
+    magnitude: 0,
+    isConnectedToTree: true,
   };
 
   @Input() ifShowExtra: boolean = false;

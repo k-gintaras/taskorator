@@ -57,9 +57,19 @@ export const TASK_ACTIONS = [
 ];
 
 // so the UI can react to task updates a bit better
-export interface ExtendedTask extends TaskoratorTask {
-  isVisible: boolean; // For filtering visible tasks
-  animationState: 'highlighted' | 'normal' | 'removed'; // For UI animations
+export interface UiTask extends TaskoratorTask {
+  isSelected: boolean; // Affects how I render this task
+  isRecentlyViewed: boolean; // Affects this task's appearance
+  completionPercent: number; // Visual state of this task
+  color: string; // probably based on age
+  views: number; // can be used to have heatmap of what is popular in massive amount of tasks
+  isRecentlyUpdated: boolean; // Show "updated" badge
+  isRecentlyCreated: boolean; // Show "new" badge
+  children: number; // Show expand icon
+  completedChildren: number; // Disable complete action for example
+  secondaryColor: string; // maybe priority color
+  magnitude: number; // maybe priority here, ui size or something precalculated
+  isConnectedToTree: boolean; // If this task is part of a tree structure
 }
 
 export const maxPriority = 10;

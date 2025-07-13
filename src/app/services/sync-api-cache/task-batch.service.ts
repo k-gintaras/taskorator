@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskTransmutationService } from '../tasks/task-transmutation.service';
@@ -42,7 +42,7 @@ export class TaskBatchService {
   async createTaskBatch(
     tasks: TaskoratorTask[],
     overlordId: string
-  ): Promise<ExtendedTask[] | null> {
+  ): Promise<UiTask[] | null> {
     try {
       // if (!this.validatorService.isTaskValid(task)) {
       //   throw new Error('Invalid task, probably because it is empty');
@@ -57,8 +57,7 @@ export class TaskBatchService {
       }
 
       // Convert and cache created tasks
-      const extendedTasks =
-        this.transmutatorService.toExtendedTasks(createdTasks);
+      const extendedTasks = this.transmutatorService.toUiTasks(createdTasks);
 
       const groupName = 'overlord_' + overlordId;
       this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition
@@ -98,7 +97,7 @@ export class TaskBatchService {
       await this.ensureApiService().updateTasks(tasks);
 
       // Refresh cache with updated tasks
-      const extendedTasks = this.transmutatorService.toExtendedTasks(tasks);
+      const extendedTasks = this.transmutatorService.toUiTasks(tasks);
 
       // Notify TaskIdCache based on action
       switch (action) {

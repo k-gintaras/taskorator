@@ -8,6 +8,7 @@ import { SelectedOverlordService } from '../selected/selected-overlord.service';
 import { ROOT_TASK_ID } from '../../../models/taskModelManager';
 import { TaskPathService } from './task-path.service';
 import { ErrorService } from '../../core/error.service';
+import { TaskStatusService } from '../task-status.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class TaskNavigatorService {
     private taskUsageService: TaskUsageService,
     private selectedOverlordService: SelectedOverlordService,
     private taskPathService: TaskPathService,
+    private taskStatusService: TaskStatusService,
     private errorService: ErrorService
   ) {}
 
@@ -36,7 +38,6 @@ export class TaskNavigatorService {
     // Push to path (going deeper)
     this.taskPathService.push({ id: task.taskId, name: task.name });
 
-    this.taskUsageService.incrementTaskView(task.taskId);
     await this.navigateToTaskRoute(taskId);
   }
 
@@ -55,7 +56,6 @@ export class TaskNavigatorService {
     // Then add this task as the current level
     this.taskPathService.push({ id: task.taskId, name: task.name });
 
-    this.taskUsageService.incrementTaskView(task.taskId);
     await this.navigateToTaskRoute(taskId);
   }
 
@@ -93,6 +93,9 @@ export class TaskNavigatorService {
   }
 
   private async navigateToTaskRoute(taskId: string) {
+    this.taskStatusService.setStatus(taskId, 'viewed'); // Set task as viewed
+    this.taskUsageService.incrementTaskView(taskId);
+
     const context = this.taskListRouter.extractContextFromUrl(this.router.url);
     const route = context.listContext
       ? `/sentinel/${context.listContext}/tasks/${taskId}`

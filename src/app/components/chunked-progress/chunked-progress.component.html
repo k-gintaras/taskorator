@@ -1,0 +1,22 @@
+<div
+  *ngIf="treeNode"
+  class="flex w-full overflow-hidden"
+  [title]="
+    treeNode.completedChildrenCount +
+    '/' +
+    treeNode.childrenCount +
+    ' completed'
+  "
+>
+  <ng-container
+    *ngFor="let i of getChunkArray(treeNode.childrenCount); let idx = index"
+  >
+    <div
+      class="flex-1 h-[4px] mx-[0.5px] rounded-full transition-colors"
+      [ngClass]="{
+        'bg-violet-300': idx < treeNode.completedChildrenCount,
+        'bg-gray-300': idx >= treeNode.completedChildrenCount
+      }"
+    ></div>
+  </ng-container>
+</div>

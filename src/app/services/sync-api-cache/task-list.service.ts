@@ -3,7 +3,7 @@ import { TaskIdCacheService } from '../cache/task-id-cache.service';
 import { TaskCacheService } from '../cache/task-cache.service';
 import { SettingsService } from '../sync-api-cache/settings.service';
 import { TaskSettings } from '../../models/settings';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../models/taskModelManager';
 import {
   getIdFromKey,
   TaskListKey,
@@ -51,7 +51,7 @@ export class TaskListService {
   private async getTaskGroupWithCache(
     taskListKey: TaskListKey,
     fetchFn: () => Promise<TaskoratorTask[] | null>
-  ): Promise<ExtendedTask[] | null> {
+  ): Promise<UiTask[] | null> {
     const groupName = getIdFromKey(taskListKey);
     const cacheState = this.taskIdCache.getListCacheState(groupName);
 
@@ -85,7 +85,7 @@ export class TaskListService {
           taskListKey.data
       );
       const fetchAll = (await fetchFn()) || [];
-      const converted = this.transmutatorService.toExtendedTasks(fetchAll);
+      const converted = this.transmutatorService.toUiTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
       this.eventBusService.getTasks(converted, taskListKey);
       return converted;
@@ -99,7 +99,7 @@ export class TaskListService {
           taskListKey.data
       );
       const fetchAll = (await fetchFn()) || [];
-      const converted = this.transmutatorService.toExtendedTasks(fetchAll);
+      const converted = this.transmutatorService.toUiTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
       this.eventBusService.getTasks(converted, taskListKey);
 
@@ -123,8 +123,7 @@ export class TaskListService {
 
       // Combine cached and fetched tasks
       if (!missingTasks) return null;
-      const extendedTasks =
-        this.transmutatorService.toExtendedTasks(missingTasks);
+      const extendedTasks = this.transmutatorService.toUiTasks(missingTasks);
       this.taskIdCache.addTasksWithGroup(extendedTasks, groupName);
 
       const tasksAndMissing = [...cacheState.tasksWithData, ...extendedTasks];
@@ -142,26 +141,26 @@ export class TaskListService {
   private getMissingTaskIds(taskIds: string[]): string[] {
     return taskIds.filter((id) => !this.taskCache.getTask(id));
   }
-  private getCachedTasks(taskIds: string[]): ExtendedTask[] {
+  private getCachedTasks(taskIds: string[]): UiTask[] {
     return this.taskIdCache.getTasksByIds(taskIds);
   }
   private async fetchMissingTasks(
     missingIds: string[],
     fetchFn: () => Promise<TaskoratorTask[] | null>
-  ): Promise<ExtendedTask[] | null> {
+  ): Promise<UiTask[] | null> {
     if (missingIds.length === 0) return null;
 
     const fetchedTasks = await fetchFn();
     return fetchedTasks
-      ? this.transmutatorService.toExtendedTasks(fetchedTasks)
+      ? this.transmutatorService.toUiTasks(fetchedTasks)
       : null;
   }
 
   private updateCacheAndReturnTasks(
     taskListKey: TaskListKey,
-    fetchedTasks: ExtendedTask[],
+    fetchedTasks: UiTask[],
     cachedTaskIds: string[]
-  ): ExtendedTask[] {
+  ): UiTask[] {
     // Add fetched tasks to the specified group
     const groupName = getIdFromKey(taskListKey);
     this.taskIdCache.addTasksWithGroup(fetchedTasks, groupName);
@@ -170,7 +169,7 @@ export class TaskListService {
     return [...this.getCachedTasks(cachedTaskIds), ...fetchedTasks];
   }
 
-  async getLatestUpdatedTasks(): Promise<ExtendedTask[] | null> {
+  async getLatestUpdatedTasks(): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.LATEST_UPDATED,
       data: TaskListSubtype.API,
@@ -180,7 +179,7 @@ export class TaskListService {
     );
   }
 
-  async getLatestTasks(): Promise<ExtendedTask[] | null> {
+  async getLatestTasks(): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.LATEST_CREATED,
       data: TaskListSubtype.API,
@@ -193,7 +192,7 @@ export class TaskListService {
   /**
    * Get tasks for a specific overlord as ExtendedTask[]
    */
-  async getOverlordTasks(overlordId: string): Promise<ExtendedTask[] | null> {
+  async getOverlordTasks(overlordId: string): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.OVERLORD,
       data: overlordId,
@@ -206,9 +205,7 @@ export class TaskListService {
   /**
    * Generic method to handle settings-based tasks, returning ExtendedTask[]
    */
-  private async getSettingsTasks(
-    key: SettingsType
-  ): Promise<ExtendedTask[] | null> {
+  private async getSettingsTasks(key: SettingsType): Promise<UiTask[] | null> {
     const settings: TaskSettings | null =
       await this.settingsService.getSettingsOnce();
     if (!settings) return null;
@@ -233,10 +230,10 @@ export class TaskListService {
       data: TaskListSubtype.SETTINGS,
     };
     const tasks = await this.getTasks(ids, taskListKey);
-    return tasks ? this.transmutatorService.toExtendedTasks(tasks) : null;
+    return tasks ? this.transmutatorService.toUiTasks(tasks) : null;
   }
 
-  async getFocusTasks(): Promise<ExtendedTask[] | null> {
+  async getFocusTasks(): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.FOCUS,
       data: TaskListSubtype.SETTINGS,
@@ -247,7 +244,7 @@ export class TaskListService {
     // return this.getSettingsTasks('focus');
   }
 
-  async getFrogTasks(): Promise<ExtendedTask[] | null> {
+  async getFrogTasks(): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.FROG,
       data: TaskListSubtype.SETTINGS,
@@ -258,7 +255,7 @@ export class TaskListService {
     // return this.getSettingsTasks('frog');
   }
 
-  async getFavoriteTasks(): Promise<ExtendedTask[] | null> {
+  async getFavoriteTasks(): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.FAVORITE,
       data: TaskListSubtype.SETTINGS,
@@ -272,9 +269,7 @@ export class TaskListService {
   /**
    * Generic method to handle repeating tasks, returning ExtendedTask[]
    */
-  private async getRepeatingTasks(
-    type: RepeatType
-  ): Promise<ExtendedTask[] | null> {
+  private async getRepeatingTasks(type: RepeatType): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.DAILY,
       data: TaskListSubtype.REPEATING,
@@ -306,19 +301,19 @@ export class TaskListService {
     });
   }
 
-  async getDailyTasks(): Promise<ExtendedTask[] | null> {
+  async getDailyTasks(): Promise<UiTask[] | null> {
     return this.getRepeatingTasks('daily');
   }
 
-  async getWeeklyTasks(): Promise<ExtendedTask[] | null> {
+  async getWeeklyTasks(): Promise<UiTask[] | null> {
     return this.getRepeatingTasks('weekly');
   }
 
-  async getMonthlyTasks(): Promise<ExtendedTask[] | null> {
+  async getMonthlyTasks(): Promise<UiTask[] | null> {
     return this.getRepeatingTasks('monthly');
   }
 
-  async getYearlyTasks(): Promise<ExtendedTask[] | null> {
+  async getYearlyTasks(): Promise<UiTask[] | null> {
     return this.getRepeatingTasks('yearly');
   }
 
@@ -329,13 +324,13 @@ export class TaskListService {
   private async getTasks(
     ids: string[],
     taskListKey: TaskListKey
-  ): Promise<ExtendedTask[] | null> {
+  ): Promise<UiTask[] | null> {
     const groupName = getIdFromKey(taskListKey);
 
     // Retrieve tasks from cache
     const cachedTasks = this.taskIdCache.getTasksByIds(ids);
     const missingIds = ids.filter(
-      (id) => !cachedTasks.find((task: ExtendedTask) => task.taskId === id)
+      (id) => !cachedTasks.find((task: UiTask) => task.taskId === id)
     );
 
     if (missingIds.length > 0) {
@@ -345,7 +340,7 @@ export class TaskListService {
       );
       if (fetchedTasks) {
         const extendedFetchedTasks =
-          this.transmutatorService.toExtendedTasks(fetchedTasks);
+          this.transmutatorService.toUiTasks(fetchedTasks);
 
         // Add fetched tasks to the cache
         this.taskIdCache.addTasksWithGroup(extendedFetchedTasks, groupName);

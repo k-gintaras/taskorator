@@ -47,12 +47,12 @@ export class GptCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.selectedOverlordService
-      .getSelectedOverlordObservable()
-      .subscribe((t: string | null) => {
-        if (!t) return;
-        this.currentOverlordId = t;
-      });
+    // this.selectedOverlordService
+    //   .getSelectedOverlordObservable()
+    //   .subscribe((t: string | null) => {
+    //     if (!t) return;
+    //     this.currentOverlordId = t;
+    //   });
 
     this.treeService.getTree().subscribe((tree) => {
       if (!tree) return;

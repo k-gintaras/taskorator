@@ -38,9 +38,7 @@ export class RootTaskListComponent implements OnInit {
         type: TaskListType.OVERLORD,
         data: ROOT_TASK_ID,
       };
-      const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
-        taskListKey
-      );
+      const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
       const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
       this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
       this.navigatorDataService.setTasks(tasks, taskListKey);

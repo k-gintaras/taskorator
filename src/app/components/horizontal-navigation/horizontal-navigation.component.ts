@@ -119,5 +119,9 @@ export class HorizontalNavigationComponent implements OnInit {
   @HostListener('window:resize', [])
   onResize() {
     this.isCompact = window.innerWidth < 1000;
+    this.isHandset = window.innerWidth < 650;
+    if (this.isCompact && this.drawer.opened) {
+      this.drawer.close();
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EventBusService } from '../core/event-bus.service';
 import { TreeNodeService } from './tree-node.service';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../models/taskModelManager';
 import { debounceTime, Subject } from 'rxjs';
 import { OTHER_CONFIG } from '../../app.config';
 import { TreeService } from '../sync-api-cache/tree.service';

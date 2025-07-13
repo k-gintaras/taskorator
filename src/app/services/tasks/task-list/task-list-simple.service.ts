@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
-import { ExtendedTask, TaskoratorTask } from '../../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskListService } from '../../sync-api-cache/task-list.service';
 import { TaskService } from '../../sync-api-cache/task.service';
 
+/**
+ * @use TaskListCoordinatorService it applies filters and colors
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +19,7 @@ export class TaskListSimpleService {
   /**
    * Get tasks for any task list type
    */
-  async getTaskList(taskListKey: TaskListKey): Promise<ExtendedTask[] | null> {
+  async getTaskList(taskListKey: TaskListKey): Promise<UiTask[] | null> {
     try {
       switch (taskListKey.type) {
         case TaskListType.DAILY:
@@ -57,7 +60,7 @@ export class TaskListSimpleService {
     }
   }
 
-  async getSuperOverlordTasks(taskId: string): Promise<ExtendedTask[] | null> {
+  async getSuperOverlordTasks(taskId: string): Promise<UiTask[] | null> {
     const superOverlord = await this.taskService.getSuperOverlord(taskId);
     return superOverlord?.overlord
       ? this.taskListService.getOverlordTasks(superOverlord.overlord)

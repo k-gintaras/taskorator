@@ -24,8 +24,8 @@ export class LatestCreatedTaskListComponent implements OnInit {
 
   constructor(
     private taskListCoordinatorService: TaskListCoordinatorService,
-    private navigatorDataService: TaskNavigatorDataService,    private selectedOverlordService: SelectedOverlordService
-
+    private navigatorDataService: TaskNavigatorDataService,
+    private selectedOverlordService: SelectedOverlordService
   ) {}
 
   async ngOnInit() {
@@ -38,9 +38,7 @@ export class LatestCreatedTaskListComponent implements OnInit {
         type: TaskListType.LATEST_CREATED,
         data: TaskListSubtype.API,
       };
-      const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
-        taskListKey
-      );
+      const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
       const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
       this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
       this.navigatorDataService.setTasks(tasks, taskListKey);

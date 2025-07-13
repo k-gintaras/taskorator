@@ -29,7 +29,7 @@ export class CacheOrchestratorService implements CacheStrategy {
   }
 
   createTask(task: TaskoratorTask): void {
-    const extendedTask = this.transmuterService.toExtendedTask(task);
+    const extendedTask = this.transmuterService.toUiTask(task);
     this.taskCache.addTask(extendedTask);
 
     // Update the latest task ID cache
@@ -39,7 +39,7 @@ export class CacheOrchestratorService implements CacheStrategy {
   }
 
   updateTask(task: TaskoratorTask): void {
-    const extendedTask = this.transmuterService.toExtendedTask(task);
+    const extendedTask = this.transmuterService.toUiTask(task);
     this.taskCache.addTask(extendedTask);
   }
 

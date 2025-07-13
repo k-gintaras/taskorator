@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import { TaskListKey } from '../../../models/task-list-model';
 import { BehaviorSubject } from 'rxjs';
-import { ExtendedTask } from '../../../models/taskModelManager';
+import { UiTask } from '../../../models/taskModelManager';
 import {
   TaskActions,
   TaskActionTrackerService,
 } from '../task-action-tracker.service';
-import { TaskListRulesService } from '../task-list/task-list-rules.service';
-import { TaskListSimpleService } from '../task-list/task-list-simple.service';
+import { TaskListCoordinatorService } from '../task-list/task-list-coordinator.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskNavigatorDataService {
-  private currentTasksSubject = new BehaviorSubject<ExtendedTask[]>([]);
+  private currentTasksSubject = new BehaviorSubject<UiTask[]>([]);
   private currentListKeySubject = new BehaviorSubject<TaskListKey | null>(null);
 
   currentTasks$ = this.currentTasksSubject.asObservable();
@@ -21,8 +20,7 @@ export class TaskNavigatorDataService {
 
   constructor(
     private taskActionService: TaskActionTrackerService,
-    private taskListSimple: TaskListSimpleService,
-    private taskListRules: TaskListRulesService
+    private taskListSimple: TaskListCoordinatorService
   ) {
     // Listen for task updates
     this.taskActionService.lastAction$.subscribe((action) => {
@@ -48,21 +46,17 @@ export class TaskNavigatorDataService {
     if (!currentListKey) return;
 
     // Reload current tasks
-    const rawTasks = await this.taskListSimple.getTaskList(currentListKey);
-    const processedTasks = this.taskListRules.applyRulesToList(
-      currentListKey,
-      rawTasks || []
-    );
+    const rawTasks = await this.taskListSimple.getTasks(currentListKey);
 
-    this.currentTasksSubject.next(processedTasks);
+    this.currentTasksSubject.next(rawTasks);
   }
 
-  setTasks(tasks: ExtendedTask[], listKey: TaskListKey) {
+  setTasks(tasks: UiTask[], listKey: TaskListKey) {
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
   }
 
-  getCurrentTasks(): ExtendedTask[] {
+  getCurrentTasks(): UiTask[] {
     return this.currentTasksSubject.value;
   }
 

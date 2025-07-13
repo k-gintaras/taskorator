@@ -123,8 +123,18 @@ export class SearchOverlordComponent implements OnInit {
         }
         this.selectedOverlordService.setSelectedOverlord({
           ...task,
-          isVisible: true,
-          animationState: 'normal',
+          isSelected: false,
+          isRecentlyViewed: false,
+          completionPercent: 0,
+          color: '',
+          views: 0,
+          isRecentlyUpdated: false,
+          isRecentlyCreated: false,
+          children: 0,
+          completedChildren: 0,
+          secondaryColor: '',
+          magnitude: 0,
+          isConnectedToTree: false,
         });
       });
   }

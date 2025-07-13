@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskListKey } from '../../models/task-list-model';
 
 /**
@@ -44,41 +44,41 @@ export class EventBusService {
     return this.subjects.get(event)?.asObservable() ?? new Observable();
   }
 
-  getTaskById(taskId: ExtendedTask): void {
+  getTaskById(taskId: UiTask): void {
     this.emit('getTaskById', taskId);
   }
 
-  getLatestTaskId(taskId: ExtendedTask): void {
+  getLatestTaskId(taskId: UiTask): void {
     this.emit('getLatestTaskId', taskId);
   }
 
-  getSuperOverlord(taskId: ExtendedTask): void {
+  getSuperOverlord(taskId: UiTask): void {
     this.emit('getSuperOverlord', taskId);
   }
 
-  getOverlordChildren(taskIds: ExtendedTask[]): void {
+  getOverlordChildren(taskIds: UiTask[]): void {
     this.emit('getOverlordChildren', taskIds);
   }
 
-  getTasks(tasks: ExtendedTask[], taskListKey: TaskListKey): void {
+  getTasks(tasks: UiTask[], taskListKey: TaskListKey): void {
     const tasksObject = { tasks, taskListKey };
     this.emit('getTasks', tasksObject);
   }
 
   // Emit just IDs or arrays of IDs instead of full objects
-  createTask(taskId: ExtendedTask): void {
+  createTask(taskId: UiTask): void {
     this.emit('createTask', taskId);
   }
 
-  updateTask(taskId: ExtendedTask): void {
+  updateTask(taskId: UiTask): void {
     this.emit('updateTask', taskId);
   }
 
-  createTasks(taskIds: ExtendedTask[]): void {
+  createTasks(taskIds: UiTask[]): void {
     this.emit('createTasks', taskIds);
   }
 
-  updateTasks(taskIds: ExtendedTask[]): void {
+  updateTasks(taskIds: UiTask[]): void {
     this.emit('updateTasks', taskIds);
   }
 }

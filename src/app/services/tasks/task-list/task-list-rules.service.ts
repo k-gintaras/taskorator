@@ -4,7 +4,7 @@ import {
   defaultTaskLists,
   TaskListKey,
 } from '../../../models/task-list-model';
-import { ExtendedTask } from '../../../models/taskModelManager';
+import { UiTask } from '../../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +33,7 @@ export class TaskListRulesService {
   /**
    * Apply rules to tasks in a specific list.
    */
-  applyRulesToList(key: TaskListKey, tasks: ExtendedTask[]): ExtendedTask[] {
+  applyRulesToList(key: TaskListKey, tasks: UiTask[]): UiTask[] {
     const list = this.getList(key);
     if (!list || !list.rules) return tasks;
 

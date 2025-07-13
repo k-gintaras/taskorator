@@ -1,48 +1,27 @@
-<div class="w-full sm:w-[600px] sm:mx-auto p-4 rounded-md box-border">
+<div
+  class="w-full lg:w-[600px] lg:min-w-[600px] max-w-[600px] mx-auto p-4 rounded-md box-border"
+>
   <div class="pb-3">
     <app-task-card [task]="selectedOverlord"></app-task-card>
   </div>
-  <div *ngIf="tasks?.length === 0" class="no-tasks">
+
+  <div
+    *ngIf="!tasks || tasks.length === 0"
+    class="text-center py-8 text-gray-500"
+  >
     <app-task-edit
       *ngIf="selectedOverlord"
       [task]="selectedOverlord"
       [isPopup]="false"
     ></app-task-edit>
-    <p>No other tasks yet.</p>
+    <p class="mt-4">No other tasks yet.</p>
   </div>
-  <div
+
+  <!-- Use TaskListItem for clean separation -->
+  <app-task-list-item
     *ngFor="let task of tasks"
-    [class.selected]="isSelected(task)"
-    [class.viewed]="getTaskStatus(task.taskId) === 'viewed'"
-    [class.updated]="getTaskStatus(task.taskId) === 'updated'"
-    [style.borderLeftColor]="getDateBasedColor(task.timeCreated)"
-    [style.borderBottom]="
-      getProgressPercent(getTreeNodeData(task)) > 0
-        ? '4px solid transparent'
-        : 'none'
-    "
-    [style.--progress-color]="'#4caf5044'"
-    [style.--progress-percent]="getProgressPercent(getTreeNodeData(task))"
-    class="flex items-center justify-between rounded-md p-3 mb-3 border border-gray-300 box-border cursor-pointer w-full"
-  >
-    <button
-      class="btn btn-sm btn-circle flex-shrink-0"
-      (click)="onNext(task); $event.stopPropagation()"
-    >
-      <mat-icon>arrow_forward</mat-icon>
-    </button>
-
-    <div class="flex-1 px-3 break-words whitespace-normal">
-      <app-task-mini [task]="task"></app-task-mini>
-      <!-- <div *ngIf="isShowMoreEnabled()" class="show-more">
-        {{ task.why }} - {{ task.todo }}
-      </div> -->
-    </div>
-
-    <app-artificer-action
-      [treeNode]="getTreeNodeData(task)"
-      [task]="task"
-      class="flex-shrink-0"
-    ></app-artificer-action>
-  </div>
+    [task]="task"
+    (navigate)="onNext($event)"
+    (taskClick)="onTaskClick($event)"
+  ></app-task-list-item>
 </div>

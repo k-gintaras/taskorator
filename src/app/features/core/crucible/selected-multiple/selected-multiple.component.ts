@@ -7,10 +7,7 @@ import { Observable } from 'rxjs';
 import { SearchOverlordComponent } from '../../../../components/search-overlord/search-overlord.component';
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
 import { TaskSettings } from '../../../../models/settings';
-import {
-  ExtendedTask,
-  TaskoratorTask,
-} from '../../../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../../../models/taskModelManager';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
 import { SelectedMultipleService } from '../../../../services/tasks/selected/selected-multiple.service';
 import { SelectedOverlordService } from '../../../../services/tasks/selected/selected-overlord.service';
@@ -34,7 +31,7 @@ import { TaskActions } from '../../../../services/tasks/task-action-tracker.serv
 })
 export class SelectedMultipleComponent implements OnInit {
   selectedTasks: TaskoratorTask[] = [];
-  selectedOverlord: ExtendedTask | null = null;
+  selectedOverlord: UiTask | null = null;
   settings: TaskSettings | undefined = undefined;
   filteredTaskOptions: Observable<TaskoratorTask[]> | undefined;
 
@@ -55,7 +52,7 @@ export class SelectedMultipleComponent implements OnInit {
     this.loadSettings();
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((overlord: ExtendedTask | null) => {
+      .subscribe((overlord: UiTask | null) => {
         if (overlord) {
           this.selectedOverlord = overlord;
         }

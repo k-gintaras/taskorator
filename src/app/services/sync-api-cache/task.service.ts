@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EventBusService } from '../core/event-bus.service';
 import { TaskValidatorService } from '../core/task-validator.service';
-import { ExtendedTask, TaskoratorTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskCacheService } from '../cache/task-cache.service';
 import { TaskTransmutationService } from '../tasks/task-transmutation.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
@@ -31,7 +31,7 @@ export class TaskService {
   /**
    * Create a single task.
    */
-  async createTask(task: TaskoratorTask): Promise<ExtendedTask> {
+  async createTask(task: TaskoratorTask): Promise<UiTask> {
     try {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
@@ -43,7 +43,7 @@ export class TaskService {
       const createdTask = await this.apiService.createTask(task);
       if (!createdTask) throw new Error('Task creation failed');
 
-      const extendedTask = this.transmutatorService.toExtendedTask(createdTask);
+      const extendedTask = this.transmutatorService.toUiTask(createdTask);
       // this.taskCache.addTask(extendedTask); // Cache the new task
       this.taskIdCache.addTasksWithGroup(
         [extendedTask],
@@ -72,7 +72,7 @@ export class TaskService {
       }
       await this.apiService.updateTask(task);
 
-      const extendedTask = this.transmutatorService.toExtendedTask(task);
+      const extendedTask = this.transmutatorService.toUiTask(task);
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
         this.taskIdCache.deleteTask(extendedTask.taskId); // Notify TaskIdCache of deletion
@@ -91,9 +91,9 @@ export class TaskService {
   /**
    * Retrieve a task by its ID, checking cache first
    */
-  async getTaskById(taskId: string): Promise<ExtendedTask | null> {
+  async getTaskById(taskId: string): Promise<UiTask | null> {
     try {
-      const cachedTask = this.taskCache.getTask(taskId) as ExtendedTask | null;
+      const cachedTask = this.taskCache.getTask(taskId) as UiTask | null;
       if (cachedTask) {
         this.eventBusService.getTaskById(cachedTask);
 
@@ -105,7 +105,7 @@ export class TaskService {
       }
       const task = await this.apiService.getTaskById(taskId);
       if (task) {
-        const extendedTask = this.transmutatorService.toExtendedTask(task);
+        const extendedTask = this.transmutatorService.toUiTask(task);
         this.taskCache.addTask(extendedTask); // Cache ExtendedTask
         this.eventBusService.getTaskById(extendedTask);
         return extendedTask;
@@ -124,19 +124,19 @@ export class TaskService {
    */
   async setLatestTask(task: TaskoratorTask): Promise<void> {
     this.latestTaskId = task.taskId;
-    const extendedTask = this.transmutatorService.toExtendedTask(task); // Convert to ExtendedTask
+    const extendedTask = this.transmutatorService.toUiTask(task); // Convert to ExtendedTask
     this.taskCache.addTask(extendedTask); // Cache the ExtendedTask
   }
 
   /**
    * Retrieve the latest task as an ExtendedTask (cached or API).
    */
-  async getLatestTask(): Promise<ExtendedTask | null> {
+  async getLatestTask(): Promise<UiTask | null> {
     if (this.latestTaskId) {
       // Check cache first
       const cachedTask = this.taskCache.getTask(
         this.latestTaskId
-      ) as ExtendedTask | null;
+      ) as UiTask | null;
       if (cachedTask) {
         return cachedTask;
       }
@@ -147,8 +147,7 @@ export class TaskService {
       }
       const latestTask = await this.apiService.getTaskById(this.latestTaskId);
       if (latestTask) {
-        const extendedTask =
-          this.transmutatorService.toExtendedTask(latestTask); // Convert to ExtendedTask
+        const extendedTask = this.transmutatorService.toUiTask(latestTask); // Convert to ExtendedTask
         this.taskCache.addTask(extendedTask); // Cache the ExtendedTask
         return extendedTask;
       }
@@ -162,9 +161,9 @@ export class TaskService {
    * @input task.taskId or task.overlord
    * @returns overlord or superoverlord
    */
-  async getSuperOverlord(taskId: string): Promise<ExtendedTask | null> {
+  async getSuperOverlord(taskId: string): Promise<UiTask | null> {
     try {
-      let task = this.taskCache.getTask(taskId) as ExtendedTask | null; // Check cache first
+      let task = this.taskCache.getTask(taskId) as UiTask | null; // Check cache first
       if (!task) {
         // Fetch from API if not cached
         if (!this.apiService) {
@@ -174,7 +173,7 @@ export class TaskService {
           taskId
         );
         if (superOverlordTask) {
-          task = this.transmutatorService.toExtendedTask(superOverlordTask); // Convert to ExtendedTask
+          task = this.transmutatorService.toUiTask(superOverlordTask); // Convert to ExtendedTask
           this.taskCache.addTask(task); // Cache the ExtendedTask
         }
       }

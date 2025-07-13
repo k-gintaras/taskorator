@@ -1,6 +1,10 @@
 <div
   *ngIf="task"
-  class="card bg-white shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 border-primary min-h-[280px] flex flex-col"
+  class="card bg-white shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 border-primary flex flex-col"
+  [ngClass]="{
+    'min-h-[280px]': ifShowExtra,
+    'min-h-[120px]': !ifShowExtra
+  }"
 >
   <div class="card-body p-4 flex flex-col flex-1">
     <!-- Header -->
@@ -24,15 +28,26 @@
       </span>
     </div>
     <ng-template #minimalHeader>
-      <app-task-breadcrumb></app-task-breadcrumb>
+      <div class="mb-2">
+        <app-task-breadcrumb></app-task-breadcrumb>
+      </div>
     </ng-template>
 
-    <!-- Main content -->
-    <div class="flex-1 space-y-2 text-sm text-gray-700 min-h-[60px]">
-      <div *ngIf="task.todo" class="max-h-[60px] overflow-y-auto">
+    <!-- Main content - conditional sizing -->
+    <div
+      class="flex-1 space-y-2 text-sm text-gray-700"
+      [ngClass]="{
+        'min-h-[60px]': ifShowExtra,
+        'min-h-[20px]': !ifShowExtra
+      }"
+    >
+      <div
+        *ngIf="ifShowExtra && task.todo"
+        class="max-h-[60px] overflow-y-auto"
+      >
         <p class="leading-relaxed">{{ task.todo }}</p>
       </div>
-      <div *ngIf="task.why" class="max-h-[40px] overflow-y-auto">
+      <div *ngIf="ifShowExtra && task.why" class="max-h-[40px] overflow-y-auto">
         <p class="italic text-gray-600 leading-relaxed">
           Reason: {{ task.why }}
         </p>

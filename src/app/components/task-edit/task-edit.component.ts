@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { getRandomTask } from '../../test-files/test-data/test-task';
 import {
-  ExtendedTask,
+  UiTask,
   getDefaultTask,
   TaskoratorTask,
 } from '../../models/taskModelManager';
@@ -23,10 +23,20 @@ import { NgIf } from '@angular/common';
 })
 export class TaskEditComponent {
   // @Input() task: Task = getRandomTask();
-  @Input() task: ExtendedTask = {
+  @Input() task: UiTask = {
     ...getDefaultTask(),
-    isVisible: true,
-    animationState: 'normal',
+    isSelected: false,
+    isRecentlyViewed: false,
+    completionPercent: 0,
+    color: '',
+    views: 0,
+    isRecentlyUpdated: false,
+    isRecentlyCreated: false,
+    children: 0,
+    completedChildren: 0,
+    secondaryColor: '',
+    magnitude: 0,
+    isConnectedToTree: false,
   };
   @Input() isPopup: boolean = true;
 

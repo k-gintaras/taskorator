@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgForOf, NgIf } from '@angular/common';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import {
-  ExtendedTask,
+  UiTask,
   getDefaultTask,
   getRootTaskObject,
   ROOT_TASK_ID,
@@ -39,10 +39,20 @@ export class SearchCreateComponent {
   @Input() isEnabledBack = false; // Or however you define this based on selection
   searchControl = new FormControl('');
   searchResults: TaskTreeNode[] = [];
-  selectedOverlord: ExtendedTask | null = {
-    isVisible: true,
-    animationState: 'normal',
+  selectedOverlord: UiTask | null = {
     ...getRootTaskObject(),
+    isSelected: false,
+    isRecentlyViewed: false,
+    completionPercent: 0,
+    color: '',
+    views: 0,
+    isRecentlyUpdated: false,
+    isRecentlyCreated: false,
+    children: 0,
+    completedChildren: 0,
+    secondaryColor: '',
+    magnitude: 0,
+    isConnectedToTree: false,
   };
 
   constructor(
@@ -72,7 +82,7 @@ export class SearchCreateComponent {
     // Watch for selected overlord changes
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((overlord: ExtendedTask | null) => {
+      .subscribe((overlord: UiTask | null) => {
         if (overlord) {
           this.selectedOverlord = overlord;
         }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TaskoratorTask, ExtendedTask } from '../../models/taskModelManager';
+import { TaskoratorTask, UiTask } from '../../models/taskModelManager';
+import { TaskNodeInfo } from '../../models/taskTree';
 
 @Injectable({
   providedIn: 'root',
@@ -11,41 +12,67 @@ export class TaskTransmutationService {
    * Convert a `Task` to an `ExtendedTask`.
    * Adds default properties for visibility and animation state.
    */
-  toExtendedTask(task: TaskoratorTask): ExtendedTask {
+  toUiTask(task: TaskoratorTask): UiTask {
     return {
       ...task,
-      isVisible: true, // Default visibility
-      animationState: 'normal', // Default animation state
+      isConnectedToTree: true, // Default value, can be updated based on tree connection
+      isSelected: false,
+      isRecentlyViewed: false,
+      completionPercent: 0,
+      color: '#ccc', // Default color, can be updated based on age
+      views: 0,
+      isRecentlyUpdated: false,
+      isRecentlyCreated: false,
+      children: 0,
+      completedChildren: 0,
+      secondaryColor: '#ccc', // Default secondary color
+      magnitude: 0, // Default size, can be updated based on task properties
     };
   }
 
   /**
    * Convert an array of `Task` to an array of `ExtendedTask`.
    */
-  toExtendedTasks(tasks: TaskoratorTask[]): ExtendedTask[] {
-    return tasks.map((task) => this.toExtendedTask(task));
+  toUiTasks(tasks: TaskoratorTask[]): UiTask[] {
+    return tasks.map((task) => this.toUiTask(task));
   }
 
   /**
    * Convert an `ExtendedTask` to a `Task`.
    * Strips out additional properties like visibility and animation state.
    */
-  toTask(extendedTask: ExtendedTask): TaskoratorTask {
-    const { isVisible, animationState, ...task } = extendedTask; // Remove extra properties
+  toTask(extendedTask: UiTask): TaskoratorTask {
+    const { ...task } = extendedTask; // Remove extra properties
+    return task;
+  }
+
+  /**
+   * Convert an `ExtendedTask` to a `TaskNodeInfo`.
+   * Strips out additional properties like visibility and animation state.
+   */
+  toTaskNodeInfo(extendedTask: UiTask): TaskNodeInfo {
+    const task: TaskNodeInfo = {
+      taskId: extendedTask.taskId,
+      stage: extendedTask.stage,
+      overlord: extendedTask.overlord,
+      childrenCount: extendedTask.children,
+      completedChildrenCount: extendedTask.completedChildren,
+      connected: extendedTask.isConnectedToTree,
+    };
     return task;
   }
 
   /**
    * Convert an array of `ExtendedTask` to an array of `Task`.
    */
-  toTasks(extendedTasks: ExtendedTask[]): TaskoratorTask[] {
+  toTasks(extendedTasks: UiTask[]): TaskoratorTask[] {
     return extendedTasks.map((extendedTask) => this.toTask(extendedTask));
   }
 
   /**
    * Extract the `taskId` from an array of `ExtendedTask`.
    */
-  getIds(tasks: ExtendedTask[]): string[] {
+  getIds(tasks: UiTask[]): string[] {
     return tasks.map((task) => task.taskId);
   }
 }

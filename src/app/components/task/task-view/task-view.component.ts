@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../../../services/sync-api-cache/task.service';
-import { ExtendedTask, ROOT_TASK_ID } from '../../../models/taskModelManager';
+import { UiTask, ROOT_TASK_ID } from '../../../models/taskModelManager';
 import { TaskNavigatorComponent } from '../../task-navigator/task-navigator.component';
 import {
   TaskListRules,
@@ -21,7 +21,7 @@ import { TaskNavigatorDataService } from '../../../services/tasks/task-navigatio
   styleUrls: ['./task-view.component.scss'],
 })
 export class TaskViewComponent implements OnInit {
-  task: ExtendedTask | null = null;
+  task: UiTask | null = null;
   errorMessage: string = '';
   taskListRules: TaskListRules | null = null;
 
@@ -66,9 +66,7 @@ export class TaskViewComponent implements OnInit {
       type: TaskListType.OVERLORD,
       data: this.task?.taskId || ROOT_TASK_ID,
     };
-    const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
-      taskListKey
-    );
+    const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
     this.selectedOverlordService.setSelectedOverlord(this.task);
     this.navigatorDataService.setTasks(tasks, taskListKey);
   }

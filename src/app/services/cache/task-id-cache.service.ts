@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { TaskCacheService } from './task-cache.service';
-import { ExtendedTask } from '../../models/taskModelManager';
+import { UiTask } from '../../models/taskModelManager';
 interface TaskListCacheResult {
-  tasksWithData: ExtendedTask[]; // Tasks with data in cache
+  tasksWithData: UiTask[]; // Tasks with data in cache
   taskIdsWithoutData: string[]; // Task IDs with no data in cache
   hasGroupAndCachedTasks: boolean; // True if all tasks are in cache
   hasGroupAndSomeCachedTasks: boolean; // True if some tasks are in cache
@@ -85,10 +85,10 @@ export class TaskIdCacheService {
     }
   }
 
-  getTasksByIds(taskIds: string[]): ExtendedTask[] {
+  getTasksByIds(taskIds: string[]): UiTask[] {
     return taskIds
       .map((id) => this.taskCacheService.getTask(id))
-      .filter((task): task is ExtendedTask => !!task);
+      .filter((task): task is UiTask => !!task);
   }
 
   getListCacheState(groupName: string): TaskListCacheResult | null {
@@ -98,7 +98,7 @@ export class TaskIdCacheService {
     const groupIds = Array.from(cache);
     const tasksWithData = groupIds
       .map((id) => this.taskCacheService.getTask(id))
-      .filter((task): task is ExtendedTask => !!task);
+      .filter((task): task is UiTask => !!task);
 
     return {
       tasksWithData,
@@ -114,7 +114,7 @@ export class TaskIdCacheService {
     };
   }
 
-  addTasksWithGroup(tasks: ExtendedTask[], groupName: string): void {
+  addTasksWithGroup(tasks: UiTask[], groupName: string): void {
     if (!this.idCache.has(groupName)) {
       console.warn(
         `Group ${groupName} does not exist. Skipping task association.`
@@ -135,14 +135,14 @@ export class TaskIdCacheService {
     return this.idCache.has(groupName);
   }
 
-  createNewGroup(tasks: ExtendedTask[], groupName: string): void {
+  createNewGroup(tasks: UiTask[], groupName: string): void {
     tasks.forEach((task) => {
       this.taskCacheService.addTaskWithTime(task);
       this.addTaskToGroup(groupName, task.taskId);
     });
   }
 
-  updateTasks(extendedTasks: ExtendedTask[]) {
+  updateTasks(extendedTasks: UiTask[]) {
     // without group name, if we are not moving.. might aswell just update to cache
     extendedTasks.forEach((t) => {
       this.taskCacheService.addTask(t);

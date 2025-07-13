@@ -1,20 +1,19 @@
 import { Injectable } from '@angular/core';
 import { TASK_CONFIG } from '../../app.config';
-import { ExtendedTask } from '../../models/taskModelManager';
+import { UiTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskCacheService {
-  private cache: Map<string, { task: ExtendedTask; timestamp: number }> =
-    new Map();
+  private cache: Map<string, { task: UiTask; timestamp: number }> = new Map();
   private specialKeys: Map<string, string> = new Map(); // Special key -> taskId mapping
 
-  getAllTasks(): ExtendedTask[] {
+  getAllTasks(): UiTask[] {
     return Array.from(this.cache.values()).map((entry) => entry.task);
   }
 
-  addTaskWithTime(task: ExtendedTask) {
+  addTaskWithTime(task: UiTask) {
     const timestamp = Date.now();
     const data = { task, timestamp };
     this.cache.set(task.taskId, data);
@@ -22,18 +21,18 @@ export class TaskCacheService {
   /**
    * Add a task to the cache.
    */
-  addTask(task: ExtendedTask): void {
+  addTask(task: UiTask): void {
     this.addTaskWithTime(task);
   }
 
-  removeTask(extendedTask: ExtendedTask) {
+  removeTask(extendedTask: UiTask) {
     this.cache.delete(extendedTask.taskId);
   }
 
   /**
    * Retrieve a task by ID.
    */
-  getTask(taskId: string): ExtendedTask | null {
+  getTask(taskId: string): UiTask | null {
     const cached = this.cache.get(taskId);
     if (cached) {
       const isExpired =
@@ -57,7 +56,7 @@ export class TaskCacheService {
   /**
    * Retrieve a task using a special key.
    */
-  getTaskBySpecialKey(key: string): ExtendedTask | null {
+  getTaskBySpecialKey(key: string): UiTask | null {
     const taskId = this.specialKeys.get(key);
     if (!taskId) {
       return null;
@@ -76,10 +75,10 @@ export class TaskCacheService {
   /**
    * Retrieve multiple tasks by IDs.
    */
-  getTasksByIds(taskIds: string[]): ExtendedTask[] {
+  getTasksByIds(taskIds: string[]): UiTask[] {
     return taskIds
       .map((id) => this.cache.get(id)?.task)
-      .filter((task): task is ExtendedTask => task !== null);
+      .filter((task): task is UiTask => task !== null);
   }
 
   /**

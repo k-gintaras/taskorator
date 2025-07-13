@@ -1,6 +1,6 @@
 import { TaskListKey } from '../../../models/task-list-model';
 import {
-  ExtendedTask,
+  UiTask,
   getRootTaskObject,
   TaskoratorTask,
 } from '../../../models/taskModelManager';
@@ -27,11 +27,21 @@ export enum TaskListSubtype {
   API = 'api',
 }
 
-export function getOverlordPlaceholder(listKey: TaskListKey): ExtendedTask {
-  const baseTask: ExtendedTask = {
+export function getOverlordPlaceholder(listKey: TaskListKey): UiTask {
+  const baseTask: UiTask = {
     ...getRootTaskObject(),
-    isVisible: true,
-    animationState: 'normal',
+    isConnectedToTree: true, // Default value, can be updated based on tree connection
+    isSelected: false,
+    isRecentlyViewed: false,
+    completionPercent: 0,
+    color: '',
+    views: 0,
+    isRecentlyUpdated: false,
+    isRecentlyCreated: false,
+    children: 0,
+    completedChildren: 0,
+    secondaryColor: '',
+    magnitude: 0,
   };
 
   switch (listKey.type) {

@@ -38,9 +38,7 @@ export class WeeklyTaskListComponent implements OnInit {
         type: TaskListType.WEEKLY,
         data: TaskListSubtype.REPEATING,
       };
-      const tasks = await this.taskListCoordinatorService.getProcessedTaskList(
-        taskListKey
-      );
+      const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
       const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
       this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
       this.navigatorDataService.setTasks(tasks, taskListKey);

@@ -4,9 +4,10 @@ import {
   defaultTaskLists,
   TaskListKey,
 } from '../../../models/task-list-model';
-import { ExtendedTask } from '../../../models/taskModelManager';
+import { UiTask } from '../../../models/taskModelManager';
 import { TaskListRulesService } from './task-list-rules.service';
 import { TaskListSimpleService } from './task-list-simple.service';
+import { TaskEnhancementService } from './task-enhancement.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,15 +15,21 @@ import { TaskListSimpleService } from './task-list-simple.service';
 export class TaskListCoordinatorService {
   constructor(
     private taskListSimple: TaskListSimpleService,
-    private taskListRules: TaskListRulesService // TaskStatusService used separately by components
+    private taskListRules: TaskListRulesService,
+    private taskEnhancer: TaskEnhancementService
   ) {}
 
-  async getProcessedTaskList(
-    taskListKey: TaskListKey
-  ): Promise<ExtendedTask[]> {
+  async getTasks(taskListKey: TaskListKey): Promise<UiTask[]> {
     const rawTasks = await this.taskListSimple.getTaskList(taskListKey);
     if (!rawTasks) return [];
 
-    return this.taskListRules.applyRulesToList(taskListKey, rawTasks);
+    const filteredSortedTasks = this.taskListRules.applyRulesToList(
+      taskListKey,
+      rawTasks
+    );
+    const enhancedTasks =
+      this.taskEnhancer.enhanceTasks(filteredSortedTasks) || [];
+
+    return enhancedTasks;
   }
 }

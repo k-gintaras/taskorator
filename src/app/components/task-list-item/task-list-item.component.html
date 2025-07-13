@@ -1,0 +1,34 @@
+<div class="relative">
+  <!-- Progress bar at top -->
+  <app-chunked-progress
+    *ngIf="task.completionPercent > 0"
+    [treeNode]="getTreeNodeInfo()"
+    class="absolute top-0 left-0 right-0 z-10"
+  >
+  </app-chunked-progress>
+
+  <div
+    [ngClass]="getContainerClasses()"
+    [style.borderLeftColor]="task.color"
+    [style.borderLeftWidth.px]="6"
+    class="flex items-center justify-between rounded-md p-3 mb-3 border border-gray-300 box-border cursor-pointer w-full task-container relative transition-all duration-200"
+    (click)="onTaskClick()"
+  >
+    <button
+      class="btn btn-sm btn-circle flex-shrink-0"
+      (click)="onNavigateClick($event)"
+    >
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+
+    <div class="flex-1 px-3 min-w-0 overflow-hidden">
+      <app-task-mini [task]="task"></app-task-mini>
+    </div>
+
+    <app-artificer-action
+      [treeNode]="getTreeNodeInfo()"
+      [task]="task"
+      class="flex-shrink-0"
+    ></app-artificer-action>
+  </div>
+</div>

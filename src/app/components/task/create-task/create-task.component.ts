@@ -8,6 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import {
   TaskoratorTask,
+  UiTask,
   getDefaultTask,
 } from '../../../models/taskModelManager';
 import { SelectedOverlordService } from '../../../services/tasks/selected/selected-overlord.service';
@@ -39,7 +40,7 @@ import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 })
 export class CreateTaskComponent {
   taskForm: FormGroup;
-  selectedOverlord$: Observable<string | null>;
+  selectedOverlord$: Observable<UiTask | null>;
   selectedOverlordName: string = '';
   showAdditionalFields = false;
 
@@ -64,7 +65,7 @@ export class CreateTaskComponent {
     this.selectedOverlord$.subscribe((overlord) => {
       if (overlord) {
         this.taskService
-          .getTaskById(overlord)
+          .getTaskById(overlord.taskId)
           .then((t) => (this.selectedOverlordName = t?.name || ''));
       }
     });
@@ -77,7 +78,7 @@ export class CreateTaskComponent {
   async createTask(): Promise<void> {
     if (this.taskForm.valid) {
       const task: TaskoratorTask = getDefaultTask();
-      const overlord: string | null =
+      const overlord: UiTask | null =
         this.selectedOverlordService.getSelectedOverlord();
 
       if (overlord) {
@@ -89,7 +90,7 @@ export class CreateTaskComponent {
           // task.duration = this.taskForm.get('duration')?.value;
         }
 
-        task.overlord = overlord;
+        task.overlord = overlord.taskId;
 
         await this.taskUpdateService.create(task);
         this.taskForm.reset();

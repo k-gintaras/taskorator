@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  TaskoratorTask,
-  ExtendedTask,
-} from '../../../../../models/taskModelManager';
+import { TaskoratorTask, UiTask } from '../../../../../models/taskModelManager';
 import { InputToTasksService } from '../services/input-to-tasks.service';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatFormField } from '@angular/material/form-field';
@@ -57,12 +54,12 @@ export class InputToTasksComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.selectedOverlord = { name: 'Default Overlord' } as ExtendedTask;
+    this.selectedOverlord = { name: 'Default Overlord' } as UiTask;
 
     if (!this.overlord) {
       this.selectedOverlordService
         .getSelectedOverlordObservable()
-        .subscribe((overlord: ExtendedTask | null) => {
+        .subscribe((overlord: UiTask | null) => {
           if (overlord) {
             this.selectedOverlord = overlord;
           }
