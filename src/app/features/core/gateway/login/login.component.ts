@@ -22,134 +22,166 @@ import { AuthUser } from '../../../../models/service-strategies/auth-strategy.in
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
-  email = '';
-  password = '';
-  isLoggedIn = false;
-  userInfo: TaskUserInfo | undefined;
-  userAuthInfo: AuthUser | undefined;
+export class LoginComponent {
+  loading = false;
 
   constructor(
     private router: Router,
-    private registration: RegistrationService,
-    private navigationService: NavigationService,
-    private sessionManagerService: SessionManagerService,
-    private cacheService: CacheOrchestratorService,
-    private errorService: ErrorService
+    private sessionManager: SessionManagerService
   ) {}
 
-  ngOnInit(): void {
-    this.getAuth()
-      .getCurrentUser()
-      .subscribe((r) => {
-        if (!r) return;
-        this.userAuthInfo = r;
-        if (this.registration.isInitialized()) {
-          this.registration.getUserInfo().then((u) => {
-            this.userInfo = u;
-          });
-        }
-      });
-  }
-
-  delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  async logout() {
-    this.getAuth().logOut();
-  }
-
-  getAuth() {
-    return this.sessionManagerService.getAuthStrategy();
+  async loginOnline() {
+    this.loading = true;
+    try {
+      await this.sessionManager.initialize('online');
+      this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
+    } catch (error) {
+      console.error('Online login failed:', error);
+      this.loading = false;
+    }
   }
 
   async loginOffline() {
+    this.loading = true;
     try {
-      this.cacheService.clearCache();
-      localStorage.removeItem(OTHER_CONFIG.OFFLINE_USER_ID);
-      const loggedInUser: LoggedInUser = await this.getAuth().login();
-
-      if (loggedInUser.isNewUser) {
-        console.log('New user detected.');
-        const userInfo = await this.registration.registerNewUser();
-        if (userInfo) {
-          userInfo.registered = true;
-          this.registration.updateUser(userInfo);
-          // offline no gpt
-          // this.handleGptApiKey(loggedInUser);
-        }
-      } else {
-        if (!this.userInfo?.registered) {
-          alert('registration failed');
-        }
-      }
-
-      const redirectUrl = await this.navigationService.getRedirectUrl();
-      if (redirectUrl) {
-        this.navigationService.clearRedirectUrl();
-        this.router.navigate([redirectUrl]);
-      } else {
-        this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
-      }
+      await this.sessionManager.initialize('offline');
+      this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
     } catch (error) {
-      this.error(error);
-      this.popup('Login failed. Please try again.');
+      console.error('Offline login failed:', error);
+      this.loading = false;
     }
   }
 
-  async loginWithGmail(): Promise<void> {
-    try {
-      this.cacheService.clearCache();
-      localStorage.removeItem('test_user_id');
-      const loggedInUser: LoggedInUser = await this.getAuth().loginWithGoogle();
+  goToGateway() {
+    this.router.navigate(['/gateway']);
+  }
+  // email = '';
+  // password = '';
+  // isLoggedIn = false;
+  // userInfo: TaskUserInfo | undefined;
+  // userAuthInfo: AuthUser | undefined;
 
-      if (loggedInUser.isNewUser) {
-        console.log('New user detected.');
-        const userInfo = await this.registration.registerNewUser();
-        if (userInfo) {
-          userInfo.registered = true;
-          this.registration.updateUser(userInfo);
-          this.handleGptApiKey(loggedInUser);
-        }
-      } else {
-        if (!this.userInfo?.registered) {
-          alert('registration failed');
-        }
-      }
+  // constructor(
+  //   private router: Router,
+  //   private registration: RegistrationService,
+  //   private navigationService: NavigationService,
+  //   private sessionManagerService: SessionManagerService,
+  //   private cacheService: CacheOrchestratorService,
+  //   private errorService: ErrorService
+  // ) {}
 
-      const redirectUrl = await this.navigationService.getRedirectUrl();
-      if (redirectUrl) {
-        this.navigationService.clearRedirectUrl();
-        this.router.navigate([redirectUrl]);
-      } else {
-        this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
-      }
-    } catch (error) {
-      this.error(error);
-      this.popup('Login failed. Please try again.');
-    }
-  }
+  // ngOnInit(): void {
+  //   this.getAuth()
+  //     .getCurrentUser()
+  //     .subscribe((r) => {
+  //       if (!r) return;
+  //       this.userAuthInfo = r;
+  //       if (this.registration.isInitialized()) {
+  //         this.registration.getUserInfo().then((u) => {
+  //           this.userInfo = u;
+  //         });
+  //       }
+  //     });
+  // }
 
-  handleGptApiKey(loggedInUser: LoggedInUser) {
-    if (loggedInUser.isNewUser) return;
-    this.registration.getUserInfo().then((u) => {
-      if (!u) return;
-      if (u.canUseGpt) this.registration.generateApiKey();
-    });
-  }
+  // delay(ms: number) {
+  //   return new Promise((resolve) => setTimeout(resolve, ms));
+  // }
 
-  login(email: string, password: string): void {
-    // Future implementation for email-password login
-  }
+  // async logout() {
+  //   this.getAuth().logOut();
+  // }
 
-  error(msg: unknown) {
-    this.errorService.error(msg);
-  }
-  popup(msg: string) {
-    this.errorService.popup(msg);
-  }
-  feedback(msg: string) {
-    this.errorService.feedback(msg);
-  }
+  // getAuth() {
+  //   return this.sessionManagerService.getAuthStrategy();
+  // }
+
+  // async loginOffline() {
+  //   try {
+  //     this.cacheService.clearCache();
+  //     localStorage.removeItem(OTHER_CONFIG.OFFLINE_USER_ID);
+  //     const loggedInUser: LoggedInUser = await this.getAuth().login();
+
+  //     if (loggedInUser.isNewUser) {
+  //       console.log('New user detected.');
+  //       const userInfo = await this.registration.registerNewUser();
+  //       if (userInfo) {
+  //         userInfo.registered = true;
+  //         this.registration.updateUser(userInfo);
+  //         // offline no gpt
+  //         // this.handleGptApiKey(loggedInUser);
+  //       }
+  //     } else {
+  //       if (!this.userInfo?.registered) {
+  //         alert('registration failed');
+  //       }
+  //     }
+
+  //     const redirectUrl = await this.navigationService.getRedirectUrl();
+  //     if (redirectUrl) {
+  //       this.navigationService.clearRedirectUrl();
+  //       this.router.navigate([redirectUrl]);
+  //     } else {
+  //       this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
+  //     }
+  //   } catch (error) {
+  //     this.error(error);
+  //     this.popup('Login failed. Please try again.');
+  //   }
+  // }
+
+  // async loginWithGmail(): Promise<void> {
+  //   try {
+  //     this.cacheService.clearCache();
+  //     localStorage.removeItem('test_user_id');
+  //     const loggedInUser: LoggedInUser = await this.getAuth().loginWithGoogle();
+
+  //     if (loggedInUser.isNewUser) {
+  //       console.log('New user detected.');
+  //       const userInfo = await this.registration.registerNewUser();
+  //       if (userInfo) {
+  //         userInfo.registered = true;
+  //         this.registration.updateUser(userInfo);
+  //         this.handleGptApiKey(loggedInUser);
+  //       }
+  //     } else {
+  //       if (!this.userInfo?.registered) {
+  //         alert('registration failed');
+  //       }
+  //     }
+
+  //     const redirectUrl = await this.navigationService.getRedirectUrl();
+  //     if (redirectUrl) {
+  //       this.navigationService.clearRedirectUrl();
+  //       this.router.navigate([redirectUrl]);
+  //     } else {
+  //       this.router.navigate(['/' + NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Default route
+  //     }
+  //   } catch (error) {
+  //     this.error(error);
+  //     this.popup('Login failed. Please try again.');
+  //   }
+  // }
+
+  // handleGptApiKey(loggedInUser: LoggedInUser) {
+  //   if (loggedInUser.isNewUser) return;
+  //   this.registration.getUserInfo().then((u) => {
+  //     if (!u) return;
+  //     if (u.canUseGpt) this.registration.generateApiKey();
+  //   });
+  // }
+
+  // login(email: string, password: string): void {
+  //   // Future implementation for email-password login
+  // }
+
+  // error(msg: unknown) {
+  //   this.errorService.error(msg);
+  // }
+  // popup(msg: string) {
+  //   this.errorService.popup(msg);
+  // }
+  // feedback(msg: string) {
+  //   this.errorService.feedback(msg);
+  // }
 }

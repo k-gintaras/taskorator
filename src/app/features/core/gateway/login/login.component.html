@@ -1,33 +1,64 @@
-<div class="login-container">
-  <h2>Login</h2>
-  <form class="login-form">
-    <button type="button" class="btn btn-primary" (click)="loginWithGmail()">
-      <i class="material-icons">login</i> Login with Google
-    </button>
-    <button type="button" class="btn btn-primary" (click)="loginOffline()">
-      <i class="material-icons">login</i> Use Offline
-    </button>
-    <button type="button" class="btn btn-primary" (click)="logout()">
-      <i class="material-icons">logout</i> Logout
-    </button>
-    <!-- <button type="button" class="btn btn-danger" (click)="deleteUser()">
-      <i class="material-icons">delete_forever</i> Delete User (test only)
-    </button> -->
-  </form>
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center p-4"
+>
+  <div class="max-w-md w-full">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-white mb-2">Taskorator</h1>
+      <p class="text-slate-300">Your task management companion</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
+
+      <div class="space-y-4">
+        <button
+          (click)="loginOnline()"
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+          [disabled]="loading"
+        >
+          <!-- Google SVG omitted for brevity -->
+          {{ loading ? "Signing in..." : "Continue with Google" }}
+        </button>
+
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">or</span>
+          </div>
+        </div>
+
+        <button
+          (click)="loginOffline()"
+          class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+          [disabled]="loading"
+        >
+          <!-- Offline SVG omitted for brevity -->
+          Try Offline Mode
+        </button>
+      </div>
+
+      <div class="mt-6 text-center">
+        <button
+          (click)="goToGateway()"
+          class="text-gray-600 hover:text-gray-800 text-sm"
+        >
+          ← Learn more about Taskorator
+        </button>
+      </div>
+    </div>
+
+    <div class="text-center mt-6">
+      <p class="text-slate-400 text-sm">
+        New to Taskorator?
+        <button
+          (click)="goToGateway()"
+          class="text-slate-200 hover:text-white underline"
+        >
+          Explore features
+        </button>
+      </p>
+    </div>
+  </div>
 </div>
-<hr />
-<h3>UserInfo</h3>
-<p>{{ userInfo?.allowedTemplates }}</p>
-<p>{{ userInfo?.canCreate }}</p>
-<p>{{ userInfo?.canUseGpt }}</p>
-<p>{{ userInfo?.registered }}</p>
-<p>{{ userInfo?.role }}</p>
-<hr />
-<h3>UserAuthInfo</h3>
-<hr />
-<p>{{ userAuthInfo?.displayName }}</p>
-<p>{{ userAuthInfo?.email }}</p>
-<p>{{ userAuthInfo?.emailVerified }}</p>
-<p>{{ userAuthInfo?.isAnonymous }}</p>
-<p>{{ userAuthInfo?.isNewUser }}</p>
-<p>{{ userAuthInfo?.uid }}</p>

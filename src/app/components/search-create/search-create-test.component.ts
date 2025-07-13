@@ -15,6 +15,7 @@ import { SelectedOverlordService } from '../../services/tasks/selected/selected-
 import { SearchTasksService } from '../../services/tasks/search-tasks.service';
 import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
+import { TaskNavigatorService } from '../../services/tasks/task-navigation/task-navigator.service';
 
 @Component({
   selector: 'app-search-create-test',
@@ -32,6 +33,7 @@ import { MatIcon } from '@angular/material/icon';
   styleUrls: ['./search-create.component.scss'],
 })
 export class SearchCreateTestComponent {
+  isEnabledBack = false;
   searchControl = new FormControl('');
   searchResults: TaskTreeNode[] = [];
   selectedOverlord: ExtendedTask | null = {
@@ -42,6 +44,7 @@ export class SearchCreateTestComponent {
 
   constructor(
     private selectedOverlordService: SelectedOverlordService,
+    private navigatorService: TaskNavigatorService,
     private taskSearchService: SearchTasksService
   ) {}
 
@@ -62,24 +65,26 @@ export class SearchCreateTestComponent {
       .subscribe((tasks) => (this.searchResults = tasks));
 
     // Watch for selected overlord changes
-    this.selectedOverlordService
-      .getSelectedOverlordObservable()
-      .subscribe((taskId: string | null) => {
-        if (!taskId) return;
-        // this.taskService.getTaskById(taskId).then((task) => {
-        //   if (!task) return;
-        //   console.log('getting task named: ' + task.name);
-        //   console.log('getting task: ');
-        //   this.selectedOverlord = task;
-        // });
-      });
+    this.selectedOverlordService;
+    // .getSelectedOverlordObservable()
+    // .subscribe((taskId: string | null) => {
+    //   if (!taskId) return;
+    //   // this.taskService.getTaskById(taskId).then((task) => {
+    //   //   if (!task) return;
+    //   //   console.log('getting task named: ' + task.name);
+    //   //   console.log('getting task: ');
+    //   //   this.selectedOverlord = task;
+    //   // });
+    // });
   }
 
   /**
    * Handles task selection from search results.
    */
   onSelectTask(taskId: string): void {
-    this.selectedOverlordService.setSelectedOverlord(taskId); // Select task as overlord
+    // this.selectedOverlordService.setSelectedOverlord(taskId); // Select task as overlord
+
+    this.navigatorService.navigateInToTask(taskId); // Navigate to task details
     this.resetState();
   }
 
@@ -116,5 +121,9 @@ export class SearchCreateTestComponent {
   private resetState(): void {
     this.searchControl.reset();
     this.searchResults = [];
+  }
+  goBack(): void {
+    if (!this.selectedOverlord) return;
+    // TODO: can go back in searchcreate???
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -36,6 +36,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./search-create.component.scss'],
 })
 export class SearchCreateComponent {
+  @Input() isEnabledBack = false; // Or however you define this based on selection
   searchControl = new FormControl('');
   searchResults: TaskTreeNode[] = [];
   selectedOverlord: ExtendedTask | null = {
@@ -78,31 +79,48 @@ export class SearchCreateComponent {
       });
   }
 
-  onSelectTask(task: TaskTreeNode): void {
-    this.router.navigate(['/tasks', task.taskId]);
+  onSelectTask(taskId: string): void {
+    this.router.navigate(['/tasks', taskId]);
     this.resetState();
   }
 
-  /**
-   * Handles creating a new task with the input value.
-   */
-  onCreateTask(taskName: string | null): void {
-    if (!taskName) return;
-    if (!taskName.trim()) {
+  onCreateTask(taskName: string): void {
+    const trimmed = taskName.trim();
+    if (!trimmed) {
       console.error('Task name cannot be empty.');
       return;
     }
 
     const task: TaskoratorTask = {
       ...getDefaultTask(),
-      name: taskName.trim(),
+      name: trimmed,
       overlord: this.selectedOverlord?.taskId || ROOT_TASK_ID,
     };
 
-    this.taskupdateService.create(task); //.then(() => {
+    this.taskupdateService.create(task);
     this.resetState();
-    // });
   }
+
+  // /**
+  //  * Handles creating a new task with the input value.
+  //  */
+  // onCreateTask(taskName: string | null): void {
+  //   if (!taskName) return;
+  //   if (!taskName.trim()) {
+  //     console.error('Task name cannot be empty.');
+  //     return;
+  //   }
+
+  //   const task: TaskoratorTask = {
+  //     ...getDefaultTask(),
+  //     name: taskName.trim(),
+  //     overlord: this.selectedOverlord?.taskId || ROOT_TASK_ID,
+  //   };
+
+  //   this.taskupdateService.create(task); //.then(() => {
+  //   this.resetState();
+  //   // });
+  // }
 
   /**
    * Clears input and search results.

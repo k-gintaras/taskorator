@@ -3,8 +3,20 @@ import { CORE_APP_METADATA } from './app.routes-metadata';
 import { canActivate, canActivateChild } from './services/core/auth-guard';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
 import { TaskViewComponent } from './components/task/task-view/task-view.component';
+import { AutoRedirectComponent } from './components/auto-redirect/auto-redirect.component';
+import { LoginComponent } from './features/core/gateway/login/login.component';
 
 export const routes: Route[] = [
+  { path: '', component: AutoRedirectComponent }, // Root redirect
+
+  { path: 'login', component: LoginComponent }, // Public login
+
+  {
+    path: 'gateway',
+    loadChildren: () =>
+      import('./features/core/gateway/gateway-routes').then((m) => m.default),
+    // No auth guard — public welcome area
+  },
   {
     path: 'next',
     canActivate: [canActivate],
@@ -75,6 +87,5 @@ export const routes: Route[] = [
     canActivate: [canActivate],
     canActivateChild: [canActivateChild],
   },
-  { path: '', redirectTo: 'gateway', pathMatch: 'full' },
-  { path: '**', redirectTo: 'gateway' },
+  { path: '**', component: AutoRedirectComponent },
 ];

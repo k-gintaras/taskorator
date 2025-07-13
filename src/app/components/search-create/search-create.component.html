@@ -1,44 +1,36 @@
 <div class="search-create-container">
-  <!-- Search and Actions Row -->
   <div class="search-create-row">
-    <!-- Search Input -->
     <mat-form-field
       class="search-bar"
       subscriptSizing="dynamic"
       appearance="outline"
     >
-      <mat-label>{{ selectedOverlord?.name }}</mat-label>
-      <input matInput [formControl]="searchControl" />
+      <input
+        matInput
+        [formControl]="searchControl"
+        placeholder="{{ selectedOverlord?.name || 'Search or Create' }}"
+      />
       <button
         mat-icon-button
         matSuffix
         (click)="clearInput()"
-        *ngIf="searchControl.value"
-        aria-label="Clear Input"
+        aria-label="Clear"
       >
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
 
-    <!-- Action Buttons -->
     <button
       mat-icon-button
       color="primary"
-      (click)="onCreateTask(searchControl.value)"
+      (click)="onCreateTask(searchControl.value ?? '')"
       aria-label="Save Task"
     >
       <mat-icon>save</mat-icon>
     </button>
-    <!-- !not needed, it auto goes in once selected -->
-    <!-- <button
-      mat-icon-button
-      color="primary"
-      (click)="goToSelectedTask()"
-      aria-label="Go To Task"
-    >
-      <mat-icon>arrow_forward</mat-icon>
-    </button> -->
+
     <button
+      *ngIf="isEnabledBack"
       mat-icon-button
       color="primary"
       (click)="goBack()"
@@ -48,11 +40,10 @@
     </button>
   </div>
 
-  <!-- Search Results -->
-  <div class="search-results" *ngIf="searchResults && searchResults.length > 0">
+  <div class="search-results" *ngIf="searchResults?.length">
     <p
       *ngFor="let task of searchResults"
-      (click)="onSelectTask(task)"
+      (click)="onSelectTask(task.taskId)"
       [class.selected]="task.taskId === selectedOverlord?.taskId"
     >
       {{ task.name }}

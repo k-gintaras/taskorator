@@ -29,10 +29,14 @@ export class TaskNavigatorService {
       this.errorService.error(`Task with ID ${taskId} not found.`);
       return;
     }
-    this.selectedOverlordService.setSelectedOverlord(task);
-    this.taskPathService.push({ id: task.taskId, name: task.name });
-    this.taskUsageService.incrementTaskView(task.taskId);
 
+    // Update selected overlord
+    this.selectedOverlordService.setSelectedOverlord(task);
+
+    // Push to path (going deeper)
+    this.taskPathService.push({ id: task.taskId, name: task.name });
+
+    this.taskUsageService.incrementTaskView(task.taskId);
     await this.navigateToTaskRoute(taskId);
   }
 
@@ -42,32 +46,33 @@ export class TaskNavigatorService {
       this.errorService.error(`Task with ID ${taskId} not found.`);
       return;
     }
+
+    // Update selected overlord
     this.selectedOverlordService.setSelectedOverlord(task);
-    this.taskPathService.removePath(task.taskId);
+
+    // Remove everything after this task in the path (going back to this level)
+    this.taskPathService.removePath(taskId);
+    // Then add this task as the current level
+    this.taskPathService.push({ id: task.taskId, name: task.name });
+
     this.taskUsageService.incrementTaskView(task.taskId);
-
     await this.navigateToTaskRoute(taskId);
-  }
-
-  private async navigateToTaskRoute(taskId: string) {
-    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
-    const route = context.listContext
-      ? `/sentinel/${context.listContext}/tasks/${taskId}`
-      : `/tasks/${taskId}`;
-    await this.router.navigate([route]);
   }
 
   async navigateToTaskParent(taskId: string): Promise<void> {
     try {
       const superOverlord = await this.taskService.getSuperOverlord(taskId);
       if (superOverlord?.overlord) {
+        // Pop the current task from path and navigate to parent
+        this.taskPathService.pop();
         await this.navigateOutOfTask(superOverlord.overlord);
       } else {
-        //this.taskPathService.clear();
+        // No parent, clear path and go to start
+        this.taskPathService.clear();
         await this.navigateToStart();
       }
     } catch {
-      // this.taskPathService.clear();
+      this.taskPathService.clear();
       await this.navigateToStart();
     }
   }
@@ -76,12 +81,23 @@ export class TaskNavigatorService {
    * Will attempt to navigate to original list, like Daily, Weekly, etc.
    */
   navigateToStart(): void {
+    // Clear the path when going back to list roots
+    this.taskPathService.clear();
+
     const context = this.taskListRouter.extractContextFromUrl(this.router.url);
     if (context.listContext) {
       this.router.navigate([`/sentinel/${context.listContext}`]);
     } else {
       this.navigateToRoot();
     }
+  }
+
+  private async navigateToTaskRoute(taskId: string) {
+    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
+    const route = context.listContext
+      ? `/sentinel/${context.listContext}/tasks/${taskId}`
+      : `/tasks/${taskId}`;
+    await this.router.navigate([route]);
   }
 
   /**

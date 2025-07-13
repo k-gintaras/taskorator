@@ -1,54 +1,66 @@
+// Fix for TaskPathService - it needs proper push/pop/clear methods
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { ROOT_TASK_ID } from '../../../models/taskModelManager';
+
+export interface PathItem {
+  id: string;
+  name: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskPathService {
-  private path$ = new BehaviorSubject<{ id: string; name: string }[]>([]);
-  currentPath$ = this.path$.asObservable();
+  private currentPathSubject = new BehaviorSubject<PathItem[]>([]);
 
-  getCurrentPath() {
-    return this.path$.value;
-  }
+  currentPath$ = this.currentPathSubject.asObservable();
 
-  setPath(p: { id: string; name: string }[]) {
-    this.path$.next(p);
-  }
-
-  push(task: { id: string; name: string }) {
-    const current = this.getCurrentPath();
-    if (current.length === 0 || current[current.length - 1].id !== task.id) {
-      this.setPath([...current, task]);
+  push(item: PathItem) {
+    const currentPath = this.currentPathSubject.value;
+    // Don't add if it's already the last item
+    if (
+      currentPath.length > 0 &&
+      currentPath[currentPath.length - 1].id === item.id
+    ) {
+      return;
     }
-    // else ignore duplicate push of same last task
+    this.currentPathSubject.next([...currentPath, item]);
   }
 
-  pop() {
-    let p = this.getCurrentPath();
-    if (p.length === 0) return;
+  pop(): PathItem | null {
+    const currentPath = this.currentPathSubject.value;
+    if (currentPath.length === 0) return null;
 
-    // Remove last
-    p = p.slice(0, -1);
-
-    // If after popping the last is ROOT_TASK_ID, remove it too (clean root)
-    if (p.length > 0 && p[p.length - 1].id === ROOT_TASK_ID) {
-      p = p.slice(0, -1);
-    }
-
-    this.setPath(p);
+    const popped = currentPath[currentPath.length - 1];
+    this.currentPathSubject.next(currentPath.slice(0, -1));
+    return popped;
   }
 
-  clear() {
-    this.setPath([]);
-  }
-
+  // Remove everything after and including the specified id
   removePath(id: string) {
-    const current = this.getCurrentPath();
-    const idx = current.findIndex((task) => task.id === id);
-    if (idx !== -1) {
-      this.setPath(current.slice(0, idx + 1));
+    const currentPath = this.currentPathSubject.value;
+    const index = currentPath.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      this.currentPathSubject.next(currentPath.slice(0, index));
     }
+  }
+
+  // Set path to a single item (for when navigating to a root or specific task)
+  setToSingle(item: PathItem) {
+    this.currentPathSubject.next([item]);
+  }
+
+  // Clear all path
+  clear() {
+    this.currentPathSubject.next([]);
+  }
+
+  getCurrentPath(): PathItem[] {
+    return this.currentPathSubject.value;
+  }
+
+  getTreeDepth(): number {
+    return this.currentPathSubject.value.length;
   }
 }

@@ -12,15 +12,18 @@ import { NextTaskManagerComponent } from '../../next-task-manager/next-task-mana
 // 'Welcome Page';
 
 const routes: Routes = [
+  // TODO: after enabling offline mode properly, please add intro, guide and so so (not really needed for myself, but for others)
   {
     path: '',
     component: GatewayComponent,
     children: [
-      // {
-      //   path: '',
-      //   redirectTo: 'login',
-      //   pathMatch: 'full',
-      // },
+      // children: [
+      { path: '', redirectTo: 'settings', pathMatch: 'full' },
+      // { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+      // { path: 'welcome', component: WelcomeComponent },
+      // { path: 'features', component: FeaturesComponent },
+      // { path: 'about', component: AboutComponent },
+      // { path: 'guide', component: AppGuideComponent },
       {
         path: 'login',
         component: LoginComponent, // Replace with your actual component
