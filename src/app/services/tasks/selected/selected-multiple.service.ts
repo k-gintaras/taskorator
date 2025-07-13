@@ -28,16 +28,19 @@ export class SelectedMultipleService {
     this.selectedTasksUpdated.next([]);
   }
 
-  addRemoveSelectedTask(task: TaskoratorTask): void {
+  addRemoveSelectedTask(task: TaskoratorTask): boolean {
+    let selected = false;
     if (this.selectedTasks.has(task)) {
       // If the task is already in the set, remove it
       this.selectedTasks.delete(task);
     } else {
       // If the task is not in the set, add it
       this.selectedTasks.add(task);
+      selected = true;
     }
     // Emit the updated list of tasks
     this.selectedTasksUpdated.next(Array.from(this.selectedTasks));
+    return selected;
   }
 
   isSelected(task: TaskoratorTask): boolean {

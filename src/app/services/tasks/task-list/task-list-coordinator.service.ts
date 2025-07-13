@@ -30,6 +30,10 @@ export class TaskListCoordinatorService {
     const enhancedTasks =
       this.taskEnhancer.enhanceTasks(filteredSortedTasks) || [];
 
+    console.log(
+      `TaskListCoordinatorService: Enhanced tasks for ${taskListKey}:`,
+      enhancedTasks
+    );
     return enhancedTasks;
   }
 }

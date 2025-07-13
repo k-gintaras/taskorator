@@ -77,4 +77,9 @@ export class TaskNavigatorComponent implements OnInit {
   onTaskClick(task: UiTask): void {
     this.selectedMultiple.addRemoveSelectedTask(task);
   }
+
+  isTaskSelected(task: UiTask): boolean {
+    console.log('Checking if task is selected:', task);
+    return this.selectedMultiple.isSelected(task);
+  }
 }

@@ -6,13 +6,15 @@ import { SelectedMultipleService } from '../selected/selected-multiple.service';
 import { TaskUsageService } from '../task-usage.service';
 import { TaskTransmutationService } from '../task-transmutation.service';
 import { TaskStatusService } from '../task-status.service';
+import { combineLatest, Observable } from 'rxjs';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskEnhancementService {
-  private recentlyCreatedThreshold = 24 * 60 * 60 * 1000; // 24 hours
-  private recentlyUpdatedThreshold = 2 * 60 * 60 * 1000; // 2 hours
+  private recentlyCreatedThreshold = 24 * 60 * 60 * 1000;
+  private recentlyUpdatedThreshold = 2 * 60 * 60 * 1000;
 
   constructor(
     private selectedService: SelectedMultipleService,
@@ -24,21 +26,48 @@ export class TaskEnhancementService {
   ) {}
 
   /**
-   * Enhance a single task with UI state
+   * Pure reactive enhancement - no caching needed!
+   * The underlying services (TaskService, TreeService) already handle caching
+   */
+  enhanceTasksReactive(rawTasks: TaskoratorTask[]): Observable<UiTask[]> {
+    return combineLatest([
+      this.selectedService.getSelectedTasks(),
+      this.taskStatusService.statuses$,
+    ]).pipe(
+      map(() => this.enhanceTasks(rawTasks)),
+      // Only emit if selection/status actually changed
+      distinctUntilChanged((prev, curr) => this.tasksEqual(prev, curr))
+    );
+  }
+
+  /**
+   * Simple enhancement - let existing caches do their job
+   */
+  enhanceTasks(rawTasks: TaskoratorTask[]): UiTask[] {
+    return rawTasks.map((task) => this.enhance(task));
+  }
+
+  /**
+   * Enhance single task (all data comes from already-cached services)
    */
   enhance(task: TaskoratorTask): UiTask {
-    const treeNode = this.treeService.getTaskTreeData(task.taskId);
     const now = Date.now();
+
+    // These calls hit existing caches, not new API calls:
+    const treeNode = this.treeService.getTaskTreeData(task.taskId); // Cached in TreeService
+    const isSelected = this.selectedService.isSelected(task); // In-memory set
+    const isViewed = this.isTaskViewed(task.taskId); // In-memory map
+    const views = this.getViewCount(task.taskId); // localStorage
 
     const transmutedTask = this.taskTransmutationService.toUiTask(task);
 
     return {
       ...transmutedTask,
-      isSelected: this.selectedService.isSelected(task),
-      isRecentlyViewed: this.isTaskViewed(task.taskId),
+      isSelected,
+      isRecentlyViewed: isViewed,
       completionPercent: this.colorService.getProgressPercent(treeNode),
       color: this.colorService.getDateBasedColor(task.timeCreated),
-      views: this.getViewCount(task.taskId), // You'll need to implement view tracking
+      views,
       isRecentlyUpdated: now - task.lastUpdated < this.recentlyUpdatedThreshold,
       isRecentlyCreated: now - task.timeCreated < this.recentlyCreatedThreshold,
       isConnectedToTree: treeNode?.connected ?? false,
@@ -49,51 +78,44 @@ export class TaskEnhancementService {
     };
   }
 
+  /**
+   * Compare tasks to prevent unnecessary re-renders
+   */
+  private tasksEqual(prev: UiTask[], curr: UiTask[]): boolean {
+    if (prev.length !== curr.length) return false;
+
+    return prev.every((prevTask, i) => {
+      const currTask = curr[i];
+      return (
+        prevTask.taskId === currTask.taskId &&
+        prevTask.isSelected === currTask.isSelected &&
+        prevTask.isRecentlyViewed === currTask.isRecentlyViewed
+      );
+    });
+  }
+
+  // Helper methods...
   isTaskViewed(taskId: string): boolean {
     return this.taskStatusService.getStatus(taskId) === 'viewed';
   }
 
-  /**
-   * Enhance multiple tasks
-   */
-  enhanceTasks(rawTasks: TaskoratorTask[]): UiTask[] {
-    return rawTasks.map((task) => this.enhance(task));
-  }
-
-  /**
-   * Get priority-based color for secondary color
-   */
   private getPriorityColor(priority: number): string {
-    if (priority >= 8) return '#ef4444'; // red
-    if (priority >= 6) return '#f97316'; // orange
-    if (priority >= 4) return '#eab308'; // yellow
-    if (priority >= 2) return '#22c55e'; // green
-    return '#6b7280'; // gray
+    if (priority >= 8) return '#ef4444';
+    if (priority >= 6) return '#f97316';
+    if (priority >= 4) return '#eab308';
+    if (priority >= 2) return '#22c55e';
+    return '#6b7280';
   }
 
-  /**
-   * Calculate magnitude (size/importance) of task
-   */
   private calculateMagnitude(task: TaskoratorTask): number {
-    let magnitude = task.priority; // Base on priority
-
-    // Boost if has children
+    let magnitude = task.priority;
     const treeNode = this.treeService.getTaskTreeData(task.taskId);
     if (treeNode && treeNode.childrenCount > 0) {
       magnitude += treeNode.childrenCount * 0.5;
     }
-
-    // Boost for certain task types
-    // if (task.type === 'milestone') magnitude += 2;
-    // if (task.size === 'large') magnitude += 1;
-
-    // Cap at reasonable range (0-10)
     return Math.min(Math.max(magnitude, 0), 10);
   }
 
-  /**
-   * Get view count for a task (placeholder - implement based on your needs)
-   */
   private getViewCount(taskId: string): number {
     return this.taskUsageService.getTaskViews(taskId);
   }

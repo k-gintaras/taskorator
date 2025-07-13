@@ -22,6 +22,8 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
 })
 export class TaskListItemComponent {
   @Input() task!: UiTask;
+  @Input() isSelected = false; // ← Selection passed from parent
+
   @Output() navigate = new EventEmitter<UiTask>();
   @Output() taskClick = new EventEmitter<UiTask>();
 
@@ -31,7 +33,7 @@ export class TaskListItemComponent {
     const classes = ['task-container'];
 
     // Use pre-computed UiTask properties
-    if (this.task.isSelected) classes.push('selected');
+    if (this.task.isSelected || this.isSelected) classes.push('selected');
     if (this.task.isRecentlyViewed) classes.push('viewed');
     if (this.task.isRecentlyUpdated) classes.push('updated');
     if (this.task.isRecentlyCreated) classes.push('new');
