@@ -1,7 +1,3 @@
-<div
-  [ngClass]="{ 'selected-task': isSelected(task) }"
-  (click)="onTaskCardClick(task)"
->
-  <!-- Use the safe navigation operator to safely access task properties -->
+<div (click)="onTaskCardClick(task)">
   <p class="task-title">{{ task?.name }}</p>
 </div>

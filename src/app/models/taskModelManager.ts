@@ -62,6 +62,7 @@ export interface UiTask extends TaskoratorTask {
   isRecentlyViewed: boolean; // Affects this task's appearance
   completionPercent: number; // Visual state of this task
   color: string; // probably based on age
+  css: string; // precomputed css, to lighten the load on UI
   views: number; // can be used to have heatmap of what is popular in massive amount of tasks
   isRecentlyUpdated: boolean; // Show "updated" badge
   isRecentlyCreated: boolean; // Show "new" badge
@@ -70,6 +71,29 @@ export interface UiTask extends TaskoratorTask {
   secondaryColor: string; // maybe priority color
   magnitude: number; // maybe priority here, ui size or something precalculated
   isConnectedToTree: boolean; // If this task is part of a tree structure
+}
+
+export function getDefaultUiTask(): UiTask {
+  return {
+    ...getDefaultTask(),
+    isSelected: false,
+    isRecentlyViewed: false,
+    completionPercent: 0,
+    color: '',
+    views: 0,
+    isRecentlyUpdated: false,
+    isRecentlyCreated: false,
+    children: 0,
+    completedChildren: 0,
+    secondaryColor: '',
+    magnitude: 0,
+    isConnectedToTree: false,
+    css: '',
+  };
+}
+
+export function getRootUiTask(): UiTask {
+  return { ...getDefaultUiTask(), ...getRootTaskObject() };
 }
 
 export const maxPriority = 10;

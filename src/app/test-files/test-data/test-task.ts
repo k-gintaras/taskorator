@@ -8,6 +8,8 @@ import {
   TaskSubtype,
   TaskSize,
   TaskoratorTask,
+  getDefaultUiTask,
+  UiTask,
 } from '../../models/taskModelManager';
 
 // Utility to generate random data
@@ -17,6 +19,18 @@ function getRandomElement<T>(array: T[]): T {
 
 export function getRandomTask() {
   return generateRandomTask();
+}
+
+/**
+ *
+ * @returns not ui random, but random task though...
+ */
+export function getRandomUiTask() {
+  const taskProps = getRandomTask();
+  return {
+    ...getDefaultUiTask(),
+    ...taskProps,
+  };
 }
 
 export function getDefaultTaskCustomized(

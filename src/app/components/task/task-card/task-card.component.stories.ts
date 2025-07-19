@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { getRandomTask } from '../../../test-files/test-data/test-task';
+import { getRandomTask, getRandomUiTask } from '../../../test-files/test-data/test-task';
 import { TaskCardComponent } from './task-card.component';
 import { Meta, moduleMetadata, StoryFn } from '@storybook/angular';
 
@@ -36,19 +36,5 @@ const Template: StoryFn<TaskCardComponent> = (args) => ({
 // Default Story
 export const Default = Template.bind({});
 Default.args = {
-  task: {
-    ...getRandomTask(),
-    isSelected: false,
-    isRecentlyViewed: false,
-    completionPercent: 0,
-    color: '',
-    views: 0,
-    isRecentlyUpdated: false,
-    isRecentlyCreated: false,
-    children: 0,
-    completedChildren: 0,
-    secondaryColor: '',
-    magnitude: 0,
-    isConnectedToTree: false,
-  },
+  task: getRandomUiTask(),
 };

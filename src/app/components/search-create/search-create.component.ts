@@ -19,6 +19,7 @@ import { TaskTreeNode } from '../../models/taskTree';
 import { MatIcon } from '@angular/material/icon';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { Router } from '@angular/router';
+import { TaskTransmutationService } from '../../services/tasks/task-transmutation.service';
 
 @Component({
   selector: 'app-search-create',
@@ -39,28 +40,16 @@ export class SearchCreateComponent {
   @Input() isEnabledBack = false; // Or however you define this based on selection
   searchControl = new FormControl('');
   searchResults: TaskTreeNode[] = [];
-  selectedOverlord: UiTask | null = {
-    ...getRootTaskObject(),
-    isSelected: false,
-    isRecentlyViewed: false,
-    completionPercent: 0,
-    color: '',
-    views: 0,
-    isRecentlyUpdated: false,
-    isRecentlyCreated: false,
-    children: 0,
-    completedChildren: 0,
-    secondaryColor: '',
-    magnitude: 0,
-    isConnectedToTree: false,
-  };
+  selectedOverlord: UiTask | null = this.taskTransmutationService.toUiTask(
+    getRootTaskObject()
+  );
 
   constructor(
-    private taskService: TaskService,
     private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
     private taskSearchService: SearchTasksService,
-    private router: Router
+    private router: Router,
+    private taskTransmutationService: TaskTransmutationService
   ) {}
 
   ngOnInit(): void {

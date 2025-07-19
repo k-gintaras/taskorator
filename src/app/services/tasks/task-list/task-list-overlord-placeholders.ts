@@ -1,8 +1,7 @@
 import { TaskListKey } from '../../../models/task-list-model';
 import {
   UiTask,
-  getRootTaskObject,
-  TaskoratorTask,
+  getRootUiTask,
 } from '../../../models/taskModelManager';
 
 export enum TaskListType {
@@ -28,21 +27,7 @@ export enum TaskListSubtype {
 }
 
 export function getOverlordPlaceholder(listKey: TaskListKey): UiTask {
-  const baseTask: UiTask = {
-    ...getRootTaskObject(),
-    isConnectedToTree: true, // Default value, can be updated based on tree connection
-    isSelected: false,
-    isRecentlyViewed: false,
-    completionPercent: 0,
-    color: '',
-    views: 0,
-    isRecentlyUpdated: false,
-    isRecentlyCreated: false,
-    children: 0,
-    completedChildren: 0,
-    secondaryColor: '',
-    magnitude: 0,
-  };
+  const baseTask: UiTask = getRootUiTask();
 
   switch (listKey.type) {
     case TaskListType.OVERLORD:

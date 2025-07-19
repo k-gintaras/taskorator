@@ -12,10 +12,12 @@
     [style.borderLeftColor]="task.color"
     [style.borderLeftWidth.px]="6"
     class="flex items-center justify-between rounded-md p-3 mb-3 border border-gray-300 box-border cursor-pointer w-full task-container relative transition-all duration-200"
-    (click)="onTaskClick()"
   >
     <button
-      class="btn btn-sm btn-circle flex-shrink-0"
+      [ngClass]="[
+        'flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2 transition-colors duration-200',
+        getButtonClass()
+      ]"
       (click)="onNavigateClick($event)"
     >
       <mat-icon>arrow_forward</mat-icon>

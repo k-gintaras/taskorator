@@ -22,7 +22,8 @@
   <app-task-list-item
     *ngFor="let task of tasks"
     [task]="task"
+    [isSelected]="task.isSelected"
+    [isViewed]="task.isRecentlyViewed"
     (navigate)="onNext($event)"
-    (taskClick)="onTaskClick($event)"
   ></app-task-list-item>
 </div>

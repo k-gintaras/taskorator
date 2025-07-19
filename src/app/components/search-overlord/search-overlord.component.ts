@@ -13,6 +13,7 @@ import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
+import { TaskTransmutationService } from '../../services/tasks/task-transmutation.service';
 
 @Component({
   selector: 'app-search-overlord',
@@ -43,7 +44,8 @@ export class SearchOverlordComponent implements OnInit {
     private treeService: TreeService,
     private treeNodeToolsService: TaskTreeNodeToolsService,
     private selectedOverlordService: SelectedOverlordService,
-    private taskService: TaskService
+    private taskService: TaskService,
+    private taskTransmutationService: TaskTransmutationService
   ) {}
 
   ngOnInit() {
@@ -121,21 +123,9 @@ export class SearchOverlordComponent implements OnInit {
           console.error('Task not found for ID:', this.selectedOverlordId);
           return;
         }
-        this.selectedOverlordService.setSelectedOverlord({
-          ...task,
-          isSelected: false,
-          isRecentlyViewed: false,
-          completionPercent: 0,
-          color: '',
-          views: 0,
-          isRecentlyUpdated: false,
-          isRecentlyCreated: false,
-          children: 0,
-          completedChildren: 0,
-          secondaryColor: '',
-          magnitude: 0,
-          isConnectedToTree: false,
-        });
+        this.selectedOverlordService.setSelectedOverlord(
+          this.taskTransmutationService.toUiTask(task)
+        );
       });
   }
 }

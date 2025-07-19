@@ -23,18 +23,23 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
 export class TaskListItemComponent {
   @Input() task!: UiTask;
   @Input() isSelected = false; // ← Selection passed from parent
+  @Input() isViewed = false; // ← Selection passed from parent
 
   @Output() navigate = new EventEmitter<UiTask>();
-  @Output() taskClick = new EventEmitter<UiTask>();
+  // @Output() taskClick = new EventEmitter<UiTask>(); // bad idea, as there is multiple things to click on
 
   constructor(private taskTransmutationService: TaskTransmutationService) {}
 
   getContainerClasses(): string {
+    console.log('getContainerClasses called for task:', this.task);
     const classes = ['task-container'];
 
     // Use pre-computed UiTask properties
-    if (this.task.isSelected || this.isSelected) classes.push('selected');
-    if (this.task.isRecentlyViewed) classes.push('viewed');
+
+    if (this.isSelected) classes.push('selected'); // TODO: LAGS AS HELL IF CHANGED TO CUSTOM CLASS
+    if (this.isViewed) classes.push('viewed');
+    // if (this.task.isSelected) classes.push('selected');
+    // if (this.task.isRecentlyViewed) classes.push('viewed');
     if (this.task.isRecentlyUpdated) classes.push('updated');
     if (this.task.isRecentlyCreated) classes.push('new');
 
@@ -51,14 +56,19 @@ export class TaskListItemComponent {
     this.navigate.emit(this.task);
   }
 
-  onTaskClick() {
-    this.taskClick.emit(this.task);
-  }
+  // bad idea, as there is multiple things to click on
+  // onTaskClick() {
+  //   this.taskClick.emit(this.task);
+  // }
 
   getTreeNodeInfo(): TaskNodeInfo | null {
     if (!this.task) {
       return null;
     }
     return this.taskTransmutationService.toTaskNodeInfo(this.task);
+  }
+
+  getButtonClass(): string {
+    return this.isViewed ? 'selected' : 'default-button';
   }
 }

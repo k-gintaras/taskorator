@@ -7,6 +7,7 @@ import {
   TaskActionTrackerService,
 } from '../task-action-tracker.service';
 import { TaskListCoordinatorService } from '../task-list/task-list-coordinator.service';
+import { TaskUiDecoratorService } from '../task-list/task-ui-decorator.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +21,9 @@ export class TaskNavigatorDataService {
 
   constructor(
     private taskActionService: TaskActionTrackerService,
-    private taskListSimple: TaskListCoordinatorService
+    private taskListSimple: TaskListCoordinatorService,
+    private taskDecorator: TaskUiDecoratorService
   ) {
-    // Listen for task updates
     this.taskActionService.lastAction$.subscribe((action) => {
       if (action && this.shouldRefreshOnAction(action.action)) {
         this.refreshCurrentTasks();
@@ -45,14 +46,17 @@ export class TaskNavigatorDataService {
     const currentListKey = this.currentListKeySubject.value;
     if (!currentListKey) return;
 
-    // Reload current tasks
     const rawTasks = await this.taskListSimple.getTasks(currentListKey);
+    const decoratedTasks = rawTasks
+      ? this.taskDecorator.decorateTasks(rawTasks)
+      : [];
 
-    this.currentTasksSubject.next(rawTasks);
+    this.currentTasksSubject.next(decoratedTasks);
   }
 
   setTasks(tasks: UiTask[], listKey: TaskListKey) {
-    this.currentTasksSubject.next(tasks);
+    const decoratedTasks = this.taskDecorator.decorateTasks(tasks);
+    this.currentTasksSubject.next(decoratedTasks);
     this.currentListKeySubject.next(listKey);
   }
 
