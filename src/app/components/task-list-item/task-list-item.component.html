@@ -1,29 +1,32 @@
 <div class="relative">
-  <!-- Progress bar at top -->
   <app-chunked-progress
     *ngIf="task.completionPercent > 0"
     [treeNode]="getTreeNodeInfo()"
     class="absolute top-0 left-0 right-0 z-10"
-  >
-  </app-chunked-progress>
+  ></app-chunked-progress>
 
   <div
-    [ngClass]="getContainerClasses()"
+    [ngClass]="task.isSelected ? 'bg-secondary' : 'bg-white border-gray-300'"
     [style.borderLeftColor]="task.color"
     [style.borderLeftWidth.px]="6"
-    class="flex items-center justify-between rounded-md p-3 mb-3 border border-gray-300 box-border cursor-pointer w-full task-container relative transition-all duration-200"
+    class="flex items-center justify-between rounded-md p-3 mb-3 border box-border cursor-pointer w-full relative"
   >
+    <!-- Navigate / Expand Button -->
     <button
-      [ngClass]="[
-        'flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2 transition-colors duration-200',
-        getButtonClass()
-      ]"
+      class="flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2"
+      [ngClass]="{
+        'border-secondary bg-primary text-secondary': task.isRecentlyViewed,
+        'border-primary bg-secondary text-primary':
+          !task.isRecentlyViewed && task.isRecentlyCreated,
+        'border-gray bg-white':
+          !task.isRecentlyViewed && !task.isRecentlyCreated
+      }"
       (click)="onNavigateClick($event)"
     >
       <mat-icon>arrow_forward</mat-icon>
     </button>
 
-    <div class="flex-1 px-3 min-w-0 overflow-hidden">
+    <div class="flex-1 px-3 min-w-0 overflow-hidden relative">
       <app-task-mini [task]="task"></app-task-mini>
     </div>
 
@@ -34,3 +37,11 @@
     ></app-artificer-action>
   </div>
 </div>
+{{ task.children }}
+{{ task.completedChildren }}
+{{ task.completionPercent }}
+{{ task.isRecentlyViewed }}
+{{ task.isRecentlyCreated }}
+
+{{ getTreeNodeInfo()?.childrenCount }}
+{{ getTreeNodeInfo()?.completedChildrenCount }}

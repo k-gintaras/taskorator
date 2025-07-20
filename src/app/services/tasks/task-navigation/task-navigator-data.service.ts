@@ -21,8 +21,8 @@ export class TaskNavigatorDataService {
 
   constructor(
     private taskActionService: TaskActionTrackerService,
-    private taskListSimple: TaskListCoordinatorService,
-    private taskDecorator: TaskUiDecoratorService
+    private taskListCoordinator: TaskListCoordinatorService,
+    private taskUiDecorator: TaskUiDecoratorService
   ) {
     this.taskActionService.lastAction$.subscribe((action) => {
       if (action && this.shouldRefreshOnAction(action.action)) {
@@ -42,21 +42,29 @@ export class TaskNavigatorDataService {
     ].includes(action);
   }
 
-  private async refreshCurrentTasks(): Promise<void> {
+  redecorateCurrentTasks(): void {
+    const currentTasks = this.currentTasksSubject.value;
+    const redecorated = this.taskUiDecorator.decorateTasks(currentTasks);
+    this.currentTasksSubject.next(redecorated);
+  }
+
+  async refreshCurrentTasks(): Promise<void> {
     const currentListKey = this.currentListKeySubject.value;
     if (!currentListKey) return;
 
-    const rawTasks = await this.taskListSimple.getTasks(currentListKey);
-    const decoratedTasks = rawTasks
-      ? this.taskDecorator.decorateTasks(rawTasks)
-      : [];
-
-    this.currentTasksSubject.next(decoratedTasks);
+    const tasks = await this.taskListCoordinator.getTasks(currentListKey);
+    this.currentTasksSubject.next(tasks);
   }
 
-  setTasks(tasks: UiTask[], listKey: TaskListKey) {
-    const decoratedTasks = this.taskDecorator.decorateTasks(tasks);
-    this.currentTasksSubject.next(decoratedTasks);
+  async refreshTasksForKey(listKey: TaskListKey): Promise<void> {
+    const tasks = await this.taskListCoordinator.getTasks(listKey);
+    this.currentTasksSubject.next(tasks);
+    this.currentListKeySubject.next(listKey);
+  }
+
+  async setTasksByKey(listKey: TaskListKey): Promise<void> {
+    const tasks = await this.taskListCoordinator.getTasks(listKey);
+    this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
   }
 

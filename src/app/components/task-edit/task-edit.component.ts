@@ -1,17 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { getRandomTask } from '../../test-files/test-data/test-task';
 import {
   UiTask,
-  getDefaultTask,
   TaskoratorTask,
   getDefaultUiTask,
 } from '../../models/taskModelManager';
 import { FormsModule } from '@angular/forms';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
-import {
-  TaskAction,
-  TaskActions,
-} from '../../services/tasks/task-action-tracker.service';
+import { TaskActions } from '../../services/tasks/task-action-tracker.service';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
 

@@ -18,6 +18,13 @@ export class TaskCacheService {
     const data = { task, timestamp };
     this.cache.set(task.taskId, data);
   }
+
+  addTasks(tasks: UiTask[]): void {
+    for (const task of tasks) {
+      this.addTaskWithTime(task);
+    }
+  }
+
   /**
    * Add a task to the cache.
    */
@@ -78,7 +85,7 @@ export class TaskCacheService {
   getTasksByIds(taskIds: string[]): UiTask[] {
     return taskIds
       .map((id) => this.cache.get(id)?.task)
-      .filter((task): task is UiTask => task !== null);
+      .filter((task): task is UiTask => !!task);
   }
 
   /**

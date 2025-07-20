@@ -7,16 +7,11 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { OverlordNavigatorComponent } from '../overlord-navigator/overlord-navigator.component';
 import { SearchCreateComponent } from '../search-create/search-create.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationComponent } from '../notification/notification.component';
-import { FormsModule } from '@angular/forms';
-import { MatDivider } from '@angular/material/divider';
-import { MatNavList } from '@angular/material/list';
 import { filter } from 'rxjs/operators';
 import { ArtificerComponent } from '../artificer/artificer.component';
-
 @Component({
   selector: 'app-horizontal-navigation',
   standalone: true,
@@ -27,10 +22,7 @@ import { ArtificerComponent } from '../artificer/artificer.component';
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
-    MatDivider,
-    MatNavList,
     RouterOutlet,
-    OverlordNavigatorComponent,
     SearchCreateComponent,
     NotificationComponent,
   ],

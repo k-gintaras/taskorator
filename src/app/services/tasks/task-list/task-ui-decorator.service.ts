@@ -14,6 +14,8 @@ export class TaskUiDecoratorService {
   private recentlyViewedTaskIds = new Set<string>();
   private selectedTaskIds = new Set<string>();
   private selectedTasks$ = new BehaviorSubject<UiTask[]>([]);
+  private uiStateChangesSubject = new BehaviorSubject<void>(undefined);
+  uiStateChanges$ = this.uiStateChangesSubject.asObservable();
 
   private recentlyCreatedThreshold = 24 * 60 * 60 * 1000;
   private recentlyUpdatedThreshold = 2 * 60 * 60 * 1000;
@@ -28,11 +30,20 @@ export class TaskUiDecoratorService {
 
   markTaskViewed(taskId: string): void {
     this.recentlyViewedTaskIds.add(taskId);
+    this.uiStateChangesSubject.next();
   }
 
   markTaskSelected(taskId: string): void {
     this.selectedTaskIds.add(taskId);
     this.emitSelectedTasks();
+    this.uiStateChangesSubject.next();
+  }
+
+  clearAllUiState(): void {
+    this.selectedTaskIds.clear();
+    this.recentlyViewedTaskIds.clear();
+    this.emitSelectedTasks();
+    this.uiStateChangesSubject.next();
   }
 
   toggleTaskSelection(taskId: string): void {
@@ -81,7 +92,6 @@ export class TaskUiDecoratorService {
       completionPercent: this.colorService.getProgressPercent(treeNode),
       color: this.colorService.getDateBasedColor(task.timeCreated),
       secondaryColor: this.getPriorityColor(task.priority),
-      css: this.computeCss(baseTask),
       views,
       isConnectedToTree: treeNode?.connected ?? false,
       children: treeNode?.childrenCount || 0,
@@ -95,17 +105,6 @@ export class TaskUiDecoratorService {
 
   decorateTasks(tasks: TaskoratorTask[]): UiTask[] {
     return tasks.map((task) => this.decorateTask(task));
-  }
-
-  private computeCss(task: UiTask): string {
-    const classes = [];
-
-    if (task.isSelected) classes.push('selected');
-    if (task.isRecentlyViewed) classes.push('viewed');
-    if (task.isRecentlyUpdated) classes.push('updated');
-    if (task.isRecentlyCreated) classes.push('new');
-
-    return classes.join(' ');
   }
 
   private getPriorityColor(priority: number): string {

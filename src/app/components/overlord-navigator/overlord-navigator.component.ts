@@ -9,6 +9,9 @@ import { TaskListRulesService } from '../../services/tasks/task-list/task-list-r
 import { TaskListKey, TaskListRules } from '../../models/task-list-model';
 import { SelectedListService } from '../../services/tasks/selected/selected-list.service';
 
+/**
+ * @deprecated just use selected overlord and url
+ */
 @Component({
   standalone: true,
   imports: [MatIcon, NgIf, SearchOverlordComponent],

@@ -2,8 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TaskSession } from '../task-session.model';
 import { TaskSessionService } from '../services/task-session.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { map } from 'rxjs/internal/operators/map';
-import { take } from 'rxjs/internal/operators/take';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,9 +9,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { SelectedMultipleService } from '../../../../../services/tasks/selected/selected-multiple.service';
+import { TaskUiInteractionService } from '../../../../../services/tasks/task-list/task-ui-interaction.service';
 import { TaskNavigatorComponent } from '../../../../../components/task-navigator/task-navigator.component';
-import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
 
 @Component({
   selector: 'app-session',
@@ -32,44 +29,33 @@ import { TaskListService } from '../../../../../services/sync-api-cache/task-lis
     TaskNavigatorComponent,
   ],
   templateUrl: './session.component.html',
-  styleUrl: './session.component.scss',
+  styleUrls: ['./session.component.scss'],
 })
 export class SessionComponent implements OnInit, OnDestroy {
   sessions: TaskSession[] = [];
   selectedTaskIds: string[] = [];
   selectedSession: TaskSession | null = null;
   remainingTime = 0;
-  private timerInterval: any;
-  private timerWorker: Worker | undefined;
+  private timerWorker?: Worker;
 
-  // Variables to collect hours, minutes, and seconds
-  hours: number = 0;
-  minutes: number = 0;
-  seconds: number = 0;
+  hours = 0;
+  minutes = 0;
+  seconds = 0;
 
   constructor(
     private taskSessionService: TaskSessionService,
-    private selectedMultipleService: SelectedMultipleService
+    private taskUiInteractionService: TaskUiInteractionService
   ) {}
 
   ngOnInit(): void {
     this.loadSessions();
-    this.selectedMultipleService
-      .getSelectedTasks()
-      .pipe(
-        take(1), // take one value and complete
-        map((tasks) => tasks.map((task) => task.taskId))
-      )
-      .subscribe((taskIds) => (this.selectedTaskIds = taskIds));
+    this.selectedTaskIds = this.taskUiInteractionService.getSelectedTaskIds();
   }
 
   startSession(): void {
     if (!this.selectedSession) return;
 
-    // Terminate any existing worker
-    if (this.timerWorker) {
-      this.timerWorker.terminate();
-    }
+    if (this.timerWorker) this.timerWorker.terminate();
 
     this.remainingTime = this.selectedSession.duration;
 
@@ -84,7 +70,6 @@ export class SessionComponent implements OnInit, OnDestroy {
       };
       this.timerWorker.postMessage({ duration: this.selectedSession.duration });
     } else {
-      // Web Workers are not supported
       console.error('Web Workers are not supported in this environment.');
     }
   }
@@ -94,39 +79,18 @@ export class SessionComponent implements OnInit, OnDestroy {
     const audio2 = new Audio('assets/session.wav');
     const audio3 = new Audio('assets/over.wav');
 
-    // Play audio2 when audio1 ends
-    audio1.addEventListener('ended', () => {
-      audio2.play();
-    });
-
-    // Play audio3 when audio2 ends
-    audio2.addEventListener('ended', () => {
-      audio3.play();
-    });
-
-    // Start by playing audio1
+    audio1.addEventListener('ended', () => audio2.play());
+    audio2.addEventListener('ended', () => audio3.play());
     audio1.play();
   }
 
   ngOnDestroy(): void {
-    if (this.timerWorker) {
-      this.timerWorker.terminate();
-    }
+    if (this.timerWorker) this.timerWorker.terminate();
   }
 
   setNavigator(session: TaskSession) {
-    this.selectedSession = session; // Set the selected session
-
-    // this.taskListService
-    //   .getTasks(session.taskIds)
-    //   .then((tasks: Task[] | null) => {
-    //     if (!tasks) return;
-    //     const taskListKey: TaskListKey = {
-    //       type: TaskListType.SESSION,
-    //       data: session.name,
-    //     };
-    //     this.navigatorService.loadAndInitializeTasks(tasks, taskListKey);
-    //   });
+    this.selectedSession = session;
+    // Navigation logic if needed
   }
 
   async loadSessions() {
@@ -143,10 +107,7 @@ export class SessionComponent implements OnInit, OnDestroy {
       alert('Please provide a session name and duration.');
       return;
     }
-
-    // Calculate the total duration in seconds
     const duration = hours * 3600 + minutes * 60 + seconds;
-
     if (this.selectedTaskIds.length < 1) {
       console.log("Can't create empty session.");
       return;
@@ -155,9 +116,8 @@ export class SessionComponent implements OnInit, OnDestroy {
       console.log('Create name for a session.');
       return;
     }
-
     const newSession: TaskSession = {
-      id: '', // This will be generated on the backend or Firestore
+      id: '',
       name,
       taskIds: this.selectedTaskIds,
       duration,
@@ -181,13 +141,9 @@ export class SessionComponent implements OnInit, OnDestroy {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     const remainingSeconds = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
-    } else if (remainingMinutes > 0) {
+    if (hours > 0) return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
+    if (remainingMinutes > 0)
       return `${remainingMinutes}m ${remainingSeconds}s`;
-    } else {
-      return `${remainingSeconds}s`;
-    }
+    return `${remainingSeconds}s`;
   }
 }

@@ -6,7 +6,7 @@ import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { TaskNodeInfo } from '../../../models/taskTree';
-import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
+import { TaskUiInteractionService } from '../../../services/tasks/task-list/task-ui-interaction.service';
 import { GptSuggestService } from '../../../features/gpt/services/gpt-suggest.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
@@ -19,18 +19,18 @@ import { TaskService } from '../../../services/sync-api-cache/task.service';
   standalone: true,
   imports: [NgClass, MatIcon, NgStyle],
   templateUrl: './artificer-action.component.html',
-  styleUrl: './artificer-action.component.scss',
+  styleUrls: ['./artificer-action.component.scss'],
 })
 export class ArtificerActionComponent {
-  @Input() task: TaskoratorTask | undefined;
+  @Input() task?: TaskoratorTask;
   currentAction!: ArtificerDetails;
   @Input() treeNode: TaskNodeInfo | null = null;
-  @Input() protectTaskFromDelete: boolean = true;
+  @Input() protectTaskFromDelete = true;
 
   constructor(
     private taskUpdateService: TaskUpdateService,
     private artificerService: ArtificerService,
-    private selectedService: SelectedMultipleService,
+    private taskUiInteractionService: TaskUiInteractionService,
     private taskService: TaskService,
     private gptHelper: GptSuggestService,
     private dialog: MatDialog
@@ -42,20 +42,15 @@ export class ArtificerActionComponent {
 
   getColor() {
     if (!this.treeNode) return;
-    // it is checklist and reappear whenever it repeats... daily, weekly
     const isRepeatingTask =
       this.task?.repeat !== 'never' && this.task?.repeat !== 'once';
     if (isRepeatingTask) return 'complete-icon-color-checklist';
 
-    // show color based on what kind of task it is
     if (this.treeNode.childrenCount > 0) {
-      // task has children
       if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount) {
-        // task has incomplete children
         return 'complete-icon-color-parent';
       }
     } else {
-      // task has no children
       return 'complete-icon-color-child';
     }
 
@@ -63,26 +58,18 @@ export class ArtificerActionComponent {
   }
 
   hasIncompleteChildren() {
-    // fixed gives wrong answer for some reason
-    // all tasks completed... maybe it includes itself?
-    // tasks were not being sent to task tree because they were received as just taskId through eventbus
     if (!this.treeNode) return false;
     if (this.treeNode.childrenCount < 1) return false;
-    if (this.treeNode.completedChildrenCount < this.treeNode.childrenCount)
-      return true;
-
-    return false;
+    return this.treeNode.completedChildrenCount < this.treeNode.childrenCount;
   }
 
   getButtonStyle() {
-    const action = this.currentAction.action;
-    return this.isActionRestricted(action)
+    return this.isActionRestricted(this.currentAction.action)
       ? { visibility: 'hidden', pointerEvents: 'none' }
       : {};
   }
 
   isActionRestricted(action: string): boolean {
-    // we allow move, because we not moving it (which is not allowed), we moving tasks into it
     if (!this.protectTaskFromDelete) return false;
     return (
       this.hasIncompleteChildren() && ['delete', 'complete'].includes(action)
@@ -90,47 +77,43 @@ export class ArtificerActionComponent {
   }
 
   performAction(): void {
-    const task = this.task;
-    if (!task) return;
+    if (!this.task) return;
     const action = this.currentAction.action;
 
     switch (action) {
       case 'moveToParent':
-        this.moveToParent(task);
+        this.moveToParent(this.task);
         break;
       case 'promote':
-        this.taskUpdateService.increasePriority(task);
+        this.taskUpdateService.increasePriority(this.task);
         break;
       case 'demote':
-        this.taskUpdateService.decreasePriority(task);
+        this.taskUpdateService.decreasePriority(this.task);
         break;
       case 'edit':
-        this.editTask(task);
+        this.editTask(this.task);
         break;
       case 'mass':
-        this.mass(task);
+        this.mass(this.task);
         break;
       case 'select':
-        this.selectedService.addRemoveSelectedTask(task);
+        this.taskUiInteractionService.toggleSelection(this.task.taskId);
         break;
       case 'suggest':
-        this.gptHelper.suggestTasksForTask(task);
+        this.gptHelper.suggestTasksForTask(this.task);
         break;
-
       case 'delete':
-        this.taskUpdateService.delete(task);
+        this.taskUpdateService.delete(this.task);
         break;
       case 'complete':
-        this.taskUpdateService.complete(task);
+        this.taskUpdateService.complete(this.task);
         break;
       case 'move':
-        this.taskUpdateService.move(task);
+        this.taskUpdateService.move(this.task);
         break;
       case 'refresh':
-        this.taskUpdateService.renew(task);
+        this.taskUpdateService.renew(this.task);
         break;
-
-      // Add more cases as needed...
       default:
         break;
     }
@@ -160,12 +143,6 @@ export class ArtificerActionComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // Update the task in your list or database
-        // if (result) {
-        //   console.log('Task updated on server:', result);
-        //   const taskAction: TaskActions = TaskActions.UPDATED;
-        //   this.taskUpdateService.update(result, taskAction);
-        // }
         console.log('mass add dialog finished');
       } else {
         console.log('task not updated or so dialog says...');
@@ -176,26 +153,24 @@ export class ArtificerActionComponent {
   editTask(task: TaskoratorTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
-      data: task, // Pass the task to edit
+      data: task,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // Update the task in your list or database
-        if (result) {
-          console.log('Task updated on server:', result);
-          const taskAction: TaskActions = TaskActions.UPDATED;
-          this.taskUpdateService.update(result, taskAction);
-        }
+        console.log('Task updated on server:', result);
+        this.taskUpdateService.update(result, TaskActions.UPDATED);
       } else {
         console.log('task not updated or so dialog says...');
       }
     });
   }
 
-  isSelected() {
+  isSelected(): boolean {
     if (!this.task) return false;
-    return this.selectedService.isSelected(this.task);
+    return this.taskUiInteractionService
+      .getSelectedTaskIds()
+      .includes(this.task.taskId);
   }
 
   getIcon(): string {

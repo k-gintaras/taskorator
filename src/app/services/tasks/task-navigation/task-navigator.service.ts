@@ -26,11 +26,8 @@ export class TaskNavigatorService {
   ) {}
 
   async navigateInToTask(taskId: string): Promise<void> {
-    const task = await this.taskService.getTaskById(taskId);
-    if (!task) {
-      this.errorService.error(`Task with ID ${taskId} not found.`);
-      return;
-    }
+    const task = await this.loadTaskOrWarn(taskId);
+    if (!task) return;
 
     this.selectedOverlordService.setSelectedOverlord(task);
     this.taskPathService.push({ id: task.taskId, name: task.name });
@@ -38,11 +35,8 @@ export class TaskNavigatorService {
   }
 
   async navigateOutOfTask(taskId: string): Promise<void> {
-    const task = await this.taskService.getTaskById(taskId);
-    if (!task) {
-      this.errorService.error(`Task with ID ${taskId} not found.`);
-      return;
-    }
+    const task = await this.loadTaskOrWarn(taskId);
+    if (!task) return;
 
     this.selectedOverlordService.setSelectedOverlord(task);
     this.taskPathService.removePath(taskId);
@@ -57,35 +51,11 @@ export class TaskNavigatorService {
         this.taskPathService.pop();
         await this.navigateOutOfTask(superOverlord.overlord);
       } else {
-        this.taskPathService.clear();
         await this.navigateToStart();
       }
     } catch {
-      this.taskPathService.clear();
       await this.navigateToStart();
     }
-  }
-
-  navigateToStart(): void {
-    this.taskPathService.clear();
-
-    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
-    if (context.listContext) {
-      this.router.navigate([`/sentinel/${context.listContext}`]);
-    } else {
-      this.navigateToRoot();
-    }
-  }
-
-  private async navigateToTaskRoute(taskId: string) {
-    this.taskUiDecorator.markTaskViewed(taskId);
-    this.taskUsageService.incrementTaskView(taskId);
-
-    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
-    const route = context.listContext
-      ? `/sentinel/${context.listContext}/tasks/${taskId}`
-      : `/tasks/${taskId}`;
-    await this.router.navigate([route]);
   }
 
   async navigateUp(): Promise<void> {
@@ -102,5 +72,36 @@ export class TaskNavigatorService {
 
   navigateToRoot(): void {
     this.router.navigate([`/sentinel/tasks/${ROOT_TASK_ID}`]);
+  }
+
+  navigateToStart(): void {
+    this.taskPathService.clear();
+
+    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
+    if (context.listContext) {
+      this.router.navigate([`/sentinel/${context.listContext}`]);
+    } else {
+      this.navigateToRoot();
+    }
+  }
+
+  private async navigateToTaskRoute(taskId: string): Promise<void> {
+    this.taskUiDecorator.markTaskViewed(taskId);
+    this.taskUsageService.incrementTaskView(taskId);
+
+    const context = this.taskListRouter.extractContextFromUrl(this.router.url);
+    const route = context.listContext
+      ? `/sentinel/${context.listContext}/tasks/${taskId}`
+      : `/tasks/${taskId}`;
+
+    await this.router.navigate([route]);
+  }
+
+  private async loadTaskOrWarn(taskId: string) {
+    const task = await this.taskService.getTaskById(taskId);
+    if (!task) {
+      this.errorService.error(`Task with ID ${taskId} not found.`);
+    }
+    return task;
   }
 }

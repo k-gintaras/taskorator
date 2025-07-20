@@ -6,9 +6,9 @@ import { TaskEditComponent } from '../task-edit/task-edit.component';
 import { TaskCardComponent } from '../task/task-card/task-card.component';
 import { ErrorService } from '../../services/core/error.service';
 import { TaskNavigatorService } from '../../services/tasks/task-navigation/task-navigator.service';
-import { TaskNavigatorDataService } from '../../services/tasks/task-navigation/task-navigator-data.service';
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskListItemComponent } from '../task-list-item/task-list-item.component';
+import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-list-data-facade.service';
 
 @Component({
   standalone: true,
@@ -28,14 +28,14 @@ export class TaskNavigatorComponent implements OnInit {
   selectedOverlord: UiTask | null = null;
 
   constructor(
-    private taskNavigatorDataService: TaskNavigatorDataService,
     private navigatorService: TaskNavigatorService,
     private selectedOverlordService: SelectedOverlordService,
+    private taskListFacade: TaskListDataFacadeService,
     private errorService: ErrorService
   ) {}
 
   ngOnInit(): void {
-    this.taskNavigatorDataService.currentTasks$.subscribe((tasks) => {
+    this.taskListFacade.currentTasks$.subscribe((tasks) => {
       this.tasks = tasks;
     });
 

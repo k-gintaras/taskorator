@@ -4,8 +4,12 @@ import { BehaviorSubject } from 'rxjs';
 export enum TaskActions {
   // other actions
   VIEWED = 'viewed',
-  // actual actions
   SELECTED = 'selected',
+  UNSELECTED = 'unselected',
+  SELECTION_CLEARED = 'selectionCleared',
+  TOGGLED_SELECTION = 'toggledSelection',
+
+  // actual actions
   MOVED = 'moved',
   CREATED = 'created',
   UPDATED = 'updated',
@@ -33,11 +37,13 @@ export enum TaskActions {
   SIZE_UPDATED = 'sizeUpdated',
 }
 
-export interface TaskAction {
+interface TaskAction {
   taskIds: string[];
-  action: TaskActions; // Action performed (e.g., 'moved', 'created', etc.)
-  subAction?: string; // Sub-action details (e.g., 'updated type to X')
-  message: string; // Optional descriptive message for batch updates
+  action: TaskActions;
+  subAction?: string;
+  message: string;
+  timestamp: number;
+  source: 'ui' | 'api' | 'system' | string;
 }
 
 @Injectable({
@@ -54,7 +60,12 @@ export class TaskActionTrackerService {
    * @param action - Action performed (e.g., 'updated', 'completed').
    * @param subAction - Optional sub-action details (e.g., 'updated type to X').
    */
-  recordAction(taskId: string, action: TaskActions, subAction?: any): void {
+  recordAction(
+    taskId: string,
+    action: TaskActions,
+    subAction?: any,
+    source: 'ui' | 'api' | 'system' | string = 'ui'
+  ): void {
     const actionRecord: TaskAction = {
       taskIds: [taskId],
       action,
@@ -62,20 +73,17 @@ export class TaskActionTrackerService {
       message: subAction
         ? `Task ${taskId} ${action} (${subAction})`
         : `Task ${taskId} ${action}`,
+      timestamp: Date.now(),
+      source,
     };
     this.lastActionSubject.next(actionRecord);
   }
 
-  /**
-   * Record a batch action.
-   * @param taskIds - Array of task IDs.
-   * @param action - Action performed (e.g., 'moved', 'updated').
-   * @param subAction - Optional sub-action details (e.g., 'updated type to X').
-   */
   recordBatchAction(
     taskIds: string[],
     action: TaskActions,
-    subAction?: string
+    subAction?: string,
+    source: 'ui' | 'api' | 'system' | string = 'ui'
   ): void {
     const actionRecord: TaskAction = {
       taskIds,
@@ -84,6 +92,8 @@ export class TaskActionTrackerService {
       message: subAction
         ? `${taskIds.length} tasks ${action} (${subAction})`
         : `${taskIds.length} tasks ${action}`,
+      timestamp: Date.now(),
+      source,
     };
     this.lastActionSubject.next(actionRecord);
   }

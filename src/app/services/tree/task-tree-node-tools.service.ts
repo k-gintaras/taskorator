@@ -111,18 +111,31 @@ export class TaskTreeNodeToolsService {
     node: TaskTreeNode,
     path: TaskTreeNode[] = []
   ): TaskTreeNode[] | null {
-    path.push(node);
-
-    if (node.taskId === taskId) {
-      return path;
-    }
+    const newPath = [...path, node];
+    if (node.taskId === taskId) return newPath;
 
     for (const child of node.children) {
-      const result = this.findPathToTask(taskId, child, [...path]);
+      const result = this.findPathToTask(taskId, child, newPath);
       if (result) return result;
     }
-
     return null;
+  }
+
+  countDescendants(node: TaskTreeNode): number {
+    return node.children.reduce(
+      (acc, child) => acc + 1 + this.countDescendants(child),
+      0
+    );
+  }
+
+  validateTree(tree: TaskTree): boolean {
+    const nodes = this.flattenTree(tree.primarch);
+    const invalidNodes = nodes.filter((n) => !this.validateNode(n));
+    if (invalidNodes.length > 0) {
+      console.warn(`Invalid nodes found: ${invalidNodes.map((n) => n.taskId)}`);
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -134,23 +147,17 @@ export class TaskTreeNodeToolsService {
     return this.flattenTree(tree.primarch);
   }
 
-  private flattenTree(
+  flattenTree(
     node: TaskTreeNode,
+    filter?: (node: TaskTreeNode) => boolean,
     array: TaskTreeNode[] = []
   ): TaskTreeNode[] {
-    if (!node) {
-      console.error('Encountered a null or undefined node:', node);
-      return array; // Skip invalid nodes
-    }
+    if (!node) return array;
 
-    array.push(node);
+    if (!filter || filter(node)) array.push(node);
 
-    (node.children || []).forEach((child) => {
-      if (!child || !child.taskId) {
-        console.warn('Skipping invalid child node:', child);
-        return;
-      }
-      this.flattenTree(child, array);
+    node.children.forEach((child) => {
+      this.flattenTree(child, filter, array);
     });
 
     return array;

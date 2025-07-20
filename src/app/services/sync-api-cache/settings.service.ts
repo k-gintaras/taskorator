@@ -6,7 +6,7 @@ import { ApiStrategy } from '../../models/service-strategies/api-strategy.interf
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
 import { ErrorService } from '../core/error.service';
 /**
- * @deprecated
+ * @deprecated TODO: probably not deprecated :DDDDDDDDDDDDDDDDDDDDDDDDDDDDD
  */
 @Injectable({
   providedIn: 'root',

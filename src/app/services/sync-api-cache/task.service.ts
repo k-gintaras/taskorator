@@ -44,7 +44,7 @@ export class TaskService {
       if (!createdTask) throw new Error('Task creation failed');
 
       const extendedTask = this.transmutatorService.toUiTask(createdTask);
-      // this.taskCache.addTask(extendedTask); // Cache the new task
+      this.taskCache.addTask(extendedTask); // Cache the new task
       this.taskIdCache.addTasksWithGroup(
         [extendedTask],
         `overlord_${task.overlord}`

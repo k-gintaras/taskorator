@@ -22,6 +22,10 @@ import { SearchOverlordComponent } from '../../search-overlord/search-overlord.c
 import { TaskService } from '../../../services/sync-api-cache/task.service';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 
+/**
+ * @deprecated OR NOT??? just use search-create component for simple task creation, or not?
+ * todo: consider if this is useful when we want to create task with more details
+ */
 @Component({
   selector: 'app-create-task',
   standalone: true,

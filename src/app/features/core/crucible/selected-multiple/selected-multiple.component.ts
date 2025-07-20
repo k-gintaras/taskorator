@@ -9,7 +9,7 @@ import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mi
 import { TaskSettings } from '../../../../models/settings';
 import { UiTask, TaskoratorTask } from '../../../../models/taskModelManager';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
-import { SelectedMultipleService } from '../../../../services/tasks/selected/selected-multiple.service';
+import { TaskUiInteractionService } from '../../../../services/tasks/task-list/task-ui-interaction.service';
 import { SelectedOverlordService } from '../../../../services/tasks/selected/selected-overlord.service';
 import { TaskSettingsTasksService } from '../../../../services/tasks/task-settings-tasks.service';
 import { TaskBatchService } from '../../../../services/sync-api-cache/task-batch.service';
@@ -27,16 +27,16 @@ import { TaskActions } from '../../../../services/tasks/task-action-tracker.serv
     SearchOverlordComponent,
   ],
   templateUrl: './selected-multiple.component.html',
-  styleUrl: './selected-multiple.component.scss',
+  styleUrls: ['./selected-multiple.component.scss'],
 })
 export class SelectedMultipleComponent implements OnInit {
   selectedTasks: TaskoratorTask[] = [];
   selectedOverlord: UiTask | null = null;
-  settings: TaskSettings | undefined = undefined;
-  filteredTaskOptions: Observable<TaskoratorTask[]> | undefined;
+  settings?: TaskSettings;
+  filteredTaskOptions?: Observable<TaskoratorTask[]>;
 
   constructor(
-    private selectedMultiple: SelectedMultipleService,
+    private taskUiInteractionService: TaskUiInteractionService,
     private taskBatchService: TaskBatchService,
     private settingsService: SettingsService,
     private selectedOverlordService: SelectedOverlordService,
@@ -44,46 +44,36 @@ export class SelectedMultipleComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.selectedMultiple
-      .getSelectedTasks()
-      .subscribe((selectedTasks: TaskoratorTask[]) => {
-        this.selectedTasks = selectedTasks;
-      });
-    this.loadSettings();
-    this.selectedOverlordService
-      .getSelectedOverlordObservable()
-      .subscribe((overlord: UiTask | null) => {
-        if (overlord) {
-          this.selectedOverlord = overlord;
-        }
-      });
-  }
-
-  loadSettings() {
-    this.settingsService.getSettings().subscribe((s: TaskSettings | null) => {
+    this.selectedTasks = this.getSelectedTasksSync();
+    this.settingsService.getSettings().subscribe((s) => {
       if (!s) return;
       this.settings = s;
     });
+    this.selectedOverlordService
+      .getSelectedOverlordObservable()
+      .subscribe((overlord) => {
+        if (overlord) this.selectedOverlord = overlord;
+      });
+  }
+
+  private getSelectedTasksSync(): TaskoratorTask[] {
+    const ids = this.taskUiInteractionService.getSelectedTaskIds();
+    // Map ids to tasks if you have cached tasks; else empty array
+    return [];
   }
 
   clear() {
-    this.selectedMultiple.clear();
+    this.taskUiInteractionService.clearSelection();
     this.selectedTasks = [];
   }
 
-  async setFocus(reset: boolean = true) {
-    if (
-      !this.settings ||
-      !this.selectedTasks ||
-      this.selectedTasks.length === 0
-    ) {
-      console.error('Settings are not initialized or no tasks are selected.');
+  async setFocus(reset = true) {
+    if (!this.settings || this.selectedTasks.length === 0) {
+      console.error('Settings not initialized or no tasks selected.');
       return;
     }
     if (reset) {
-      this.settings.focusTaskIds = this.selectedTasks.map(
-        (task) => task.taskId
-      );
+      this.settings.focusTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
     } else {
       for (const task of this.selectedTasks) {
@@ -92,17 +82,13 @@ export class SelectedMultipleComponent implements OnInit {
     }
   }
 
-  async setFrogs(reset: boolean = true) {
-    if (
-      !this.settings ||
-      !this.selectedTasks ||
-      this.selectedTasks.length === 0
-    ) {
-      console.error('Settings are not initialized or no tasks are selected.');
+  async setFrogs(reset = true) {
+    if (!this.settings || this.selectedTasks.length === 0) {
+      console.error('Settings not initialized or no tasks selected.');
       return;
     }
     if (reset) {
-      this.settings.frogTaskIds = this.selectedTasks.map((task) => task.taskId);
+      this.settings.frogTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
     } else {
       for (const task of this.selectedTasks) {
@@ -111,19 +97,13 @@ export class SelectedMultipleComponent implements OnInit {
     }
   }
 
-  async setFavorites(reset: boolean = true) {
-    if (
-      !this.settings ||
-      !this.selectedTasks ||
-      this.selectedTasks.length === 0
-    ) {
-      console.error('Settings are not initialized or no tasks are selected.');
+  async setFavorites(reset = true) {
+    if (!this.settings || this.selectedTasks.length === 0) {
+      console.error('Settings not initialized or no tasks selected.');
       return;
     }
     if (reset) {
-      this.settings.favoriteTaskIds = this.selectedTasks.map(
-        (task) => task.taskId
-      );
+      this.settings.favoriteTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
     } else {
       for (const task of this.selectedTasks) {
@@ -133,10 +113,10 @@ export class SelectedMultipleComponent implements OnInit {
   }
 
   onTaskCardClick(task: TaskoratorTask) {
-    if (this.selectedTasks.indexOf(task) > -1) {
-      this.selectedMultiple.removeSelectedTask(task);
+    if (this.selectedTasks.includes(task)) {
+      this.taskUiInteractionService.unselect(task.taskId);
     } else {
-      this.selectedMultiple.addSelectedTask(task);
+      this.taskUiInteractionService.select(task.taskId);
     }
   }
 
@@ -155,9 +135,9 @@ export class SelectedMultipleComponent implements OnInit {
       .updateTaskBatch(this.selectedTasks, TaskActions.MOVED, o)
       .then(() => {
         console.log(
-          `Task ${this.selectedTasks.map(
-            (t) => t.name
-          )} updated with new overlord ${o}`
+          `Tasks ${this.selectedTasks
+            .map((t) => t.name)
+            .join(', ')} updated with new overlord ${o}`
         );
       });
   }

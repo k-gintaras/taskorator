@@ -62,7 +62,6 @@ export interface UiTask extends TaskoratorTask {
   isRecentlyViewed: boolean; // Affects this task's appearance
   completionPercent: number; // Visual state of this task
   color: string; // probably based on age
-  css: string; // precomputed css, to lighten the load on UI
   views: number; // can be used to have heatmap of what is popular in massive amount of tasks
   isRecentlyUpdated: boolean; // Show "updated" badge
   isRecentlyCreated: boolean; // Show "new" badge
@@ -88,7 +87,6 @@ export function getDefaultUiTask(): UiTask {
     secondaryColor: '',
     magnitude: 0,
     isConnectedToTree: false,
-    css: '',
   };
 }
 

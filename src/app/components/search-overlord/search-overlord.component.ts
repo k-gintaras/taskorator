@@ -15,6 +15,9 @@ import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
 import { TaskTransmutationService } from '../../services/tasks/task-transmutation.service';
 
+/**
+ * @deprecated no point to search overlord, we just search tasks
+ */
 @Component({
   selector: 'app-search-overlord',
   standalone: true,

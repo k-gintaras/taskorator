@@ -8,6 +8,10 @@ import {
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 
+/**
+ * @deprecated was probably an idea to create a form for task creation or editing,
+ * but now we have task-edit component that uses this form for editing tasks.
+ */
 @Component({
   selector: 'app-form',
   standalone: true,

@@ -17,6 +17,15 @@ import { EventBusService } from '../core/event-bus.service';
 type RepeatType = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type SettingsType = 'focus' | 'frog' | 'favorite';
 
+/**
+ * TODO: Potential Improvements
+Optional: Emit Event on Cache Miss or API Call
+
+In getTaskGroupWithCache, on any cache miss, you can emit an event like eventBusService.cacheMiss(taskListKey).
+
+Gives observability without polluting this service.
+ */
+
 @Injectable({
   providedIn: 'root',
 })
@@ -270,34 +279,27 @@ export class TaskListService {
    * Generic method to handle repeating tasks, returning ExtendedTask[]
    */
   private async getRepeatingTasks(type: RepeatType): Promise<UiTask[] | null> {
+    const typeMap: Record<RepeatType, TaskListType> = {
+      daily: TaskListType.DAILY,
+      weekly: TaskListType.WEEKLY,
+      monthly: TaskListType.MONTHLY,
+      yearly: TaskListType.YEARLY,
+    };
     const taskListKey: TaskListKey = {
-      type: TaskListType.DAILY,
+      type: typeMap[type],
       data: TaskListSubtype.REPEATING,
     };
-    switch (type) {
-      case 'daily':
-        taskListKey.type = TaskListType.DAILY;
-        break;
-      case 'weekly':
-        taskListKey.type = TaskListType.WEEKLY;
-        break;
-      case 'monthly':
-        taskListKey.type = TaskListType.MONTHLY;
-        break;
-      case 'yearly':
-        taskListKey.type = TaskListType.YEARLY;
-        break;
-    }
 
     return this.getTaskGroupWithCache(taskListKey, () => {
       const api = this.ensureApiService();
-      const apiMethodMap = {
-        daily: api.getDailyTasks.bind(api),
-        weekly: api.getWeeklyTasks.bind(api),
-        monthly: api.getMonthlyTasks.bind(api),
-        yearly: api.getYearlyTasks.bind(api),
-      };
-      return apiMethodMap[type]();
+      const apiMap: Record<RepeatType, () => Promise<TaskoratorTask[] | null>> =
+        {
+          daily: api.getDailyTasks.bind(api),
+          weekly: api.getWeeklyTasks.bind(api),
+          monthly: api.getMonthlyTasks.bind(api),
+          yearly: api.getYearlyTasks.bind(api),
+        };
+      return apiMap[type]();
     });
   }
 
@@ -350,5 +352,25 @@ export class TaskListService {
     }
 
     return cachedTasks;
+  }
+
+  async getTasksByIds(ids: string[]): Promise<TaskoratorTask[]> {
+    if (!ids.length) return [];
+
+    const cachedTasks = this.taskCache.getTasksByIds(ids);
+    const missingIds = ids.filter(
+      (id) => !cachedTasks.find((task) => task.taskId === id)
+    );
+
+    if (!missingIds.length) return cachedTasks;
+
+    const fetchedTasks =
+      (await this.ensureApiService().getTasksFromIds(missingIds)) || [];
+
+    const extendedFetchedTasks =
+      this.transmutatorService.toUiTasks(fetchedTasks);
+    this.taskCache.addTasks(extendedFetchedTasks); // ensure you have an addTasks in cache
+
+    return [...cachedTasks, ...extendedFetchedTasks];
   }
 }

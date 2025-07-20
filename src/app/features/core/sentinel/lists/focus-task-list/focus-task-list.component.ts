@@ -6,10 +6,9 @@ import {
   TaskListType,
   TaskListSubtype,
 } from '../../../../../models/task-list-model';
-import { TaskListCoordinatorService } from '../../../../../services/tasks/task-list/task-list-coordinator.service';
-import { TaskNavigatorDataService } from '../../../../../services/tasks/task-navigation/task-navigator-data.service';
 import { getOverlordPlaceholder } from '../../../../../services/tasks/task-list/task-list-overlord-placeholders';
 import { SelectedOverlordService } from '../../../../../services/tasks/selected/selected-overlord.service';
+import { TaskListDataFacadeService } from '../../../../../services/tasks/task-list/task-list-data-facade.service';
 
 @Component({
   selector: 'app-focus-task-list',
@@ -23,8 +22,7 @@ export class FocusTaskListComponent implements OnInit {
   taskListRules: TaskListRules | null = null;
 
   constructor(
-    private taskListCoordinatorService: TaskListCoordinatorService,
-    private navigatorDataService: TaskNavigatorDataService,
+    private navigatorDataService: TaskListDataFacadeService,
     private selectedOverlordService: SelectedOverlordService
   ) {}
 
@@ -38,10 +36,9 @@ export class FocusTaskListComponent implements OnInit {
         type: TaskListType.FOCUS,
         data: TaskListSubtype.SETTINGS,
       };
-      const tasks = await this.taskListCoordinatorService.getTasks(taskListKey);
       const overlordPlaceholder = getOverlordPlaceholder(taskListKey);
       this.selectedOverlordService.setSelectedOverlord(overlordPlaceholder);
-      this.navigatorDataService.setTasks(tasks, taskListKey);
+      this.navigatorDataService.loadTaskList(taskListKey);
       this.errorMessage = '';
     } catch (error) {
       this.errorMessage = 'Failed to load focus tasks.';

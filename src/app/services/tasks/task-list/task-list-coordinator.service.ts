@@ -1,13 +1,9 @@
 import { Injectable } from '@angular/core';
-import {
-  TaskListRules,
-  defaultTaskLists,
-  TaskListKey,
-} from '../../../models/task-list-model';
+import { TaskListKey } from '../../../models/task-list-model';
 import { UiTask } from '../../../models/taskModelManager';
 import { TaskListRulesService } from './task-list-rules.service';
 import { TaskListSimpleService } from './task-list-simple.service';
-import { TaskEnhancementService } from './task-enhancement.service';
+import { TaskUiDecoratorService } from './task-ui-decorator.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +12,7 @@ export class TaskListCoordinatorService {
   constructor(
     private taskListSimple: TaskListSimpleService,
     private taskListRules: TaskListRulesService,
-    private taskEnhancer: TaskEnhancementService
+    private taskDecorator: TaskUiDecoratorService
   ) {}
 
   async getTasks(taskListKey: TaskListKey): Promise<UiTask[]> {
@@ -27,13 +23,10 @@ export class TaskListCoordinatorService {
       taskListKey,
       rawTasks
     );
-    const enhancedTasks =
-      this.taskEnhancer.enhanceTasks(filteredSortedTasks) || [];
 
-    console.log(
-      `TaskListCoordinatorService: Enhanced tasks for ${taskListKey}:`,
-      enhancedTasks
-    );
-    return enhancedTasks;
+    const decoratedTasks =
+      this.taskDecorator.decorateTasks(filteredSortedTasks);
+
+    return decoratedTasks;
   }
 }

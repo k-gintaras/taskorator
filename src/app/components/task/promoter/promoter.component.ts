@@ -4,6 +4,9 @@ import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 
+/**
+ * @deprecated replaced by artificer action component that lets you swap to button that promotes or demotes task
+ */
 @Component({
   selector: 'app-promoter',
   standalone: true,

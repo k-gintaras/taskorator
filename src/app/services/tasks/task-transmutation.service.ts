@@ -15,7 +15,6 @@ export class TaskTransmutationService {
   toUiTask(task: TaskoratorTask): UiTask {
     return {
       ...task,
-      css: '', // precomputed css, to lighten the load on UI
       isConnectedToTree: true, // Default value, can be updated based on tree connection
       isSelected: false,
       isRecentlyViewed: false,

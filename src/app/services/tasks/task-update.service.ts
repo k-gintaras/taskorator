@@ -19,6 +19,7 @@ import {
   TaskActionTrackerService,
 } from './task-action-tracker.service';
 import { ErrorService } from '../core/error.service';
+import { TaskUiInteractionService } from './task-list/task-ui-interaction.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,48 +28,55 @@ export class TaskUpdateService {
   constructor(
     private taskService: TaskService,
     private taskBatchService: TaskBatchService,
-    private selectedService: SelectedMultipleService,
+    private taskUiInteractionService: TaskUiInteractionService,
     private settingsService: SettingsService,
     private actionService: TaskActionTrackerService,
     private errorService: ErrorService
   ) {}
 
-  move(targetTask: TaskoratorTask) {
-    firstValueFrom(this.selectedService.getSelectedTasks()).then(
-      (selectedTasks) => {
-        if (selectedTasks.length > 0 && targetTask.taskId) {
-          for (const task of selectedTasks) {
-            task.overlord = targetTask.taskId;
-          }
+  async move(targetTask: TaskoratorTask) {
+    const selectedTaskIds = this.taskUiInteractionService.getSelectedTaskIds();
 
-          this.taskBatchService.updateTaskBatch(
-            selectedTasks,
-            TaskActions.MOVED,
-            targetTask.taskId
-          );
-          this.clearSelectedTasks();
-          this.feedback(
-            'Moved multiple tasks. ' +
-              selectedTasks.map((t) => t.name).join(',')
-          );
-        } else {
-          this.error(
-            "Can't update empty tasks or failed to create new overlord."
-          );
-        }
+    if (selectedTaskIds.length > 0 && targetTask.taskId) {
+      try {
+        const selectedTasks = await Promise.all(
+          selectedTaskIds.map((id) => this.taskService.getTaskById(id))
+        );
+        selectedTasks.forEach((task) => {
+          if (task) task.overlord = targetTask.taskId;
+        });
+
+        await this.taskBatchService.updateTaskBatch(
+          selectedTasks.filter(Boolean) as TaskoratorTask[],
+          TaskActions.MOVED,
+          targetTask.taskId
+        );
+
+        await this.clearSelectedTasks();
+
+        this.feedback(
+          'Moved multiple tasks. ' +
+            selectedTasks
+              .map((t) => t?.name)
+              .filter(Boolean)
+              .join(',')
+        );
+      } catch {
+        this.error(
+          "Can't update empty tasks or failed to create new overlord."
+        );
       }
-    );
+    } else {
+      this.error("Can't update empty tasks or failed to create new overlord.");
+    }
   }
 
-  private clearSelectedTasks() {
-    this.settingsService.getSettingsOnce().then((s: TaskSettings | null) => {
-      if (s) {
-        if (s.moveTasksOnce) {
-          this.selectedService.clear();
-          this.feedback('Cleared selected tasks. ');
-        }
-      }
-    });
+  private async clearSelectedTasks() {
+    const settings = await this.settingsService.getSettingsOnce();
+    if (settings?.moveTasksOnce) {
+      this.taskUiInteractionService.clearSelection();
+      this.feedback('Cleared selected tasks.');
+    }
   }
 
   split(
