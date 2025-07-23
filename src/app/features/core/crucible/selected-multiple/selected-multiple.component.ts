@@ -3,17 +3,18 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { Observable } from 'rxjs';
-import { SearchOverlordComponent } from '../../../../components/search-overlord/search-overlord.component';
 import { TaskMiniComponent } from '../../../../components/task/task-mini/task-mini.component';
 import { TaskSettings } from '../../../../models/settings';
-import { UiTask, TaskoratorTask } from '../../../../models/taskModelManager';
+import { UiTask } from '../../../../models/taskModelManager';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
 import { TaskUiInteractionService } from '../../../../services/tasks/task-list/task-ui-interaction.service';
 import { SelectedOverlordService } from '../../../../services/tasks/selected/selected-overlord.service';
 import { TaskSettingsTasksService } from '../../../../services/tasks/task-settings-tasks.service';
 import { TaskBatchService } from '../../../../services/sync-api-cache/task-batch.service';
 import { TaskActions } from '../../../../services/tasks/task-action-tracker.service';
+import { TaskListCoordinatorService } from '../../../../services/tasks/task-list/task-list-coordinator.service';
+import { TaskUiDecoratorService } from '../../../../services/tasks/task-list/task-ui-decorator.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-selected-multiple',
@@ -24,54 +25,58 @@ import { TaskActions } from '../../../../services/tasks/task-action-tracker.serv
     ReactiveFormsModule,
     NgxMatSelectSearchModule,
     MatButton,
-    SearchOverlordComponent,
   ],
   templateUrl: './selected-multiple.component.html',
   styleUrls: ['./selected-multiple.component.scss'],
 })
 export class SelectedMultipleComponent implements OnInit {
-  selectedTasks: TaskoratorTask[] = [];
+  selectedTasks: UiTask[] = [];
   selectedOverlord: UiTask | null = null;
   settings?: TaskSettings;
-  filteredTaskOptions?: Observable<TaskoratorTask[]>;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private taskUiInteractionService: TaskUiInteractionService,
+    private taskUiDecoratorService: TaskUiDecoratorService,
     private taskBatchService: TaskBatchService,
     private settingsService: SettingsService,
     private selectedOverlordService: SelectedOverlordService,
-    private taskPriorityService: TaskSettingsTasksService
+    private taskPriorityService: TaskSettingsTasksService,
+    private taskListCoordinator: TaskListCoordinatorService
   ) {}
 
   ngOnInit() {
-    this.selectedTasks = this.getSelectedTasksSync();
-    this.settingsService.getSettings().subscribe((s) => {
-      if (!s) return;
-      this.settings = s;
-    });
+    this.refreshSelectedTasks();
+    this.settingsService
+      .getSettings()
+      .subscribe((s) => (this.settings = s || undefined));
     this.selectedOverlordService
       .getSelectedOverlordObservable()
-      .subscribe((overlord) => {
-        if (overlord) this.selectedOverlord = overlord;
+      .subscribe((o) => {
+        this.selectedOverlord = o;
       });
+    this.taskUiDecoratorService.selectedTasksChanges$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshSelectedTasks());
   }
 
-  private getSelectedTasksSync(): TaskoratorTask[] {
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private async refreshSelectedTasks() {
     const ids = this.taskUiInteractionService.getSelectedTaskIds();
-    // Map ids to tasks if you have cached tasks; else empty array
-    return [];
+    this.selectedTasks = await this.taskListCoordinator.getTasksByIds(ids);
   }
 
   clear() {
     this.taskUiInteractionService.clearSelection();
-    this.selectedTasks = [];
+    this.refreshSelectedTasks();
   }
 
   async setFocus(reset = true) {
-    if (!this.settings || this.selectedTasks.length === 0) {
-      console.error('Settings not initialized or no tasks selected.');
-      return;
-    }
+    if (!this.settings || this.selectedTasks.length === 0) return;
     if (reset) {
       this.settings.focusTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
@@ -83,10 +88,7 @@ export class SelectedMultipleComponent implements OnInit {
   }
 
   async setFrogs(reset = true) {
-    if (!this.settings || this.selectedTasks.length === 0) {
-      console.error('Settings not initialized or no tasks selected.');
-      return;
-    }
+    if (!this.settings || this.selectedTasks.length === 0) return;
     if (reset) {
       this.settings.frogTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
@@ -98,10 +100,7 @@ export class SelectedMultipleComponent implements OnInit {
   }
 
   async setFavorites(reset = true) {
-    if (!this.settings || this.selectedTasks.length === 0) {
-      console.error('Settings not initialized or no tasks selected.');
-      return;
-    }
+    if (!this.settings || this.selectedTasks.length === 0) return;
     if (reset) {
       this.settings.favoriteTaskIds = this.selectedTasks.map((t) => t.taskId);
       await this.settingsService.updateSettings(this.settings);
@@ -112,33 +111,31 @@ export class SelectedMultipleComponent implements OnInit {
     }
   }
 
-  onTaskCardClick(task: TaskoratorTask) {
-    if (this.selectedTasks.includes(task)) {
+  async onTaskCardClick(task: UiTask) {
+    if (task.isSelected) {
       this.taskUiInteractionService.unselect(task.taskId);
     } else {
       this.taskUiInteractionService.select(task.taskId);
     }
+    await this.refreshSelectedTasks();
   }
 
-  setNewOverlordForSelectedTasks() {
-    const o = this.selectedOverlord;
-    if (!o) {
-      alert('Please select an overlord from the list.');
+  async setNewOverlordForSelectedTasks() {
+    if (!this.selectedOverlord) {
+      alert('Please select an overlord.');
       return;
     }
 
     this.selectedTasks.forEach((task) => {
-      task.overlord = o.taskId;
+      task.overlord = this.selectedOverlord!.taskId;
     });
 
-    this.taskBatchService
-      .updateTaskBatch(this.selectedTasks, TaskActions.MOVED, o)
-      .then(() => {
-        console.log(
-          `Tasks ${this.selectedTasks
-            .map((t) => t.name)
-            .join(', ')} updated with new overlord ${o}`
-        );
-      });
+    await this.taskBatchService.updateTaskBatch(
+      this.selectedTasks,
+      TaskActions.MOVED,
+      this.selectedOverlord
+    );
+
+    await this.refreshSelectedTasks();
   }
 }

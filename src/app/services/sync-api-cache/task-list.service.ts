@@ -88,11 +88,11 @@ export class TaskListService {
 
     // not cached as a list
     if (!cacheState) {
-      console.log(
-        'getTaskGroupWithCache: no group not cached ' +
-          taskListKey.type +
-          taskListKey.data
-      );
+      // console.log(
+      //   'getTaskGroupWithCache: no group not cached ' +
+      //     taskListKey.type +
+      //     taskListKey.data
+      // );
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toUiTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
@@ -201,14 +201,25 @@ export class TaskListService {
   /**
    * Get tasks for a specific overlord as ExtendedTask[]
    */
+  // In task-list.service.ts
   async getOverlordTasks(overlordId: string): Promise<UiTask[] | null> {
     const taskListKey: TaskListKey = {
       type: TaskListType.OVERLORD,
       data: overlordId,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
+
+    const tasks = await this.getTaskGroupWithCache(taskListKey, () =>
       this.ensureApiService().getOverlordTasks(overlordId)
     );
+
+    // ALWAYS emit event, even if no children (empty array means 0 children!)
+    // This ensures parents with no children get their counts fixed to 0
+    this.eventBusService.overlordChildrenLoaded(
+      overlordId,
+      tasks || [] // Ensure we always pass an array
+    );
+
+    return tasks;
   }
 
   /**
@@ -354,7 +365,7 @@ export class TaskListService {
     return cachedTasks;
   }
 
-  async getTasksByIds(ids: string[]): Promise<TaskoratorTask[]> {
+  async getTasksByIds(ids: string[]): Promise<UiTask[]> {
     if (!ids.length) return [];
 
     const cachedTasks = this.taskCache.getTasksByIds(ids);
@@ -364,7 +375,7 @@ export class TaskListService {
 
     if (!missingIds.length) return cachedTasks;
 
-    const fetchedTasks =
+    const fetchedTasks: TaskoratorTask[] =
       (await this.ensureApiService().getTasksFromIds(missingIds)) || [];
 
     const extendedFetchedTasks =

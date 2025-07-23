@@ -24,6 +24,9 @@ export enum TaskListType {
   OVERLORD = 'overlord',
   SUPER_OVERLORD = 'superOverlord',
   SESSION = 'session',
+  SELECTED = 'selected', // For selected tasks
+  TASKORATOR = 'taskorator', // For Taskorator picks
+  MOST_VIEWED = 'mostViewed', // For most viewed tasks
 }
 
 export enum TaskListSubtype {
@@ -32,20 +35,6 @@ export enum TaskListSubtype {
   REPEATING = 'repeating',
   API = 'api',
 }
-
-// export enum TaskListKey {
-//   OVERLORD = 'overlord_',
-//   FOCUS = 'settings_focus',
-//   FROG = 'settings_frog',
-//   FAVORITE = 'settings_favorite',
-//   DAILY = 'repeating_daily',
-//   WEEKLY = 'repeating_weekly',
-//   MONTHLY = 'repeating_monthly',
-//   YEALRY = 'repeating_yearly',
-//   CREATED = 'latest_created',
-//   UPDATED = 'latest_updated',
-//   SESSION = 'session_',
-// }
 
 export interface TaskListKey {
   type: TaskListType;
@@ -73,6 +62,62 @@ export function getIdFromKey(key: TaskListKey): string {
 }
 
 export const defaultTaskLists: TaskListRules[] = [
+  {
+    id: 'mostViewed',
+    title: 'Most Viewed Tasks',
+    type: TaskListType.MOST_VIEWED,
+    description: 'Tasks that have been viewed the most',
+    rules: {
+      filter: (task) => true, // Placeholder: logic for selection across groups
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
+      permissions: {
+        canAdd: false,
+        canMove: true,
+        canDelete: true,
+        canComplete: true,
+      },
+    },
+    parent: '',
+    autoRefresh: false, // or true if you wire selectedTasksChanges$
+  },
+  {
+    id: 'selectedTasks',
+    title: 'Selected Tasks',
+    type: TaskListType.SELECTED, // or new type like CUSTOM if needed
+    description: 'Tasks currently selected by the user',
+    rules: {
+      filter: (task) => true, // Placeholder: logic for selection across groups
+      // filter: (task) => task.isSelected,
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
+      permissions: {
+        canAdd: false,
+        canMove: true,
+        canDelete: true,
+        canComplete: true,
+      },
+    },
+    parent: '',
+    autoRefresh: false, // or true if you wire selectedTasksChanges$
+  },
+
+  {
+    id: 'taskorator',
+    title: 'Taskorator Picks',
+    type: TaskListType.TASKORATOR,
+    description: 'A curated mix: latest, oldest, popular, random etc.',
+    rules: {
+      filter: (task) => true, // Placeholder: logic for selection across groups
+      sorter: (a, b) => 0, // Placeholder: future mixed sorting strategy
+      permissions: {
+        canAdd: false,
+        canMove: false,
+        canDelete: false,
+        canComplete: true,
+      },
+    },
+    parent: '',
+    autoRefresh: false, // will be curated on demand
+  },
   {
     id: 'daily',
     title: 'Daily Tasks',

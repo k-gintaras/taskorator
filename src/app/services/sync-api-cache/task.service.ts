@@ -70,9 +70,15 @@ export class TaskService {
       if (!this.apiService) {
         throw new Error('TaskService api not initialized');
       }
+      task.lastUpdated = Date.now();
+      console.log('TASK BEFORE API update', task);
       await this.apiService.updateTask(task);
 
       const extendedTask = this.transmutatorService.toUiTask(task);
+      console.log('TRANSFORMED to UiTask', extendedTask);
+
+      console.log('Updating extendedTask:', extendedTask);
+
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
         this.taskIdCache.deleteTask(extendedTask.taskId); // Notify TaskIdCache of deletion

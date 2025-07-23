@@ -13,6 +13,12 @@ export class TreeNodeService {
     tree: TaskTree,
     tasks: TaskoratorTask[]
   ): Promise<string[]> {
+    // Validate input
+    if (!tasks || !Array.isArray(tasks)) {
+      console.warn('[TreeNodeService] Invalid tasks input for createTasks');
+      return [];
+    }
+
     const uniqueTasks = this.deduplicateTasks(tasks);
     const created: string[] = [];
 
@@ -29,6 +35,12 @@ export class TreeNodeService {
     tree: TaskTree,
     tasks: TaskoratorTask[]
   ): Promise<string[]> {
+    // Validate input
+    if (!tasks || !Array.isArray(tasks)) {
+      console.warn('[TreeNodeService] Invalid tasks input for updateTasks');
+      return [];
+    }
+
     const updated: string[] = [];
 
     for (const task of tasks) {
@@ -78,19 +90,19 @@ export class TreeNodeService {
         return this.removeTaskFromTree(tree, existingNode);
       }
 
-      const wasUpdated = this.updateNodeFields(existingNode, task);
+      const wasUpdated = this.updateNodeFields(existingNode, task, tree);
       if (task.overlord !== existingNode.overlord) {
         this.moveTaskNode(tree, existingNode, task.overlord);
       }
 
-      this.forceUpdateParentCounts(tree, existingNode);
+      this.updateNodeCounts(existingNode);
       return wasUpdated;
     }
 
     const newNode = this.createNode(task);
     this.addTaskToParent(parentNode, newNode);
     tree.totalTasks++;
-    this.forceUpdateParentCounts(tree, newNode);
+    this.updateNodeCounts(parentNode);
     return true;
   }
 
@@ -115,25 +127,34 @@ export class TreeNodeService {
   }
 
   private addTaskToParent(parent: TaskTreeNode, node: TaskTreeNode): void {
-    if (parent.children.some((c) => c.taskId === node.taskId)) return;
-
     parent.children.push(node);
-    parent.childrenCount = parent.children.length;
-    parent.completedChildrenCount = parent.children.filter(
-      (c) => c.stage === 'completed' || c.stage === 'deleted'
-    ).length;
+    this.updateNodeCounts(parent);
   }
 
-  private updateNodeFields(node: TaskTreeNode, task: TaskoratorTask): boolean {
+  private updateNodeFields(
+    node: TaskTreeNode,
+    task: TaskoratorTask,
+    tree: TaskTree
+  ): boolean {
     let updated = false;
+
     if (node.name !== task.name) {
       node.name = task.name;
       updated = true;
     }
+
     if (node.stage !== task.stage) {
       node.stage = task.stage;
       updated = true;
+
+      if (node.overlord) {
+        const parent = this.getParentNodeById(tree, node.overlord);
+        if (parent) {
+          this.updateNodeCounts(parent);
+        }
+      }
     }
+
     return updated;
   }
 
@@ -167,20 +188,18 @@ export class TreeNodeService {
       parent.children = parent.children.filter(
         (child) => child.taskId !== node.taskId
       );
-      this.forceUpdateParentCounts(tree, parent);
+
+      // Update the parent's counts after removing the child
+      this.updateNodeCounts(parent);
     }
   }
 
-  private forceUpdateParentCounts(tree: TaskTree, node: TaskTreeNode): void {
-    if (!node.overlord) return;
-
-    const parent = this.getParentNodeById(tree, node.overlord);
-    if (parent) {
-      parent.completedChildrenCount = parent.children.filter(
-        (c) => c.stage === 'completed' || c.stage === 'deleted'
-      ).length;
-      parent.childrenCount = parent.children.length;
-    }
+  private updateNodeCounts(node: TaskTreeNode): void {
+    // Update counts based on the node's actual children
+    node.childrenCount = node.children.length;
+    node.completedChildrenCount = node.children.filter(
+      (c) => c.stage === 'completed' || c.stage === 'deleted'
+    ).length;
   }
 
   private getParentNode(

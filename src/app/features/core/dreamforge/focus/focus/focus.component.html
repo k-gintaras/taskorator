@@ -8,11 +8,12 @@
 </div>
 <div class="component-width">
   <h1>Selected Tasks</h1>
-  <app-staged-task-list
+  <!-- <app-staged-task-list
     [tasks]="selectedTasks"
     (tasksChange)="updateSelectedTasks($event)"
   >
-  </app-staged-task-list>
+  </app-staged-task-list> -->
+  <app-selected-multiple></app-selected-multiple>
   <button class="task-btn" (click)="add()">
     <mat-icon>add</mat-icon>Add To Focus
   </button>

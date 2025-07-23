@@ -8,10 +8,7 @@ import {
   TaskSubtype,
   TaskSize,
 } from '../../models/taskModelManager';
-import { SelectedMultipleService } from './selected/selected-multiple.service';
-import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { SettingsService } from '../sync-api-cache/settings.service';
-import { TaskSettings } from '../../models/settings';
 import { TaskService } from '../sync-api-cache/task.service';
 import { TaskBatchService } from '../sync-api-cache/task-batch.service';
 import {
@@ -106,7 +103,7 @@ export class TaskUpdateService {
     this.taskService.createTask(task).then((createdTask: TaskoratorTask) => {
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
       this.feedback('Created: ' + ' ' + createdTask.name);
-      this.actionService.recordAction(task.taskId, TaskActions.CREATED);
+      this.actionService.recordAction(createdTask.taskId, TaskActions.CREATED);
     });
   }
 

@@ -60,6 +60,11 @@ export class TaskListSimpleService {
     }
   }
 
+  async getTasksByIds(ids: string[]) {
+    const tasks = await this.taskListService.getTasksByIds(ids);
+    return tasks;
+  }
+
   async getSuperOverlordTasks(taskId: string): Promise<UiTask[] | null> {
     const superOverlord = await this.taskService.getSuperOverlord(taskId);
     return superOverlord?.overlord

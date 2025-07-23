@@ -1,14 +1,14 @@
 import { Component, Input } from '@angular/core';
-import { TaskoratorTask } from '../../../models/taskModelManager';
+import { UiTask } from '../../../models/taskModelManager';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
 import { NgClass, NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { TaskNodeInfo } from '../../../models/taskTree';
-import { SelectedMultipleService } from '../../../services/tasks/selected/selected-multiple.service';
 import { TaskActions } from '../../../services/tasks/task-action-tracker.service';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TaskUiInteractionService } from '../../../services/tasks/task-list/task-ui-interaction.service';
 
 @Component({
   selector: 'app-artificer-action-test',
@@ -18,13 +18,13 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './artificer-action.component.scss',
 })
 export class ArtificerActionComponentTest {
-  @Input() task: TaskoratorTask | undefined;
+  @Input() task: UiTask | undefined;
   currentAction!: ArtificerDetails;
   @Input() treeNode: TaskNodeInfo | undefined;
 
   constructor(
     private artificerService: ArtificerService,
-    private selectedService: SelectedMultipleService,
+    private selectedService: TaskUiInteractionService,
     private dialog: MatDialog
   ) {
     this.artificerService.currentAction$.subscribe((action) => {
@@ -95,7 +95,7 @@ export class ArtificerActionComponentTest {
         this.editTask(task);
         break;
       case 'select':
-        this.selectedService.addRemoveSelectedTask(task);
+        this.selectedService.toggleSelection(task.taskId);
         break;
       case 'suggest':
         console.log(' this.gptHelper.suggestTasksForTask(task);');
@@ -121,7 +121,7 @@ export class ArtificerActionComponentTest {
     }
   }
 
-  editTask(task: TaskoratorTask): void {
+  editTask(task: UiTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
       data: task, // Pass the task to edit
@@ -143,7 +143,7 @@ export class ArtificerActionComponentTest {
 
   isSelected() {
     if (!this.task) return false;
-    return this.selectedService.isSelected(this.task);
+    return this.task.isSelected;
   }
 
   getIcon(): string {

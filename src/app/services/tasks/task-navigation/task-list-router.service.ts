@@ -98,6 +98,9 @@ export class TaskListRouterService {
       [TaskListType.SUPER_OVERLORD]: this.getRouteUrlByType(
         TaskListType.SUPER_OVERLORD
       ),
+      [TaskListType.SELECTED]: '', // todo: ADD NEW ROUTES
+      [TaskListType.TASKORATOR]: '',
+      [TaskListType.MOST_VIEWED]: '',
     };
   }
 

@@ -1,4 +1,4 @@
-<div class="component-width">
+<div class="component-width space-y-4">
   <!-- Task Title -->
   <div class="form-group">
     <label for="task-title">Title:</label>
@@ -7,8 +7,10 @@
       type="text"
       [(ngModel)]="task.name"
       placeholder="Enter task title"
+      class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
     />
   </div>
+
   <div class="form-group">
     <label for="task-backup-link">Link:</label>
     <input
@@ -16,10 +18,10 @@
       type="url"
       [(ngModel)]="task.backupLink"
       placeholder="Enter link (URL)"
+      class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
     />
   </div>
 
-  <!-- Task Description -->
   <div class="form-group">
     <label for="task-description">Description:</label>
     <input
@@ -27,9 +29,10 @@
       type="text"
       [(ngModel)]="task.todo"
       placeholder="Enter task description"
+      class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
     />
   </div>
-  <!-- Task Why -->
+
   <div class="form-group">
     <label for="task-why">Why:</label>
     <input
@@ -37,10 +40,10 @@
       type="text"
       [(ngModel)]="task.why"
       placeholder="Enter task reason why"
+      class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
     />
   </div>
 
-  <!-- Task Status and Priority -->
   <div class="form-group duo">
     <div>
       <label for="task-priority">Priority:</label>
@@ -51,11 +54,16 @@
         min="1"
         max="10"
         placeholder="Enter priority (1-10)"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
       />
     </div>
     <div>
       <label for="task-stage">Stage:</label>
-      <select id="task-stage" [(ngModel)]="task.stage">
+      <select
+        id="task-stage"
+        [(ngModel)]="task.stage"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+      >
         <option value="todo">To Do</option>
         <option value="seen">Seen</option>
         <option value="completed">Completed</option>
@@ -65,11 +73,14 @@
     </div>
   </div>
 
-  <!-- Task Repeat and Stage -->
   <div class="form-group duo">
     <div>
       <label for="task-type">Type:</label>
-      <select id="task-type" [(ngModel)]="task.type">
+      <select
+        id="task-type"
+        [(ngModel)]="task.type"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+      >
         <option value="">None</option>
         <option value="code">Code</option>
         <option value="idea">Idea</option>
@@ -88,7 +99,11 @@
     </div>
     <div>
       <label for="task-repeat">Repeat:</label>
-      <select id="task-repeat" [(ngModel)]="task.repeat">
+      <select
+        id="task-repeat"
+        [(ngModel)]="task.repeat"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+      >
         <option value="once">Once</option>
         <option value="never">Never</option>
         <option value="half-hourly">Half-Hourly</option>
@@ -105,7 +120,6 @@
     </div>
   </div>
 
-  <!-- Task End Time and Duration -->
   <div class="form-group duo">
     <div>
       <label for="task-duration">Duration (Minutes):</label>
@@ -116,9 +130,11 @@
         (ngModelChange)="updateDuration($event)"
         min="0"
         placeholder="Enter duration"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
       />
     </div>
   </div>
+
   <div class="form-group duo">
     <div>
       <label for="task-end-time">End Time (Optional):</label>
@@ -128,6 +144,7 @@
         [(ngModel)]="endTimeDisplay"
         (ngModelChange)="updateTimeEnd($event)"
         placeholder="Select end time"
+        class="w-full bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
       />
     </div>
   </div>
@@ -144,60 +161,9 @@
     </button>
   </div>
 
-  <!-- Placeholder Buttons for Future Features -->
-  <div class="form-actions">
-    <button
-      type="button"
-      mat-raised-button
-      class="app-button future-feature-button"
-      disabled
-    >
-      Edit Tags
-    </button>
-    <button
-      type="button"
-      mat-raised-button
-      class="app-button future-feature-button"
-      disabled
-    >
-      Edit Owner
-    </button>
-    <button
-      type="button"
-      mat-raised-button
-      class="app-button future-feature-button"
-      disabled
-    >
-      Add Image
-    </button>
+  <div class="form-actions space-x-2">
+    <button type="button" mat-raised-button disabled>Edit Tags</button>
+    <button type="button" mat-raised-button disabled>Edit Owner</button>
+    <button type="button" mat-raised-button disabled>Add Image</button>
   </div>
 </div>
-
-<!-- TODO: task edit subtype and size to be added later if needed -->
-<!-- <div class="form-group duo">
-  <div>
-    <label for="task-size">Size:</label>
-    <select id="task-size" [(ngModel)]="task.size">
-      <option value="do now">Do Now</option>
-      <option value="split">Split</option>
-      <option value="delegate">Delegate</option>
-    </select>
-  </div>
-  <div>
-    <label for="task-subtype">Subtype:</label>
-    <select id="task-subtype" [(ngModel)]="task.subtype">
-      <option value="">None</option>
-      <option value="js">JavaScript</option>
-      <option value="ts">TypeScript</option>
-      <option value="html">HTML</option>
-      <option value="css">CSS</option>
-      <option value="sound">Sound</option>
-      <option value="android">Android</option>
-      <option value="angular">Angular</option>
-      <option value="nodejs">Node.js</option>
-      <option value="java">Java</option>
-      <option value="text">Text</option>
-      <option value="list">List</option>
-    </select>
-  </div>
-</div> -->

@@ -97,7 +97,7 @@ export class SearchCreateComponent {
     };
 
     this.taskupdateService.create(task);
-    this.resetState();
+    setTimeout(() => this.resetState(), 1000);
   }
 
   // /**

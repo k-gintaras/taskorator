@@ -1,4 +1,4 @@
-<div class="px-3 py-2 select-none">
+<div class="px-3 py-2 select-none w-full max-w-full">
   <!-- Title at top -->
   <ng-container *ngIf="currentPath$ | async as path">
     <button
@@ -11,17 +11,7 @@
     </button>
   </ng-container>
 
-  <!-- Back button and breadcrumb nav below -->
-  <div class="flex items-center gap-3">
-    <!-- <button
-      (click)="goBack()"
-      class="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-      title="Go back"
-      aria-label="Go back"
-    >
-      ←
-    </button> -->
-
+  <div class="flex items-center flex-wrap gap-3 max-w-full">
     <button
       mat-icon-button
       color="primary"
@@ -34,12 +24,12 @@
     <ng-container *ngIf="currentPath$ | async as path">
       <nav
         *ngIf="path.length > 1"
-        class="flex items-center gap-1 overflow-x-auto text-gray-700 text-sm"
+        class="flex flex-wrap items-center gap-1 text-gray-700 text-sm max-w-full"
         aria-label="Breadcrumb"
       >
         <ng-container *ngFor="let crumb of path; let last = last">
           <a
-            class="cursor-pointer hover:underline truncate max-w-[120px]"
+            class="cursor-pointer hover:underline break-words max-w-[120px] truncate"
             [title]="crumb.name"
             (click)="jumpTo(crumb.id)"
           >

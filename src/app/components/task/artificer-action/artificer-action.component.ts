@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { TaskoratorTask } from '../../../models/taskModelManager';
+import {  UiTask } from '../../../models/taskModelManager';
 import { TaskUpdateService } from '../../../services/tasks/task-update.service';
 import { ArtificerDetails } from '../../artificer/artificer.interface';
 import { ArtificerService } from '../../artificer/artificer.service';
@@ -22,7 +22,7 @@ import { TaskService } from '../../../services/sync-api-cache/task.service';
   styleUrls: ['./artificer-action.component.scss'],
 })
 export class ArtificerActionComponent {
-  @Input() task?: TaskoratorTask;
+  @Input() task?: UiTask;
   currentAction!: ArtificerDetails;
   @Input() treeNode: TaskNodeInfo | null = null;
   @Input() protectTaskFromDelete = true;
@@ -119,7 +119,7 @@ export class ArtificerActionComponent {
     }
   }
 
-  async moveToParent(task: TaskoratorTask): Promise<void> {
+  async moveToParent(task: UiTask): Promise<void> {
     if (!task.overlord) {
       console.warn('Task has no parent, cannot move to parent level.');
       return;
@@ -135,7 +135,7 @@ export class ArtificerActionComponent {
     await this.taskUpdateService.update(task, TaskActions.MOVED);
   }
 
-  mass(task: TaskoratorTask) {
+  mass(task: UiTask) {
     const dialogRef = this.dialog.open(MassAddPopupComponent, {
       width: '600px',
       data: task,
@@ -150,7 +150,7 @@ export class ArtificerActionComponent {
     });
   }
 
-  editTask(task: TaskoratorTask): void {
+  editTask(task: UiTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
       data: task,

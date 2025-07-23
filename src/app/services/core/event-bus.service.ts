@@ -24,6 +24,7 @@ export class EventBusService {
       'getTasks',
       'createTasks',
       'updateTasks',
+      'overlord-children-loaded', // Add the new event here
     ];
     events.forEach((event) => this.subjects.set(event, new Subject<any>()));
   }
@@ -80,5 +81,10 @@ export class EventBusService {
 
   updateTasks(taskIds: UiTask[]): void {
     this.emit('updateTasks', taskIds);
+  }
+
+  // New method for the overlord children loaded event
+  overlordChildrenLoaded(overlordId: string, children: UiTask[]): void {
+    this.emit('overlord-children-loaded', { overlordId, children });
   }
 }

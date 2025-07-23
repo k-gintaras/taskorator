@@ -11,11 +11,12 @@ import { StagedTaskListComponent } from '../../../../../components/task/staged-t
 import { MatIcon } from '@angular/material/icon';
 import { TaskUiInteractionService } from '../../../../../services/tasks/task-list/task-ui-interaction.service';
 import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
+import { SelectedMultipleComponent } from '../../../crucible/selected-multiple/selected-multiple.component';
 
 @Component({
   selector: 'app-focus',
   standalone: true,
-  imports: [NgFor, StagedTaskListComponent, MatIcon],
+  imports: [NgFor, StagedTaskListComponent, MatIcon, SelectedMultipleComponent],
   templateUrl: './focus.component.html',
   styleUrls: ['./focus.component.scss'],
 })

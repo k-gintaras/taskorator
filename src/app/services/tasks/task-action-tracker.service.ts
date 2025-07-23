@@ -66,6 +66,7 @@ export class TaskActionTrackerService {
     subAction?: any,
     source: 'ui' | 'api' | 'system' | string = 'ui'
   ): void {
+    console.log(`Recording action: ${action} for task ${taskId}`);
     const actionRecord: TaskAction = {
       taskIds: [taskId],
       action,
@@ -77,6 +78,7 @@ export class TaskActionTrackerService {
       source,
     };
     this.lastActionSubject.next(actionRecord);
+    console.log(`Recorded action: ${actionRecord.message}`);
   }
 
   recordBatchAction(

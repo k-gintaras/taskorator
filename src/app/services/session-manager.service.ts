@@ -76,7 +76,6 @@ export class SessionManagerService {
         throw new Error('Login failed or user not authenticated.');
       } else {
         console.log('log: ' + this.user);
-        console.log(`"log: " + this.user`);
       }
     } else if (mode === 'offline') {
       this.authStrategy = this.offlineAuth;
@@ -88,8 +87,7 @@ export class SessionManagerService {
       if (!this.user) {
         throw new Error('Login failed or user not authenticated.');
       } else {
-        console.log('log: ' + this.user);
-        console.log(`"log: " + this.user`);
+        console.log('Offline User ID: ' + this.user.uid);
       }
     }
 

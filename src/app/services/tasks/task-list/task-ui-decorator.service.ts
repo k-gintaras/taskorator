@@ -1,3 +1,5 @@
+// src/app/services/tasks/task-list/task-ui-decorator.service.ts
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { TaskoratorTask, UiTask } from '../../../models/taskModelManager';
@@ -78,10 +80,13 @@ export class TaskUiDecoratorService {
 
   decorateTask(task: TaskoratorTask): UiTask {
     const now = Date.now();
+    // 🔥 FIX: Update cache FIRST, then fetch tree node info
+    const baseTask = this.taskTransmutationService.toUiTask(task);
+    this.taskCache.addTask(baseTask); // Cache the updated task FIRST
+
+    // Now fetch tree node info - this will use the updated cache
     const treeNode = this.treeService.getTaskTreeData(task.taskId);
     const views = this.taskUsageService.getTaskViews(task.taskId);
-
-    const baseTask = this.taskTransmutationService.toUiTask(task);
 
     const enhancedTask: UiTask = {
       ...baseTask,
@@ -99,6 +104,7 @@ export class TaskUiDecoratorService {
       magnitude: this.calculateMagnitude(task, treeNode),
     };
 
+    // Update cache with the fully enhanced task
     this.taskCache.addTask(enhancedTask);
     return enhancedTask;
   }

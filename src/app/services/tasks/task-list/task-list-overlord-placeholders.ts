@@ -1,30 +1,5 @@
-import { TaskListKey } from '../../../models/task-list-model';
-import {
-  UiTask,
-  getRootUiTask,
-} from '../../../models/taskModelManager';
-
-export enum TaskListType {
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-  LATEST_UPDATED = 'latestUpdated',
-  LATEST_CREATED = 'latestCreated',
-  FOCUS = 'focus',
-  FROG = 'frog',
-  FAVORITE = 'favorite',
-  OVERLORD = 'overlord',
-  SUPER_OVERLORD = 'superOverlord',
-  SESSION = 'session',
-}
-
-export enum TaskListSubtype {
-  SETTINGS = 'settings',
-  SESSION = 'session',
-  REPEATING = 'repeating',
-  API = 'api',
-}
+import { TaskListKey, TaskListType } from '../../../models/task-list-model';
+import { UiTask, getRootUiTask } from '../../../models/taskModelManager';
 
 export function getOverlordPlaceholder(listKey: TaskListKey): UiTask {
   const baseTask: UiTask = getRootUiTask();
@@ -90,6 +65,23 @@ export function getOverlordPlaceholder(listKey: TaskListKey): UiTask {
       baseTask.name = 'Focus Session';
       baseTask.todo = 'Dedicated time for concentrated work';
       baseTask.why = 'Sessions turn scattered effort into focused results';
+      return baseTask;
+
+    case TaskListType.SELECTED:
+      baseTask.name = 'Selected Tasks';
+      baseTask.todo = 'Tasks you’ve selected for immediate attention';
+      baseTask.why = 'Selection reveals priority by intent';
+      return baseTask;
+
+    case TaskListType.TASKORATOR:
+      baseTask.name = 'Taskorator Mix';
+      baseTask.todo = 'An algorithmic blend of projects and priorities';
+      baseTask.why = 'Curated variety fuels consistent progress';
+      return baseTask;
+    case TaskListType.MOST_VIEWED:
+      baseTask.name = 'Most Viewed Tasks';
+      baseTask.todo = 'Tasks that have been viewed the most';
+      baseTask.why = 'Visibility drives engagement and action';
       return baseTask;
 
     default:

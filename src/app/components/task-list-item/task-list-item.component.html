@@ -1,6 +1,5 @@
 <div class="relative">
   <app-chunked-progress
-    *ngIf="task.completionPercent > 0"
     [treeNode]="getTreeNodeInfo()"
     class="absolute top-0 left-0 right-0 z-10"
   ></app-chunked-progress>
@@ -37,11 +36,3 @@
     ></app-artificer-action>
   </div>
 </div>
-{{ task.children }}
-{{ task.completedChildren }}
-{{ task.completionPercent }}
-{{ task.isRecentlyViewed }}
-{{ task.isRecentlyCreated }}
-
-{{ getTreeNodeInfo()?.childrenCount }}
-{{ getTreeNodeInfo()?.completedChildrenCount }}

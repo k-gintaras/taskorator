@@ -95,7 +95,6 @@ export class AuthService implements AuthStrategy {
 
   isAuthenticated(): boolean {
     const isAuthenticated = !!this.currentUserSubject.getValue();
-    console.log(`isAuthenticated called. Result: ${isAuthenticated}`);
     return isAuthenticated;
   }
 
