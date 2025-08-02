@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { SessionManagerService } from './services/session-manager.service';
+import { Router, RouterOutlet } from '@angular/router';
+import { AuthStateManagerService } from './services/auth-state-manager.service';
+import { ThemeService } from './services/core/theme.service';
 import { NAVIGATION_CONFIG } from './app.config';
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 import { NavigationService } from './services/navigation.service';
@@ -8,34 +9,31 @@ import { NavigationService } from './services/navigation.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HorizontalNavigationComponent],
+  imports: [HorizontalNavigationComponent, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   constructor(
-    private sessionManager: SessionManagerService,
+    private authStateManager: AuthStateManagerService,
     private router: Router,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private themeService: ThemeService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // Initialize the session (online or offline)
-    await this.sessionManager.initialize('online');
-
-    // Redirect based on login state
-    const isLoggedIn = this.sessionManager.isLoggedIn();
-    if (isLoggedIn) {
-      const previousRoute = await this.navigationService.getRedirectUrl();
-      // i mean... if logged in, why redirect, just allow go wherever they want ???
-      // TODO: previous route always null, fix this
-      // if (!previousRoute) {
-      //   this.router.navigate([NAVIGATION_CONFIG.ON_LOGIN_ROUTE_URL]); // Replace with your default route
-      // }
-      // console.warn('Redirecting to previous route:', previousRoute);
-      // this.router.navigate([previousRoute]);
-    } else {
-      this.router.navigate(['/login']); // Redirect to login if not authenticated
+    // Initialize theme system
+    console.log('App component initialized with theme:', this.themeService.getCurrentTheme());
+    
+    // Initialize the auth state and session
+    try {
+      console.log('App: Initializing auth state...');
+      await this.authStateManager.initializeApp();
+      console.log('App: Auth state initialized successfully');
+    } catch (error) {
+      console.log('App: Auth state initialization failed:', error);
+      // If auth state init fails, redirect to login
+      this.router.navigate(['/welcome']);
     }
   }
 }

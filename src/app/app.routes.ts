@@ -8,6 +8,7 @@ import { LoginComponent } from './features/core/gateway/login/login.component';
 
 export const routes: Route[] = [
   { path: '', component: AutoRedirectComponent }, // Root redirect
+  { path: 'welcome', redirectTo: '/gateway/welcome', pathMatch: 'full' }, // Redirect welcome to gateway/welcome
 
   { path: 'login', component: LoginComponent }, // Public login
 

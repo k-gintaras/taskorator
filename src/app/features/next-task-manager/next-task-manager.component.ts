@@ -5,7 +5,7 @@ import { NgIf } from '@angular/common';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { TaskListService } from '../../services/sync-api-cache/task-list.service';
 import { SearchCreateComponent } from '../../components/search-create/search-create.component';
-import { SessionManagerService } from '../../services/session-manager.service';
+import { AuthStateManagerService } from '../../services/auth-state-manager.service';
 import { LatestCreatedTaskListComponent } from '../core/sentinel/lists/latest-created-task-list/latest-created-task-list.component';
 
 @Component({
@@ -28,15 +28,18 @@ export class NextTaskManagerComponent implements OnInit {
   constructor(
     private taskService: TaskUpdateService,
     private taskListService: TaskListService,
-    private sessionManager: SessionManagerService
+    private authStateManager: AuthStateManagerService
   ) {}
 
   async ngOnInit() {
-    this.initialized = await this.sessionManager.waitForInitialization();
-
-    console.log('Session is ready:', this.sessionManager.getSessionType());
-    // Your component logic here
+    // Wait for the AuthStateManager to ensure all services are initialized
+    await this.authStateManager.ensureInitialized();
+    
+    console.log('Auth state is ready, user authenticated:', this.authStateManager.isAuthenticated());
+    
+    // Now it's safe to fetch tasks since the API is properly initialized
     this.fetchLatestNextTasks();
+    this.initialized = true;
   }
 
   createNextTask(): void {

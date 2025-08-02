@@ -6,99 +6,41 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { Router } from '@angular/router';
-import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
+import { AuthStateManagerService } from '../auth-state-manager.service';
 import { NavigationService } from '../navigation.service';
-import { SessionManagerService } from '../session-manager.service';
-import { AuthOfflineService } from './auth-offline.service';
-
-// export const canActivate: CanActivateFn = (
-//   route: ActivatedRouteSnapshot,
-//   state: RouterStateSnapshot
-// ): boolean | UrlTree => {
-//   const authService = inject(AuthService);
-//   const router = inject(Router);
-//   const navigationService = inject(NavigationService); // Inject the service
-//   const isAuthenticated = authService.isAuthenticated();
-
-//   if (isAuthenticated || state.url.includes('gateway')) {
-//     return true;
-//   } else {
-//     // Save the original URL
-//     navigationService.setRedirectUrl(state.url); // Save the intended URL
-//     return router.createUrlTree(['/gateway/login']);
-//   }
-// };
-
-// export const canActivate: CanActivateFn = (
-//   route: ActivatedRouteSnapshot,
-//   state: RouterStateSnapshot
-// ): boolean | UrlTree => {
-//   const authService = inject(AuthService);
-//   const router = inject(Router);
-//   const navigationService = inject(NavigationService);
-
-//   const isAuthenticated = authService.isAuthenticated();
-
-//   if (isAuthenticated) {
-//     return true;
-//   }
-
-//   navigationService.setRedirectUrl(state.url);
-//   return router.createUrlTree(['/gateway/login']);
-// };
-// export const canActivate: CanActivateFn = (
-//   route: ActivatedRouteSnapshot,
-//   state: RouterStateSnapshot
-// ): Promise<boolean | UrlTree> => {
-//   const router = inject(Router);
-//   const navigationService = inject(NavigationService);
-//   const sessionManager = inject(SessionManagerService);
-//   const authServiceOnline = inject(AuthService);
-//   const authServiceOffline = inject(AuthOfflineService);
-
-//   return (async () => {
-//     await sessionManager.waitForInitialization();
-//     const authService =
-//       sessionManager.getSessionType() === 'online'
-//         ? authServiceOnline
-//         : authServiceOffline;
-
-//     const isAuthenticated = authService.isAuthenticated();
-
-//     if (isAuthenticated) {
-//       return true;
-//     }
-
-//     navigationService.setRedirectUrl(state.url);
-//     return router.createUrlTree(['/gateway/login']);
-//   })();
-// };
 
 export const canActivate: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ): Promise<boolean | UrlTree> => {
   const router = inject(Router);
+  const authStateManager = inject(AuthStateManagerService);
   const navigationService = inject(NavigationService);
-  const sessionManager = inject(SessionManagerService);
-  const authServiceOnline = inject(AuthService);
-  const authServiceOffline = inject(AuthOfflineService);
 
   return (async () => {
-    await sessionManager.waitForInitialization();
+    try {
+      // This will:
+      // 1. Check if already initialized -> return immediately
+      // 2. Check if user is authenticated in Firebase/localStorage -> initialize session
+      // 3. If not authenticated -> return without initializing
+      await authStateManager.ensureInitialized();
 
-    const authService =
-      sessionManager.getSessionType() === 'online'
-        ? authServiceOnline
-        : authServiceOffline;
+      // Now check if user is authenticated after ensuring initialization
+      if (authStateManager.isAuthenticated()) {
+        return true;
+      }
 
-    if (authService.isAuthenticated()) {
-      return true;
+      // Not authenticated - save the intended URL for redirect after login
+      navigationService.setRedirectUrl(state.url);
+      return router.createUrlTree(['/gateway/login']);
+      
+    } catch (error) {
+      console.error('Auth guard error:', error);
+      // On any error, still save the URL and redirect to login
+      navigationService.setRedirectUrl(state.url);
+      return router.createUrlTree(['/gateway/login']);
     }
-
-    navigationService.setRedirectUrl(state.url);
-    return router.createUrlTree(['/login']);
   })();
 };
 

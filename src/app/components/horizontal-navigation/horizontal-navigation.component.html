@@ -1,71 +1,105 @@
-<mat-toolbar
-  class="mat-elevation-z4 flex justify-between items-center px-4 headerMain"
-  style="background-color: #7d4fbf; color: white"
->
-  <div class="flex items-center gap-2">
-    <button mat-icon-button (click)="toggleDrawer()">
+<!-- Top Navigation Bar -->
+<mat-toolbar class="theme-topbar nav-toolbar">
+  <div class="nav-toolbar-left">
+    <button 
+      mat-icon-button 
+      (click)="toggleDrawer()"
+      class="theme-nav-item nav-menu-btn"
+      aria-label="Toggle navigation menu"
+    >
       <mat-icon>menu</mat-icon>
     </button>
-    <app-notification></app-notification>
   </div>
-  <app-search-create></app-search-create>
+  
+  <div class="nav-toolbar-center">
+    <!-- Mobile: Empty center, let right content float -->
+  </div>
+  
+  <div class="nav-toolbar-right">
+    <app-search-create class="nav-search-create"></app-search-create>
+  </div>
 </mat-toolbar>
 
-<mat-sidenav-container class="h-[calc(100vh-64px)]">
+<!-- Main Layout Container -->
+<mat-sidenav-container class="nav-container">
+  <!-- Sidebar Navigation -->
   <mat-sidenav
     #drawer
     [mode]="isHandset ? 'over' : 'side'"
     [opened]="!isHandset && !isCompact"
-    class="bg-secondary !w-[280px] lg:!w-[320px] max-w-full flex flex-col"
+    class="theme-sidebar nav-sidebar"
   >
-    <div class="flex flex-col flex-1 h-full">
-      <!-- Top container: parent + child lists side by side -->
-      <div class="flex flex-1 overflow-hidden border-b border-gray-300">
-        <ul class="w-1/2 overflow-y-auto p-2">
-          <li
-            *ngFor="let item of parentItems"
-            class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
-            [class.bg-primary]="isSelected(item.path)"
-            [class.text-white]="isSelected(item.path)"
-            (click)="onParentClick(item)"
-          >
-            <div class="flex items-center gap-2">
-              <mat-icon>{{ item.metadata.icon || "folder" }}</mat-icon>
-              <span class="whitespace-normal break-words text-grey">
-                {{ item.metadata.title }}
-              </span>
-            </div>
-          </li>
-        </ul>
+    <div class="nav-sidebar-content">
+      <!-- Navigation Items Container -->
+      <div class="nav-items-container">
+        <!-- Parent Items (Left Column) -->
+        <div class="nav-column nav-parent-column">
+          <h3 class="nav-column-title">Modules</h3>
+          <ul class="nav-list">
+            <li
+              *ngFor="let item of parentItems"
+              class="nav-item theme-nav-item"
+              [class.active]="isSelected(item.path)"
+              (click)="onParentClick(item)"
+            >
+              <div class="nav-item-content">
+                <mat-icon class="nav-item-icon">{{ item.metadata.icon || "folder" }}</mat-icon>
+                <span class="nav-item-text">{{ item.metadata.title }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
 
-        <ul class="w-1/2 overflow-y-auto p-2">
-          <li
-            *ngFor="let child of childItems"
-            class="p-2 rounded cursor-pointer hover:bg-gray-300 text-sm truncate"
-            [class.bg-primary]="isSelected(child.path)"
-            [class.text-white]="isSelected(child.path)"
-            (click)="onChildClick(child)"
-          >
-            <div class="flex items-center gap-2">
-              <span class="whitespace-normal break-words">
-                {{ child.metadata.altName || child.metadata.title }}
-              </span>
-            </div>
-          </li>
-        </ul>
+        <!-- Child Items (Right Column) -->
+        <div class="nav-column nav-child-column">
+          <h3 class="nav-column-title">Sections</h3>
+          <ul class="nav-list">
+            <li
+              *ngFor="let child of childItems"
+              class="nav-item theme-nav-item"
+              [class.active]="isSelected(child.path)"
+              (click)="onChildClick(child)"
+            >
+              <div class="nav-item-content">
+                <span class="nav-item-text">
+                  {{ child.metadata.altName || child.metadata.title }}
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <!-- Bottom container: artificer and extra buttons -->
-      <div class="flex-shrink-0 p-2">
+      <!-- Bottom Actions Container -->
+      <div class="nav-actions-container">
+        <!-- Theme Toggle in Menu -->
+        <button 
+          mat-button 
+          (click)="toggleTheme()"
+          class="nav-theme-toggle-btn theme-nav-item"
+          [attr.aria-label]="'Current theme: ' + getCurrentTheme()"
+        >
+          <mat-icon>
+            {{ getCurrentTheme() === 'light' ? 'light_mode' : getCurrentTheme() === 'dark' ? 'dark_mode' : 'contrast' }}
+          </mat-icon>
+          <span>{{ getCurrentTheme() | titlecase }} Mode</span>
+        </button>
+
+        <!-- Notification Component -->
+        <div class="nav-notification-container">
+          <app-notification></app-notification>
+        </div>
+
         <ng-container *ngIf="showArtificer">
           <app-artificer></app-artificer>
         </ng-container>
-        <!-- Add other button components here if needed -->
+        <!-- Add other action components here if needed -->
       </div>
     </div>
   </mat-sidenav>
 
-  <mat-sidenav-content class="p-0">
+  <!-- Main Content Area -->
+  <mat-sidenav-content class="theme-content nav-main-content">
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>

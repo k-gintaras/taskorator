@@ -3,6 +3,7 @@ import { GatewayComponent } from './gateway/gateway.component';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { SettingsComponent } from './settings/settings.component';
+import { WelcomeComponent } from './welcome/welcome.component';
 import { AppRouteMap } from '../../../app.routes-models';
 import { NextTaskManagerComponent } from '../../next-task-manager/next-task-manager.component';
 
@@ -18,9 +19,8 @@ const routes: Routes = [
     component: GatewayComponent,
     children: [
       // children: [
-      { path: '', redirectTo: 'settings', pathMatch: 'full' },
-      // { path: '', redirectTo: 'welcome', pathMatch: 'full' },
-      // { path: 'welcome', component: WelcomeComponent },
+      { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+      { path: 'welcome', component: WelcomeComponent },
       // { path: 'features', component: FeaturesComponent },
       // { path: 'about', component: AboutComponent },
       // { path: 'guide', component: AppGuideComponent },

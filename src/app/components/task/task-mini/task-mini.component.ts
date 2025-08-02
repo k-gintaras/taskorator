@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { CommonModule } from '@angular/common';
 import { TaskListDataFacadeService } from '../../../services/tasks/task-list/task-list-data-facade.service';
+import { ArtificerService } from '../../artificer/artificer.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-task-mini',
@@ -12,8 +14,18 @@ import { TaskListDataFacadeService } from '../../../services/tasks/task-list/tas
 })
 export class TaskMiniComponent {
   @Input() task: TaskoratorTask | undefined;
+  
+  showPriority$: Observable<boolean>;
 
-  constructor(private dataFacade: TaskListDataFacadeService) {}
+  constructor(
+    private dataFacade: TaskListDataFacadeService,
+    private artificerService: ArtificerService
+  ) {
+    // Show priority when artificer action is promote or demote
+    this.showPriority$ = this.artificerService.currentAction$.pipe(
+      map(action => action.action === 'promote' || action.action === 'demote')
+    );
+  }
 
   onTaskCardClick(task: TaskoratorTask | undefined): void {
     if (!task) return;

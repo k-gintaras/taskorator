@@ -101,6 +101,7 @@ export class TaskListRouterService {
       [TaskListType.SELECTED]: '', // todo: ADD NEW ROUTES
       [TaskListType.TASKORATOR]: '',
       [TaskListType.MOST_VIEWED]: '',
+      [TaskListType.RECENTLY_VIEWED]: '',
     };
   }
 

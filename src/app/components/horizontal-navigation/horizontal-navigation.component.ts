@@ -3,6 +3,7 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
+import { ThemeService } from '../../services/core/theme.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,7 +45,8 @@ export class HorizontalNavigationComponent implements OnInit {
   constructor(
     private navigationService: NavigationService,
     private router: Router,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -106,6 +108,15 @@ export class HorizontalNavigationComponent implements OnInit {
 
   toggleDrawer() {
     this.drawer?.toggle();
+  }
+
+  // Bonus: Theme toggle method for development/testing
+  toggleTheme() {
+    this.themeService.toggleTheme();
+  }
+
+  getCurrentTheme() {
+    return this.themeService.getCurrentTheme();
   }
 
   @HostListener('window:resize', [])

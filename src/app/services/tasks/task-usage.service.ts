@@ -54,6 +54,42 @@ export class TaskUsageService {
   }
 
   /**
+   * Get the most viewed tasks ordered by view count.
+   * @param limit - Maximum number of tasks to return (default: 10)
+   * @returns Array of task IDs ordered by view count (descending)
+   */
+  getMostViewedTasks(limit: number = 10): string[] {
+    const usageData = this.getUsageData();
+    
+    // Convert to array and sort by view count (descending)
+    const sortedTasks = Object.entries(usageData)
+      .map(([taskId, usage]) => ({ taskId, views: usage.views }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, limit)
+      .map(item => item.taskId);
+
+    return sortedTasks;
+  }
+
+  /**
+   * Get recently viewed tasks ordered by last viewed timestamp.
+   * @param limit - Maximum number of tasks to return (default: 10)
+   * @returns Array of task IDs ordered by last viewed (most recent first)
+   */
+  getRecentlyViewedTasks(limit: number = 10): string[] {
+    const usageData = this.getUsageData();
+    
+    // Convert to array and sort by last viewed timestamp (descending)
+    const sortedTasks = Object.entries(usageData)
+      .map(([taskId, usage]) => ({ taskId, lastViewed: usage.lastViewed }))
+      .sort((a, b) => b.lastViewed - a.lastViewed)
+      .slice(0, limit)
+      .map(item => item.taskId);
+
+    return sortedTasks;
+  }
+
+  /**
    * Retrieve usage data from localStorage.
    * @returns Parsed usage data object.
    */

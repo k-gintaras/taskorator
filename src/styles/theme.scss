@@ -1,0 +1,225 @@
+/* Taskorator - Productivity Twilight Theme */
+/* Perfect balance between dark and light for productive work sessions */
+
+:root {
+  /* === BACKGROUND LAYERS (Warm Grays with Purple Undertones) === */
+  --bg-primary: #1a1625;      /* Main app background - warm dark */
+  --bg-secondary: #2d2438;    /* Sidebar, secondary panels */
+  --bg-surface: #3f3549;      /* Cards, elevated content */
+  --bg-elevated: #4a405c;     /* Hover states, active elements */
+  --bg-overlay: rgba(26, 22, 37, 0.9); /* Modal overlays */
+  
+  /* === PURPLE SYSTEM (Brand Colors) === */
+  --purple-primary: #8b5cf6;   /* violet-500 - main brand color */
+  --purple-hover: #7c3aed;     /* violet-600 - hover states */
+  --purple-light: #a78bfa;     /* violet-400 - subtle accents */
+  --purple-muted: #6d28d9;     /* violet-700 - disabled states */
+  --purple-soft: rgba(139, 92, 246, 0.1); /* transparent purple for backgrounds */
+  
+  /* === TEXT HIERARCHY === */
+  --text-primary: #f1f5f9;     /* slate-100 - main headings, important text */
+  --text-secondary: #cbd5e1;   /* slate-300 - body text, descriptions */
+  --text-muted: #94a3b8;       /* slate-400 - helper text, placeholders */
+  --text-inverse: #1e293b;     /* slate-800 - text on light backgrounds */
+  --text-accent: var(--purple-light); /* accent text color */
+  
+  /* === SEMANTIC COLORS === */
+  --success: #10b981;          /* emerald-500 - success states */
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;          /* amber-500 - warning states */
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --error: #ef4444;            /* red-500 - error states */
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --info: #3b82f6;             /* blue-500 - info states */
+  --info-bg: rgba(59, 130, 246, 0.1);
+  
+  /* === UI ELEMENTS === */
+  --border: #475569;           /* slate-600 - subtle borders */
+  --border-light: #64748b;     /* slate-500 - interactive borders */
+  --border-accent: var(--purple-primary); /* accent borders */
+  
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.4);
+  --shadow-purple: 0 4px 14px rgba(139, 92, 246, 0.2);
+  
+  /* === COMPONENT-SPECIFIC VARIABLES === */
+  /* App Layout */
+  --app-bg: var(--bg-primary);
+  --topbar-bg: var(--purple-primary);
+  --topbar-text: white;
+  --sidebar-bg: var(--bg-secondary);
+  --sidebar-text: var(--text-secondary);
+  --content-bg: var(--bg-primary);
+  
+  /* Cards */
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border);
+  --card-shadow: var(--shadow-md);
+  --card-hover-bg: var(--bg-elevated);
+  
+  /* Buttons */
+  --btn-primary-bg: var(--purple-primary);
+  --btn-primary-hover: var(--purple-hover);
+  --btn-primary-text: white;
+  --btn-secondary-bg: var(--bg-elevated);
+  --btn-secondary-hover: var(--purple-soft);
+  --btn-secondary-text: var(--text-secondary);
+  
+  /* Inputs */
+  --input-bg: var(--bg-elevated);
+  --input-border: var(--border);
+  --input-focus: var(--purple-primary);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+  
+  /* Navigation */
+  --nav-item-hover: var(--purple-soft);
+  --nav-item-active: var(--purple-primary);
+  --nav-item-text: var(--text-secondary);
+  --nav-item-active-text: white;
+}
+
+/* === THEME VARIANTS === */
+
+/* Light Mode Override */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;       /* slate-50 */
+  --bg-secondary: #f1f5f9;     /* slate-100 */
+  --bg-surface: #ffffff;       /* white */
+  --bg-elevated: #f8fafc;      /* slate-50 */
+  
+  --text-primary: #1e293b;     /* slate-800 */
+  --text-secondary: #475569;   /* slate-600 */
+  --text-muted: #64748b;       /* slate-500 */
+  --text-inverse: #f1f5f9;     /* slate-100 */
+  
+  --border: #e2e8f0;           /* slate-200 */
+  --border-light: #cbd5e1;     /* slate-300 */
+  
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Deep Dark Mode Override */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;       /* slate-900 */
+  --bg-secondary: #1e293b;     /* slate-800 */
+  --bg-surface: #334155;       /* slate-700 */
+  --bg-elevated: #475569;      /* slate-600 */
+  
+  --purple-primary: #6d28d9;   /* deeper purple for dark mode */
+  --topbar-bg: var(--purple-muted);
+}
+
+/* === UTILITY CLASSES === */
+
+/* Quick Theme Application */
+.theme-bg-primary { background-color: var(--bg-primary); }
+.theme-bg-secondary { background-color: var(--bg-secondary); }
+.theme-bg-surface { background-color: var(--bg-surface); }
+.theme-bg-elevated { background-color: var(--bg-elevated); }
+
+.theme-text-primary { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-muted { color: var(--text-muted); }
+.theme-text-accent { color: var(--text-accent); }
+
+.theme-border { border-color: var(--border); }
+.theme-border-light { border-color: var(--border-light); }
+.theme-border-accent { border-color: var(--border-accent); }
+
+.theme-shadow-sm { box-shadow: var(--shadow-sm); }
+.theme-shadow-md { box-shadow: var(--shadow-md); }
+.theme-shadow-lg { box-shadow: var(--shadow-lg); }
+.theme-shadow-purple { box-shadow: var(--shadow-purple); }
+
+/* Component Base Classes */
+.theme-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  color: var(--text-primary);
+}
+
+.theme-card:hover {
+  background-color: var(--card-hover-bg);
+}
+
+.theme-btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+}
+
+.theme-btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.theme-btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--border);
+}
+
+.theme-btn-secondary:hover {
+  background-color: var(--btn-secondary-hover);
+}
+
+.theme-input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+}
+
+.theme-input:focus {
+  border-color: var(--input-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.theme-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Navigation Items */
+.theme-nav-item {
+  color: var(--nav-item-text);
+  transition: all 0.2s ease;
+}
+
+.theme-nav-item:hover {
+  background-color: var(--nav-item-hover);
+}
+
+.theme-nav-item.active {
+  background-color: var(--nav-item-active);
+  color: var(--nav-item-active-text);
+}
+
+/* Base App Layout */
+.theme-app {
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.theme-topbar {
+  background-color: var(--topbar-bg);
+  color: var(--topbar-text);
+  border-bottom: 1px solid var(--border);
+}
+
+.theme-sidebar {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border);
+}
+
+.theme-content {
+  background-color: var(--content-bg);
+}

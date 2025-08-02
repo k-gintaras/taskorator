@@ -26,7 +26,8 @@ export enum TaskListType {
   SESSION = 'session',
   SELECTED = 'selected', // For selected tasks
   TASKORATOR = 'taskorator', // For Taskorator picks
-  MOST_VIEWED = 'mostViewed', // For most viewed tasks
+  MOST_VIEWED = 'mostViewed',
+  RECENTLY_VIEWED = "RECENTLY_VIEWED", // For most viewed tasks
 }
 
 export enum TaskListSubtype {

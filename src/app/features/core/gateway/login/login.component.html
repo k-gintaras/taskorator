@@ -10,15 +10,78 @@
     <div class="bg-white rounded-lg shadow-xl p-8">
       <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
 
-      <div class="space-y-4">
-        <button
-          (click)="loginOnline()"
-          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
-          [disabled]="loading"
+      <!-- Warning Banner -->
+      <div *ngIf="showPopupWarning" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg relative">
+        <button 
+          (click)="hideWarning()" 
+          class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xl font-bold"
+          aria-label="Close warning"
         >
-          <!-- Google SVG omitted for brevity -->
-          {{ loading ? "Signing in..." : "Continue with Google" }}
+          ×
         </button>
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <svg class="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-red-800">{{ warningMessage }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Main login button -->
+        <div class="space-y-2">
+          <button
+            (click)="loginOnline()"
+            class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+            [disabled]="loading"
+          >
+            <!-- Google SVG omitted for brevity -->
+            {{ loading && currentLoginMethod === 'popup' ? "Signing in..." : "Continue with Google" }}
+          </button>
+        </div>
+
+        <!-- Popup failure alternative (shown when popup fails) -->
+        <div *ngIf="showAlternativeLogin" class="p-3 bg-orange-50 border border-orange-200 rounded-lg relative">
+          <button 
+            (click)="hideAlternativeLogin()" 
+            class="absolute top-2 right-2 text-orange-400 hover:text-orange-600 text-xl font-bold"
+            aria-label="Close alternative login"
+          >
+            ×
+          </button>
+          <div class="flex items-center justify-between pr-6">
+            <p class="text-sm text-orange-800">
+              Enable popups or 
+              <button
+                (click)="loginWithRedirect()"
+                class="text-orange-600 hover:text-orange-800 underline font-medium"
+                [disabled]="loading"
+              >
+                try login without popup
+              </button>
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-amber-800">
+                <strong>First time?</strong><br>
+                Enable "Popup" option in browser.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
@@ -27,6 +90,17 @@
           <div class="relative flex justify-center text-sm">
             <span class="px-2 bg-white text-gray-500">or</span>
           </div>
+        </div>
+
+        <!-- Quick alternative link below the "or" line -->
+        <div class="text-center">
+          <button
+            (click)="loginWithRedirect()"
+            class="text-sm text-blue-600 hover:text-blue-800 underline"
+            [disabled]="loading"
+          >
+            {{ loading && currentLoginMethod === 'redirect' ? "redirecting..." : "Gmail login without popup." }}
+          </button>
         </div>
 
         <button
@@ -39,13 +113,24 @@
         </button>
       </div>
 
-      <div class="mt-6 text-center">
+      <div class="mt-6 text-center space-y-2">
         <button
           (click)="goToGateway()"
           class="text-gray-600 hover:text-gray-800 text-sm"
         >
           ← Learn more about Taskorator
         </button>
+        
+        <!-- Developer/Testing logout option -->
+        <div>
+          <button
+            (click)="logout()"
+            class="text-red-600 hover:text-red-800 text-xs underline"
+            title="Clear session and logout for testing"
+          >
+            🧪 Logout & Clear Session
+          </button>
+        </div>
       </div>
     </div>
 

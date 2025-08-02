@@ -27,34 +27,74 @@ export class TaskListCoordinatorService {
       return this.getTasksByMostViewed();
     }
 
+    if (taskListKey.type === TaskListType.RECENTLY_VIEWED) {
+      return this.getTasksByRecentlyViewed();
+    }
+
     const rawTasks = await this.taskListSimple.getTaskList(taskListKey);
     if (!rawTasks) return [];
 
+    // FIRST: Decorate tasks with UI properties (views, priority, colors, etc.)
+    const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
+
+    // THEN: Apply rules (filtering and sorting) to decorated tasks
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       taskListKey,
-      rawTasks
+      decoratedTasks
     );
 
-    return this.taskDecorator.decorateTasks(filteredSortedTasks);
+    return filteredSortedTasks;
   }
 
   async getTasksByIds(ids: string[]): Promise<UiTask[]> {
     if (!ids.length) return [];
     const rawTasks = await this.taskListSimple.getTasksByIds(ids);
-    return this.taskDecorator.decorateTasks(rawTasks);
+    
+    // FIRST: Decorate tasks with UI properties
+    const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
+    
+    // THEN: Apply rules for selected tasks
+    const filteredSortedTasks = this.taskListRules.applyRulesToList(
+      { type: TaskListType.SELECTED, data: 'selected' },
+      decoratedTasks
+    );
+    
+    return filteredSortedTasks;
   }
 
   async getTasksByMostViewed(): Promise<UiTask[]> {
-    // TODO: add simple thing ez pz
-    // const rawTasks: string[] = await this.taskUsageService.getMostViewedTasks();
-    // if (!rawTasks) return [];
+    const mostViewedTaskIds = this.taskUsageService.getMostViewedTasks(20); // Get top 20 most viewed
+    if (!mostViewedTaskIds.length) return [];
 
-    // const filteredSortedTasks = this.taskListRules.applyRulesToList(
-    //   { type: TaskListType.MOST_VIEWED, id: 'mostViewed' },
-    //   rawTasks
-    // );
+    const rawTasks = await this.taskListSimple.getTasksByIds(mostViewedTaskIds);
+    
+    // FIRST: Decorate tasks with UI properties (including views count)
+    const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
 
-    // return this.taskDecorator.decorateTasks(filteredSortedTasks);
-    return [];
+    // THEN: Apply rules for most viewed list (sorting by views + priority)
+    const filteredSortedTasks = this.taskListRules.applyRulesToList(
+      { type: TaskListType.MOST_VIEWED, data: 'mostViewed' },
+      decoratedTasks
+    );
+
+    return filteredSortedTasks;
+  }
+
+  async getTasksByRecentlyViewed(): Promise<UiTask[]> {
+    const recentTaskIds = this.taskUsageService.getRecentlyViewedTasks(20); // Get top 20 recently viewed
+    if (!recentTaskIds.length) return [];
+
+    const rawTasks = await this.taskListSimple.getTasksByIds(recentTaskIds);
+    
+    // FIRST: Decorate tasks with UI properties (including views count)
+    const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
+
+    // THEN: Apply rules for recently viewed list (sorting by views + priority)
+    const filteredSortedTasks = this.taskListRules.applyRulesToList(
+      { type: TaskListType.RECENTLY_VIEWED, data: 'recentlyViewed' },
+      decoratedTasks
+    );
+
+    return filteredSortedTasks;
   }
 }

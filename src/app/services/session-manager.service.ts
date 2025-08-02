@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { take } from 'rxjs/operators';
 import { ApiStrategy } from '../models/service-strategies/api-strategy.interface';
 import {
   AuthStrategy,
@@ -58,7 +59,17 @@ export class SessionManagerService {
    * @param mode online offline
    */
   async initialize(mode: 'online' | 'offline'): Promise<void> {
-    if (this.isInitialized) return;
+    // If already initialized with the same mode, just return
+    if (this.isInitialized && this.sessionType === mode) {
+      console.log(`Session already initialized in ${mode} mode`);
+      return;
+    }
+
+    // If switching modes, reset initialization status
+    if (this.isInitialized && this.sessionType !== mode) {
+      console.log(`Switching from ${this.sessionType} to ${mode} mode`);
+      this.isInitialized = false;
+    }
 
     const isTestingSimple = OTHER_CONFIG.OFFLINE_TESTING;
     if (isTestingSimple) {
@@ -70,12 +81,47 @@ export class SessionManagerService {
       this.apiStrategy = this.firebaseApi;
       this.firebaseAuth.initialize(); // init here, so we don't login by accident
 
-      // Wait for login state
-      this.user = await this.waitForLogin();
-      if (!this.user) {
-        throw new Error('Login failed or user not authenticated.');
+      // Wait for Firebase auth state to settle before checking authentication
+      console.log('Waiting for Firebase auth state to settle...');
+      await new Promise<void>((resolve) => {
+        const timeout = setTimeout(() => {
+          console.log('Auth state check timeout - proceeding anyway');
+          resolve();
+        }, 5000); // Increased timeout to 5 seconds
+
+        let settled = false;
+        let subscription: any;
+        subscription = this.firebaseAuth.getCurrentUser().subscribe((user) => {
+          console.log('Firebase auth state settled:', user ? `User: ${user.uid}` : 'No user');
+          
+          // Give Firebase more time to potentially restore auth state
+          if (!settled) {
+            settled = true;
+            setTimeout(() => {
+              clearTimeout(timeout);
+              if (subscription) {
+                subscription.unsubscribe();
+              }
+              resolve();
+            }, 1000); // Wait additional 1 second after first auth state change
+          }
+        });
+      });
+
+      // Now check if user is authenticated
+      if (this.firebaseAuth.isAuthenticated()) {
+        console.log('User already authenticated');
+        const currentUser = await this.firebaseAuth.getCurrentUser().pipe(take(1)).toPromise();
+        if (currentUser) {
+          this.user = currentUser;
+          console.log('User authenticated: ' + this.user.uid);
+        } else {
+          console.log('Authentication state inconsistent - user appears authenticated but no user data');
+          throw new Error('User not authenticated. Please log in manually.');
+        }
       } else {
-        console.log('log: ' + this.user);
+        console.log('User not authenticated - manual login required');
+        throw new Error('User not authenticated. Please log in manually.');
       }
     } else if (mode === 'offline') {
       this.authStrategy = this.offlineAuth;
@@ -127,11 +173,18 @@ export class SessionManagerService {
 
   private waitForLogin(): Promise<AuthUser | null> {
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject('Login timed out'), 10000); // 10 seconds timeout.
+      console.log('Waiting for authentication to complete...');
+      const timeout = setTimeout(() => {
+        console.error('Authentication timeout reached - no user authenticated within 10 seconds');
+        reject('Login timed out');
+      }, 10000); // 10 seconds timeout.
 
-      this.authStrategy.getCurrentUser().subscribe((user) => {
+      const subscription = this.authStrategy.getCurrentUser().subscribe((user) => {
+        console.log('Authentication state changed:', user ? `User logged in: ${user.uid}` : 'User is null/logged out');
         if (user) {
+          console.log('Authentication successful, resolving promise');
           clearTimeout(timeout);
+          subscription.unsubscribe();
           resolve(user);
         }
       });

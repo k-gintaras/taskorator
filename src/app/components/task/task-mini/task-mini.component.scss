@@ -42,6 +42,16 @@
   margin-right: 5px;
 }
 
+.task-priority {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
 .high-priority {
   color: #ff6347; /* Tomato color for high priority */
 }
