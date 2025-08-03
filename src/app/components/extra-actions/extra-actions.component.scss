@@ -1,0 +1,119 @@
+/* Extra Actions Component - Artificer Style Consistency */
+
+.extra-actions-container {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0.25rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* === CONSISTENT BUTTON STYLING (Artificer Pattern) === */
+.extra-action-btn-compact,
+.sort-btn-compact {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px;
+  background-color: var(--nav-item-hover);
+  color: var(--text-muted);
+  border: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  /* Override Material icon button styles */
+  &.mat-mdc-icon-button {
+    background-color: var(--nav-item-hover) !important;
+    color: var(--text-muted) !important;
+    border: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    
+    .mat-mdc-button-touch-target {
+      width: 40px !important;
+      height: 40px !important;
+    }
+    
+    .mat-icon {
+      margin: 0 !important;
+    }
+  }
+  
+  &:hover {
+    background-color: var(--nav-item-active) !important;
+    color: var(--nav-item-active-text) !important;
+    transform: translateY(-1px);
+  }
+  
+  &.active {
+    background-color: var(--nav-item-active) !important;
+    color: var(--nav-item-active-text) !important;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  mat-icon {
+    font-size: 1.125rem !important;
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+    line-height: 1.125rem !important;
+    transition: color 0.2s ease;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* === THEME BUTTON SPECIFIC STYLING === */
+.extra-action-btn-compact {
+  mat-icon {
+    color: var(--purple-light) !important;
+  }
+  
+  &:hover mat-icon {
+    color: var(--text-primary) !important;
+  }
+  
+  &.active mat-icon {
+    color: var(--nav-item-active-text) !important;
+  }
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
+  .extra-actions-container {
+    gap: 0.25rem;
+    padding: 0.25rem;
+  }
+  
+  .extra-action-btn-compact,
+  .sort-btn-compact {
+    width: 36px !important;
+    height: 36px !important;
+    
+    &.mat-mdc-icon-button {
+      width: 36px !important;
+      height: 36px !important;
+      
+      .mat-mdc-button-touch-target {
+        width: 36px !important;
+        height: 36px !important;
+      }
+    }
+    
+    mat-icon {
+      font-size: 1rem !important;
+      width: 1rem !important;
+      height: 1rem !important;
+      line-height: 1rem !important;
+    }
+  }
+}

@@ -1,14 +1,15 @@
-<div
-  class="bg-white flex flex-wrap justify-center items-center gap-2 px-4 py-2"
->
+<div class="artificer-container">
   <button
     *ngFor="let action of actions"
     (click)="selectAction(action)"
-    [ngClass]="[
-      'flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2 transition-colors duration-200',
-      getActionClass(action)
-    ]"
+    class="artificer-action-btn"
+    [class.active]="action === currentAction"
+    [class]="getActionClass(action)"
+    [attr.aria-label]="action.tooltip"
+    [title]="action.tooltip"
+    matTooltip="{{ action.tooltip }}"
+    matTooltipPosition="above"
   >
-    <mat-icon class="text-xl">{{ action.icon }}</mat-icon>
+    <mat-icon>{{ action.icon }}</mat-icon>
   </button>
 </div>

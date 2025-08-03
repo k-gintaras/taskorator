@@ -1,26 +1,36 @@
+/* Root container */
+:host {
+  display: block;
+  padding: var(--spacing-md);
+  background-color: var(--content-bg);
+  color: var(--text-color);
+}
+
 .filter-section,
 .action-section {
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f2f2f2; /* Light grey background for distinction */
-  border-radius: 8px;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .filter-title,
 .action-title {
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-muted);
 }
 
 .filter-options label,
 .action-buttons button {
-  margin-right: 10px;
-  white-space: nowrap; /* Keeps the label text on one line */
+  margin-right: var(--spacing-md);
+  white-space: nowrap;
 }
 
 .filter-options {
   display: flex;
-  flex-wrap: wrap; /* Allows options to wrap to the next line if space is limited */
+  flex-wrap: wrap;
 }
 
 .action-buttons {
@@ -28,11 +38,58 @@
   align-items: center;
 }
 
-.data {
-  display: block;
-  padding: 5px;
+.user-info {
+  margin: var(--spacing-lg) 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
-.user-info {
-  margin: 20px;
+.user-info .data {
+  background-color: var(--bg-elevated);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* Task preview and actions container */
+.task-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+}
+
+.task-container .left-section,
+.task-container .right-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.nav-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: var(--radius-sm);
+}
+
+.nav-list li:hover {
+  background-color: var(--nav-item-hover);
+}
+
+.nav-list li mat-icon {
+  color: var(--icon-color);
 }

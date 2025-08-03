@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { SettingsService } from '../../services/sync-api-cache/settings.service';
 
 export type ThemeMode = 'twilight' | 'light' | 'dark';
 
@@ -12,8 +14,23 @@ export class ThemeService {
   
   public currentTheme$ = this.currentThemeSubject.asObservable();
 
-  constructor() {
+  constructor(private settingsService: SettingsService) {
+    // Apply theme from localStorage first
     this.initializeTheme();
+    const savedTheme = localStorage.getItem(this.THEME_KEY) as ThemeMode;
+    const defaultTheme: ThemeMode = 'twilight';
+    // Override with persisted TaskSettings theme only if it differs from localStorage
+    this.settingsService.getSettingsOnce()
+      .then(settings => {
+        const remoteTheme = settings?.theme as ThemeMode | undefined;
+        // Only override if localStorage still has default and remote has custom
+        if (remoteTheme && savedTheme === defaultTheme && remoteTheme !== defaultTheme) {
+          this.setTheme(remoteTheme);
+        }
+      })
+      .catch(() => {
+        // Ignore if settings API not initialized yet
+      });
   }
 
   private initializeTheme(): void {
@@ -23,12 +40,17 @@ export class ThemeService {
   }
 
   setTheme(theme: ThemeMode): void {
-    // Remove existing theme attributes
-    document.documentElement.removeAttribute('data-theme');
-    
-    // Apply new theme
-    if (theme !== 'twilight') {
-      document.documentElement.setAttribute('data-theme', theme);
+    const html = document.documentElement;
+    // Reset DaisyUI theme and Tailwind dark class
+    html.removeAttribute('data-theme');
+    html.classList.remove('dark');
+
+    // Apply DaisyUI theme
+    html.setAttribute('data-theme', theme);
+
+    // Apply Tailwind dark mode class for dark theme
+    if (theme === 'dark') {
+      html.classList.add('dark');
     }
     
     // Save to localStorage

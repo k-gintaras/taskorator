@@ -60,4 +60,10 @@ export class TaskListDataFacadeService {
   getSelectedTaskIds(): string[] {
     return this.interactionService.getSelectedTaskIds();
   }
+  /**
+   * Sort current tasks by 'date' or 'priority'.
+   */
+  sortCurrentTasks(order: 'date' | 'priority'): void {
+    this.navigatorData.sortCurrentTasks(order);
+  }
 }

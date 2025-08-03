@@ -75,4 +75,18 @@ export class TaskNavigatorDataService {
   getCurrentListKey(): TaskListKey | null {
     return this.currentListKeySubject.value;
   }
+
+  /**
+   * Sort the current tasks by given order.
+   */
+  sortCurrentTasks(order: 'date' | 'priority'): void {
+    let tasks = this.currentTasksSubject.value.slice();
+    if (order === 'date') {
+      // Sort by timeCreated (TaskoratorTask property)
+      tasks.sort((a, b) => (a.timeCreated || 0) - (b.timeCreated || 0));
+    } else if (order === 'priority') {
+      tasks.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+    }
+    this.currentTasksSubject.next(tasks);
+  }
 }

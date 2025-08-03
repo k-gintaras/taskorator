@@ -14,6 +14,11 @@ export interface TaskSettings {
   focusTaskIds: string[];
   frogTaskIds: string[];
   favoriteTaskIds: string[];
+  // UI preferences
+  theme: string; // e.g. 'light', 'dark', 'twilight'
+  sortOrder: 'date' | 'priority' | 'custom';
+  showArtificer: boolean; // toggle artificer component
+  showExtraControls: boolean; // toggle extra controls area
 }
 
 export function getDefaultTaskSettings() {
@@ -31,6 +36,10 @@ export function getDefaultTaskSettings() {
     frogTaskIds: [],
     favoriteTaskIds: [],
     moveTasksOnce: true,
+    theme: 'twilight',
+    sortOrder: 'priority',
+    showArtificer: true,
+    showExtraControls: true,
   };
   return { ...settings };
 }

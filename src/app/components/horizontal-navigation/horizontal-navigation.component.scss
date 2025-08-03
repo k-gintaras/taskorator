@@ -36,6 +36,52 @@
   min-width: 0; // Allow shrinking
 }
 
+.nav-notification-topbar {
+  width: 100%;
+  max-width: 300px; // Limit width so it doesn't take too much space
+  
+  // Override any notification component styles for topbar placement
+  .notification-container {
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--topbar-text) !important;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    
+    .feedback-message {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--topbar-text) !important;
+      text-align: center;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .blinker {
+      // Style the blinker for mobile in topbar context
+      background-color: var(--topbar-text) !important;
+    }
+  }
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--topbar-text);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
 .nav-toolbar-right {
   display: flex;
   align-items: center;
@@ -185,37 +231,70 @@
 /* === BOTTOM ACTIONS === */
 .nav-actions-container {
   flex-shrink: 0;
-  padding: 1rem;
-  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;        // increased spacing between sections for titles
+  padding: 0.75rem; // slightly increased padding
+  border-top: none; // remove top border for compact layout
   background-color: var(--bg-elevated);
+}
+
+/* === SECTION TITLES === */
+.nav-section-title {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem 0;
+  padding: 0 0.25rem;
+  text-align: center;
+}
+
+// Extra controls section (theme toggle, notifications, etc.)
+.nav-extra-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   
   .nav-theme-toggle-btn {
     width: 100%;
     justify-content: flex-start;
     gap: 0.75rem;
     padding: 0.75rem;
-    margin-bottom: 0.5rem;
     background-color: transparent !important;
     color: var(--sidebar-text) !important;
     border-radius: 0.5rem;
-    
-    &:hover {
-      background-color: var(--nav-item-hover) !important;
-    }
-    
-    .mat-icon {
-      color: var(--purple-primary) !important;
-    }
-    
-    span {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
   }
   
-  .nav-notification-container {
-    margin-bottom: 0.5rem;
+  .nav-notification-item {
+    width: 100%;
   }
+}
+
+// Artificer actions section
+.nav-artificer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  // Hover state for artificer section
+  &:hover {
+    background-color: var(--nav-item-hover) !important;
+  }
+  
+  .mat-icon {
+    color: var(--purple-primary) !important;
+  }
+  
+  span {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}
+
+.nav-notification-container {
+  margin-bottom: 0.5rem;
 }
 
 /* === MAIN CONTENT === */

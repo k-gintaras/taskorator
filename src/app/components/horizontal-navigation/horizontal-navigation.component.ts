@@ -3,7 +3,6 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
-import { ThemeService } from '../../services/core/theme.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,10 +12,12 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationComponent } from '../notification/notification.component';
 import { filter } from 'rxjs/operators';
 import { ArtificerComponent } from '../artificer/artificer.component';
+import { ExtraActionsComponent } from '../extra-actions/extra-actions.component';
 @Component({
   selector: 'app-horizontal-navigation',
   standalone: true,
   imports: [
+    ExtraActionsComponent,
     ArtificerComponent,
     CommonModule,
     MatSidenavModule,
@@ -45,8 +46,7 @@ export class HorizontalNavigationComponent implements OnInit {
   constructor(
     private navigationService: NavigationService,
     private router: Router,
-    private breakpointObserver: BreakpointObserver,
-    private themeService: ThemeService
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
@@ -108,15 +108,6 @@ export class HorizontalNavigationComponent implements OnInit {
 
   toggleDrawer() {
     this.drawer?.toggle();
-  }
-
-  // Bonus: Theme toggle method for development/testing
-  toggleTheme() {
-    this.themeService.toggleTheme();
-  }
-
-  getCurrentTheme() {
-    return this.themeService.getCurrentTheme();
   }
 
   @HostListener('window:resize', [])

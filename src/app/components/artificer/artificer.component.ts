@@ -3,6 +3,7 @@ import { ArtificerDetails } from './artificer.interface';
 import { ArtificerService } from './artificer.service';
 import { NgClass, NgFor } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 /**
  * what we can do with each task
  * delete
@@ -17,7 +18,7 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-artificer',
   standalone: true,
-  imports: [NgFor, NgClass, MatIcon],
+  imports: [NgFor, NgClass, MatIcon, MatTooltipModule],
   templateUrl: './artificer.component.html',
   styleUrl: './artificer.component.scss',
 })

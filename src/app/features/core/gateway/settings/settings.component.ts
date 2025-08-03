@@ -7,6 +7,7 @@ import { completeButtonColorMap } from '../../../../models/colors';
 import {
   CompleteButtonAction,
   TaskSettings,
+  getDefaultTaskSettings,
 } from '../../../../models/settings';
 import { SettingsService } from '../../../../services/sync-api-cache/settings.service';
 import {
@@ -25,12 +26,13 @@ import { SessionManagerService } from '../../../../services/session-manager.serv
 import { RouteMetadata } from '../../../../app.routes-models';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../../../services/navigation.service';
+import { ThemeService, ThemeMode } from '../../../../services/core/theme.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css'],
+  styleUrls: ['./settings.component.scss'],
   imports: [
     MatIcon,
     MatCardModule,
@@ -64,15 +66,33 @@ export class SettingsComponent implements OnInit {
     private sessionService: SessionManagerService,
     private navigationService: NavigationService,
     private router: Router,
-    private sessionManager: SessionManagerService
+    private sessionManager: SessionManagerService,
+    private themeService: ThemeService
   ) {
+    // Initialize form with all settings including new preferences
+    const defaults = getDefaultTaskSettings();
     this.settingsForm = this.fb.group({
-      isShowArchived: [false],
-      isShowCompleted: [false],
-      isShowSeen: [true],
-      isShowDeleted: [false],
-      isShowTodo: [true],
-      completeButtonAction: ['completed'],
+      isShowArchived: [defaults.isShowArchived],
+      isShowCompleted: [defaults.isShowCompleted],
+      isShowSeen: [defaults.isShowSeen],
+      isShowDeleted: [defaults.isShowDeleted],
+      isShowTodo: [defaults.isShowTodo],
+      completeButtonAction: [defaults.completeButtonAction],
+      theme: [defaults.theme],
+      sortOrder: [defaults.sortOrder],
+      showArtificer: [defaults.showArtificer],
+      showExtraControls: [defaults.showExtraControls],
+    });
+
+    // Listen for changes and save
+    this.settingsForm.valueChanges.subscribe((newValues) => {
+      if (!this.isInitializingForm) {
+        // Apply theme immediately when changed
+        if (newValues.theme) {
+          this.themeService.setTheme(newValues.theme);
+        }
+        this.saveSettings(newValues);
+      }
     });
   }
 
@@ -89,23 +109,40 @@ export class SettingsComponent implements OnInit {
   // Add a private member to control the save operation
   private isInitializingForm = true;
 
-  async ngOnInit() {
-    // await this.sessionManager.waitForInitialization();
+  private saveSettings(values: TaskSettings) {
+    // Merge currentSettings base with form values
+    const updated: TaskSettings = { ...this.currentSettings, ...values } as TaskSettings;
+    this.settingsService.updateSettings(updated).catch(console.error);
+  }
 
-    // this.loadCurrentSettings();
-
-    // Subscribe to form value changes with additional logic to prevent loop
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    this.settingsForm.valueChanges.subscribe((newFormValues) => {
-      // Only save settings if we're not initializing the form
-      if (!this.isInitializingForm) {
-        //this.saveSettings(newFormValues);
+  private loadCurrentSettings(): void {
+    this.settingsService.getSettings().subscribe((settings) => {
+      if (settings) {
+        this.isInitializingForm = true;
+        this.currentSettings = settings;
+        // Patch form with loaded settings
+        this.settingsForm.patchValue({
+          isShowArchived: settings.isShowArchived,
+          isShowCompleted: settings.isShowCompleted,
+          isShowSeen: settings.isShowSeen,
+          isShowDeleted: settings.isShowDeleted,
+          isShowTodo: settings.isShowTodo,
+          completeButtonAction: settings.completeButtonAction,
+          theme: settings.theme,
+          sortOrder: settings.sortOrder,
+          showArtificer: settings.showArtificer,
+          showExtraControls: settings.showExtraControls,
+        });
+        // Apply loaded theme to the app
+        this.themeService.setTheme(settings.theme as ThemeMode);
+        setTimeout(() => (this.isInitializingForm = false), 0);
       }
     });
-    // this.treeService.getTree().subscribe((t) => {
-    //   if (!t) return;
-    //   this.tree = JSON.stringify(t, null, 2);
-    // });
+  }
+
+  async ngOnInit() {
+    await this.sessionManager.waitForInitialization();
+    this.loadCurrentSettings();
 
     // TODO: replace with the correct auth
     this.getAuth()
@@ -132,103 +169,41 @@ export class SettingsComponent implements OnInit {
   getApi() {
     return this.sessionService.getApiStrategy();
   }
-
+  
+  /**
+   * Get current Auth strategy
+   */
   getAuth() {
     return this.sessionService.getAuthStrategy();
   }
 
-  editTask(t: TaskoratorTask) {
+  /**
+   * Open edit dialog for a task
+   */
+  editTask(task: TaskoratorTask): void {
     const dialogRef = this.dialog.open(TaskEditPopupComponent, {
       width: '600px',
-      data: t, // Pass the task to edit
+      data: task,
     });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        // Update the task in your list or database
-        if (typeof result === 'object') {
-          console.log('Task updated on server:', result);
-          const taskAction: TaskActions = TaskActions.UPDATED;
-          const canUpdate = this.isUpdateValid(result);
-          if (canUpdate) this.taskUpdateService.update(result, taskAction);
-        }
-      } else {
-        console.log('task not updated or so dialog says...');
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && typeof result === 'object') {
+        const action: TaskActions = TaskActions.UPDATED;
+        this.taskUpdateService.update(result, action);
       }
     });
   }
 
-  isUpdateValid(task: TaskoratorTask): boolean {
-    if (task.taskId === ROOT_TASK_ID) {
-      // Rule 1: Root task must never be marked as !completed
-      if (task.stage !== 'completed') {
-        console.error('Root task must always be completed.');
-        return false;
-      }
-
-      // Rule 3: Root task repeat can only be "once" or "never"
-      if (task.repeat && task.repeat !== 'once' && task.repeat !== 'never') {
-        console.error('Root task repeat can only be "once" or "never".');
-        return false;
-      }
-    }
-
-    // Add further validations for non-root tasks if needed
-
-    return true; // All validations passed
-  }
-  saveTask(t: TaskoratorTask) {}
-
-  private loadCurrentSettings(): void {
-    this.settingsService.getSettings().subscribe((currentSettings) => {
-      if (currentSettings) {
-        // Before patching the form, ensure we're in initialization mode
-        this.isInitializingForm = true;
-
-        // Populate form with current settings
-        this.settingsForm.patchValue(currentSettings);
-
-        // After the form is patched, we're no longer initializing
-        setTimeout(() => (this.isInitializingForm = false), 0);
-
-        // Store currentSettings for later use in merging
-        this.currentSettings = currentSettings;
-      }
-    });
+  /**
+   * Save current task state (stub)
+   */
+  saveTask(task: TaskoratorTask): void {
+    console.log('Saving task', task);
+    // implement save logic if needed
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private saveSettings(newFormValues: any): void {
-    const newSettings: TaskSettings = {
-      ...this.currentSettings,
-      ...newFormValues,
-    };
-
-    // Save the new, merged settings
-    this.settingsService.updateSettings(newSettings);
+  // Add public handler for Save Settings button
+  public onSaveSettings(): void {
+    // Trigger settings save with current form values
+    this.saveSettings(this.settingsForm.value);
   }
-
-  // Add to your existing form or component class
-
-  // TypeScript will no longer complain about potential null values
-  setAction(action: string) {
-    this.settingsForm.get('completeButtonAction')?.setValue(action);
-  }
-
-  getColor() {
-    const c = this.settingsForm.get('completeButtonAction')?.value;
-    return this.getButtonColor(c);
-  }
-
-  isActionSelected(action: string): boolean {
-    return this.settingsForm.get('completeButtonAction')?.value === action;
-  }
-
-  getButtonColor(action: CompleteButtonAction): string {
-    return completeButtonColorMap[action] || 'black';
-  }
-
-  // saveSettings() {
-  //   this.settingsService.setSettings(this.settingsForm.value);
-  // }
 }

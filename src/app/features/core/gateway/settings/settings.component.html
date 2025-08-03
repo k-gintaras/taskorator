@@ -1,75 +1,157 @@
-<!-- <form [formGroup]="settingsForm">
-  <div class="filter-section">
-    <div class="filter-title">Task Filters:</div>
-    <div class="filter-options">
-      <label
-        *ngFor="
-          let option of ['Archived', 'Completed', 'Deleted', 'Seen', 'Todo']
-        "
-      >
-        <input type="checkbox" [formControlName]="'isShow' + option" />
-        {{ option }}
-      </label>
-    </div>
-  </div>
-
-  <div class="action-section">
-    <div class="action-title">Complete Action:</div>
-    <div class="action-buttons">
+<!-- Settings Container with Theme Integration -->
+<div class="settings-container theme-content">
+  <!-- Header Section -->
+  <div class="settings-header">
+    <div class="settings-nav-items">
       <button
-        mat-icon-button
-        style="background-color: white"
-        [style.color]="getColor()"
+        class="settings-action-btn theme-nav-item"
+        (click)="editTask(task)"
+        aria-label="Edit Root Task"
       >
-        <mat-icon aria-label="Complete">check_circle</mat-icon>
-      </button>
-      <button
-        mat-button
-        *ngFor="let action of completeButtonActions"
-        (click)="setAction(action)"
-        [ngClass]="{ active: isActionSelected(action) }"
-        [style.color]="getButtonColor(action)"
-      >
-        {{ action }}
-      </button>
-    </div>
-  </div>
-</form> -->
-
-<div class="user-info">
-  <span class="data">Allowed Templates: {{ user?.allowedTemplates }}</span>
-  <span class="data">Can Create Templates: {{ user?.canCreate }}</span>
-  <span class="data">Can Use GPT: {{ user?.canUseGpt }}</span>
-  <span class="data">Role: {{ user?.role }}</span>
-</div>
-
-<div class="task-container">
-  <div class="left-section">
-    <div class="navigation-actions">
-      <button class="task-btn" (click)="editTask(task)">
         <mat-icon>edit</mat-icon>
       </button>
+      <app-task-mini [task]="task"></app-task-mini>
     </div>
-    <app-task-mini [task]="task"></app-task-mini>
+    <div class="settings-extra-controls">
+      <button
+        class="settings-action-btn theme-nav-item"
+        (click)="onSaveSettings()"
+        aria-label="Save Settings"
+      >
+        <mat-icon>save</mat-icon>
+      </button>
+    </div>
   </div>
-  <div class="right-section">
-    <button class="task-btn" (click)="saveTask(task)">
-      <mat-icon>save</mat-icon>
-    </button>
-  </div>
-</div>
 
-<div *ngIf="user?.role === 'admin'">
-  <ul class="nav-list">
-    <li *ngFor="let item of navItems" (click)="onNavItemClick(item)">
-      <mat-icon>{{ item.metadata.icon }}</mat-icon>
-      <span class="nav-text">{{ item.metadata.title }}</span>
-      <span class="nav-alt">{{ item.metadata.altName }}</span>
-    </li>
-  </ul>
+  <!-- Preferences Card -->
+  <div class="settings-card theme-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title theme-text-primary">
+        <mat-icon class="settings-title-icon">tune</mat-icon>
+        Preferences
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <form [formGroup]="settingsForm" class="settings-form">
+        <!-- Theme Selector -->
+        <div class="settings-form-group">
+          <label class="settings-label theme-text-secondary" for="theme">
+            <mat-icon class="settings-label-icon">palette</mat-icon>
+            Theme
+          </label>
+          <select
+            id="theme"
+            formControlName="theme"
+            class="settings-select theme-input"
+          >
+            <option *ngFor="let t of ['light', 'dark', 'twilight']" [value]="t">
+              {{ t | titlecase }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort Order Selector -->
+        <div class="settings-form-group">
+          <label class="settings-label theme-text-secondary" for="sortOrder">
+            <mat-icon class="settings-label-icon">sort</mat-icon>
+            Sort Order
+          </label>
+          <select
+            id="sortOrder"
+            formControlName="sortOrder"
+            class="settings-select theme-input"
+          >
+            <option value="date">Date</option>
+            <option value="priority">Priority</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <!-- UI Toggles Section -->
+        <div class="settings-toggles-section">
+          <h3 class="settings-section-title theme-text-muted">Interface Options</h3>
+          
+          <!-- Show Artificer Toggle -->
+          <div class="settings-toggle-group">
+            <label class="settings-toggle-label">
+              <input
+                type="checkbox"
+                formControlName="showArtificer"
+                class="settings-toggle"
+              />
+              <div class="settings-toggle-content">
+                <mat-icon class="settings-toggle-icon">auto_awesome</mat-icon>
+                <span class="theme-text-secondary">Show Artificer Panel</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Show Extra Controls Toggle -->
+          <div class="settings-toggle-group">
+            <label class="settings-toggle-label">
+              <input
+                type="checkbox"
+                formControlName="showExtraControls"
+                class="settings-toggle"
+              />
+              <div class="settings-toggle-content">
+                <mat-icon class="settings-toggle-icon">tune</mat-icon>
+                <span class="theme-text-secondary">Show Extra Controls</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Info Card -->
+  <div class="settings-user-card theme-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title theme-text-primary">
+        <mat-icon class="settings-title-icon">person</mat-icon>
+        User Information
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-user-badges">
+        <div class="settings-user-badge">
+          <strong>Templates:</strong> {{ user?.allowedTemplates }}
+        </div>
+        <div class="settings-user-badge">
+          <strong>Create Access:</strong> {{ user?.canCreate ? 'Yes' : 'No' }}
+        </div>
+        <div class="settings-user-badge">
+          <strong>GPT Access:</strong> {{ user?.canUseGpt ? 'Yes' : 'No' }}
+        </div>
+        <div class="settings-user-badge">
+          <strong>Role:</strong> {{ user?.role }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Navigation Menu -->
+  <div *ngIf="user?.role === 'admin'" class="settings-admin-card theme-card">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title theme-text-primary">
+        <mat-icon class="settings-title-icon">admin_panel_settings</mat-icon>
+        Admin Routes
+      </h2>
+    </div>
+    <div class="settings-card-body">
+      <ul class="settings-admin-menu">
+        <li 
+          *ngFor="let item of navItems" 
+          class="settings-admin-item"
+          (click)="onNavItemClick(item)"
+        >
+          <a class="settings-admin-link">
+            <mat-icon>{{ item.metadata.icon }}</mat-icon>
+            <span>{{ item.metadata.title }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
-<!-- <div>
-  <pre>
-    {{ tree }}
-  </pre>
-</div> -->

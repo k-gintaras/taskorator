@@ -12,7 +12,8 @@
   </div>
   
   <div class="nav-toolbar-center">
-    <!-- Mobile: Empty center, let right content float -->
+    <!-- Notification component replaces title - shows app name normally, notifications when active -->
+    <app-notification class="nav-notification-topbar"></app-notification>
   </div>
   
   <div class="nav-toolbar-right">
@@ -34,7 +35,6 @@
       <div class="nav-items-container">
         <!-- Parent Items (Left Column) -->
         <div class="nav-column nav-parent-column">
-          <h3 class="nav-column-title">Modules</h3>
           <ul class="nav-list">
             <li
               *ngFor="let item of parentItems"
@@ -52,7 +52,6 @@
 
         <!-- Child Items (Right Column) -->
         <div class="nav-column nav-child-column">
-          <h3 class="nav-column-title">Sections</h3>
           <ul class="nav-list">
             <li
               *ngFor="let child of childItems"
@@ -72,28 +71,16 @@
 
       <!-- Bottom Actions Container -->
       <div class="nav-actions-container">
-        <!-- Theme Toggle in Menu -->
-        <button 
-          mat-button 
-          (click)="toggleTheme()"
-          class="nav-theme-toggle-btn theme-nav-item"
-          [attr.aria-label]="'Current theme: ' + getCurrentTheme()"
-        >
-          <mat-icon>
-            {{ getCurrentTheme() === 'light' ? 'light_mode' : getCurrentTheme() === 'dark' ? 'dark_mode' : 'contrast' }}
-          </mat-icon>
-          <span>{{ getCurrentTheme() | titlecase }} Mode</span>
-        </button>
-
-        <!-- Notification Component -->
-        <div class="nav-notification-container">
-          <app-notification></app-notification>
+        <!-- Extra Controls Section -->
+        <div class="nav-extra-actions">
+          <h4 class="nav-section-title">View Controls</h4>
+          <app-extra-actions></app-extra-actions>
         </div>
-
-        <ng-container *ngIf="showArtificer">
+        <!-- Artificer Section -->
+        <div class="nav-artificer-actions" *ngIf="showArtificer">
+          <h4 class="nav-section-title">Task Actions</h4>
           <app-artificer></app-artificer>
-        </ng-container>
-        <!-- Add other action components here if needed -->
+        </div>
       </div>
     </div>
   </mat-sidenav>

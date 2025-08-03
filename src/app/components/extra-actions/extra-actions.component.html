@@ -1,0 +1,36 @@
+<div class="extra-actions-container">
+  <!-- Theme Toggle Button (Artificer Style) -->
+  <button
+    mat-icon-button
+    (click)="extraActionsService.toggleTheme()"
+    class="extra-action-btn-compact"
+    [attr.aria-label]="'Current theme: ' + extraActionsService.getCurrentTheme()"
+    [title]="'Switch to ' + (extraActionsService.getCurrentTheme() === 'light' ? 'dark' : extraActionsService.getCurrentTheme() === 'dark' ? 'high contrast' : 'light') + ' theme'"
+  >
+    <mat-icon>
+      {{ extraActionsService.getCurrentTheme() === 'light' ? 'light_mode' : extraActionsService.getCurrentTheme() === 'dark' ? 'dark_mode' : 'contrast' }}
+    </mat-icon>
+  </button>
+
+  <!-- Compact Sort Controls -->
+  <button
+    mat-icon-button
+    class="sort-btn-compact"
+    [class.active]="currentSort === 'date'"
+    (click)="changeSort('date')"
+    [attr.aria-label]="'Sort by date'"
+    [title]="'Sort tasks by creation date'"
+  >
+    <mat-icon>schedule</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    class="sort-btn-compact"
+    [class.active]="currentSort === 'priority'"
+    (click)="changeSort('priority')"
+    [attr.aria-label]="'Sort by priority'"
+    [title]="'Sort tasks by priority level'"
+  >
+    <mat-icon>flag</mat-icon>
+  </button>
+</div>

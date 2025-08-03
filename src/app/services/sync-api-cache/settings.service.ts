@@ -35,7 +35,14 @@ export class SettingsService implements SettingsStrategy {
 
   async createSettings(settings: TaskSettings): Promise<TaskSettings> {
     try {
-      await this.ensureApiService().createSettings(settings);
+      // Persist to API if initialized
+      if (this.apiService) {
+        try {
+          await this.apiService.createSettings(settings);
+        } catch (err) {
+          console.warn('SettingsService: API createSettings failed, using cache', err);
+        }
+      }
       await this.cacheService.createSettings(settings);
       this.settingsSubject.next(settings);
       return settings;
@@ -55,15 +62,23 @@ export class SettingsService implements SettingsStrategy {
   async fetchSettings(): Promise<void> {
     try {
       let settings = await this.cacheService.getSettings();
-      if (!settings) {
-        settings = await this.ensureApiService().getSettings();
-        if (!settings) {
-          // Settings not found or error occurred
-          const defaultSettings = getDefaultTaskSettings(); // Assume some default settings exist
-
-          await this.createSettings(defaultSettings);
-          settings = defaultSettings;
+      // Try remote API only if initialized
+      if (!settings && this.apiService) {
+        try {
+          settings = await this.apiService.getSettings();
+        } catch (err) {
+          console.warn('SettingsService: API getSettings failed, using cache/default', err);
         }
+      }
+      if (!settings) {
+        // No settings found or API unavailable, use default
+        const defaultSettings = getDefaultTaskSettings();
+        // Persist to cache and API if available
+        await this.cacheService.createSettings(defaultSettings);
+        if (this.apiService) {
+          try { await this.apiService.createSettings(defaultSettings); } catch {}
+        }
+        settings = defaultSettings;
       }
       this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);
@@ -75,7 +90,14 @@ export class SettingsService implements SettingsStrategy {
 
   async updateSettings(settings: TaskSettings): Promise<void> {
     try {
-      await this.ensureApiService().updateSettings(settings);
+      // Update API if initialized
+      if (this.apiService) {
+        try {
+          await this.apiService.updateSettings(settings);
+        } catch (err) {
+          console.warn('SettingsService: API updateSettings failed, using cache', err);
+        }
+      }
       this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);
     } catch (error) {
