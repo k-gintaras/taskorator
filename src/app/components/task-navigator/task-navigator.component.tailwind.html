@@ -34,7 +34,7 @@
     <app-task-card [task]="selectedOverlord"></app-task-card>
   </div>
 
-  <div *ngIf="!tasks?.length" class="text-center py-8 text-gray-500">
+  <div *ngIf="!tasks?.length" class="text-center py-8 text-gray-500 dark:text-gray-400">
     <app-task-edit
       *ngIf="selectedOverlord"
       [task]="selectedOverlord"

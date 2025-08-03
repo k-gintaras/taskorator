@@ -1,0 +1,132 @@
+<!-- Task Navigator V2 - Improved Design System Implementation -->
+<div class="task-navigator-v2">
+  <!-- Header Section -->
+  <div class="navigator-header">
+    <h2 class="navigator-title">
+      <mat-icon class="title-icon">assignment</mat-icon>
+      Tasks Navigator
+    </h2>
+    <div class="navigator-stats">
+      <span class="stat-item">
+        <mat-icon class="stat-icon">list</mat-icon>
+        {{ tasks.length }} tasks
+      </span>
+      <span class="stat-item">
+        <mat-icon class="stat-icon">check_circle</mat-icon>
+        {{ getCompletedCount() }} completed
+      </span>
+    </div>
+  </div>
+
+  <!-- Current Task Section (if selected) -->
+  <div *ngIf="currentTask" class="current-task-section">
+    <mat-card class="current-task-card">
+      <mat-card-header>
+        <mat-card-title>Current Focus</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h3>{{ currentTask.title || 'Untitled Task' }}</h3>
+        <p class="task-why" *ngIf="currentTask.why">
+          <strong>Why:</strong> {{ currentTask.why }}
+        </p>
+        <p class="task-todo" *ngIf="currentTask.todo">
+          <strong>Action:</strong> {{ currentTask.todo }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Tasks List -->
+  <div class="tasks-container">
+    <div *ngIf="tasks.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">assignment_outlined</mat-icon>
+      <h3>No tasks yet</h3>
+      <p>Create your first task to get started!</p>
+      <button mat-raised-button color="primary" class="create-task-btn">
+        <mat-icon>add</mat-icon>
+        Create Task
+      </button>
+    </div>
+
+    <div 
+      *ngFor="let task of tasks; trackBy: trackByTaskId" 
+      class="task-item"
+      [class.selected]="isSelected(task)"
+      [class.completed]="task.completed"
+      [class.has-children]="hasChildren(task)"
+      [style.--accent-color]="getDateBasedColor(task.timeCreated)"
+      [style.--progress-percent]="getProgressPercent(task) + '%'"
+      (click)="onSelectTask(task)"
+    >
+      <!-- Task Status Indicator -->
+      <div class="task-status-bar"></div>
+
+      <!-- Main Task Content -->
+      <div class="task-content">
+        <!-- Left Section: Task Info -->
+        <div class="task-info">
+          <div class="task-header">
+            <h4 class="task-title">{{ task.title || 'Untitled Task' }}</h4>
+            <div class="task-badges">
+              <span *ngIf="hasChildren(task)" class="badge badge-children">
+                <mat-icon class="badge-icon">account_tree</mat-icon>
+                {{ task.children!.length }}
+              </span>
+              <span 
+                *ngIf="getTaskStatus(task.taskId) === 'updated'" 
+                class="badge badge-updated"
+              >
+                <mat-icon class="badge-icon">update</mat-icon>
+                Updated
+              </span>
+            </div>
+          </div>
+
+          <div class="task-details">
+            <p *ngIf="task.why" class="task-why">
+              <mat-icon class="detail-icon">help_outline</mat-icon>
+              {{ task.why }}
+            </p>
+            <p *ngIf="task.todo" class="task-todo">
+              <mat-icon class="detail-icon">assignment</mat-icon>
+              {{ task.todo }}
+            </p>
+          </div>
+
+          <!-- Progress Bar for Parent Tasks -->
+          <div *ngIf="hasChildren(task)" class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <span class="progress-text">{{ getProgressPercent(task) }}% complete</span>
+          </div>
+        </div>
+
+        <!-- Right Section: Actions -->
+        <div class="task-actions">
+          <button 
+            mat-icon-button 
+            class="action-btn navigate-btn"
+            [class.navigate-completed]="task.completed"
+            [class.navigate-has-children]="hasChildren(task)"
+            (click)="onNavigateToTask(task); $event.stopPropagation()"
+            [title]="hasChildren(task) ? 'View subtasks' : 'View details'"
+          >
+            <mat-icon>{{ hasChildren(task) ? 'arrow_forward_ios' : 'visibility' }}</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button 
+            class="action-btn complete-btn"
+            [class.complete-active]="task.completed"
+            [class.complete-parent]="hasChildren(task) && !task.completed"
+            (click)="onCompleteTask(task); $event.stopPropagation()"
+            [title]="task.completed ? 'Mark incomplete' : 'Mark complete'"
+          >
+            <mat-icon>{{ task.completed ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

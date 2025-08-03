@@ -1,6 +1,6 @@
 <div (click)="onTaskCardClick(task)">
-  <p class="task-title">{{ task?.name }}</p>
-  <span *ngIf="(showPriority$ | async) && task?.priority" class="task-priority">
+  <p class="task-title theme-text-primary">{{ task?.name }}</p>
+  <span *ngIf="(showPriority$ | async) && task?.priority" class="task-priority theme-text-secondary">
     Priority: {{ task?.priority }}
   </span>
 </div>

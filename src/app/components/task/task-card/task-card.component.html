@@ -1,10 +1,11 @@
 <div
   *ngIf="task"
-  class="card bg-white shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 border-primary flex flex-col"
+  class="card theme-card shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 flex flex-col"
   [ngClass]="{
     'min-h-[280px]': ifShowExtra,
     'min-h-[120px]': !ifShowExtra
   }"
+  [style.borderLeftColor]="getAgeBasedBorderColor()"
 >
   <div class="card-body p-4 flex flex-col flex-1">
     <!-- Header -->

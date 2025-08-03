@@ -3,7 +3,7 @@
   <ng-container *ngIf="currentPath$ | async as path">
     <button
       *ngIf="path.length"
-      class="text-xl font-semibold text-gray-900 text-left hover:underline max-w-full break-words mb-2"
+      class="text-xl font-semibold theme-text-primary text-left hover:underline max-w-full break-words mb-2"
       (click)="jumpTo(path[path.length - 1].id)"
       [title]="path[path.length - 1].name"
     >
@@ -24,7 +24,7 @@
     <ng-container *ngIf="currentPath$ | async as path">
       <nav
         *ngIf="path.length > 1"
-        class="flex flex-wrap items-center gap-1 text-gray-700 text-sm max-w-full"
+        class="flex flex-wrap items-center gap-1 theme-text-secondary text-sm max-w-full"
         aria-label="Breadcrumb"
       >
         <ng-container *ngFor="let crumb of path; let last = last">
@@ -35,7 +35,7 @@
           >
             {{ crumb.name }}
           </a>
-          <span *ngIf="!last" class="text-gray-400 mx-1 select-none">›</span>
+          <span *ngIf="!last" class="theme-text-muted mx-1 select-none">›</span>
         </ng-container>
       </nav>
     </ng-container>

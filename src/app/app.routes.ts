@@ -5,12 +5,16 @@ import { NextTaskManagerComponent } from './features/next-task-manager/next-task
 import { TaskViewComponent } from './components/task/task-view/task-view.component';
 import { AutoRedirectComponent } from './components/auto-redirect/auto-redirect.component';
 import { LoginComponent } from './features/core/gateway/login/login.component';
+import { TaskNavigatorV2Component } from './components/task-navigator-v2/task-navigator-v2.component';
 
 export const routes: Route[] = [
   { path: '', component: AutoRedirectComponent }, // Root redirect
   { path: 'welcome', redirectTo: '/gateway/welcome', pathMatch: 'full' }, // Redirect welcome to gateway/welcome
 
   { path: 'login', component: LoginComponent }, // Public login
+
+  // Test route for new task navigator
+  { path: 'test/navigator-v2', component: TaskNavigatorV2Component },
 
   {
     path: 'gateway',

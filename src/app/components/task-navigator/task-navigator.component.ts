@@ -53,4 +53,38 @@ export class TaskNavigatorComponent implements OnInit {
       this.errorService.warn('Failed to navigate to next tasks.');
     }
   }
+
+  // Utility methods for improved UI
+  trackByTaskId(index: number, task: UiTask): string {
+    return task.taskId;
+  }
+
+  getDateBasedColor(timestamp: number): string {
+    const today = new Date();
+    const taskDate = new Date(timestamp);
+    const diffTime = Math.abs(today.getTime() - taskDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Color gradient based on age - following design system
+    if (diffDays <= 1) return '#27ae60'; // Green for recent
+    if (diffDays <= 3) return '#007bff'; // Blue for medium  
+    if (diffDays <= 7) return '#ffc107'; // Yellow for old
+    return '#c0392b'; // Red for very old
+  }
+
+  getProgressPercent(task: any): number {
+    // Simple progress calculation - can be enhanced based on actual task structure
+    if (!task || !task.children || task.children.length === 0) {
+      return task?.completed ? 100 : 0;
+    }
+    
+    const completedChildren = task.children.filter((child: any) => child.completed).length;
+    return Math.round((completedChildren / task.children.length) * 100);
+  }
+
+  getTreeNodeData(task: UiTask): any {
+    // Return task data for progress calculation
+    // This should be adapted based on your actual tree structure
+    return task;
+  }
 }

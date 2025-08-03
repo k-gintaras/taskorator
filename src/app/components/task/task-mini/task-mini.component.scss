@@ -1,8 +1,8 @@
 .task-title {
   margin-left: 10px;
   margin-top: 10px;
-  font-weight: bold;
-  color: #333;
+  font-weight: normal;
+  color: var(--text-primary);
   text-align: center;
 
   /* Break long words and wrap text */
@@ -30,7 +30,7 @@
 
 .task-info {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .task-due-date {
@@ -45,15 +45,15 @@
 .task-priority {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #666;
-  background-color: #f0f0f0;
+  color: var(--text-secondary);
+  background-color: var(--bg-elevated);
   padding: 2px 6px;
   border-radius: 4px;
   display: inline-block;
 }
 
 .high-priority {
-  color: #ff6347; /* Tomato color for high priority */
+  color: var(--text-accent); /* Use theme accent color for high priority */
 }
 
 .task-actions button {
@@ -61,5 +61,5 @@
 }
 
 .selected-task {
-  border-color: #007bff;
+  border-color: var(--purple-primary);
 }

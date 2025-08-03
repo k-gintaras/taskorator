@@ -1,0 +1,31 @@
+// Task Navigator - Simple and clean
+// Just essential color theming to complement Tailwind
+
+:host {
+  // Design system colors from your existing setup
+  --primary-purple: #7d4fbf;
+  --secondary-purple: #a18ac1;
+  --background-gray: #b4b4b4;
+  
+  // Ensure proper background for the component
+  display: block;
+  min-height: 100%;
+}
+
+// Mobile optimization - ensure proper touch targets
+@media (max-width: 480px) {
+  button, 
+  [role="button"], 
+  .cursor-pointer {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+// Respect user's motion preferences
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

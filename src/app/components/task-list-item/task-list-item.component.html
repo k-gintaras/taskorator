@@ -5,20 +5,18 @@
   ></app-chunked-progress>
 
   <div
-    [ngClass]="task.isSelected ? 'bg-secondary' : 'bg-white border-gray-300'"
+    [ngClass]="task.isSelected ? 'bg-secondary' : 'theme-card'"
     [style.borderLeftColor]="task.color"
     [style.borderLeftWidth.px]="6"
-    class="flex items-center justify-between rounded-md p-3 mb-3 border box-border cursor-pointer w-full relative"
+    class="flex items-center justify-between rounded-md p-3 mb-3 border box-border cursor-pointer w-full relative transition-shadow"
   >
     <!-- Navigate / Expand Button -->
     <button
       class="flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2"
       [ngClass]="{
-        'border-secondary bg-primary text-secondary': task.isRecentlyViewed,
-        'border-primary bg-secondary text-primary':
-          !task.isRecentlyViewed && task.isRecentlyCreated,
-        'border-gray bg-white':
-          !task.isRecentlyViewed && !task.isRecentlyCreated
+        'theme-btn-primary': task.isRecentlyViewed,
+        'theme-btn-secondary': !task.isRecentlyViewed && task.isRecentlyCreated,
+        'theme-bg-elevated border': !task.isRecentlyViewed && !task.isRecentlyCreated
       }"
       (click)="onNavigateClick($event)"
     >
