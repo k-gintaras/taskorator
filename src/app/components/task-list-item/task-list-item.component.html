@@ -16,7 +16,7 @@
       [ngClass]="{
         'theme-btn-primary': task.isRecentlyViewed,
         'theme-btn-secondary': !task.isRecentlyViewed && task.isRecentlyCreated,
-        'theme-bg-elevated border': !task.isRecentlyViewed && !task.isRecentlyCreated
+        'theme-bg-elevated': !task.isRecentlyViewed && !task.isRecentlyCreated
       }"
       (click)="onNavigateClick($event)"
     >

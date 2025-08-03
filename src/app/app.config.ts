@@ -1,5 +1,26 @@
 import { ApplicationConfig } from '@angular/core';
 
+/*
+🧪 TESTING CONFIGURATION GUIDE:
+
+To set up offline testing with sample data:
+
+1. OFFLINE_TESTING: true  -> No Firebase calls, uses localStorage
+2. TEST_DATA_MODE: true   -> Populates with test data on startup
+3. TEST_USER_PROFILE: Set to one of these profiles:
+   - 'empty': Just root task + 3 basic tasks (like new user)
+   - 'basic': Organized categories with some tasks 
+   - 'complex': Realistic project structure with phases (RECOMMENDED for development)
+   - 'massive': Large dataset for performance testing
+
+How to use:
+- Change TEST_USER_PROFILE and restart the app
+- Or use console: sessionManager.switchTestProfile('basic')
+- Each profile uses different localStorage keys, so they don't interfere
+
+This avoids hitting Firebase during development and gives you realistic test data immediately!
+*/
+
 // we kinda import them elsewhere in main
 export const appConfig: ApplicationConfig = {
   providers: [],
@@ -8,7 +29,9 @@ export const appConfig: ApplicationConfig = {
 
 export const OTHER_CONFIG = {
   APP_TITLE: 'taskorator',
-  OFFLINE_TESTING: false,
+  OFFLINE_TESTING: true, // 🔥 ENABLED for development - no Firebase calls
+  TEST_DATA_MODE: true, // 🧪 ENABLED - populate with random test tasks
+  TEST_USER_PROFILE: 'complex', // 🧪 OPTIONS: 'empty', 'basic', 'complex', 'massive'
   REPAIR_TREE: true,
   TREE_UPDATE_FREQUENCY: 500,
   OFFLINE_USER_LOGIN_ID: 'OfflineLoginUserId3',

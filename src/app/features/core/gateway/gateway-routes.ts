@@ -44,6 +44,13 @@ const routes: Routes = [
 ];
 
 export const gatewayRouteMetadata: AppRouteMap = {
+  // Welcome page metadata
+  welcome: {
+    title: 'Welcome',
+    icon: 'home',
+    description: 'Welcome to Taskorator! Get started by exploring your tasks or logging in.',
+    altName: 'Welcome',
+  },
   login: {
     title: 'Login',
     icon: 'template', // Replace with the appropriate icon

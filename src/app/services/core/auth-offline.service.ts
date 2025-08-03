@@ -19,7 +19,8 @@ export interface OfflineUser {
 @Injectable({ providedIn: 'root' })
 export class AuthOfflineService implements AuthStrategy {
   private currentUser = new BehaviorSubject<AuthUser | null>(null);
-  private readonly localStorageKey = OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+  // Use OFFLINE_USER_ID so stored user matches test data profile keys
+  private readonly localStorageKey = OTHER_CONFIG.OFFLINE_USER_ID;
 
   constructor() {}
 
@@ -41,12 +42,15 @@ export class AuthOfflineService implements AuthStrategy {
    * Logs in as an offline user. If no user exists in local storage, creates a new one.
    */
   async login(): Promise<{ userId: string; isNewUser: boolean }> {
+    // Use configured offline user ID (may include test profile suffix)
+    const configuredId = OTHER_CONFIG.OFFLINE_USER_ID;
     let offlineUser = this.currentUser.getValue();
     const isNewUser = offlineUser === null;
 
     if (isNewUser) {
+      // Create a new offline user with configured ID
       offlineUser = {
-        uid: 'offline-user',
+        uid: configuredId,
         displayName: 'Offline User',
         email: null,
         isAnonymous: true,
@@ -61,7 +65,7 @@ export class AuthOfflineService implements AuthStrategy {
       console.log('Logged in as existing offline user:', offlineUser);
     }
 
-    // Ensure offlineUser is not null here with a type assertion or conditional.
+    // Return user ID with configured ID (matches tasks storage keys)
     return {
       userId: offlineUser!.uid,
       isNewUser,

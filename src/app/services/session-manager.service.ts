@@ -18,6 +18,7 @@ import { ScoreService } from './sync-api-cache/score.service';
 import { RegistrationService } from './core/registration.service';
 import { TaskTreeHealService } from './tree/task-tree-heal.service';
 import { TaskBatchService } from './sync-api-cache/task-batch.service';
+import { TestDataInitializerService } from '../test-files/test-services/test-data-initializer.service';
 import { NavigationService } from './navigation.service';
 import { OTHER_CONFIG } from '../app.config';
 
@@ -30,6 +31,7 @@ export class SessionManagerService {
   private isInitialized = false;
   private initializationComplete: Promise<void>;
   private resolveInitialization!: () => void;
+  private testUserIdSet = false; // 🧪 Flag to prevent multiple ID modifications
 
   constructor(
     private firebaseAuth: AuthService,
@@ -45,7 +47,8 @@ export class SessionManagerService {
     private settingsService: SettingsService,
     private scoreService: ScoreService,
     private registrationService: RegistrationService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private testDataInitializer: TestDataInitializerService
   ) {
     this.initializationComplete = new Promise((resolve) => {
       this.resolveInitialization = resolve;
@@ -74,6 +77,17 @@ export class SessionManagerService {
     const isTestingSimple = OTHER_CONFIG.OFFLINE_TESTING;
     if (isTestingSimple) {
       mode = 'offline';
+      
+      // 🧪 Set test user ID based on profile (only once)
+      if (OTHER_CONFIG.TEST_DATA_MODE && OTHER_CONFIG.TEST_USER_PROFILE && !this.testUserIdSet) {
+        const originalUserId = 'OfflineLoginUserId3'; // Use hardcoded original
+        const testUserId = `${originalUserId}-${OTHER_CONFIG.TEST_USER_PROFILE}`;
+        // Override the user ID for test data
+        (OTHER_CONFIG as any).OFFLINE_USER_LOGIN_ID = testUserId;
+        (OTHER_CONFIG as any).OFFLINE_USER_ID = testUserId;
+        this.testUserIdSet = true;
+        console.log(`🧪 Using test profile user ID: ${testUserId}`);
+      }
     }
 
     if (mode === 'online') {
@@ -126,14 +140,37 @@ export class SessionManagerService {
     } else if (mode === 'offline') {
       this.authStrategy = this.offlineAuth;
       this.apiStrategy = this.localStorageApi;
-      this.offlineAuth.initialize(); // init here, so we don't login by accident
-      await this.offlineAuth.login();
-      this.user = await this.waitForLogin();
+      this.offlineAuth.initialize();
+      
+      try {
+        await this.offlineAuth.login();
+        this.user = await this.waitForLogin();
+        // Persist test user to localStorage under OFFLINE_USER_ID as well
+        localStorage.setItem(
+          OTHER_CONFIG.OFFLINE_USER_ID,
+          JSON.stringify(this.user)
+        );
 
-      if (!this.user) {
-        throw new Error('Login failed or user not authenticated.');
-      } else {
-        console.log('Offline User ID: ' + this.user.uid);
+        if (!this.user) {
+          throw new Error('Login failed or user not authenticated.');
+        } else {
+          console.log('Offline User ID: ' + this.user.uid);
+        }
+      } catch (error) {
+        console.error('Offline authentication failed:', error);
+        // For offline mode, we can be more lenient and still proceed
+        if (!this.user) {
+          // Create a fallback user if authentication completely fails
+          this.user = {
+            uid: 'offline-fallback-user',
+            displayName: 'Offline User',
+            email: null,
+            isAnonymous: true,
+            emailVerified: false,
+            isNewUser: true,
+          };
+          console.log('🚨 Using fallback offline user due to auth failure');
+        }
       }
     }
 
@@ -154,7 +191,19 @@ export class SessionManagerService {
     return true;
   }
 
-  private initializeServices(): void {
+  private async initializeServices(): Promise<void> {
+    // Initialize test data for current profile (always refresh to ensure correct data)
+    if (OTHER_CONFIG.TEST_DATA_MODE && OTHER_CONFIG.OFFLINE_TESTING) {
+      console.log('🧪 Reinitializing test data for profile:', OTHER_CONFIG.TEST_USER_PROFILE);
+      // Clear any existing test data for current user
+      this.testDataInitializer.clearTestData();
+      // Populate fresh test data
+      await this.testDataInitializer.initializeTestData();
+      // Debug: Check tasks loaded
+      const loadedTasks = await this.apiStrategy.getLatestCreatedTasks();
+      console.log(`🧪 Debug: Loaded ${loadedTasks?.length || 0} test tasks`);
+    }
+
     // TaskService
     this.taskService.initialize(this.apiStrategy);
     // SettingsService
@@ -174,20 +223,34 @@ export class SessionManagerService {
   private waitForLogin(): Promise<AuthUser | null> {
     return new Promise((resolve, reject) => {
       console.log('Waiting for authentication to complete...');
+      
+      // Shorter timeout for offline mode
+      const timeoutDuration = this.sessionType === 'offline' ? 3000 : 10000;
       const timeout = setTimeout(() => {
-        console.error('Authentication timeout reached - no user authenticated within 10 seconds');
+        console.error(`Authentication timeout reached - no user authenticated within ${timeoutDuration}ms`);
         reject('Login timed out');
-      }, 10000); // 10 seconds timeout.
+      }, timeoutDuration);
 
-      const subscription = this.authStrategy.getCurrentUser().subscribe((user) => {
-        console.log('Authentication state changed:', user ? `User logged in: ${user.uid}` : 'User is null/logged out');
-        if (user) {
-          console.log('Authentication successful, resolving promise');
-          clearTimeout(timeout);
-          subscription.unsubscribe();
-          resolve(user);
-        }
-      });
+      // Use take(1) to auto-unsubscribe after first emission
+      this.authStrategy.getCurrentUser()
+        .pipe(take(1))
+        .subscribe(
+          (user) => {
+            console.log(
+              'Authentication state changed:',
+              user ? `User logged in: ${user.uid}` : 'User is null/logged out'
+            );
+            if (user) {
+              console.log('Authentication successful, resolving promise');
+              clearTimeout(timeout);
+              resolve(user);
+            }
+          },
+          (err) => {
+            clearTimeout(timeout);
+            reject(err);
+          }
+        );
     });
   }
 
@@ -215,5 +278,58 @@ export class SessionManagerService {
 
   isLoggedIn(): boolean {
     return this.authStrategy.isAuthenticated();
+  }
+
+  /**
+   * Clear test data from localStorage (useful for testing)
+   */
+  clearTestData(): void {
+    this.testDataInitializer.clearTestData();
+  }
+
+  /**
+   * Reinitialize test data (useful for testing)
+   */
+  async reinitializeTestData(): Promise<void> {
+    if (OTHER_CONFIG.TEST_DATA_MODE && OTHER_CONFIG.OFFLINE_TESTING) {
+      this.testDataInitializer.clearTestData();
+      await this.testDataInitializer.initializeTestData();
+      console.log('🧪 Test data reinitialized');
+    } else {
+      console.log('🧪 Test data reinitialization skipped - not in test mode');
+    }
+  }
+
+  /**
+   * Switch to a different test profile and reinitialize data
+   * Usage: sessionManager.switchTestProfile('basic')
+   */
+  async switchTestProfile(profile: 'empty' | 'basic' | 'complex' | 'massive'): Promise<void> {
+    if (!OTHER_CONFIG.TEST_DATA_MODE || !OTHER_CONFIG.OFFLINE_TESTING) {
+      console.log('🧪 Profile switching only available in test mode');
+      return;
+    }
+
+    console.log(`🧪 Switching to test profile: ${profile}`);
+    
+    // Reset the test user ID flag and update config
+    this.testUserIdSet = false;
+    (OTHER_CONFIG as any).TEST_USER_PROFILE = profile;
+    
+    // Clear old data and create new
+    await this.testDataInitializer.initializeTestData();
+    
+    // You might need to reload the page or reinitialize services
+    console.log(`🧪 Switched to ${profile} profile. Consider refreshing the page for full effect.`);
+  }
+
+  /**
+   * Reset offline test state (useful for debugging)
+   */
+  resetTestState(): void {
+    this.testUserIdSet = false;
+    this.isInitialized = false;
+    this.sessionType = null;
+    console.log('🧪 Test state reset');
   }
 }

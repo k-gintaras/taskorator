@@ -14,7 +14,7 @@ import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
 import { AuthOfflineService } from './auth-offline.service';
 import { OTHER_CONFIG } from '../../app.config';
 
-const getUserStorageKeys = (userId: string) => ({
+export const getUserStorageKeys = (userId: string) => ({
   TASKS: `tasks_${userId}`,
   SETTINGS: `settings_${userId}`,
   TREE: `tree_${userId}`,
