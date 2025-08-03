@@ -1,181 +1,27 @@
-.search-create-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background-color: transparent;
-  box-shadow: none;
-  margin: 0; /* Remove any default margins */
-  
-  /* Keep same responsive behavior */
-  @media (max-width: 800px) {
-    max-width: 400px;
-  }
-  @media (max-width: 600px) {
-    max-width: 300px;
-  }
-  @media (max-width: 400px) {
-    max-width: 250px;
-  }
-}
+/* Search Create Component - Tailwind Implementation */
+/* Minimal SCSS - using Tailwind classes in template */
 
-.search-create-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 40px; /* Match toolbar height better */
-  margin: 0; /* Remove any margins */
-  
-  .search-bar {
-    flex: 1;
-    min-width: 0;
-    margin: 0; /* Remove margins */
-    
-    /* Override Material field appearance */
-    ::ng-deep .mat-mdc-form-field {
-      margin: 0;
-      
-      .mat-mdc-text-field-wrapper {
-        height: 36px; /* Slightly taller for better alignment */
-        background-color: var(--input-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        
-        &:hover {
-          border-color: var(--border-light);
-          background-color: var(--bg-surface);
-        }
-        
-        &.mdc-text-field--focused {
-          border-color: var(--input-focus);
-          box-shadow: 0 0 0 1px var(--input-focus);
-        }
-      }
-      
-      .mat-mdc-form-field-subscript-wrapper {
-        display: none; /* Hide subscript area */
-      }
-      
-      .mat-mdc-form-field-infix {
-        padding: 0 12px;
-        min-height: 34px;
-        border: none;
-      }
-    }
-    
-    /* Input styling - better contrast */
-    ::ng-deep input {
-      color: var(--input-text) !important;
-      font-size: 0.875rem;
-      background-color: transparent !important;
-      
-      &::placeholder {
-        color: var(--input-placeholder) !important;
-        font-size: 0.8rem;
-        opacity: 1; /* Ensure placeholder is visible */
-      }
-    }
-  }
-}
-
-.search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
+/* Only custom styles needed for specific overrides if any */
+:host {
+  display: block;
   width: 100%;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: var(--shadow-lg);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-  margin-top: 2px;
 }
 
-.search-results p {
-  margin: 0;
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  line-height: 1.2;
-  cursor: pointer;
-  background-color: transparent;
-  transition: background-color 0.2s ease;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-light);
-  
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background-color: var(--nav-item-hover);
-  }
-
-  &.selected {
-    background-color: var(--nav-item-active);
-    color: var(--nav-item-active-text);
-    font-weight: 500;
-  }
+/* Ensure proper scrollbar styling for search results */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
 }
 
-/* Icon buttons styling - better visibility */
-::ng-deep mat-icon-button {
-  width: 32px !important;
-  height: 32px !important;
-  line-height: 32px !important;
-  background-color: var(--btn-secondary-bg) !important;
-  color: var(--btn-secondary-text) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
-  margin: 0 !important;
-  
-  &:hover {
-    background-color: var(--btn-secondary-hover) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-light) !important;
-  }
-  
-  &[color="primary"] {
-    background-color: var(--btn-primary-bg) !important;
-    color: var(--btn-primary-text) !important;
-    border-color: var(--purple-primary) !important;
-    
-    &:hover {
-      background-color: var(--btn-primary-hover) !important;
-    }
-  }
-  
-  .mat-icon {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    color: inherit !important;
-  }
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
 }
 
-@media (max-width: 400px) {
-  .search-results {
-    max-height: 150px;
-  }
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
 
-  ::ng-deep mat-icon-button {
-    width: 24px !important;
-    height: 24px !important;
-    
-    .mat-icon {
-      font-size: 16px !important;
-      width: 16px !important;
-      height: 16px !important;
-    }
-  }
-
-  .search-results p {
-    font-size: 0.8rem;
-    padding: 6px 10px;
-  }
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }

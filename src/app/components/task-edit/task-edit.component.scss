@@ -1,49 +1,242 @@
-/* Component Width for Consistency */
-.component-width {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 16px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
+/* Task Edit Component - Clean & Readable */
+
+.task-edit-container {
+  min-height: 100vh;
+  background-color: var(--app-bg);
 }
 
-/* Form Group Styling */
-.form-group {
+.task-edit-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
+  gap: 2rem;
 }
 
-/* Duo Fields for Equal Spacing */
-.form-group.duo {
+/* Header */
+.task-edit-header {
+  text-align: center;
+  padding: 1rem 0;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+
+    mat-icon {
+      color: var(--purple-primary);
+      font-size: 1.75rem;
+    }
+  }
+}
+
+/* Sections */
+.task-section {
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  
+  /* Light mode specific styling */
+  @media (prefers-color-scheme: light) {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Dark mode fallback */
+  @media (prefers-color-scheme: dark) {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+    box-shadow: var(--card-shadow);
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-light);
+
+    /* Light mode border */
+    @media (prefers-color-scheme: light) {
+      border-bottom-color: #e2e8f0;
+    }
+
+    mat-icon {
+      font-size: 1.25rem;
+      color: var(--purple-light);
+    }
+  }
+}
+
+/* Form Layout */
+.form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 1.25rem;
+
+  &.form-grid-2 {
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
 
-/* Labels for Fields */
-label {
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #333;
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+  }
+
+  input, select, textarea {
+    padding: 0.75rem;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+
+    /* Light mode specific styling */
+    @media (prefers-color-scheme: light) {
+      background-color: #ffffff;
+      border-color: #d1d5db;
+      color: #374151;
+      
+      &:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+      }
+    }
+
+    /* Dark mode fallback */
+    @media (prefers-color-scheme: dark) {
+      &:focus {
+        outline: none;
+        border-color: var(--purple-primary);
+        box-shadow: 0 0 0 3px var(--purple-light);
+      }
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+      
+      @media (prefers-color-scheme: light) {
+        color: #9ca3af;
+      }
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+
+  select {
+    cursor: pointer;
+    
+    option {
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+    }
+  }
 }
 
-/* Input, Select, and Textarea Fields */
-input,
-select,
-textarea {
-  padding: 8px;
-  font-size: 0.9rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box; /* Prevents overflow */
+/* Actions */
+.task-actions {
+  .save-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background-color: var(--purple-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--purple-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-purple);
+    }
+
+    mat-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--bg-elevated);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    mat-icon {
+      font-size: 1rem;
+    }
+  }
 }
 
-/* Textarea Resizing and Alignment */
-textarea {
-  resize: none;
+/* Responsive */
+@media (max-width: 768px) {
+  .task-edit-wrapper {
+    padding: 0.5rem;
+    gap: 1.5rem;
+  }
+
+  .task-section {
+    padding: 1rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+
+    .action-btn {
+      width: 100%;
+      max-width: 200px;
+      justify-content: center;
+    }
+  }
 }
