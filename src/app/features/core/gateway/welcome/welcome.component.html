@@ -14,46 +14,48 @@
     <section class="demo-section">
       <div class="slideshow-container">
         <div class="slide-wrapper">
-          <div 
-            *ngFor="let slide of slides; let i = index" 
-            class="slide"
-            [class.active]="i === currentSlide"
-          >
-            <div class="slide-content">
-              <img [src]="slide.gif" [alt]="slide.title" class="demo-gif" loading="lazy">
-              <div class="slide-info">
-                <h3>{{ slide.title }}</h3>
-                <p>{{ slide.description }}</p>
+          @for (slide of slides; track slide; let i = $index) {
+            <div
+              class="slide"
+              [class.active]="i === currentSlide"
+              >
+              <div class="slide-content">
+                <img [src]="slide.gif" [alt]="slide.title" class="demo-gif" loading="lazy">
+                <div class="slide-info">
+                  <h3>{{ slide.title }}</h3>
+                  <p>{{ slide.description }}</p>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
 
         <!-- Navigation Controls -->
         <div class="slide-controls">
-          <button 
-            class="nav-btn prev" 
+          <button
+            class="nav-btn prev"
             (click)="previousSlide()"
             aria-label="Previous slide"
-          >
+            >
             ‹
           </button>
-          
+
           <div class="slide-indicators">
-            <button 
-              *ngFor="let slide of slides; let i = index"
-              class="indicator"
-              [class.active]="i === currentSlide"
-              (click)="goToSlide(i)"
-              [attr.aria-label]="'Go to slide ' + (i + 1)"
-            ></button>
+            @for (slide of slides; track slide; let i = $index) {
+              <button
+                class="indicator"
+                [class.active]="i === currentSlide"
+                (click)="goToSlide(i)"
+                [attr.aria-label]="'Go to slide ' + (i + 1)"
+              ></button>
+            }
           </div>
-          
-          <button 
-            class="nav-btn next" 
+
+          <button
+            class="nav-btn next"
             (click)="nextSlide()"
             aria-label="Next slide"
-          >
+            >
             ›
           </button>
         </div>
@@ -64,9 +66,11 @@
     <section class="features-section">
       <h2>Why Choose Taskorator?</h2>
       <div class="features-grid">
-        <div *ngFor="let feature of features" class="feature-card">
-          {{ feature }}
-        </div>
+        @for (feature of features; track feature) {
+          <div class="feature-card">
+            {{ feature }}
+          </div>
+        }
       </div>
     </section>
 
@@ -75,29 +79,29 @@
       <div class="cta-content">
         <h2>Ready to Get Started?</h2>
         <p>Choose your preferred way to dive into task management</p>
-        
+
         <div class="cta-buttons">
-          <button 
-            class="cta-btn primary" 
+          <button
+            class="cta-btn primary"
             (click)="startOnlineLogin()"
-          >
+            >
             <span class="btn-icon">🚀</span>
             Sign In with Google
           </button>
-          
-          <button 
-            class="cta-btn secondary" 
+
+          <button
+            class="cta-btn secondary"
             (click)="startOfflineMode()"
-          >
+            >
             <span class="btn-icon">⚡</span>
             Try Offline Mode
           </button>
         </div>
-        
-        <button 
-          class="learn-more-btn" 
+
+        <button
+          class="learn-more-btn"
           (click)="learnMore()"
-        >
+          >
           Learn More About Features
         </button>
       </div>

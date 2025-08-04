@@ -1,15 +1,17 @@
-<div *ngIf="template">
-  <h1>{{ template.name }}</h1>
-  <p>Author: {{ template.authorName }}</p>
-  <p>Number of tasks: {{ template.tasks.length }}</p>
-
+@if (template) {
   <div>
-    <label for="overlord">Select Overlord:</label>
-    <input type="text" id="overlord" [(ngModel)]="selectedOverlordId" />
+    <h1>{{ template.name }}</h1>
+    <p>Author: {{ template.authorName }}</p>
+    <p>Number of tasks: {{ template.tasks.length }}</p>
+    <div>
+      <label for="overlord">Select Overlord:</label>
+      <input type="text" id="overlord" [(ngModel)]="selectedOverlordId" />
+    </div>
+    <button (click)="addTasksToOverlord()">Add Tasks to Overlord</button>
   </div>
-
-  <button (click)="addTasksToOverlord()">Add Tasks to Overlord</button>
-</div>
-<div *ngIf="!template">
-  <p>Loading template...</p>
-</div>
+}
+@if (!template) {
+  <div>
+    <p>Loading template...</p>
+  </div>
+}

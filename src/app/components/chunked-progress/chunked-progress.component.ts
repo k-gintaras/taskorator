@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { TaskNodeInfo } from '../../models/taskTree';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-chunked-progress',
   standalone: true,
-  imports: [NgIf, NgClass, NgFor],
+  imports: [NgClass],
   templateUrl: './chunked-progress.component.html',
   styleUrl: './chunked-progress.component.scss',
 })

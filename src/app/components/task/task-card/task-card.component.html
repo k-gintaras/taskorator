@@ -1,116 +1,135 @@
-<div
-  *ngIf="task"
-  class="card theme-card shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 flex flex-col"
+@if (task) {
+  <div
+    class="card theme-card shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 flex flex-col"
   [ngClass]="{
     'min-h-[280px]': ifShowExtra,
     'min-h-[120px]': !ifShowExtra
   }"
-  [style.borderLeftColor]="getAgeBasedBorderColor()"
->
-  <div class="card-body p-4 flex flex-col flex-1">
-    <!-- Header -->
-    <div
-      class="flex justify-between items-start mb-3 min-h-[32px]"
-      *ngIf="ifShowExtra; else minimalHeader"
+    [style.borderLeftColor]="getAgeBasedBorderColor()"
     >
-      <h3
-        class="text-lg font-bold break-words leading-tight text-gray-900 flex-1 pr-2"
-      >
-        {{ task.name }}
-      </h3>
-
-      <app-task-breadcrumb></app-task-breadcrumb>
-
-      <span
-        class="badge badge-sm flex-shrink-0"
-        [ngClass]="task.priority > 7 ? 'badge-error' : 'badge-info'"
-      >
-        P: {{ task.priority }}
-      </span>
-    </div>
-    <ng-template #minimalHeader>
-      <div class="mb-2">
-        <app-task-breadcrumb></app-task-breadcrumb>
-      </div>
-    </ng-template>
-
-    <!-- Main content - conditional sizing -->
-    <div
-      class="flex-1 space-y-2 text-sm text-gray-700"
+    <div class="card-body p-4 flex flex-col flex-1">
+      <!-- Header -->
+      @if (ifShowExtra) {
+        <div
+          class="flex justify-between items-start mb-3 min-h-[32px]"
+          >
+          <h3
+            class="text-lg font-bold break-words leading-tight text-gray-900 flex-1 pr-2"
+            >
+            {{ task.name }}
+          </h3>
+          <app-task-breadcrumb></app-task-breadcrumb>
+          <span
+            class="badge badge-sm flex-shrink-0"
+            [ngClass]="task.priority > 7 ? 'badge-error' : 'badge-info'"
+            >
+            P: {{ task.priority }}
+          </span>
+        </div>
+      } @else {
+        <div class="mb-2">
+          <app-task-breadcrumb></app-task-breadcrumb>
+        </div>
+      }
+      <!-- Main content - conditional sizing -->
+      <div
+        class="flex-1 space-y-2 text-sm text-gray-700"
       [ngClass]="{
         'min-h-[60px]': ifShowExtra,
         'min-h-[20px]': !ifShowExtra
       }"
-    >
-      <div
-        *ngIf="ifShowExtra && task.todo"
-        class="max-h-[60px] overflow-y-auto"
-      >
-        <p class="leading-relaxed">{{ task.todo }}</p>
+        >
+        @if (ifShowExtra && task.todo) {
+          <div
+            class="max-h-[60px] overflow-y-auto"
+            >
+            <p class="leading-relaxed">{{ task.todo }}</p>
+          </div>
+        }
+        @if (ifShowExtra && task.why) {
+          <div class="max-h-[40px] overflow-y-auto">
+            <p class="italic text-gray-600 leading-relaxed">
+              Reason: {{ task.why }}
+            </p>
+          </div>
+        }
+        @if (ifShowExtra && task.backupLink) {
+          <a
+            [href]="task.backupLink"
+            class="link link-primary block truncate"
+            >
+            Link
+          </a>
+        }
       </div>
-      <div *ngIf="ifShowExtra && task.why" class="max-h-[40px] overflow-y-auto">
-        <p class="italic text-gray-600 leading-relaxed">
-          Reason: {{ task.why }}
-        </p>
-      </div>
-
-      <a
-        *ngIf="ifShowExtra && task.backupLink"
-        [href]="task.backupLink"
-        class="link link-primary block truncate"
-      >
-        Link
-      </a>
-    </div>
-
-    <!-- Tags -->
-    <div
-      *ngIf="ifShowExtra && thereIsTags()"
-      class="min-h-[24px] mb-2 flex flex-wrap gap-1"
-    >
-      <span *ngFor="let tag of task.tags" class="badge badge-info badge-xs">
-        {{ tag }}
-      </span>
-    </div>
-
-    <!-- Metadata badges -->
-    <div
-      *ngIf="ifShowExtra"
-      class="min-h-[48px] mb-3 flex flex-wrap gap-1 text-gray-600"
-    >
-      <span *ngIf="task.status" class="badge badge-outline badge-xs">
-        Status: {{ task.status }}
-      </span>
-      <span *ngIf="task.stage" class="badge badge-outline badge-xs">
-        Stage: {{ task.stage }}
-      </span>
-      <span *ngIf="task.duration" class="badge badge-outline badge-xs">
-        Dur: {{ task.duration }}
-      </span>
-      <span *ngIf="task.type" class="badge badge-outline badge-xs">
-        Type: {{ task.type }}
-      </span>
-      <span *ngIf="task.subtype" class="badge badge-outline badge-xs">
-        Subtype: {{ task.subtype }}
-      </span>
-      <span *ngIf="task.size" class="badge badge-outline badge-xs">
-        Size: {{ task.size }}
-      </span>
-      <span *ngIf="task.owner" class="badge badge-outline badge-xs">
-        Owner: {{ task.owner }}
-      </span>
-    </div>
-
-    <!-- Footer -->
-    <div
-      *ngIf="ifShowExtra"
-      class="flex flex-wrap gap-3 text-xs text-gray-400 justify-between pt-2 border-t border-gray-100 mt-auto"
-    >
-      <span>Created: {{ task.timeCreated | date : "short" }}</span>
-      <span>Updated: {{ task.lastUpdated | date : "short" }}</span>
-      <span *ngIf="task.timeEnd">
-        Deadline: {{ task.timeEnd | date : "short" }}
-      </span>
+      <!-- Tags -->
+      @if (ifShowExtra && thereIsTags()) {
+        <div
+          class="min-h-[24px] mb-2 flex flex-wrap gap-1"
+          >
+          @for (tag of task.tags; track tag) {
+            <span class="badge badge-info badge-xs">
+              {{ tag }}
+            </span>
+          }
+        </div>
+      }
+      <!-- Metadata badges -->
+      @if (ifShowExtra) {
+        <div
+          class="min-h-[48px] mb-3 flex flex-wrap gap-1 text-gray-600"
+          >
+          @if (task.status) {
+            <span class="badge badge-outline badge-xs">
+              Status: {{ task.status }}
+            </span>
+          }
+          @if (task.stage) {
+            <span class="badge badge-outline badge-xs">
+              Stage: {{ task.stage }}
+            </span>
+          }
+          @if (task.duration) {
+            <span class="badge badge-outline badge-xs">
+              Dur: {{ task.duration }}
+            </span>
+          }
+          @if (task.type) {
+            <span class="badge badge-outline badge-xs">
+              Type: {{ task.type }}
+            </span>
+          }
+          @if (task.subtype) {
+            <span class="badge badge-outline badge-xs">
+              Subtype: {{ task.subtype }}
+            </span>
+          }
+          @if (task.size) {
+            <span class="badge badge-outline badge-xs">
+              Size: {{ task.size }}
+            </span>
+          }
+          @if (task.owner) {
+            <span class="badge badge-outline badge-xs">
+              Owner: {{ task.owner }}
+            </span>
+          }
+        </div>
+      }
+      <!-- Footer -->
+      @if (ifShowExtra) {
+        <div
+          class="flex flex-wrap gap-3 text-xs text-gray-400 justify-between pt-2 border-t border-gray-100 mt-auto"
+          >
+          <span>Created: {{ task.timeCreated | date : "short" }}</span>
+          <span>Updated: {{ task.lastUpdated | date : "short" }}</span>
+          @if (task.timeEnd) {
+            <span>
+              Deadline: {{ task.timeEnd | date : "short" }}
+            </span>
+          }
+        </div>
+      }
     </div>
   </div>
-</div>
+}

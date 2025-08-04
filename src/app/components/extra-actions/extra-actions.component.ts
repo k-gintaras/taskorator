@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ExtraActionsService } from '../../services/extra-actions.service';
@@ -11,7 +11,7 @@ import { ThemeMode } from '../../services/core/theme.service';
 @Component({
   selector: 'app-extra-actions',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule],
   templateUrl: './extra-actions.component.html',
   styleUrls: ['./extra-actions.component.scss'],
 })

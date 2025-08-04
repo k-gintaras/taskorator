@@ -8,54 +8,57 @@
         [formControl]="searchControl"
         [placeholder]="selectedOverlord?.name || 'Search or Create'"
         class="w-full h-10 px-3 text-sm text-white placeholder-white/70 bg-white/10 border border-white/20 rounded-lg focus:border-white/50 focus:bg-white/20 focus:outline-none transition-all duration-200"
-      />
-    </div>
-    
-    <!-- Clear button -->
-    <button
-      type="button"
-      (click)="clearInput()"
-      class="flex items-center justify-center w-10 h-10 text-white/60 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
-      aria-label="Clear"
-    >
-      <mat-icon class="text-base">close</mat-icon>
-    </button>
-    
-    <!-- Save button -->
-    <button
-      type="button"
-      (click)="onCreateTask(searchControl.value ?? '')"
-      class="flex items-center justify-center w-10 h-10 text-purple-600 bg-white/90 border border-white/90 rounded-lg hover:bg-white hover:text-purple-700 transition-all duration-200"
-      aria-label="Save Task"
-    >
-      <mat-icon class="text-base">check</mat-icon>
-    </button>
-    
-    <!-- Back button (when enabled) -->
-    <button
-      *ngIf="isEnabledBack"
-      type="button"
-      (click)="goBack()"
-      class="flex items-center justify-center w-10 h-10 text-white/90 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
-      aria-label="Go Back"
-    >
-      <mat-icon class="text-base">arrow_back</mat-icon>
-    </button>
-  </div>
+        />
+      </div>
 
-  <!-- Search results dropdown -->
-  <div 
-    *ngIf="searchResults?.length" 
-    class="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
-  >
-    <div
-      *ngFor="let task of searchResults"
-      (click)="onSelectTask(task.taskId)"
-      [class.bg-purple-600]="task.taskId === selectedOverlord?.taskId"
-      [class.text-white]="task.taskId === selectedOverlord?.taskId"
-      class="px-4 py-3 text-sm text-gray-100 cursor-pointer hover:bg-gray-700 border-b border-gray-600 last:border-b-0 transition-colors duration-150"
-    >
-      {{ task.name }}
+      <!-- Clear button -->
+      <button
+        type="button"
+        (click)="clearInput()"
+        class="flex items-center justify-center w-10 h-10 text-white/60 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
+        aria-label="Clear"
+        >
+        <mat-icon class="text-base">close</mat-icon>
+      </button>
+
+      <!-- Save button -->
+      <button
+        type="button"
+        (click)="onCreateTask(searchControl.value ?? '')"
+        class="flex items-center justify-center w-10 h-10 text-purple-600 bg-white/90 border border-white/90 rounded-lg hover:bg-white hover:text-purple-700 transition-all duration-200"
+        aria-label="Save Task"
+        >
+        <mat-icon class="text-base">check</mat-icon>
+      </button>
+
+      <!-- Back button (when enabled) -->
+      @if (isEnabledBack) {
+        <button
+          type="button"
+          (click)="goBack()"
+          class="flex items-center justify-center w-10 h-10 text-white/90 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
+          aria-label="Go Back"
+          >
+          <mat-icon class="text-base">arrow_back</mat-icon>
+        </button>
+      }
     </div>
+
+    <!-- Search results dropdown -->
+      @if (searchResults.length) {
+      <div
+        class="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
+        >
+        @for (task of searchResults; track task) {
+          <div
+            (click)="onSelectTask(task.taskId)"
+            [class.bg-purple-600]="task.taskId === selectedOverlord?.taskId"
+            [class.text-white]="task.taskId === selectedOverlord?.taskId"
+            class="px-4 py-3 text-sm text-gray-100 cursor-pointer hover:bg-gray-700 border-b border-gray-600 last:border-b-0 transition-colors duration-150"
+            >
+            {{ task.name }}
+          </div>
+        }
+      </div>
+    }
   </div>
-</div>

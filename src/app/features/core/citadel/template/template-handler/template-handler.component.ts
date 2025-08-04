@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TaskTemplate } from '../models/template';
 import { TemplateService } from '../services/template.service';
-import { NgIf } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../../../../services/sync-api-cache/task.service';
 import { TaskUpdateService } from '../../../../../services/tasks/task-update.service';
@@ -13,7 +13,7 @@ import { TaskUpdateService } from '../../../../../services/tasks/task-update.ser
 @Component({
   selector: 'app-template-handler',
   standalone: true,
-  imports: [NgIf, FormsModule],
+  imports: [FormsModule],
   templateUrl: './template-handler.component.html',
   styleUrls: ['./template-handler.component.scss'],
 })

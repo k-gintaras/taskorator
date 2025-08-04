@@ -1,0 +1,7 @@
+<h2>Test Task Tagging</h2>
+<app-tag-multiple-items
+  [items]="items"
+  [tagGroups]="tagGroups"
+  (tagAdded)="onTagAdded($event)"
+  (tagRemoved)="onTagRemoved($event)">
+</app-tag-multiple-items>

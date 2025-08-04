@@ -6,7 +6,7 @@ import {
 } from '../../../../models/taskModelManager';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import { NgForOf } from '@angular/common';
+
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,9 +23,8 @@ import { ErrorService } from '../../../../services/core/error.service';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    NgForOf,
-    MatIcon,
-  ],
+    MatIcon
+],
   templateUrl: './create-repetitive-task.component.html',
   styleUrl: './create-repetitive-task.component.scss',
 })

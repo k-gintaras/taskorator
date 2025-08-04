@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TaskNavigatorDataService } from '../../../services/tasks/task-navigation/task-navigator-data.service';
 import { TaskNavigatorService } from '../../../services/tasks/task-navigation/task-navigator.service';
@@ -13,7 +13,7 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-task-breadcrumb',
   standalone: true,
-  imports: [NgIf, NgFor, MatIcon, AsyncPipe],
+  imports: [MatIcon, AsyncPipe],
   templateUrl: './task-breadcrumb.component.html',
   styleUrl: './task-breadcrumb.component.scss',
 })

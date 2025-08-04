@@ -1,4 +1,4 @@
-  <div class="task-edit-container">
+<div class="task-edit-container">
   <div class="task-edit-wrapper">
     <!-- Header -->
     <header class="task-edit-header">
@@ -14,7 +14,7 @@
         <mat-icon>info</mat-icon>
         Basic Information
       </h2>
-      
+
       <div class="form-grid">
         <div class="form-row">
           <label>Title</label>
@@ -22,165 +22,167 @@
             type="text"
             [(ngModel)]="task.name"
             placeholder="Enter task title"
-          />
-        </div>
+            />
+          </div>
 
-        <div class="form-row">
-          <label>Link</label>
-          <input
-            type="url"
-            [(ngModel)]="task.backupLink"
-            placeholder="Enter link (URL)"
-          />
-        </div>
+          <div class="form-row">
+            <label>Link</label>
+            <input
+              type="url"
+              [(ngModel)]="task.backupLink"
+              placeholder="Enter link (URL)"
+              />
+            </div>
 
-        <div class="form-row">
-          <label>Description</label>
-          <textarea
-            [(ngModel)]="task.todo"
-            placeholder="Enter task description"
-            rows="3"
-          ></textarea>
-        </div>
+            <div class="form-row">
+              <label>Description</label>
+              <textarea
+                [(ngModel)]="task.todo"
+                placeholder="Enter task description"
+                rows="3"
+              ></textarea>
+            </div>
 
-        <div class="form-row">
-          <label>Why</label>
-          <textarea
-            [(ngModel)]="task.why"
-            placeholder="Enter task reason why"
-            rows="3"
-          ></textarea>
-        </div>
-      </div>
-    </section>
+            <div class="form-row">
+              <label>Why</label>
+              <textarea
+                [(ngModel)]="task.why"
+                placeholder="Enter task reason why"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </section>
 
-    <!-- Properties -->
-    <section class="task-section">
-      <h2>
-        <mat-icon>settings</mat-icon>
-        Properties
-      </h2>
-      
-      <div class="form-grid form-grid-2">
-        <div class="form-row">
-          <label>Priority</label>
-          <input
-            type="number"
-            [(ngModel)]="task.priority"
-            min="1"
-            max="10"
-            placeholder="1-10"
-          />
-        </div>
+        <!-- Properties -->
+        <section class="task-section">
+          <h2>
+            <mat-icon>settings</mat-icon>
+            Properties
+          </h2>
 
-        <div class="form-row">
-          <label>Stage</label>
-          <select [(ngModel)]="task.stage">
-            <option value="todo">To Do</option>
-            <option value="seen">Seen</option>
-            <option value="completed">Completed</option>
-            <option value="archived">Archived</option>
-            <option value="deleted">Deleted</option>
-          </select>
-        </div>
+          <div class="form-grid form-grid-2">
+            <div class="form-row">
+              <label>Priority</label>
+              <input
+                type="number"
+                [(ngModel)]="task.priority"
+                min="1"
+                max="10"
+                placeholder="1-10"
+                />
+              </div>
 
-        <div class="form-row">
-          <label>Type</label>
-          <select [(ngModel)]="task.type">
-            <option value="">None</option>
-            <option value="code">Code</option>
-            <option value="idea">Idea</option>
-            <option value="note">Note</option>
-            <option value="todo">To Do</option>
-            <option value="checklist">Checklist</option>
-            <option value="tree">Decision Tree</option>
-            <option value="flowchart">Flowchart</option>
-            <option value="task">Task</option>
-            <option value="next">Next</option>
-            <option value="job">Job</option>
-            <option value="feature">Feature</option>
-            <option value="schedule">Schedule</option>
-            <option value="project">Project</option>
-          </select>
-        </div>
+              <div class="form-row">
+                <label>Stage</label>
+                <select [(ngModel)]="task.stage">
+                  <option value="todo">To Do</option>
+                  <option value="seen">Seen</option>
+                  <option value="completed">Completed</option>
+                  <option value="archived">Archived</option>
+                  <option value="deleted">Deleted</option>
+                </select>
+              </div>
 
-        <div class="form-row">
-          <label>Repeat</label>
-          <select [(ngModel)]="task.repeat">
-            <option value="once">Once</option>
-            <option value="never">Never</option>
-            <option value="half-hourly">Half-Hourly</option>
-            <option value="hourly">Hourly</option>
-            <option value="half-daily">Half-Daily</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="half-monthly">Half-Monthly</option>
-            <option value="monthly">Monthly</option>
-            <option value="three-monthly">Three-Monthly</option>
-            <option value="half-yearly">Half-Yearly</option>
-            <option value="yearly">Yearly</option>
-          </select>
-        </div>
-      </div>
-    </section>
+              <div class="form-row">
+                <label>Type</label>
+                <select [(ngModel)]="task.type">
+                  <option value="">None</option>
+                  <option value="code">Code</option>
+                  <option value="idea">Idea</option>
+                  <option value="note">Note</option>
+                  <option value="todo">To Do</option>
+                  <option value="checklist">Checklist</option>
+                  <option value="tree">Decision Tree</option>
+                  <option value="flowchart">Flowchart</option>
+                  <option value="task">Task</option>
+                  <option value="next">Next</option>
+                  <option value="job">Job</option>
+                  <option value="feature">Feature</option>
+                  <option value="schedule">Schedule</option>
+                  <option value="project">Project</option>
+                </select>
+              </div>
 
-    <!-- Timing -->
-    <section class="task-section">
-      <h2>
-        <mat-icon>schedule</mat-icon>
-        Timing
-      </h2>
-      
-      <div class="form-grid form-grid-2">
-        <div class="form-row">
-          <label>Duration (Minutes)</label>
-          <input
-            type="number"
-            [(ngModel)]="durationDisplay"
-            (ngModelChange)="updateDuration($event)"
-            min="0"
-            placeholder="Enter duration"
-          />
-        </div>
+              <div class="form-row">
+                <label>Repeat</label>
+                <select [(ngModel)]="task.repeat">
+                  <option value="once">Once</option>
+                  <option value="never">Never</option>
+                  <option value="half-hourly">Half-Hourly</option>
+                  <option value="hourly">Hourly</option>
+                  <option value="half-daily">Half-Daily</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="half-monthly">Half-Monthly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="three-monthly">Three-Monthly</option>
+                  <option value="half-yearly">Half-Yearly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            </div>
+          </section>
 
-        <div class="form-row">
-          <label>End Time</label>
-          <input
-            type="datetime-local"
-            [(ngModel)]="endTimeDisplay"
-            (ngModelChange)="updateTimeEnd($event)"
-          />
-        </div>
-      </div>
-    </section>
+          <!-- Timing -->
+          <section class="task-section">
+            <h2>
+              <mat-icon>schedule</mat-icon>
+              Timing
+            </h2>
 
-    <!-- Actions -->
-    <section class="task-section task-actions">
-      <div *ngIf="!isPopup" class="save-section">
-        <button
-          type="button"
-          (click)="onSave(task)"
-          class="save-btn"
-        >
-          <mat-icon>save</mat-icon>
-          Save Changes
-        </button>
-      </div>
+            <div class="form-grid form-grid-2">
+              <div class="form-row">
+                <label>Duration (Minutes)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="durationDisplay"
+                  (ngModelChange)="updateDuration($event)"
+                  min="0"
+                  placeholder="Enter duration"
+                  />
+                </div>
 
-      <div class="action-buttons">
-        <button type="button" class="action-btn" disabled>
-          <mat-icon>local_offer</mat-icon>
-          Edit Tags
-        </button>
-        <button type="button" class="action-btn" disabled>
-          <mat-icon>person</mat-icon>
-          Edit Owner
-        </button>
-        <button type="button" class="action-btn" disabled>
-          <mat-icon>image</mat-icon>
-          Add Image
-        </button>
-      </div>
-    </section>
-  </div>
-</div>
+                <div class="form-row">
+                  <label>End Time</label>
+                  <input
+                    type="datetime-local"
+                    [(ngModel)]="endTimeDisplay"
+                    (ngModelChange)="updateTimeEnd($event)"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Actions -->
+              <section class="task-section task-actions">
+                @if (!isPopup) {
+                  <div class="save-section">
+                    <button
+                      type="button"
+                      (click)="onSave(task)"
+                      class="save-btn"
+                      >
+                      <mat-icon>save</mat-icon>
+                      Save Changes
+                    </button>
+                  </div>
+                }
+
+                <div class="action-buttons">
+                  <button type="button" class="action-btn" disabled>
+                    <mat-icon>local_offer</mat-icon>
+                    Edit Tags
+                  </button>
+                  <button type="button" class="action-btn" disabled>
+                    <mat-icon>person</mat-icon>
+                    Edit Owner
+                  </button>
+                  <button type="button" class="action-btn" disabled>
+                    <mat-icon>image</mat-icon>
+                    Add Image
+                  </button>
+                </div>
+              </section>
+            </div>
+          </div>

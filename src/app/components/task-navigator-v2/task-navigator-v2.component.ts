@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -23,11 +23,10 @@ export interface TaskStatus {
   selector: 'app-task-navigator-v2',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
     MatButtonModule,
     MatCardModule
-  ],
+],
   templateUrl: './task-navigator-v2.component.html',
   styleUrl: './task-navigator-v2.component.scss'
 })

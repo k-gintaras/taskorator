@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor } from '@angular/common';
+
 import {
   TaskSettings,
   getDefaultTaskSettings,
@@ -16,7 +16,7 @@ import { SelectedMultipleComponent } from '../../../crucible/selected-multiple/s
 @Component({
   selector: 'app-focus',
   standalone: true,
-  imports: [NgFor, StagedTaskListComponent, MatIcon, SelectedMultipleComponent],
+  imports: [StagedTaskListComponent, MatIcon, SelectedMultipleComponent],
   templateUrl: './focus.component.html',
   styleUrls: ['./focus.component.scss'],
 })

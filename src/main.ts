@@ -49,11 +49,9 @@ if (isTesting) {
         // RouterModule.forRoot(routes)
         RouterModule.forRoot(routes)
       ),
-      importProvidersFrom(
-        provideFirebaseApp(() => initializeApp(firebaseJson))
-      ),
-      importProvidersFrom(provideAuth(() => getAuth())),
-      importProvidersFrom(provideFirestore(() => getFirestore())),
+      provideFirebaseApp(() => initializeApp(firebaseJson)),
+      provideAuth(() => getAuth()),
+      provideFirestore(() => getFirestore()),
       provideHttpClient(),
       provideAnimationsAsync(),
     ],

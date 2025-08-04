@@ -1,15 +1,16 @@
 <div class="px-3 py-2 select-none w-full max-w-full">
   <!-- Title at top -->
-  <ng-container *ngIf="currentPath$ | async as path">
-    <button
-      *ngIf="path.length"
-      class="text-xl font-semibold theme-text-primary text-left hover:underline max-w-full break-words mb-2"
-      (click)="jumpTo(path[path.length - 1].id)"
-      [title]="path[path.length - 1].name"
-    >
-      {{ path[path.length - 1].name }}
-    </button>
-  </ng-container>
+  @if (currentPath$ | async; as path) {
+    @if (path.length) {
+      <button
+        class="text-xl font-semibold theme-text-primary text-left hover:underline max-w-full break-words mb-2"
+        (click)="jumpTo(path[path.length - 1].id)"
+        [title]="path[path.length - 1].name"
+        >
+        {{ path[path.length - 1].name }}
+      </button>
+    }
+  }
 
   <div class="flex items-center flex-wrap gap-3 max-w-full">
     <button
@@ -17,27 +18,30 @@
       color="primary"
       (click)="goBack()"
       aria-label="Go Back"
-    >
+      >
       <mat-icon>arrow_back</mat-icon>
     </button>
 
-    <ng-container *ngIf="currentPath$ | async as path">
-      <nav
-        *ngIf="path.length > 1"
-        class="flex flex-wrap items-center gap-1 theme-text-secondary text-sm max-w-full"
-        aria-label="Breadcrumb"
-      >
-        <ng-container *ngFor="let crumb of path; let last = last">
-          <a
-            class="cursor-pointer hover:underline break-words max-w-[120px] truncate"
-            [title]="crumb.name"
-            (click)="jumpTo(crumb.id)"
+    @if (currentPath$ | async; as path) {
+      @if (path.length > 1) {
+        <nav
+          class="flex flex-wrap items-center gap-1 theme-text-secondary text-sm max-w-full"
+          aria-label="Breadcrumb"
           >
-            {{ crumb.name }}
-          </a>
-          <span *ngIf="!last" class="theme-text-muted mx-1 select-none">›</span>
-        </ng-container>
-      </nav>
-    </ng-container>
+          @for (crumb of path; track crumb; let last = $last) {
+            <a
+              class="cursor-pointer hover:underline break-words max-w-[120px] truncate"
+              [title]="crumb.name"
+              (click)="jumpTo(crumb.id)"
+              >
+              {{ crumb.name }}
+            </a>
+            @if (!last) {
+              <span class="theme-text-muted mx-1 select-none">›</span>
+            }
+          }
+        </nav>
+      }
+    }
   </div>
 </div>

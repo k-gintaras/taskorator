@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+// import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ErrorService } from '../services/core/error.service';
-import { ArtificerComponent } from '../components/artificer/artificer.component';
+// import { ArtificerComponent } from '../components/artificer/artificer.component';
 import { HorizontalNavigationComponent } from '../components/horizontal-navigation/horizontal-navigation.component';
 
 @Component({
-  imports: [RouterOutlet, HorizontalNavigationComponent, ArtificerComponent],
+  imports: [HorizontalNavigationComponent],
   standalone: true,
   selector: 'app-test-root',
   templateUrl: './test-app.component.html',

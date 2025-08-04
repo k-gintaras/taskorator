@@ -1,5 +1,7 @@
-<div class="component-width" *ngIf="initialized">
-  <h2>Next Task Manager</h2>
-  <app-search-create></app-search-create>
-  <app-latest-created-task-list></app-latest-created-task-list>
-</div>
+@if (initialized) {
+  <div class="component-width">
+    <h2>Next Task Manager</h2>
+    <app-search-create></app-search-create>
+    <app-latest-created-task-list></app-latest-created-task-list>
+  </div>
+}

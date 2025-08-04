@@ -1,21 +1,21 @@
 <!-- Top Navigation Bar -->
 <mat-toolbar class="theme-topbar nav-toolbar">
   <div class="nav-toolbar-left">
-    <button 
-      mat-icon-button 
+    <button
+      mat-icon-button
       (click)="toggleDrawer()"
       class="theme-nav-item nav-menu-btn"
       aria-label="Toggle navigation menu"
-    >
+      >
       <mat-icon>menu</mat-icon>
     </button>
   </div>
-  
+
   <div class="nav-toolbar-center">
     <!-- Notification component replaces title - shows app name normally, notifications when active -->
     <app-notification class="nav-notification-topbar"></app-notification>
   </div>
-  
+
   <div class="nav-toolbar-right">
     <app-search-create class="nav-search-create"></app-search-create>
   </div>
@@ -29,42 +29,44 @@
     [mode]="isHandset ? 'over' : 'side'"
     [opened]="!isHandset && !isCompact"
     class="theme-sidebar nav-sidebar"
-  >
+    >
     <div class="nav-sidebar-content">
       <!-- Navigation Items Container -->
       <div class="nav-items-container">
         <!-- Parent Items (Left Column) -->
         <div class="nav-column nav-parent-column">
           <ul class="nav-list">
-            <li
-              *ngFor="let item of parentItems"
-              class="nav-item theme-nav-item"
-              [class.active]="isSelected(item.path)"
-              (click)="onParentClick(item)"
-            >
-              <div class="nav-item-content">
-                <mat-icon class="nav-item-icon">{{ item.metadata.icon || "folder" }}</mat-icon>
-                <span class="nav-item-text">{{ item.metadata.title }}</span>
-              </div>
-            </li>
+            @for (item of parentItems; track item) {
+              <li
+                class="nav-item theme-nav-item"
+                [class.active]="isSelected(item.path)"
+                (click)="onParentClick(item)"
+                >
+                <div class="nav-item-content">
+                  <mat-icon class="nav-item-icon">{{ item.metadata.icon || "folder" }}</mat-icon>
+                  <span class="nav-item-text">{{ item.metadata.title }}</span>
+                </div>
+              </li>
+            }
           </ul>
         </div>
 
         <!-- Child Items (Right Column) -->
         <div class="nav-column nav-child-column">
           <ul class="nav-list">
-            <li
-              *ngFor="let child of childItems"
-              class="nav-item theme-nav-item"
-              [class.active]="isSelected(child.path)"
-              (click)="onChildClick(child)"
-            >
-              <div class="nav-item-content">
-                <span class="nav-item-text">
-                  {{ child.metadata.altName || child.metadata.title }}
-                </span>
-              </div>
-            </li>
+            @for (child of childItems; track child) {
+              <li
+                class="nav-item theme-nav-item"
+                [class.active]="isSelected(child.path)"
+                (click)="onChildClick(child)"
+                >
+                <div class="nav-item-content">
+                  <span class="nav-item-text">
+                    {{ child.metadata.altName || child.metadata.title }}
+                  </span>
+                </div>
+              </li>
+            }
           </ul>
         </div>
       </div>
@@ -77,10 +79,12 @@
           <app-extra-actions></app-extra-actions>
         </div>
         <!-- Artificer Section -->
-        <div class="nav-artificer-actions" *ngIf="showArtificer">
-          <h4 class="nav-section-title">Task Actions</h4>
-          <app-artificer></app-artificer>
-        </div>
+        @if (showArtificer) {
+          <div class="nav-artificer-actions">
+            <h4 class="nav-section-title">Task Actions</h4>
+            <app-artificer></app-artificer>
+          </div>
+        }
       </div>
     </div>
   </mat-sidenav>

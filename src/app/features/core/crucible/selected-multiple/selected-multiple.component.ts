@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -21,11 +21,10 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [
     TaskMiniComponent,
-    CommonModule,
     ReactiveFormsModule,
     NgxMatSelectSearchModule,
-    MatButton,
-  ],
+    MatButton
+],
   templateUrl: './selected-multiple.component.html',
   styleUrls: ['./selected-multiple.component.scss'],
 })

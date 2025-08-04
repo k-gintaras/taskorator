@@ -3,7 +3,7 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
-import { CommonModule } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -19,15 +19,14 @@ import { ExtraActionsComponent } from '../extra-actions/extra-actions.component'
   imports: [
     ExtraActionsComponent,
     ArtificerComponent,
-    CommonModule,
     MatSidenavModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
     RouterOutlet,
     SearchCreateComponent,
-    NotificationComponent,
-  ],
+    NotificationComponent
+],
   templateUrl: './horizontal-navigation.component.html',
   styleUrls: ['./horizontal-navigation.component.scss'],
 })

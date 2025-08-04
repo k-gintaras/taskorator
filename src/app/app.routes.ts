@@ -6,6 +6,7 @@ import { TaskViewComponent } from './components/task/task-view/task-view.compone
 import { AutoRedirectComponent } from './components/auto-redirect/auto-redirect.component';
 import { LoginComponent } from './features/core/gateway/login/login.component';
 import { TaskNavigatorV2Component } from './components/task-navigator-v2/task-navigator-v2.component';
+import { TestTaskTaggingComponent } from './components/test-task-tagging/test-task-tagging.component';
 
 export const routes: Route[] = [
   { path: '', component: AutoRedirectComponent }, // Root redirect
@@ -15,6 +16,7 @@ export const routes: Route[] = [
 
   // Test route for new task navigator
   { path: 'test/navigator-v2', component: TaskNavigatorV2Component },
+  { path: 'test/tagging', component: TestTaskTaggingComponent },
 
   {
     path: 'gateway',

@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
 })

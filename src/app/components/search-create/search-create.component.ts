@@ -3,7 +3,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { NgForOf, NgIf } from '@angular/common';
+
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import {
   UiTask,
@@ -29,10 +29,8 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    NgForOf,
-    NgIf,
-    MatIcon,
-  ],
+    MatIcon
+],
   templateUrl: './search-create.component.html',
   styleUrls: ['./search-create.component.scss'],
 })

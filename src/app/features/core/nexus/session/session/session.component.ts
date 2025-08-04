@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TaskSession } from '../task-session.model';
 import { TaskSessionService } from '../services/task-session.service';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,8 +16,6 @@ import { TaskNavigatorComponent } from '../../../../../components/task-navigator
   selector: 'app-session',
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     NgClass,
     MatListModule,
     MatButtonModule,
@@ -26,8 +24,8 @@ import { TaskNavigatorComponent } from '../../../../../components/task-navigator
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    TaskNavigatorComponent,
-  ],
+    TaskNavigatorComponent
+],
   templateUrl: './session.component.html',
   styleUrls: ['./session.component.scss'],
 })

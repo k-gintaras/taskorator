@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { ArtificerDetails } from './artificer.interface';
 import { ArtificerService } from './artificer.service';
-import { NgClass, NgFor } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 /**
@@ -18,7 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-artificer',
   standalone: true,
-  imports: [NgFor, NgClass, MatIcon, MatTooltipModule],
+  imports: [MatIcon, MatTooltipModule],
   templateUrl: './artificer.component.html',
   styleUrl: './artificer.component.scss',
 })

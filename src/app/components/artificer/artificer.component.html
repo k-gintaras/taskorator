@@ -1,15 +1,16 @@
 <div class="artificer-container">
-  <button
-    *ngFor="let action of actions"
-    (click)="selectAction(action)"
-    class="artificer-action-btn"
-    [class.active]="action === currentAction"
-    [class]="getActionClass(action)"
-    [attr.aria-label]="action.tooltip"
-    [title]="action.tooltip"
-    matTooltip="{{ action.tooltip }}"
-    matTooltipPosition="above"
-  >
-    <mat-icon>{{ action.icon }}</mat-icon>
-  </button>
+  @for (action of actions; track action) {
+    <button
+      (click)="selectAction(action)"
+      class="artificer-action-btn"
+      [class.active]="action === currentAction"
+      [class]="getActionClass(action)"
+      [attr.aria-label]="action.tooltip"
+      [title]="action.tooltip"
+      matTooltip="{{ action.tooltip }}"
+      matTooltipPosition="above"
+      >
+      <mat-icon>{{ action.icon }}</mat-icon>
+    </button>
+  }
 </div>

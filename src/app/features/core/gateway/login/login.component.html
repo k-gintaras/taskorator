@@ -1,6 +1,6 @@
 <div
   class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center p-4"
->
+  >
   <div class="max-w-md w-full">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold text-white mb-2">Taskorator</h1>
@@ -11,25 +11,27 @@
       <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
 
       <!-- Warning Banner -->
-      <div *ngIf="showPopupWarning" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg relative">
-        <button 
-          (click)="hideWarning()" 
-          class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xl font-bold"
-          aria-label="Close warning"
-        >
-          ×
-        </button>
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <svg class="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-800">{{ warningMessage }}</p>
+      @if (showPopupWarning) {
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg relative">
+          <button
+            (click)="hideWarning()"
+            class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xl font-bold"
+            aria-label="Close warning"
+            >
+            ×
+          </button>
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <svg class="w-5 h-5 text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-red-800">{{ warningMessage }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <div class="space-y-4">
         <!-- Main login button -->
@@ -38,34 +40,36 @@
             (click)="loginOnline()"
             class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
             [disabled]="loading"
-          >
+            >
             <!-- Google SVG omitted for brevity -->
             {{ loading && currentLoginMethod === 'popup' ? "Signing in..." : "Continue with Google" }}
           </button>
         </div>
 
         <!-- Popup failure alternative (shown when popup fails) -->
-        <div *ngIf="showAlternativeLogin" class="p-3 bg-orange-50 border border-orange-200 rounded-lg relative">
-          <button 
-            (click)="hideAlternativeLogin()" 
-            class="absolute top-2 right-2 text-orange-400 hover:text-orange-600 text-xl font-bold"
-            aria-label="Close alternative login"
-          >
-            ×
-          </button>
-          <div class="flex items-center justify-between pr-6">
-            <p class="text-sm text-orange-800">
-              Enable popups or 
-              <button
-                (click)="loginWithRedirect()"
-                class="text-orange-600 hover:text-orange-800 underline font-medium"
-                [disabled]="loading"
+        @if (showAlternativeLogin) {
+          <div class="p-3 bg-orange-50 border border-orange-200 rounded-lg relative">
+            <button
+              (click)="hideAlternativeLogin()"
+              class="absolute top-2 right-2 text-orange-400 hover:text-orange-600 text-xl font-bold"
+              aria-label="Close alternative login"
               >
-                try login without popup
-              </button>
-            </p>
+              ×
+            </button>
+            <div class="flex items-center justify-between pr-6">
+              <p class="text-sm text-orange-800">
+                Enable popups or
+                <button
+                  (click)="loginWithRedirect()"
+                  class="text-orange-600 hover:text-orange-800 underline font-medium"
+                  [disabled]="loading"
+                  >
+                  try login without popup
+                </button>
+              </p>
+            </div>
           </div>
-        </div>
+        }
 
         <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
           <div class="flex items-start">
@@ -98,7 +102,7 @@
             (click)="loginWithRedirect()"
             class="text-sm text-blue-600 hover:text-blue-800 underline"
             [disabled]="loading"
-          >
+            >
             {{ loading && currentLoginMethod === 'redirect' ? "redirecting..." : "Gmail login without popup." }}
           </button>
         </div>
@@ -107,7 +111,7 @@
           (click)="loginOffline()"
           class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
           [disabled]="loading"
-        >
+          >
           <!-- Offline SVG omitted for brevity -->
           Try Offline Mode
         </button>
@@ -117,17 +121,17 @@
         <button
           (click)="goToGateway()"
           class="text-gray-600 hover:text-gray-800 text-sm"
-        >
+          >
           ← Learn more about Taskorator
         </button>
-        
+
         <!-- Developer/Testing logout option -->
         <div>
           <button
             (click)="logout()"
             class="text-red-600 hover:text-red-800 text-xs underline"
             title="Clear session and logout for testing"
-          >
+            >
             🧪 Logout & Clear Session
           </button>
         </div>
@@ -140,7 +144,7 @@
         <button
           (click)="goToGateway()"
           class="text-slate-200 hover:text-white underline"
-        >
+          >
           Explore features
         </button>
       </p>

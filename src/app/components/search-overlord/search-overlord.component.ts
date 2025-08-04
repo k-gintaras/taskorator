@@ -9,7 +9,7 @@ import { TaskTreeNode } from '../../models/taskTree';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskoratorTask } from '../../models/taskModelManager';
-import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
@@ -22,17 +22,14 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
   selector: 'app-search-overlord',
   standalone: true,
   imports: [
-    NgForOf,
     AsyncPipe,
     MatFormField,
     MatLabel,
-    SlicePipe,
     MatSelect,
     MatOption,
     ReactiveFormsModule,
-    NgxMatSelectSearchModule,
-    NgIf,
-  ],
+    NgxMatSelectSearchModule
+],
   templateUrl: './search-overlord.component.html',
   styleUrl: './search-overlord.component.scss',
 })

@@ -1,14 +1,20 @@
 <div class="notification-container" (click)="toggleFeedbackView()">
   <!-- App title when no feedback -->
-  <h1 *ngIf="!feedbackUpdated" class="app-title">
-    {{ appTitle }}
-  </h1>
+  @if (!feedbackUpdated) {
+    <h1 class="app-title">
+      {{ appTitle }}
+    </h1>
+  }
 
   <!-- Feedback message for larger screens -->
-  <div *ngIf="message && feedbackUpdated" class="feedback-message">
-    {{ message }}
-  </div>
+  @if (message && feedbackUpdated) {
+    <div class="feedback-message">
+      {{ message }}
+    </div>
+  }
 
   <!-- Blinker for smaller screens -->
-  <div *ngIf="feedbackUpdated" class="blinker"></div>
+  @if (feedbackUpdated) {
+    <div class="blinker"></div>
+  }
 </div>

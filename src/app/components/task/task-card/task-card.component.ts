@@ -4,14 +4,14 @@ import {
   getDefaultTask,
   getDefaultUiTask,
 } from '../../../models/taskModelManager';
-import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { TaskBreadcrumbComponent } from '../task-breadcrumb/task-breadcrumb.component';
 import { ColorService } from '../../../services/utils/color.service';
 
 @Component({
   selector: 'app-task-card',
   standalone: true,
-  imports: [DatePipe, NgFor, NgIf, NgClass, TaskBreadcrumbComponent],
+  imports: [DatePipe, NgClass, TaskBreadcrumbComponent],
   templateUrl: './task-card.component.html',
   styleUrl: './task-card.component.scss',
 })

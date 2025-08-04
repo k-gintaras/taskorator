@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TaskTree } from '../../../../../models/taskTree';
 import {
   TaskSettings,
@@ -15,7 +15,7 @@ import { TaskListService } from '../../../../../services/sync-api-cache/task-lis
 @Component({
   selector: 'app-frog-task',
   standalone: true,
-  imports: [CommonModule, MatIcon, StagedTaskListComponent],
+  imports: [MatIcon, StagedTaskListComponent],
   templateUrl: './frog-task.component.html',
   styleUrls: ['./frog-task.component.scss'],
 })

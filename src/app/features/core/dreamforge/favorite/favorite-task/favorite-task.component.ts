@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TaskTree } from '../../../../../models/taskTree';
 import {
   TaskSettings,
@@ -15,7 +15,7 @@ import { TaskListService } from '../../../../../services/sync-api-cache/task-lis
 @Component({
   selector: 'app-favorite-task',
   standalone: true,
-  imports: [CommonModule, MatIcon, StagedTaskListComponent],
+  imports: [MatIcon, StagedTaskListComponent],
   templateUrl: './favorite-task.component.html',
   styleUrls: ['./favorite-task.component.scss'],
 })

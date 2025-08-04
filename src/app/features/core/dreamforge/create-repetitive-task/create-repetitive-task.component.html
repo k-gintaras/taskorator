@@ -11,11 +11,11 @@
         name="name"
         required
         placeholder="Enter task name"
-      />
-    </mat-form-field>
+        />
+      </mat-form-field>
 
-    <!-- Task Description -->
-    <!-- <mat-form-field appearance="fill">
+      <!-- Task Description -->
+      <!-- <mat-form-field appearance="fill">
       <mat-label>Task Description</mat-label>
       <textarea
         matInput
@@ -31,58 +31,60 @@
     <mat-form-field appearance="fill">
       <mat-label>Repeat</mat-label>
       <mat-select [(ngModel)]="task.repeat" name="repeat" required>
-        <mat-option *ngFor="let option of repeatOptions" [value]="option">
-          {{ option }}
-        </mat-option>
+        @for (option of repeatOptions; track option) {
+          <mat-option [value]="option">
+            {{ option }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <!-- Duration -->
     <!-- <mat-form-field appearance="fill">
-      <mat-label>Duration (minutes)</mat-label>
-      <input
-        matInput
-        type="number"
-        [(ngModel)]="task.duration"
-        name="duration"
-        required
-        placeholder="Enter duration"
-        min="0"
+    <mat-label>Duration (minutes)</mat-label>
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="task.duration"
+      name="duration"
+      required
+      placeholder="Enter duration"
+      min="0"
       />
     </mat-form-field> -->
 
     <!-- Priority -->
     <!-- <mat-form-field appearance="fill">
-      <mat-label>Priority (1-10)</mat-label>
-      <input
-        matInput
-        type="number"
-        [(ngModel)]="task.priority"
-        name="priority"
-        required
-        placeholder="Enter priority"
-        min="1"
-        max="10"
+    <mat-label>Priority (1-10)</mat-label>
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="task.priority"
+      name="priority"
+      required
+      placeholder="Enter priority"
+      min="1"
+      max="10"
       />
     </mat-form-field> -->
 
     <!-- Submit and Reset Buttons -->
     <div class="button-group">
       <!-- <button mat-raised-button color="primary" type="submit">
-        Create Task
-      </button> -->
-      <!-- <button
-        mat-stroked-button
-        color="warn"
-        type="button"
-        (click)="resetForm()"
-      >
-        Reset Form
-      </button> -->
-      <button class="task-btn" type="submit"><mat-icon>save</mat-icon></button>
-      <button class="task-btn" (click)="resetForm()">
-        <mat-icon>clear</mat-icon>
-      </button>
-    </div>
-  </form>
+      Create Task
+    </button> -->
+    <!-- <button
+    mat-stroked-button
+    color="warn"
+    type="button"
+    (click)="resetForm()"
+    >
+    Reset Form
+  </button> -->
+  <button class="task-btn" type="submit"><mat-icon>save</mat-icon></button>
+  <button class="task-btn" (click)="resetForm()">
+    <mat-icon>clear</mat-icon>
+  </button>
+</div>
+</form>
 </div>

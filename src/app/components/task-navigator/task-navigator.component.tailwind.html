@@ -1,50 +1,53 @@
 <!-- <div
-  class="w-full max-w-[600px] mx-auto p-4 rounded-md box-border"
-  style="min-width: min(100vw - 2rem, 600px)"
+class="w-full max-w-[600px] mx-auto p-4 rounded-md box-border"
+style="min-width: min(100vw - 2rem, 600px)"
 >
-  <div class="pb-3">
-    <app-task-card [task]="selectedOverlord"></app-task-card>
-  </div>
+<div class="pb-3">
+  <app-task-card [task]="selectedOverlord"></app-task-card>
+</div>
 
-  <div
-    *ngIf="!tasks || tasks.length === 0"
-    class="text-center py-8 text-gray-500"
+<div
+  *ngIf="!tasks || tasks.length === 0"
+  class="text-center py-8 text-gray-500"
   >
-    <app-task-edit
-      *ngIf="selectedOverlord"
-      [task]="selectedOverlord"
-      [isPopup]="false"
-    ></app-task-edit>
-    <p class="mt-4">No other tasks yet.</p>
-  </div>
+  <app-task-edit
+    *ngIf="selectedOverlord"
+    [task]="selectedOverlord"
+    [isPopup]="false"
+  ></app-task-edit>
+  <p class="mt-4">No other tasks yet.</p>
+</div>
 
-  <app-task-list-item
-    *ngFor="let task of tasks"
-    [task]="task"
-    [isSelected]="task.isSelected"
-    [isViewed]="task.isRecentlyViewed"
-    (navigate)="onNext($event)"
-  ></app-task-list-item>
+<app-task-list-item
+  *ngFor="let task of tasks"
+  [task]="task"
+  [isSelected]="task.isSelected"
+  [isViewed]="task.isRecentlyViewed"
+  (navigate)="onNext($event)"
+></app-task-list-item>
 </div> -->
 <div
   class="w-full max-w-[600px] mx-auto p-4 rounded-md box-border"
   style="min-width: min(100vw - 2rem, 600px)"
->
+  >
   <div class="pb-3">
     <app-task-card [task]="selectedOverlord"></app-task-card>
   </div>
 
-  <div *ngIf="!tasks?.length" class="text-center py-8 text-gray-500 dark:text-gray-400">
-    <app-task-edit
-      *ngIf="selectedOverlord"
-      [task]="selectedOverlord"
-      [isPopup]="false"
-    ></app-task-edit>
-    <p class="mt-4">No other tasks yet.</p>
-  </div>
+  @if (!tasks?.length) {
+    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+      @if (selectedOverlord) {
+        <app-task-edit
+          [task]="selectedOverlord"
+          [isPopup]="false"
+        ></app-task-edit>
+      }
+      <p class="mt-4">No other tasks yet.</p>
+    </div>
+  }
 
-  <ng-container *ngFor="let task of tasks">
+  @for (task of tasks; track task) {
     <app-task-list-item [task]="task" (navigate)="onNext($event)">
     </app-task-list-item>
-  </ng-container>
+  }
 </div>

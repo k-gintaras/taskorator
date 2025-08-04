@@ -8,12 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { TaskUpdateService } from '../../services/tasks/task-update.service';
 import { TaskActions } from '../../services/tasks/task-action-tracker.service';
 import { MatIcon } from '@angular/material/icon';
-import { NgIf } from '@angular/common';
+
 
 @Component({
   selector: 'app-task-edit',
   standalone: true,
-  imports: [FormsModule, MatIcon, NgIf],
+  imports: [FormsModule, MatIcon],
   templateUrl: './task-edit.component.html',
   styleUrl: './task-edit.component.scss',
 })

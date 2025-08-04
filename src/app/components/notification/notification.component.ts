@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ErrorService } from '../../services/core/error.service';
-import { NgIf } from '@angular/common';
+
 
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
 })

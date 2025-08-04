@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
 import { NavigationService } from '../../../../services/navigation.service';
@@ -8,7 +8,7 @@ import { NAVIGATION_CONFIG } from '../../../../app.config';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
