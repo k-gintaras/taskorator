@@ -109,18 +109,36 @@ export class SettingsService implements SettingsStrategy {
   // New method to get settings once from cache or API
   async getSettingsOnce(): Promise<TaskSettings | null> {
     try {
+      // 1) Try cache first
       let settings = await this.cacheService.getSettings();
-      if (!settings) {
-        settings = await this.ensureApiService().getSettings();
-        if (!settings) return null;
 
-        // Optionally update the cache with the fetched settings
-        await this.cacheService.updateSettings(settings);
+      // 2) If not in cache, try API only if initialized
+      if (!settings && this.apiService) {
+        try {
+          settings = await this.apiService.getSettings();
+          if (settings) {
+            // Update cache with fetched settings
+            await this.cacheService.updateSettings(settings);
+          }
+        } catch (err) {
+          console.warn('SettingsService: API getSettingsOnce failed, using cache/default', err);
+        }
       }
+
+      // 3) If still not found, return defaults and persist to cache (and API if available)
+      if (!settings) {
+        settings = getDefaultTaskSettings();
+        await this.cacheService.createSettings(settings);
+        if (this.apiService) {
+          try { await this.apiService.createSettings(settings); } catch {}
+        }
+      }
+
       return settings;
     } catch (error) {
       this.error(error);
-      return null;
+      // Last resort
+      return getDefaultTaskSettings();
     }
   }
 

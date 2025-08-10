@@ -29,13 +29,14 @@ export const appConfig: ApplicationConfig = {
 
 export const OTHER_CONFIG = {
   APP_TITLE: 'taskorator',
-  OFFLINE_TESTING: true, // 🔥 ENABLED for development - no Firebase calls
-  TEST_DATA_MODE: true, // 🧪 ENABLED - populate with random test tasks
+  OFFLINE_TESTING: true, // 🔥 ENABLES offline mode (no Firebase calls)
+  TEST_DATA_MODE: false, // 🧪 ENABLES test data profiles (only when offline)
+  // To use real offline user registration flow, set TEST_DATA_MODE to false
   TEST_USER_PROFILE: 'complex', // 🧪 OPTIONS: 'empty', 'basic', 'complex', 'massive'
   REPAIR_TREE: true,
   TREE_UPDATE_FREQUENCY: 500,
-  OFFLINE_USER_LOGIN_ID: 'OfflineLoginUserId3',
-  OFFLINE_USER_ID: 'OfflineUserId3',
+  OFFLINE_USER_LOGIN_ID: 'OfflineLoginUserId17',
+  OFFLINE_USER_ID: 'OfflineUserId17',
 };
 
 export const SENSITIVE_CONFIG = {

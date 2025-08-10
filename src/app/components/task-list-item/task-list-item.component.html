@@ -6,8 +6,7 @@
 
   <div
     [ngClass]="task.isSelected ? 'bg-secondary' : 'theme-card'"
-    [style.borderLeftColor]="task.color"
-    [style.borderLeftWidth.px]="6"
+    [ngStyle]="{ 'border-left': '6px solid ' + task.color }"
     class="flex items-center justify-between rounded-md p-3 mb-3 border box-border cursor-pointer w-full relative transition-shadow"
   >
     <!-- Navigate / Expand Button -->

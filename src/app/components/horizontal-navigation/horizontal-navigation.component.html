@@ -36,7 +36,7 @@
         <!-- Parent Items (Left Column) -->
         <div class="nav-column nav-parent-column">
           <ul class="nav-list">
-            @for (item of parentItems; track item) {
+            @for (item of parentItems; track item.path) {
               <li
                 class="nav-item theme-nav-item"
                 [class.active]="isSelected(item.path)"
@@ -54,7 +54,7 @@
         <!-- Child Items (Right Column) -->
         <div class="nav-column nav-child-column">
           <ul class="nav-list">
-            @for (child of childItems; track child) {
+            @for (child of childItems; track child.path) {
               <li
                 class="nav-item theme-nav-item"
                 [class.active]="isSelected(child.path)"

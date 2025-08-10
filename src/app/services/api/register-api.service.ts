@@ -35,7 +35,7 @@ export class RegisterApiService implements RegistrationApiStrategy {
     registrationData: RegistrationData
   ): Promise<RegisterUserResult> {
     const firestore = this.firestore;
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     try {
       await runTransaction(firestore, async (transaction) => {
@@ -107,13 +107,14 @@ export class RegisterApiService implements RegistrationApiStrategy {
     return this.userService.updateUserInfo(userInfo);
   }
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
     return userId;
   }
+
 
   async deleteCurrentUser(): Promise<void> {
     return await this.authService.deleteCurrentUser();

@@ -124,9 +124,15 @@
 /* === SIDEBAR === */
 .nav-sidebar {
   width: 320px !important;
-  max-width: 90vw !important;
+  max-width: 320px !important;
   border-right: 1px solid var(--border) !important;
   background-color: var(--sidebar-bg) !important;
+  
+  // On mobile/tablet, ensure consistent width for overlay mode
+  &.mat-drawer-over {
+    width: 320px !important;
+    max-width: 320px !important;
+  }
 }
 
 .nav-sidebar-content {
@@ -141,6 +147,8 @@
   flex: 1;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
+  flex-wrap: nowrap; /* Force side-by-side layout */
+  min-height: 200px; /* Ensure minimum height for navigation */
 }
 
 .nav-column {
@@ -148,6 +156,20 @@
   display: flex;
   flex-direction: column;
   min-height: 0; /* Allow flex children to shrink */
+  min-width: 0; /* Allow flex children to shrink horizontally */
+  max-width: 50%; /* Each column takes exactly half the width */
+  width: 50%; /* Force exact width */
+  box-sizing: border-box; /* Include borders in width calculation */
+}
+
+/* Make sure columns stay side by side on all screen sizes */
+.nav-parent-column {
+  border-right: 1px solid var(--border);
+  flex: 1 1 50%; /* Take exactly half */
+}
+
+.nav-child-column {
+  flex: 1 1 50%; /* Take exactly half */
 }
 
 .nav-parent-column {
@@ -172,7 +194,9 @@
   margin: 0;
   padding: 0.5rem;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal overflow */
   flex: 1;
+  max-height: calc(100vh - 300px); /* Limit height to force scrolling */
 }
 
 .nav-item {
@@ -225,6 +249,24 @@
   .nav-item.active & {
     color: var(--nav-item-active-text);
     font-weight: 500;
+  }
+}
+
+/* Responsive adjustments for small screens while keeping two columns */
+@media (max-width: 480px) {
+  .nav-item-text {
+    font-size: 0.8rem; /* Slightly smaller text on very small screens */
+  }
+  
+  .nav-item-content {
+    padding: 0.5rem; /* Reduce padding to save space */
+    gap: 0.5rem;
+  }
+  
+  .nav-item-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -309,8 +351,16 @@
   .nav-toolbar-right { max-width: 60%; }
   .nav-search-create { max-width: 180px; }
   .nav-sidebar { width: 260px !important; }
-  .nav-items-container { flex-direction: column; }
-  .nav-column { width: 100%; margin-bottom: 1rem; }
+  /* Keep two-column layout even on very small screens */
+  .nav-items-container { 
+    flex-direction: row !important; 
+    flex-wrap: nowrap !important;
+  }
+  .nav-column { 
+    width: 50% !important; 
+    max-width: 50% !important;
+    margin-bottom: 0; 
+  }
   .nav-item-content { padding: 0.5rem; }
 }
 
@@ -318,6 +368,26 @@
   .nav-toolbar { padding: 0 0.5rem; }
   .nav-sidebar { width: 280px !important; }
   .nav-search-create { max-width: 200px; }
+}
+
+@media (max-width: 600px) {
+  .nav-sidebar {
+    width: 70vw !important;
+    max-width: 70vw !important;
+  }
+  /* Ensure two-column layout is preserved */
+  .nav-items-container {
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+  }
+  .nav-column {
+    min-width: 50% !important;
+    max-width: 50% !important;
+    width: 50% !important;
+  }
+  .nav-item-text {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -349,18 +419,29 @@
     width: 280px !important;
   }
   
+  /* Force two-column layout instead of stacking */
   .nav-items-container {
-    flex-direction: column;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
   }
   
   .nav-parent-column {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    width: 50% !important;
+    max-width: 50% !important;
+  }
+  
+  .nav-child-column {
+    width: 50% !important;
+    max-width: 50% !important;
   }
   
   .nav-column {
-    flex: none;
-    max-height: 50%;
+    flex: 1 1 50%;
+    max-height: none; /* Remove height restriction */
+    width: 50% !important;
+    max-width: 50% !important;
   }
 }
 

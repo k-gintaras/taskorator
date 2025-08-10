@@ -34,20 +34,18 @@ style="min-width: min(100vw - 2rem, 600px)"
     <app-task-card [task]="selectedOverlord"></app-task-card>
   </div>
 
-  @if (!tasks?.length) {
-    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-      @if (selectedOverlord) {
-        <app-task-edit
-          [task]="selectedOverlord"
-          [isPopup]="false"
-        ></app-task-edit>
-      }
-      <p class="mt-4">No other tasks yet.</p>
-    </div>
-  }
+  <div *ngIf="!tasks?.length" class="text-center py-8 text-gray-500 dark:text-gray-400">
+    <app-task-edit
+      *ngIf="selectedOverlord"
+      [task]="selectedOverlord!"
+      [isPopup]="false"
+    ></app-task-edit>
+    <p class="mt-4">No other tasks yet.</p>
+  </div>
 
-  @for (task of tasks; track task) {
-    <app-task-list-item [task]="task" (navigate)="onNext($event)">
-    </app-task-list-item>
-  }
+  <app-task-list-item
+    *ngFor="let task of tasks; trackBy: trackByTaskId"
+    [task]="task"
+    (navigate)="onNext($event)"
+  ></app-task-list-item>
 </div>

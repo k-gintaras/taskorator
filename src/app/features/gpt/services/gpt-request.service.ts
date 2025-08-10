@@ -12,8 +12,8 @@ export class GptRequestService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+    private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -21,7 +21,7 @@ export class GptRequestService {
   }
 
   async makeGptRequest(userInput: string): Promise<any> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const requestData = { userInput };
     const headers = { 'user-id': userId };
 

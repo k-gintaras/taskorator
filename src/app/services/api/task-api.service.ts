@@ -30,8 +30,8 @@ import { AuthService } from '../core/auth.service';
 export class TaskApiService implements TaskApiStrategy {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -39,7 +39,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async getTasks(): Promise<TaskoratorTask[] | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     throw new Error(
       'Can not just get tasks as non admin. Not implemented yet anyway.'
     );
@@ -58,7 +58,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async createTask(task: TaskoratorTask): Promise<TaskoratorTask | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const taskCollection = this.getTaskCollection(userId);
     const taskDocRef = doc(taskCollection);
@@ -77,7 +77,7 @@ export class TaskApiService implements TaskApiStrategy {
     task: TaskoratorTask,
     taskId: string
   ): Promise<TaskoratorTask | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const taskCollection = this.getTaskCollection(userId);
     const taskDocRef = doc(taskCollection, taskId);
@@ -93,7 +93,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async updateTask(task: TaskoratorTask): Promise<boolean> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     if (!task.taskId) {
       console.warn('TaskApiService.updateTask: Missing task ID for update');
@@ -131,7 +131,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async getTaskById(taskId: string): Promise<TaskoratorTask | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const taskDocRef = doc(this.getTaskCollection(userId), taskId);
 
@@ -153,7 +153,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async getLatestTaskId(): Promise<string | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const taskCollection = this.getTaskCollection(userId);
     const latestTaskQuery = query(
@@ -176,7 +176,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async createTasks(tasks: TaskoratorTask[]): Promise<TaskoratorTask[] | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const batch = writeBatch(this.firestore);
     const taskCollection = this.getTaskCollection(userId);
@@ -199,7 +199,7 @@ export class TaskApiService implements TaskApiStrategy {
   }
 
   async updateTasks(tasks: TaskoratorTask[]): Promise<boolean> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const batch = writeBatch(this.firestore);
     const taskCollection = this.getTaskCollection(userId);
@@ -235,7 +235,7 @@ export class TaskApiService implements TaskApiStrategy {
    * @returns super overlord if we pass task.overlord or overlord if we pass task.taskId
    */
   async getSuperOverlord(overlordId: string): Promise<TaskoratorTask | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const overlordDocRef = doc(this.getTaskCollection(userId), overlordId);
 

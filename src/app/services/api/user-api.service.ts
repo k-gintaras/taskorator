@@ -9,8 +9,8 @@ import { AuthService } from '../core/auth.service';
 export class UserApiService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -18,7 +18,7 @@ export class UserApiService {
   }
 
   async getUserInfo(): Promise<TaskUserInfo | undefined> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const docRef = doc(this.firestore, this.getUserInfoLocation(userId));
     try {
@@ -35,7 +35,7 @@ export class UserApiService {
   }
 
   async updateUserInfo(userInfo: TaskUserInfo): Promise<void> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const docRef = doc(this.firestore, this.getUserInfoLocation(userId));
     try {
       await setDoc(docRef, userInfo, { merge: true }); // Merge updates only the specified fields
@@ -47,7 +47,7 @@ export class UserApiService {
   }
 
   async createUserInfo(userInfo: TaskUserInfo): Promise<void> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const docRef = doc(this.firestore, this.getUserInfoLocation(userId));
     try {
       await setDoc(docRef, userInfo); // Overwrites if the document exists

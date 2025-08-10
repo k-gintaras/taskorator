@@ -10,8 +10,8 @@ import { AuthService } from '../core/auth.service';
 export class TaskTreeApiService implements TreeApiStrategy {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -20,7 +20,7 @@ export class TaskTreeApiService implements TreeApiStrategy {
 
   async createTree(taskTree: TaskTree): Promise<TaskTree | null> {
     this.validateTreeStructure(taskTree);
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const treeDocRef = doc(
       this.firestore,
       `users/${userId}/taskTrees/${userId}`
@@ -90,7 +90,7 @@ export class TaskTreeApiService implements TreeApiStrategy {
   async updateTree(taskTree: TaskTree): Promise<void> {
     this.validateTreeStructure(taskTree);
 
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const treeDocRef = doc(
       this.firestore,
       `users/${userId}/taskTrees/${userId}`
@@ -106,7 +106,7 @@ export class TaskTreeApiService implements TreeApiStrategy {
   }
 
   async getTree(): Promise<TaskTree | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const treeDocRef = doc(
       this.firestore,
       `users/${userId}/taskTrees/${userId}`

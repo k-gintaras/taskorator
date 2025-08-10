@@ -9,8 +9,8 @@ import { AuthService } from '../core/auth.service';
 export class TaskSettingsApiService implements SettingsApiStrategy {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -18,7 +18,7 @@ export class TaskSettingsApiService implements SettingsApiStrategy {
   }
 
   async createSettings(settings: TaskSettings): Promise<TaskSettings | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -34,7 +34,7 @@ export class TaskSettingsApiService implements SettingsApiStrategy {
   }
 
   async getSettings(): Promise<TaskSettings | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`
@@ -57,7 +57,7 @@ export class TaskSettingsApiService implements SettingsApiStrategy {
   }
 
   async updateSettings(settings: TaskSettings): Promise<void> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const settingsDocRef = doc(
       this.firestore,
       `users/${userId}/settings/${userId}`

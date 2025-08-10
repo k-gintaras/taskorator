@@ -31,6 +31,13 @@ export class ApiOfflineService implements ApiStrategy {
     private auth: AuthOfflineService
   ) {}
 
+  // Helper to retrieve current user ID or fallback
+  private async getUserId(): Promise<string> {
+    // Use the current offline user's UID or fallback to the configured login ID
+    const userId = await this.auth.getCurrentUserId();
+    return userId ?? OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+  }
+
   private getStorageItem<T>(key: string): T | null {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : null;
@@ -46,29 +53,18 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async deleteUser(): Promise<void> {
-    const storageKeys = this.getCurrentUserStorageKeys();
-    if (!storageKeys) return;
-    localStorage.removeItem(storageKeys['USER']);
+    const userId = await this.getUserId();
+    localStorage.removeItem(getUserStorageKeys(userId).USER);
   }
 
   async createUserInfo(userInfo: TaskUserInfo): Promise<void> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    this.setStorageItem(storageKeys.USER, userInfo);
+    const userId = await this.getUserId();
+    this.setStorageItem(getUserStorageKeys(userId).USER, userInfo);
   }
 
   async updateUserInfo(userInfo: TaskUserInfo): Promise<void> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    this.setStorageItem(storageKeys.USER, userInfo);
-  }
-
-  private getCurrentUserStorageKeys(): Record<string, string> | null {
-    const currentUserId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    return currentUserId ? getUserStorageKeys(currentUserId) : null;
+    const userId = await this.getUserId();
+    this.setStorageItem(getUserStorageKeys(userId).USER, userInfo);
   }
 
   async register(
@@ -77,9 +73,7 @@ export class ApiOfflineService implements ApiStrategy {
     console.log('Registering offline...');
 
     try {
-      // User ID generation (example, customize as needed)
-      const userId =
-        this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+      const userId = await this.getUserId();
       const storageKeys = getUserStorageKeys(userId);
 
       // Save user-specific settings
@@ -122,19 +116,14 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getUserInfo(): Promise<TaskUserInfo | undefined> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    return this.getStorageItem(storageKeys.USER) || undefined;
+    const userId = await this.getUserId();
+    return this.getStorageItem(getUserStorageKeys(userId).USER) || undefined;
   }
 
   // Tasks collection methods
   async getLatestCreatedTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.sort(
       (a, b) =>
         new Date(b.timeCreated).getTime() - new Date(a.timeCreated).getTime()
@@ -142,11 +131,8 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.sort(
       (a, b) =>
         new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
@@ -154,38 +140,26 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getDailyTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.filter((task) => task.repeat === 'daily');
   }
 
   async getWeeklyTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.filter((task) => task.repeat === 'weekly');
   }
 
   async getMonthlyTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.filter((task) => task.repeat === 'monthly');
   }
 
   async getYearlyTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
-    const storageKeys = getUserStorageKeys(userId);
-    const tasks =
-      this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    const userId = await this.getUserId();
+    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
     return tasks.filter((task) => task.repeat === 'yearly');
   }
 
@@ -209,8 +183,7 @@ export class ApiOfflineService implements ApiStrategy {
 
   // Individual task methods
   async createTask(task: TaskoratorTask): Promise<TaskoratorTask | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -221,8 +194,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async updateTask(task: TaskoratorTask): Promise<boolean> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -236,8 +208,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getTaskById(taskId: string): Promise<TaskoratorTask | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -246,22 +217,19 @@ export class ApiOfflineService implements ApiStrategy {
 
   // Settings methods
   async getSettings(): Promise<TaskSettings | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     return this.getStorageItem(storageKeys.SETTINGS);
   }
 
   async updateSettings(settings: TaskSettings): Promise<void> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.SETTINGS, settings);
   }
 
   async createSettings(settings: TaskSettings): Promise<TaskSettings | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.SETTINGS, settings);
     return settings;
@@ -269,31 +237,27 @@ export class ApiOfflineService implements ApiStrategy {
 
   // Score methods
   async createScore(score: Score): Promise<Score | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.SCORE, score);
     return score;
   }
 
   async getScore(): Promise<Score | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     return this.getStorageItem(storageKeys.SCORE);
   }
 
   async updateScore(score: Score): Promise<void> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.SCORE, score);
   }
 
   // Implementing remaining required methods with basic functionality
   async getOverlordTasks(taskId: string): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -335,8 +299,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getTasksFromIds(taskIds: string[]): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -352,8 +315,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getLatestTaskId(): Promise<string | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -365,8 +327,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getSuperOverlord(taskId: string): Promise<TaskoratorTask | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const tasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -382,15 +343,13 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async getTasks(): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     return this.getStorageItem(storageKeys.TASKS);
   }
 
   async createTasks(tasks: TaskoratorTask[]): Promise<TaskoratorTask[] | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const existingTasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -403,8 +362,7 @@ export class ApiOfflineService implements ApiStrategy {
   }
 
   async updateTasks(tasks: TaskoratorTask[]): Promise<boolean> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     const existingTasks =
       this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
@@ -418,22 +376,19 @@ export class ApiOfflineService implements ApiStrategy {
 
   // Tree methods
   async getTree(): Promise<TaskTree | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     return this.getStorageItem(storageKeys.TREE);
   }
 
   async updateTree(taskTree: TaskTree): Promise<void> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.TREE, taskTree);
   }
 
   async createTree(taskTree: TaskTree): Promise<TaskTree | null> {
-    const userId =
-      this.auth.getCurrentUserId() || OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    const userId = await this.getUserId();
     const storageKeys = getUserStorageKeys(userId);
     this.setStorageItem(storageKeys.TREE, taskTree);
     return taskTree;

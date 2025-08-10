@@ -12,10 +12,10 @@ export interface AuthUser {
 
 export interface AuthStrategy {
   isAuthenticated(): boolean;
-  getCurrentUserId(): string | undefined;
+  getCurrentUserId(): Promise<string | undefined>;
   getCurrentUser(): Observable<AuthUser | null>; // firebase User or whatever... for now unknown...
   logOut(): Promise<void>;
-  deleteCurrentUser(): void;
+  deleteCurrentUser(): Promise<void>;
   login(): Promise<{ userId: string; isNewUser: boolean }>; // General login method, using it for testing really or offline mode...
 
   loginWithEmailAndPassword(email: string, password: string): Promise<void>;

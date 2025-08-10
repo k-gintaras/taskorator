@@ -1,7 +1,34 @@
 <h2>Test Task Tagging</h2>
-<app-tag-multiple-items
-  [items]="items"
-  [tagGroups]="tagGroups"
-  (tagAdded)="onTagAdded($event)"
-  (tagRemoved)="onTagRemoved($event)">
-</app-tag-multiple-items>
+<div class="p-4 bg-white/80 dark:bg-gray-800 rounded-lg">
+  <app-tag-multiple-items
+    [items]="items"
+    [tagGroups]="tagGroups"
+    (tagAdded)="onTagAdded($event)"
+    (tagRemoved)="onTagRemoved($event)">
+  </app-tag-multiple-items>
+</div>
+
+<!-- DaisyUI Badge Test -->
+<div class="mt-6">
+  <h3 class="text-lg font-medium mb-2">DaisyUI Badge Test</h3>
+  <div class="flex flex-wrap gap-2">
+    <span class="badge">Default</span>
+    <span class="badge badge-primary">Primary</span>
+    <span class="badge badge-secondary">Secondary</span>
+    <span class="badge badge-accent">Accent</span>
+    <span class="badge badge-info">Info</span>
+    <span class="badge badge-success">Success</span>
+    <span class="badge badge-warning">Warning</span>
+    <span class="badge badge-error">Error</span>
+  </div>
+</div>
+
+
+
+<div class="bg-red-500 text-white p-4">Tailwind Test</div>
+
+<button class="btn btn-primary">Hello</button>
+
+<span class="badge">Todo</span>
+<span class="badge badge-secondary">In Progress</span>
+<button class="btn btn-primary">Test DaisyUI Button</button>

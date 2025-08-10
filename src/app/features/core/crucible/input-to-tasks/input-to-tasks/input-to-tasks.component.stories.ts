@@ -15,6 +15,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { TaskBatchService } from '../../../../../services/sync-api-cache/task-batch.service';
+import { TaskoratorTask } from '../../../../../models/taskModelManager';
 
 class MockTaskUtilityService {
   getSelectedOverlord() {
@@ -22,7 +23,7 @@ class MockTaskUtilityService {
   }
 }
 class MockTaskBatchService {
-  createTaskBatch(tasks: Task[], overlordId: string) {
+  createTaskBatch(tasks: TaskoratorTask[], overlordId: string) {
     console.log('batch created');
     return;
   }

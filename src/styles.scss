@@ -1,16 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
+// Load your theme variables/functions first
 @use "./styles/theme" as *;
-@use "tailwindcss/base";
-@use "tailwindcss/components";
-@use "tailwindcss/utilities";
 
-html,
-body {
-  @apply h-full m-0 p-0;
-}
-.selected {
-  @apply bg-secondary text-white;
-}
-.selected-task {
-  @apply bg-secondary text-white;
-}
+
+

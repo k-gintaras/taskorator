@@ -7,6 +7,7 @@ import {
 } from '../models/service-strategies/auth-strategy.interface';
 import { AuthService } from './core/auth.service';
 import { ApiFirebaseService } from './core/api-firebase.service';
+// Removed FirebaseApiHelperService: using AuthService directly
 import { ApiOfflineService } from './core/api-offline.service';
 import { AuthOfflineService } from './core/auth-offline.service';
 import { TaskService } from './sync-api-cache/task.service';
@@ -19,6 +20,7 @@ import { RegistrationService } from './core/registration.service';
 import { TaskTreeHealService } from './tree/task-tree-heal.service';
 import { TaskBatchService } from './sync-api-cache/task-batch.service';
 import { TestDataInitializerService } from '../test-files/test-services/test-data-initializer.service';
+import { TaskInitializerService } from './core/task-initializer.service';
 import { NavigationService } from './navigation.service';
 import { OTHER_CONFIG } from '../app.config';
 
@@ -48,7 +50,8 @@ export class SessionManagerService {
     private scoreService: ScoreService,
     private registrationService: RegistrationService,
     private navigationService: NavigationService,
-    private testDataInitializer: TestDataInitializerService
+    private testDataInitializer: TestDataInitializerService,
+    private taskInitializer: TaskInitializerService
   ) {
     this.initializationComplete = new Promise((resolve) => {
       this.resolveInitialization = resolve;
@@ -74,26 +77,29 @@ export class SessionManagerService {
       this.isInitialized = false;
     }
 
-    const isTestingSimple = OTHER_CONFIG.OFFLINE_TESTING;
-    if (isTestingSimple) {
+    const isOfflineMode = OTHER_CONFIG.OFFLINE_TESTING;
+    if (isOfflineMode) {
       mode = 'offline';
-      
-      // 🧪 Set test user ID based on profile (only once)
+      // Offline mode enabled: decide between test profile and real offline flow
       if (OTHER_CONFIG.TEST_DATA_MODE && OTHER_CONFIG.TEST_USER_PROFILE && !this.testUserIdSet) {
-        const originalUserId = 'OfflineLoginUserId3'; // Use hardcoded original
+        // 🧪 Test profile override: append profile to user IDs (only once)
+        const originalUserId = OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
         const testUserId = `${originalUserId}-${OTHER_CONFIG.TEST_USER_PROFILE}`;
-        // Override the user ID for test data
-        (OTHER_CONFIG as any).OFFLINE_USER_LOGIN_ID = testUserId;
-        (OTHER_CONFIG as any).OFFLINE_USER_ID = testUserId;
+        OTHER_CONFIG.OFFLINE_USER_LOGIN_ID = testUserId;
+        OTHER_CONFIG.OFFLINE_USER_ID = testUserId;
         this.testUserIdSet = true;
         console.log(`🧪 Using test profile user ID: ${testUserId}`);
+      } else if (!OTHER_CONFIG.TEST_DATA_MODE) {
+        // 🔧 Real offline user flow: no test data, acts like new user registration
+        console.log('🔧 Offline mode with real user flow (TEST_DATA_MODE disabled)');
       }
     }
 
     if (mode === 'online') {
+      // Use AuthService (compat) and ApiFirebaseService directly
       this.authStrategy = this.firebaseAuth;
       this.apiStrategy = this.firebaseApi;
-      this.firebaseAuth.initialize(); // init here, so we don't login by accident
+      console.log('🔥 Using AuthService and ApiFirebaseService for online mode');
 
       // Wait for Firebase auth state to settle before checking authentication
       console.log('Waiting for Firebase auth state to settle...');
@@ -105,7 +111,7 @@ export class SessionManagerService {
 
         let settled = false;
         let subscription: any;
-        subscription = this.firebaseAuth.getCurrentUser().subscribe((user) => {
+        subscription = this.authStrategy.getCurrentUser().subscribe((user) => {
           console.log('Firebase auth state settled:', user ? `User: ${user.uid}` : 'No user');
           
           // Give Firebase more time to potentially restore auth state
@@ -123,9 +129,9 @@ export class SessionManagerService {
       });
 
       // Now check if user is authenticated
-      if (this.firebaseAuth.isAuthenticated()) {
+      if (this.authStrategy.isAuthenticated()) {
         console.log('User already authenticated');
-        const currentUser = await this.firebaseAuth.getCurrentUser().pipe(take(1)).toPromise();
+        const currentUser = await this.authStrategy.getCurrentUser().pipe(take(1)).toPromise();
         if (currentUser) {
           this.user = currentUser;
           console.log('User authenticated: ' + this.user.uid);
@@ -143,24 +149,41 @@ export class SessionManagerService {
       this.offlineAuth.initialize();
       
       try {
-        await this.offlineAuth.login();
+        // Login offline and detect new user
+        const { isNewUser, userId } = await this.offlineAuth.login();
         this.user = await this.waitForLogin();
-        // Persist test user to localStorage under OFFLINE_USER_ID as well
+        // Persist offline user state
         localStorage.setItem(
           OTHER_CONFIG.OFFLINE_USER_ID,
           JSON.stringify(this.user)
         );
-
         if (!this.user) {
-          throw new Error('Login failed or user not authenticated.');
-        } else {
-          console.log('Offline User ID: ' + this.user.uid);
+          throw new Error('Offline login failed or user not authenticated.');
+        }
+        console.log('Offline User ID:', this.user.uid);
+        // Seed data for first-time offline users
+        if (isNewUser) {
+          if (OTHER_CONFIG.TEST_DATA_MODE) {
+            console.log('🧪 Initializing test data for new offline user');
+            this.testDataInitializer.clearTestData();
+            await this.testDataInitializer.initializeTestData();
+          } else {
+            console.log('🔧 Registering offline user data for new user');
+            const seeded = await this.taskInitializer.registerOfflineUser(
+              this.apiStrategy,
+              this.registrationService
+            );
+            if (seeded) {
+              console.log('🔧 Offline user tasks and data created');
+            } else {
+              console.error('🔧 Offline user data seeding failed');
+            }
+          }
         }
       } catch (error) {
         console.error('Offline authentication failed:', error);
-        // For offline mode, we can be more lenient and still proceed
+        // Fallback for offline auth failure
         if (!this.user) {
-          // Create a fallback user if authentication completely fails
           this.user = {
             uid: 'offline-fallback-user',
             displayName: 'Offline User',
@@ -169,7 +192,7 @@ export class SessionManagerService {
             emailVerified: false,
             isNewUser: true,
           };
-          console.log('🚨 Using fallback offline user due to auth failure');
+          console.log('🚨 Using fallback offline user due to auth error');
         }
       }
     }
@@ -324,6 +347,25 @@ export class SessionManagerService {
   }
 
   /**
+   * Initialize Firebase helpers only (for login flow)
+   * This sets up the helpers without checking authentication status
+   */
+  async initializeHelpersOnly(mode: 'online' | 'offline'): Promise<void> {
+    if (mode === 'online') {
+      // No init needed: use AuthService and ApiFirebaseService directly
+      this.authStrategy = this.firebaseAuth;
+      this.apiStrategy = this.firebaseApi;
+      console.log('🔥 Firebase services ready for login flow');
+    } else {
+      this.authStrategy = this.offlineAuth;
+      this.apiStrategy = this.localStorageApi;
+      this.offlineAuth.initialize();
+      
+      console.log('📱 Offline services initialized for login flow');
+    }
+  }
+
+  /**
    * Reset offline test state (useful for debugging)
    */
   resetTestState(): void {
@@ -331,5 +373,46 @@ export class SessionManagerService {
     this.isInitialized = false;
     this.sessionType = null;
     console.log('🧪 Test state reset');
+  }
+
+  /**
+   * Registers a new online user by creating initial tasks, settings, score, and tree
+   */
+  async registerOnlineUser(): Promise<boolean> {
+    console.log('🔧 Registering data for new online user');
+    this.registrationService.initialize(this.firebaseApi);
+    const result = await this.registrationService.registerNewUser();
+    return result !== null;
+  }
+  
+  /**
+   * Registers a new offline user by creating initial tasks, settings, score, and tree
+   */
+  async registerOfflineUser(): Promise<boolean> {
+    console.log('🔧 Registering data for new offline user');
+    // If using test data profiles, seed test data instead of real user registration
+    if (OTHER_CONFIG.TEST_DATA_MODE) {
+      // Apply test profile suffix once so storage keys align
+      if (!this.testUserIdSet && OTHER_CONFIG.TEST_USER_PROFILE) {
+        const original = OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+        const suffixed = `${original}-${OTHER_CONFIG.TEST_USER_PROFILE}`;
+        OTHER_CONFIG.OFFLINE_USER_LOGIN_ID = suffixed;
+        OTHER_CONFIG.OFFLINE_USER_ID = suffixed;
+        this.testUserIdSet = true;
+        // Reinitialize offline auth to pick up new key
+        this.offlineAuth.initialize();
+        console.log(`🧪 Using test profile user ID: ${suffixed}`);
+      }
+      console.log('🧪 Test data mode enabled - initializing test data for profile');
+      await this.testDataInitializer.initializeTestData();
+      return true;
+    }
+    // Real offline user flow: initialize helpers and register new user data
+    await this.initializeHelpersOnly('offline');
+    const success = await this.taskInitializer.registerOfflineUser(
+      this.apiStrategy,
+      this.registrationService
+    );
+    return success;
   }
 }

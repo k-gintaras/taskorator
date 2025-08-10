@@ -19,8 +19,14 @@ export interface OfflineUser {
 @Injectable({ providedIn: 'root' })
 export class AuthOfflineService implements AuthStrategy {
   private currentUser = new BehaviorSubject<AuthUser | null>(null);
-  // Use OFFLINE_USER_ID so stored user matches test data profile keys
-  private readonly localStorageKey = OTHER_CONFIG.OFFLINE_USER_ID;
+  // Dynamic storage key: include profile suffix in test mode
+  private get localStorageKey(): string {
+    const base = OTHER_CONFIG.OFFLINE_USER_LOGIN_ID;
+    if (OTHER_CONFIG.TEST_DATA_MODE && OTHER_CONFIG.TEST_USER_PROFILE) {
+      return `${base}-${OTHER_CONFIG.TEST_USER_PROFILE}`;
+    }
+    return base;
+  }
 
   constructor() {}
 
@@ -35,6 +41,8 @@ export class AuthOfflineService implements AuthStrategy {
       console.log('Restored offline user from local storage:', user);
     } else {
       console.log('No offline user found in local storage.');
+      // Clear any existing user to force new user creation
+      this.currentUser.next(null);
     }
   }
 
@@ -43,11 +51,12 @@ export class AuthOfflineService implements AuthStrategy {
    */
   async login(): Promise<{ userId: string; isNewUser: boolean }> {
     // Use configured offline user ID (may include test profile suffix)
-    const configuredId = OTHER_CONFIG.OFFLINE_USER_ID;
+    const configuredId = this.localStorageKey;
     let offlineUser = this.currentUser.getValue();
     const isNewUser = offlineUser === null;
 
     if (isNewUser) {
+      console.log('Creating new offline user...');
       // Create a new offline user with configured ID
       offlineUser = {
         uid: configuredId,
@@ -65,11 +74,8 @@ export class AuthOfflineService implements AuthStrategy {
       console.log('Logged in as existing offline user:', offlineUser);
     }
 
-    // Return user ID with configured ID (matches tasks storage keys)
-    return {
-      userId: offlineUser!.uid,
-      isNewUser,
-    };
+    // Return user ID and new-user flag
+    return { userId: offlineUser!.uid, isNewUser };
   }
 
   /**
@@ -84,8 +90,8 @@ export class AuthOfflineService implements AuthStrategy {
   /**
    * Deletes the current offline user.
    */
-  deleteCurrentUser(): void {
-    this.logOut(); // Log out and remove user data.
+  async deleteCurrentUser(): Promise<void> {
+    await this.logOut(); // Log out and remove user data.
     console.log('Offline user deleted');
   }
 
@@ -114,7 +120,7 @@ export class AuthOfflineService implements AuthStrategy {
     return !!this.currentUser.getValue();
   }
 
-  getCurrentUserId(): string | undefined {
+  async getCurrentUserId(): Promise<string | undefined> {
     const user = this.currentUser.getValue();
     return user ? user.uid : undefined;
   }

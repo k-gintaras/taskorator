@@ -1,15 +1,15 @@
 <div class="artificer-container">
   @for (action of actions; track action) {
     <button
-      (click)="selectAction(action)"
       class="artificer-action-btn"
+      (click)="selectAction(action)"
       [class.active]="action === currentAction"
-      [class]="getActionClass(action)"
+      [ngClass]="action.colorClass"
       [attr.aria-label]="action.tooltip"
       [title]="action.tooltip"
       matTooltip="{{ action.tooltip }}"
       matTooltipPosition="above"
-      >
+    >
       <mat-icon>{{ action.icon }}</mat-icon>
     </button>
   }

@@ -10,8 +10,8 @@ import { AuthService } from '../core/auth.service';
 export class TaskScoreApiService implements ScoreApiStrategy {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -19,7 +19,7 @@ export class TaskScoreApiService implements ScoreApiStrategy {
   }
 
   async createScore(score: Score): Promise<Score | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const scoreData = JSON.parse(JSON.stringify(score));
@@ -32,7 +32,7 @@ export class TaskScoreApiService implements ScoreApiStrategy {
   }
 
   async getScore(): Promise<Score | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const docSnap = await getDoc(scoreDocRef);
@@ -49,7 +49,7 @@ export class TaskScoreApiService implements ScoreApiStrategy {
   }
 
   async updateScore(score: Score): Promise<void> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const scoreDocRef = doc(this.firestore, `users/${userId}/scores/${userId}`);
     try {
       const scoreData = JSON.parse(JSON.stringify(score));

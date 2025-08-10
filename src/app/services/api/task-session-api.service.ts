@@ -8,7 +8,7 @@ import {
   updateDoc,
   deleteDoc,
   getDoc,
-} from 'firebase/firestore';
+} from '@angular/fire/firestore';
 import { TaskSession } from '../../features/core/nexus/session/task-session.model';
 import { TaskSessionApiStrategy } from '../../models/service-strategies/session-strategy.interface';
 import { AuthService } from '../core/auth.service';
@@ -19,8 +19,8 @@ import { AuthService } from '../core/auth.service';
 export class TaskSessionApiService implements TaskSessionApiStrategy {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+    private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -28,7 +28,7 @@ export class TaskSessionApiService implements TaskSessionApiStrategy {
   }
 
   async getSession(sessionId: string): Promise<TaskSession | null> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
 
     const sessionRef = doc(
       this.firestore,
@@ -44,7 +44,7 @@ export class TaskSessionApiService implements TaskSessionApiStrategy {
   }
 
   async getSessions(): Promise<TaskSession[]> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     try {
       const sessionsCollection = collection(
         this.firestore,
@@ -66,7 +66,7 @@ export class TaskSessionApiService implements TaskSessionApiStrategy {
 
   async createSession(session: TaskSession): Promise<TaskSession> {
     try {
-      const userId = this.getUserId();
+    const userId = await this.getUserId();
       const sessionsCollection = collection(
         this.firestore,
         `users/${userId}/task-sessions`
@@ -83,7 +83,7 @@ export class TaskSessionApiService implements TaskSessionApiStrategy {
   }
 
   async updateSession(session: TaskSession): Promise<void> {
-    const userId = this.getUserId();
+    const userId = await this.getUserId();
     const sessionDoc = doc(
       this.firestore,
       `users/${userId}/task-sessions/${session.id}`
@@ -96,7 +96,9 @@ export class TaskSessionApiService implements TaskSessionApiStrategy {
     }
   }
 
-  async deleteSession(userId: string, id: string): Promise<void> {
+  async deleteSession(id: string): Promise<void> {
+    // Delete a session document for the current user
+    const userId = await this.getUserId();
     const sessionDoc = doc(
       this.firestore,
       `users/${userId}/task-sessions/${id}`

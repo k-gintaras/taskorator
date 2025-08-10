@@ -17,18 +17,14 @@
         "outputPath": "dist/taskorator",
         "index": "src/index.html",
         "main": "src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "src/favicon.ico",
-          "src/assets"
-        ],
+        "assets": ["src/favicon.ico", "src/assets"],
         "styles": [
-          "@angular/material/prebuilt-themes/deeppurple-amber.css",
-          "src/styles.scss"
+          "src/styles.css",
+          "src/styles.scss",
+          "@angular/material/prebuilt-themes/deeppurple-amber.css"
         ],
         "scripts": []
       },
@@ -69,9 +65,7 @@
         }
       },
       "defaultConfiguration": "production",
-      "outputs": [
-        "{options.outputPath}"
-      ]
+      "outputs": ["{options.outputPath}"]
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
@@ -97,18 +91,13 @@
     "test": {
       "executor": "@angular-devkit/build-angular:karma",
       "options": {
-        "polyfills": [
-          "zone.js",
-          "zone.js/testing"
-        ],
+        "polyfills": ["zone.js", "zone.js/testing"],
         "tsConfig": "tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "src/favicon.ico",
-          "src/assets"
-        ],
+        "assets": ["src/favicon.ico", "src/assets"],
         "styles": [
           "@angular/material/prebuilt-themes/deeppurple-amber.css",
+          "src/styles.css",
           "src/styles.scss"
         ],
         "scripts": []
@@ -137,12 +126,7 @@
         "configDir": ".storybook",
         "browserTarget": "taskorator:build",
         "compodoc": true,
-        "compodocArgs": [
-          "-e",
-          "json",
-          "-d",
-          "."
-        ],
+        "compodocArgs": ["-e", "json", "-d", "."],
         "port": 6006
       }
     },
@@ -152,12 +136,7 @@
         "configDir": ".storybook",
         "browserTarget": "taskorator:build",
         "compodoc": true,
-        "compodocArgs": [
-          "-e",
-          "json",
-          "-d",
-          "."
-        ],
+        "compodocArgs": ["-e", "json", "-d", "."],
         "outputDir": "storybook-static"
       }
     }

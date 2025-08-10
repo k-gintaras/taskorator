@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UiTask } from '../../models/taskModelManager';
+import { CommonModule } from '@angular/common';
 
 import { MatCardModule } from '@angular/material/card';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
@@ -13,11 +14,12 @@ import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-l
 @Component({
   standalone: true,
   imports: [
+    CommonModule,
     MatCardModule,
     TaskEditComponent,
     TaskCardComponent,
     TaskListItemComponent
-],
+  ],
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.tailwind.html',
   styleUrls: ['./task-navigator.component.scss'],

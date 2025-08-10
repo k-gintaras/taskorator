@@ -32,20 +32,20 @@ export interface ArtificerDetails {
 }
 
 export const artificerDetailList: ArtificerDetails[] = [
-  { action: 'complete', icon: 'check', colorClass: 'complete-icon-color', tooltip: 'Mark task as complete' },
-  { action: 'delete', icon: 'delete', colorClass: 'delete-icon-color', tooltip: 'Delete selected tasks' },
-  { action: 'refresh', icon: 'refresh', colorClass: 'refresh-icon-color', tooltip: 'Reset task to TODO status' },
-  { action: 'move', icon: 'move_to_inbox', colorClass: 'refresh-icon-color', tooltip: 'Move selected tasks into this task' },
-  { action: 'edit', icon: 'edit', colorClass: 'refresh-icon-color', tooltip: 'Edit task details' },
-  { action: 'select', icon: 'check_box', colorClass: 'refresh-icon-color', tooltip: 'Toggle task selection' },
-  { action: 'suggest', icon: 'search', colorClass: 'refresh-icon-color', tooltip: 'Get AI suggestions for task' },
-  { action: 'promote', icon: 'expand_less', colorClass: 'refresh-icon-color', tooltip: 'Promote task priority' },
-  { action: 'demote', icon: 'expand_more', colorClass: 'refresh-icon-color', tooltip: 'Demote task priority' },
-  { action: 'mass', icon: 'add', colorClass: 'refresh-icon-color', tooltip: 'Mass add similar tasks' },
+  { action: 'complete', icon: 'check', colorClass: 'success-icon-color', tooltip: 'Mark task as complete' },
+  { action: 'delete', icon: 'delete', colorClass: 'danger-icon-color', tooltip: 'Delete selected tasks' },
+  { action: 'refresh', icon: 'refresh', colorClass: 'info-icon-color', tooltip: 'Reset task to TODO status' },
+  { action: 'move', icon: 'move_to_inbox', colorClass: 'move-icon-color', tooltip: 'Move selected tasks into this task' },
+  { action: 'edit', icon: 'edit', colorClass: 'edit-icon-color', tooltip: 'Edit task details' },
+  { action: 'select', icon: 'check_box', colorClass: 'select-icon-color', tooltip: 'Toggle task selection' },
+  { action: 'suggest', icon: 'search', colorClass: 'suggest-icon-color', tooltip: 'Get AI suggestions for task' },
+  { action: 'promote', icon: 'expand_less', colorClass: 'promote-icon-color', tooltip: 'Promote task priority' },
+  { action: 'demote', icon: 'expand_more', colorClass: 'demote-icon-color', tooltip: 'Demote task priority' },
+  { action: 'mass', icon: 'add', colorClass: 'mass-icon-color', tooltip: 'Mass add similar tasks' },
   {
     action: 'moveToParent',
     icon: 'arrow_upward',
-    colorClass: 'refresh-icon-color',
+    colorClass: 'parent-icon-color',
     tooltip: 'Move task to parent level',
   },
 ];

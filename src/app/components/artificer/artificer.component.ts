@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ArtificerDetails } from './artificer.interface';
 import { ArtificerService } from './artificer.service';
 import { MatIcon } from '@angular/material/icon';
@@ -17,7 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-artificer',
   standalone: true,
-  imports: [MatIcon, MatTooltipModule],
+  imports: [CommonModule, MatIcon, MatTooltipModule],
   templateUrl: './artificer.component.html',
   styleUrl: './artificer.component.scss',
 })
@@ -37,16 +38,11 @@ export class ArtificerComponent {
     this.artificerService.setCurrentAction(action);
   }
 
-  getActionClasses(action: ArtificerDetails) {
-    return {
-      selected: action === this.currentAction,
-      [action.colorClass]: true,
-    };
+  // Helper to build a space-separated string of utility classes
+  getActionClass(action: ArtificerDetails): string {
+    const base = action.colorClass;
+    const selected = action === this.currentAction ? ' selected' : '';
+    return `${base}${selected}`;
   }
 
-  getActionClass(action: ArtificerDetails) {
-    const selected = action === this.currentAction ? ' selected' : '';
-    const classs = action.colorClass ? ` ${action.colorClass}` : '';
-    return selected + ' ' + classs;
-  }
 }

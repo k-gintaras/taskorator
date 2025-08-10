@@ -79,13 +79,40 @@ export class AuthStateManagerService {
       let result: { userId: string; isNewUser: boolean };
 
       if (mode === 'online') {
-        result = await this.authService.loginWithGoogle();
+        // Initialize Firebase providers (no auth check)
+        await this.sessionManager.initializeHelpersOnly(mode);
+        // Perform Google auth
+        result = await this.sessionManager.getAuthStrategy().loginWithGoogle();
+        // If first-time user, register initial data
+        if (result.isNewUser) {
+          console.log('AuthStateManager: New online user detected, registering data');
+          const registered = await this.sessionManager.registerOnlineUser();
+          console.log(
+            `AuthStateManager: Online user data registration ${registered ? 'succeeded' : 'failed'}`
+          );
+        }
+        // Complete session initialization
+        await this.initializeSession(mode);
       } else {
+        // Perform offline login
         result = await this.authOfflineService.login();
+        // Seed test data if in TEST_DATA_MODE, else seed only for new users
+        if (OTHER_CONFIG.TEST_DATA_MODE) {
+          console.log('AuthStateManager: Test data mode enabled, initializing test data');
+          const seeded = await this.sessionManager.registerOfflineUser();
+          console.log(
+            `AuthStateManager: Test data initialization ${seeded ? 'succeeded' : 'failed'}`
+          );
+        } else if (result.isNewUser) {
+          console.log('AuthStateManager: New offline user detected, registering data');
+          const seeded = await this.sessionManager.registerOfflineUser();
+          console.log(
+            `AuthStateManager: Offline user data registration ${seeded ? 'succeeded' : 'failed'}`
+          );
+        }
+        // Initialize session after offline login
+        await this.initializeSession(mode);
       }
-
-      // Initialize session after successful login
-      await this.initializeSession(mode);
 
       console.log(`AuthStateManager: ${mode} login successful`);
       return result;
@@ -106,7 +133,15 @@ export class AuthStateManagerService {
     this._isLoading.next(true);
 
     try {
-      await this.authService.loginWithGoogleRedirect();
+      // Initialize session first to set up the auth strategy
+      await this.sessionManager.initialize('online');
+      // Get the auth strategy and cast to Firebase helper for redirect method
+      const authStrategy = this.sessionManager.getAuthStrategy();
+      if ('loginWithGoogleRedirect' in authStrategy) {
+        await (authStrategy as any).loginWithGoogleRedirect();
+      } else {
+        throw new Error('Redirect login not supported by current auth strategy');
+      }
       // Note: Page will redirect, so no need to continue
     } catch (error) {
       this._isLoading.next(false);
@@ -126,7 +161,7 @@ export class AuthStateManagerService {
       const currentMode = this._currentMode.value;
 
       if (currentMode === 'online') {
-        await this.authService.logOut();
+        await this.sessionManager.getAuthStrategy().logOut();
       } else if (currentMode === 'offline') {
         await this.authOfflineService.logOut();
       }

@@ -1,0 +1,86 @@
+/* Artificer Action Button Styles (match toolbar) */
+.artificer-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--nav-item-hover);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  .mat-icon {
+    transition: color 0.2s ease;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Default selected or active style */
+  &.active {
+    background-color: var(--purple-primary);
+    color: white;
+    box-shadow: var(--shadow-purple);
+  }
+  
+  /* Color variants from artificerDetailList */
+  /* Color variants: show color by default, lighter on hover */
+  &.success-icon-color {
+    .mat-icon { color: #059669; }  /* emerald-600 - darker primary */
+    &:hover .mat-icon { color: #34d399; }  /* emerald-400 - much lighter hover */
+  }
+
+  &.danger-icon-color {
+    .mat-icon { color: #dc2626; }  /* red-600 - darker primary */
+    &:hover .mat-icon { color: #fca5a5; }  /* red-300 - much lighter hover */
+  }
+
+  &.info-icon-color {
+    .mat-icon { color: #2563eb; }  /* blue-600 - darker primary */
+    &:hover .mat-icon { color: #93c5fd; }  /* blue-300 - much lighter hover */
+  }
+
+  &.move-icon-color {
+    .mat-icon { color: var(--purple-hover); }  /* purple-600 - darker */
+    &:hover .mat-icon { color: #c4b5fd; }  /* purple-300 - much lighter */
+  }
+
+  &.edit-icon-color {
+    .mat-icon { color: #d97706; }  /* amber-600 - darker primary */
+    &:hover .mat-icon { color: #fcd34d; }  /* amber-300 - much lighter hover */
+  }
+
+  &.select-icon-color {
+    .mat-icon { color: #0f766e; }  /* teal-600 - darker primary */
+    &:hover .mat-icon { color: #5eead4; }  /* teal-300 - much lighter hover */
+  }
+
+  &.suggest-icon-color {
+    .mat-icon { color: #9333ea; }  /* purple-600 - darker primary */
+    &:hover .mat-icon { color: #d8b4fe; }  /* purple-300 - much lighter hover */
+  }
+
+  &.promote-icon-color {
+    .mat-icon { color: #047857; }  /* emerald-700 - darker primary */
+    &:hover .mat-icon { color: #6ee7b7; }  /* emerald-300 - much lighter hover */
+  }
+
+  &.demote-icon-color {
+    .mat-icon { color: #c2410c; }  /* orange-700 - darker primary */
+    &:hover .mat-icon { color: #fdba74; }  /* orange-300 - much lighter hover */
+  }
+
+  &.mass-icon-color {
+    .mat-icon { color: #4338ca; }  /* indigo-700 - darker primary */
+    &:hover .mat-icon { color: #a5b4fc; }  /* indigo-300 - much lighter hover */
+  }
+
+  &.parent-icon-color {
+    .mat-icon { color: #475569; }  /* slate-600 - darker primary */
+    &:hover .mat-icon { color: #cbd5e1; }  /* slate-300 - much lighter hover */
+  }
+  /* reuse refresh-icon-color for move/edit/select/etc if desired */
+}

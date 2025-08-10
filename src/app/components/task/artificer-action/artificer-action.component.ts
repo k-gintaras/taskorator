@@ -40,8 +40,17 @@ export class ArtificerActionComponent {
     });
   }
 
-  getColor() {
-    if (!this.treeNode) return;
+  /**
+   * Determine CSS class for the action button:
+   * 1) If a global Artificer action is selected, use its colorClass
+   * 2) Otherwise fallback to tree-based complete colors
+   */
+  getColor(): string {
+    // Use selected action's class if available
+    if (this.currentAction && this.currentAction.colorClass) {
+      return this.currentAction.colorClass;
+    }
+    if (!this.treeNode) return '';
     const isRepeatingTask =
       this.task?.repeat !== 'never' && this.task?.repeat !== 'once';
     if (isRepeatingTask) return 'complete-icon-color-checklist';

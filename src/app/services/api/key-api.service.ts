@@ -8,8 +8,8 @@ import { AuthService } from '../core/auth.service';
 export class KeyApiService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  private getUserId(): string {
-    const userId = this.authService.getCurrentUserId();
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
     if (!userId) {
       throw new Error('User not logged in');
     }
@@ -23,7 +23,7 @@ export class KeyApiService {
   async generateApiKey(): Promise<void> {
     try {
       // Generate a unique API key (you can use any method to generate a key)
-      const userId = this.getUserId();
+      const userId = await this.getUserId();
 
       const apiKey = this.generateUniqueApiKey();
 

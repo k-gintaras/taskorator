@@ -102,9 +102,8 @@ export class TestDataInitializerService {
    * Get test user ID based on profile
    */
   private getTestUserId(profile: TestUserProfile): string {
-    // Use the configured offline user ID (already includes profile suffix when in test mode)
-    const userId = OTHER_CONFIG.OFFLINE_USER_ID as string;
-    return userId;
+    // Use the configured offline login ID (includes profile suffix if applied)
+    return OTHER_CONFIG.OFFLINE_USER_LOGIN_ID as string;
   }
 
   /**

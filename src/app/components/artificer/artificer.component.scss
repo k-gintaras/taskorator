@@ -27,8 +27,11 @@
   &:hover {
     background-color: var(--nav-item-active);
     color: var(--nav-item-active-text);
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.05);
     box-shadow: var(--shadow-md);
+  }
+  .mat-icon {
+    transition: color 0.2s ease;
   }
 
   &.active {
@@ -44,23 +47,71 @@
   }
 }
 
-/* Color variants for different action types */
+/* Color variants for different action types: show color by default, lighter on hover */
 .artificer-action-btn {
-  &.complete-icon-color {
-    &:hover, &.active {
-      background-color: var(--success-primary, #27ae60);
-    }
+  /* Success actions - complete */
+  &.success-icon-color {
+    .mat-icon { color: #059669; }  /* emerald-600 - darker primary */
+    &:hover .mat-icon { color: #34d399; }  /* emerald-400 - much lighter hover */
   }
 
-  &.delete-icon-color {
-    &:hover, &.active {
-      background-color: var(--danger-primary, #c0392b);
-    }
+  /* Danger actions - delete */
+  &.danger-icon-color {
+    .mat-icon { color: #dc2626; }  /* red-600 - darker primary */
+    &:hover .mat-icon { color: #fca5a5; }  /* red-300 - much lighter hover */
   }
 
-  &.refresh-icon-color {
-    &:hover, &.active {
-      background-color: var(--info-primary, #007bff);
-    }
+  /* Info actions - refresh */
+  &.info-icon-color {
+    .mat-icon { color: #2563eb; }  /* blue-600 - darker primary */
+    &:hover .mat-icon { color: #93c5fd; }  /* blue-300 - much lighter hover */
+  }
+
+  /* Move actions - purple theme */
+  &.move-icon-color {
+    .mat-icon { color: var(--purple-hover); }  /* purple-600 - darker */
+    &:hover .mat-icon { color: #c4b5fd; }  /* purple-300 - much lighter */
+  }
+
+  /* Edit actions - amber */
+  &.edit-icon-color {
+    .mat-icon { color: #d97706; }  /* amber-600 - darker primary */
+    &:hover .mat-icon { color: #fcd34d; }  /* amber-300 - much lighter hover */
+  }
+
+  /* Select actions - teal */
+  &.select-icon-color {
+    .mat-icon { color: #0f766e; }  /* teal-600 - darker primary */
+    &:hover .mat-icon { color: #5eead4; }  /* teal-300 - much lighter hover */
+  }
+
+  /* AI/Suggest actions - purple accent */
+  &.suggest-icon-color {
+    .mat-icon { color: #9333ea; }  /* purple-600 - darker primary */
+    &:hover .mat-icon { color: #d8b4fe; }  /* purple-300 - much lighter hover */
+  }
+
+  /* Promote actions - emerald */
+  &.promote-icon-color {
+    .mat-icon { color: #047857; }  /* emerald-700 - darker primary */
+    &:hover .mat-icon { color: #6ee7b7; }  /* emerald-300 - much lighter hover */
+  }
+
+  /* Demote actions - orange */
+  &.demote-icon-color {
+    .mat-icon { color: #c2410c; }  /* orange-700 - darker primary */
+    &:hover .mat-icon { color: #fdba74; }  /* orange-300 - much lighter hover */
+  }
+
+  /* Mass actions - indigo */
+  &.mass-icon-color {
+    .mat-icon { color: #4338ca; }  /* indigo-700 - darker primary */
+    &:hover .mat-icon { color: #a5b4fc; }  /* indigo-300 - much lighter hover */
+  }
+
+  /* Parent navigation - slate */
+  &.parent-icon-color {
+    .mat-icon { color: #475569; }  /* slate-600 - darker primary */
+    &:hover .mat-icon { color: #cbd5e1; }  /* slate-300 - much lighter hover */
   }
 }

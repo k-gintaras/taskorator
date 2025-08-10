@@ -16,12 +16,25 @@
   <button
     mat-icon-button
     class="sort-btn-compact"
+    [class.active]="currentSort === 'rules'"
+    (click)="changeSort('rules')"
+    [attr.aria-label]="'Sort by list rules'"
+    [title]="'Sort tasks by list-specific rules (default)'"
+  >
+    <mat-icon>rule</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    class="sort-btn-compact"
     [class.active]="currentSort === 'date'"
     (click)="changeSort('date')"
     [attr.aria-label]="'Sort by date'"
     [title]="'Sort tasks by creation date'"
   >
     <mat-icon>schedule</mat-icon>
+    <mat-icon *ngIf="currentSort==='date'" class="direction-icon">
+      {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+    </mat-icon>
   </button>
   <button
     mat-icon-button
@@ -32,5 +45,10 @@
     [title]="'Sort tasks by priority level'"
   >
     <mat-icon>flag</mat-icon>
+    <mat-icon *ngIf="currentSort==='priority'" class="direction-icon">
+      {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+    </mat-icon>
   </button>
+
+  <!-- Reset button removed: sorting defaults to rules when selected -->
 </div>
