@@ -65,6 +65,17 @@
 - The root cause was mutating `OFFLINE_USER_LOGIN_ID` without reinitializing `AuthOfflineService`, leading to an undefined API and empty task lists.
 - Fix: Centralize test-profile suffix logic in `AuthOfflineService.localStorageKey`, reinitialize the service before offline login, and seed test data only after an explicit offline login so storage and API strategy align correctly.
 
+## Design System Contract & Copilot
+
+- Issue: Copilot generated inconsistent styles due to overlapping layers (CSS vars, theme-* classes, Tailwind, DaisyUI, Material, legacy custom classes).
+- Solution:
+  1. Defined a single source of truth in `src/styles/theme.scss` using CSS custom properties for all colors.
+  2. Established `theme-*` shell classes and canonical patterns in `DESIGN_SYSTEM.md` to wrap UI components.
+  3. Bound DaisyUI theme to CSS variables and safelisted key classes in `tailwind.config.js`.
+  4. Introduced Stylelint/ESLint rules to forbid raw colors and non-theme class names.
+  5. Provided copy/paste HTML/CSS patterns (buttons, cards, nav, inputs) for Copilot to mimic.
+- Outcome: Copilot now follows the Design System Contract, producing consistent, token-based styling and avoiding drift.
+
 ## General Takeaway
 
 - Always check for default exports when using `require()`.

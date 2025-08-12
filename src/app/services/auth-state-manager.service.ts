@@ -4,6 +4,7 @@ import { AuthService } from './core/auth.service';
 import { AuthOfflineService } from './core/auth-offline.service';
 import { SessionManagerService } from './session-manager.service';
 import { Router } from '@angular/router';
+import { CacheOrchestratorService } from './core/cache-orchestrator.service';
 import { OTHER_CONFIG } from '../app.config';
 
 export type AuthMode = 'online' | 'offline';
@@ -27,6 +28,7 @@ export class AuthStateManagerService {
     private authService: AuthService,
     private authOfflineService: AuthOfflineService,
     private sessionManager: SessionManagerService,
+    private cacheOrchestrator: CacheOrchestratorService,
     private router: Router
   ) {
     // Initialize auth service listeners
@@ -74,6 +76,8 @@ export class AuthStateManagerService {
   async login(mode: AuthMode = 'online'): Promise<{ userId: string; isNewUser: boolean }> {
     console.log(`AuthStateManager: Starting ${mode} login...`);
     this._isLoading.next(true);
+    // Clear any existing caches to avoid mixing tasks between users/modes
+    this.cacheOrchestrator.clearCache();
 
     try {
       let result: { userId: string; isNewUser: boolean };
@@ -166,14 +170,16 @@ export class AuthStateManagerService {
         await this.authOfflineService.logOut();
       }
 
-      // Clear session
+      // Clear session and caches
       this.clearState();
+      this.cacheOrchestrator.clearCache();
 
       console.log('AuthStateManager: Logout successful');
     } catch (error) {
       console.error('AuthStateManager: Logout error:', error);
-      // Force clear state anyway
+      // Force clear session and caches
       this.clearState();
+      this.cacheOrchestrator.clearCache();
     } finally {
       this._isLoading.next(false);
     }

@@ -1,93 +1,93 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { Router } from '@angular/router';
+import { LoginService } from '../../../../services/login.service';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
 })
-export class WelcomeComponent implements OnInit, OnDestroy {
+export class WelcomeComponent {
+  constructor(
+    private router: Router,
+    private loginService: LoginService
+  ) {}
   currentSlide = 0;
-  private slideInterval?: Subscription;
-
   slides = [
     {
-      gif: '/assets/readme-resources/navigating.gif',
-      title: 'Navigate with Ease',
-      description: 'Seamlessly move through your task hierarchy with our intuitive navigation system.'
-    },
-    {
-      gif: '/assets/readme-resources/create-task-and-children.gif',
-      title: 'Create & Organize',
-      description: 'Effortlessly create tasks and subtasks to build your perfect project structure.'
-    },
-    {
+      title: 'Navigate the Tree',
+      description:
+        'Drill down by overlord, bubble back up. Surface-level loading keeps it snappy.',
       gif: '/assets/readme-resources/tree-view.gif',
-      title: 'Tree View Organization',
-      description: 'Visualize your entire project structure with our powerful tree view interface.'
     },
     {
-      gif: '/assets/readme-resources/promote-demote.gif',
-      title: 'Smart Priority Management',
-      description: 'Promote and demote tasks to adjust priorities and maintain perfect organization.'
+      title: 'Create & Split',
+      description:
+        'Turn one monster into a clean set of atomic tasks without losing why.',
+      gif: '/assets/readme-resources/create-task-and-children.gif',
     },
     {
+      title: 'Move & Crush',
+      description:
+        'Reshape plans fast: move between overlords or fuse tasks back into one.',
       gif: '/assets/readme-resources/move-task.gif',
-      title: 'Flexible Task Movement',
-      description: 'Drag and drop tasks between different projects and hierarchies with ease.'
-    }
+    },
+    {
+      title: 'Promote / Demote',
+      description: 'Adjust gravity in the hierarchy with a click—no ceremony.',
+      gif: '/assets/readme-resources/promote-demote.gif',
+    },
+    {
+      title: 'Priority Engine',
+      description:
+        'Focus/Frog/Favorite + numeric priority + view heat. Secret sauce sorts the rest.',
+      gif: '',
+    },
+    {
+      title: 'Tags & Links',
+      description:
+        'Connect tasks and ideas across projects without losing structure.',
+      gif: '',
+    },
+    {
+      title: 'Smart Lists',
+      description:
+        'A rotating mix of latest, favorites, random, long‑time‑no‑see.',
+      gif: '',
+    },
+    {
+      title: 'Offline ⇄ Online',
+      description:
+        'Work without a connection, sync later—no interruptions to your flow.',
+      gif: '',
+    },
   ];
+  coreSlides = this.slides.slice(0, 4);
+  featureSlides = this.slides.slice(4);
+  coreIndex = 0;
+  featureIndex = 0;
 
-  features = [
-    '🚀 Hierarchical Task Management',
-    '📊 Smart Priority System',
-    '🔄 Real-time Sync & Offline Mode',
-    '🎯 Focus & Frog Task Modes',
-    '📈 Progress Tracking',
-    '🔍 Advanced Search & Filtering'
-  ];
-
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    // Auto-advance slides every 5 seconds
-    this.slideInterval = interval(5000).subscribe(() => {
-      this.nextSlide();
-    });
+  goToCore(index: number) {
+    this.coreIndex = index;
   }
-
-  ngOnDestroy() {
-    if (this.slideInterval) {
-      this.slideInterval.unsubscribe();
-    }
-  }
-
-  nextSlide() {
-    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-  }
-
-  previousSlide() {
-    this.currentSlide = this.currentSlide === 0 ? this.slides.length - 1 : this.currentSlide - 1;
-  }
-
-  goToSlide(index: number) {
-    this.currentSlide = index;
+  goToFeature(index: number) {
+    this.featureIndex = index;
   }
 
   startOnlineLogin() {
-    this.router.navigate(['/gateway/login']);
+    // Navigate to the login page
+    this.router.navigate(['gateway/login']);
   }
-
   startOfflineMode() {
-    this.router.navigate(['/gateway/login']); // Let login component handle offline
+    // Perform offline login and redirect to default authenticated route
+    this.loginService.loginOffline();
   }
-
-  learnMore() {
-    // Could navigate to a features page or show more info
-    this.router.navigate(['/gateway/settings']);
+  openTaskoratorList() {
+    /* navigate to smart list */
   }
 }

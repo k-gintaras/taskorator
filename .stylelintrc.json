@@ -1,0 +1,11 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "color-named": "never",
+    "color-no-hex": true,
+    "declaration-property-value-disallowed-list": {
+      "color": ["/^((?!var\\().)*$/"],
+      "/.*background.*/": ["/^((?!var\\().)*$/"]
+    }
+  }
+}

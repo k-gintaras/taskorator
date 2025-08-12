@@ -144,11 +144,9 @@
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
   color: var(--text-primary);
+  border-radius: 4px;
 }
 
-.theme-card:hover {
-  background-color: var(--card-hover-bg);
-}
 
 .theme-btn-primary {
   background-color: var(--btn-primary-bg);
@@ -200,6 +198,8 @@
   background-color: var(--nav-item-active);
   color: var(--nav-item-active-text);
 }
+
+
 
 /* Base App Layout */
 .theme-app {

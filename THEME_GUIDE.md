@@ -1,149 +1,99 @@
-# Taskorator Theme System
+# Taskorator Theme Guide (Aligned with DSC)
 
-## Productivity Twilight Theme
+This guide explains how to use the Design System Contract (DSC) in day‑to‑day code.
 
-The theme system provides a cohesive design language that balances productivity with visual comfort. The default "twilight" theme offers a perfect middle ground between dark and light modes.
+Key rules:
 
-## Theme Structure
+- Tokens only (CSS variables). No raw hex/rgb/hsl in components.
+- Start with theme-* shells; add Tailwind utilities as needed.
+- DaisyUI is bound to tokens (theme: taskorator) for consistent components.
 
-### CSS Variables Available
+## Tokens Overview
 
-#### Background Layers
-- `--bg-primary`: Main app background
-- `--bg-secondary`: Sidebar, secondary panels
-- `--bg-surface`: Cards, elevated content
-- `--bg-elevated`: Hover states, active elements
+See `src/styles/theme.scss` for the full token list and variants. Core tokens include:
 
-#### Purple Brand System
-- `--purple-primary`: Main brand color (#8b5cf6)
-- `--purple-hover`: Hover states (#7c3aed)
-- `--purple-light`: Subtle accents (#a78bfa)
-- `--purple-muted`: Disabled states (#6d28d9)
+- Backgrounds: `--bg-primary`, `--bg-surface`, `--card-bg`, `--card-border`, `--card-shadow`
+- Text: `--text-primary`, `--text-secondary`, `--text-muted`
+- Brand: `--purple-primary`, `--purple-hover`, `--purple-light`
+- Inputs: `--input-bg`, `--input-border`, `--input-focus`
+- Nav: `--nav-item-hover`, `--nav-item-active`, `--nav-item-active-text`
 
-#### Text Hierarchy
-- `--text-primary`: Main headings, important text
-- `--text-secondary`: Body text, descriptions
-- `--text-muted`: Helper text, placeholders
-- `--text-accent`: Purple accent text
+## Theme Shells
 
-#### Component Variables
-- `--card-bg`, `--card-border`, `--card-shadow`
-- `--btn-primary-bg`, `--btn-secondary-bg`
-- `--input-bg`, `--input-border`, `--input-focus`
-- `--nav-item-hover`, `--nav-item-active`
-
-## Usage Examples
-
-### Using CSS Variables
-```scss
-.my-component {
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--text-primary);
-}
+```css
+.theme-content { background: var(--bg-primary); color: var(--text-secondary); }
+.theme-card    { background: var(--card-bg); border:1px solid var(--card-border); box-shadow: var(--card-shadow); border-radius:12px; }
+.theme-text-primary   { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-muted     { color: var(--text-muted); }
+.theme-btn-primary { background: var(--purple-primary); color:#fff; border-radius:10px; padding:.625rem 1rem; }
+.theme-btn-primary:hover { background: var(--purple-hover); }
+.theme-btn-secondary{ background: var(--nav-item-hover); color: var(--text-secondary); border-radius:10px; padding:.625rem 1rem; }
+.theme-nav-item:hover { background: var(--nav-item-hover); }
 ```
 
-### Using Theme Classes
+## DaisyUI Binding
+
+DaisyUI is configured in `tailwind.config.js` with the custom `taskorator` theme mapping to tokens. Use DaisyUI components inside theme shells.
+
+Example:
+
 ```html
-<div class="theme-card">
-  <h2 class="theme-text-primary">Title</h2>
-  <p class="theme-text-secondary">Description</p>
-  <button class="theme-btn-primary">Action</button>
+<div class="theme-card p-4">
+  <button class="btn">Daisy Button</button>
 </div>
 ```
 
-### App Layout Classes
+## Canonical Patterns
+
+Buttons
+
 ```html
-<div class="theme-app">
-  <header class="theme-topbar">Top Navigation</header>
-  <aside class="theme-sidebar">Side Menu</aside>
-  <main class="theme-content">Main Content</main>
+<button class="theme-btn-primary">Confirm</button>
+<button class="theme-btn-secondary">Cancel</button>
+```
+
+Cards
+
+```html
+<div class="theme-card p-4">
+  <h3 class="theme-text-primary text-lg">Title</h3>
+  <p class="theme-text-secondary">Body</p>
 </div>
 ```
 
-## Theme Service
+Tabs / Nav
 
-### Switching Themes
-```typescript
-import { ThemeService } from './services/core/theme.service';
-
-constructor(private themeService: ThemeService) {}
-
-// Set specific theme
-this.themeService.setTheme('light');
-this.themeService.setTheme('dark');
-this.themeService.setTheme('twilight');
-
-// Toggle through themes
-this.themeService.toggleTheme();
-
-// Check current theme
-const current = this.themeService.getCurrentTheme();
-const isDark = this.themeService.isDarkMode();
+```html
+<button class="tab theme-nav-item" [class.tab-active]="active">General</button>
+<style>
+.tab-active{ background:var(--nav-item-active); color:var(--nav-item-active-text); font-weight:700; }
+</style>
 ```
 
-### Available Themes
-1. **Twilight (Default)**: Productivity-focused, warm dark theme
-2. **Light**: Clean, bright theme for daylight use
-3. **Dark**: Deep dark theme for night work
+Inputs
 
-## Component Styling Guidelines
-
-### Cards
-```scss
-.my-card {
-  @extend .theme-card;
-  
-  &:hover {
-    background-color: var(--card-hover-bg);
-  }
-}
+```html
+<label class="theme-text-muted text-sm">Title</label>
+<input class="w-full rounded-md" style="background:var(--input-bg);border:1px solid var(--input-border);color:var(--text-primary);padding:.6rem .8rem;outline:none;box-shadow:none" />
 ```
 
-### Buttons
-```scss
-// Primary action button
-.action-btn {
-  @extend .theme-btn-primary;
-}
+## Do / Don't
 
-// Secondary button
-.secondary-btn {
-  @extend .theme-btn-secondary;
-}
-```
+Do
 
-### Navigation Items
-```scss
-.nav-item {
-  @extend .theme-nav-item;
-  
-  &.active {
-    background-color: var(--nav-item-active);
-    color: var(--nav-item-active-text);
-  }
-}
-```
+- Wrap pages in `theme-content`; use `theme-card` for elevated panels.
+- Use only CSS variables for colors/borders/shadows.
+- Prefer DaisyUI components inside theme shells for consistent affordances.
 
-## Color Semantic Meanings
+Don't
 
-- **Purple**: Brand, primary actions, focus states
-- **Success Green**: Completed tasks, positive feedback
-- **Warning Amber**: Pending tasks, caution states
-- **Error Red**: Failed actions, critical warnings
-- **Info Blue**: Informational content, links
+- Add new visual classes not starting with `theme-`.
+- Hard-code hex/rgb/hsl colors.
+- Mix multiple unrelated button patterns.
 
-## Design Principles
+## Migration Notes
 
-1. **Consistent Elevation**: Use defined shadow levels
-2. **Purposeful Color**: Purple for brand/actions, semantics for status
-3. **Clear Hierarchy**: Primary, secondary, muted text levels
-4. **Accessible Contrast**: All text meets WCAG guidelines
-5. **Cohesive Spacing**: Use the elevation system for layering
-
-## Future Enhancements
-
-- System theme detection (auto dark/light)
-- Custom theme creation
-- Theme-specific animations
-- High contrast accessibility mode
+- Replace `action-btn`, `login-btn-*`, `welcome-btn-*` with `theme-btn-*`.
+- Remove hardcoded colors; switch to tokens.
+- If a needed token is missing, add it to `theme.scss` and map in `tailwind.config.js`.

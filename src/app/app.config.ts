@@ -29,7 +29,7 @@ export const appConfig: ApplicationConfig = {
 
 export const OTHER_CONFIG = {
   APP_TITLE: 'taskorator',
-  OFFLINE_TESTING: true, // 🔥 ENABLES offline mode (no Firebase calls)
+  OFFLINE_TESTING: false, // 🔥 ENABLES offline mode (no Firebase calls)
   TEST_DATA_MODE: false, // 🧪 ENABLES test data profiles (only when offline)
   // To use real offline user registration flow, set TEST_DATA_MODE to false
   TEST_USER_PROFILE: 'complex', // 🧪 OPTIONS: 'empty', 'basic', 'complex', 'massive'

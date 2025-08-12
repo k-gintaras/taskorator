@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
-import { NavigationService } from '../../../../services/navigation.service';
-import { NAVIGATION_CONFIG } from '../../../../app.config';
+import { LoginService } from '../../../../services/login.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
@@ -22,8 +21,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authStateManager: AuthStateManagerService,
-    private navigationService: NavigationService
+    private loginService: LoginService
   ) {}
 
   ngOnInit() {
@@ -57,44 +55,22 @@ export class LoginComponent implements OnInit {
     this.currentLoginMethod = 'popup';
     this.hideWarning();
     this.showAlternativeLogin = false;
-    
     try {
       console.log('Starting Google login...');
-      
-      // If we know popups are blocked, show warning immediately
       if (this.popupBlocked) {
-        this.showWarning('Popups seem to be blocked. If login fails, try the redirect method below.');
+        this.showWarning('Popups seem to be blocked. If login fails, try redirect.');
         this.showAlternativeLogin = true;
       }
-      
-      // Use AuthStateManager for login
-      await this.authStateManager.login('online');
-      
-      // Success - navigate to saved redirect URL or default route
-      console.log('Login successful!');
-      const redirectUrl = await this.navigationService.getRedirectUrl();
-      if (redirectUrl) {
-        console.log('Redirecting to saved URL:', redirectUrl);
-        this.navigationService.clearRedirectUrl();
-        this.router.navigateByUrl(redirectUrl);
-      } else {
-        console.log('No saved redirect URL, going to default route');
-        this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
-      }
-      
+      await this.loginService.loginOnline();
     } catch (error: any) {
       console.error('Login failed:', error);
-      
-      // Show alternative login method
       this.showAlternativeLogin = true;
-      
-      // Give specific error messages
       if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup')) {
-        this.showWarning('Popup was blocked! Please use the redirect method below.');
+        this.showWarning('Popup was blocked! Please use redirect.');
       } else if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
         this.showWarning('Login was cancelled.');
       } else {
-        this.showWarning('Login failed. Please try the redirect method below.');
+        this.showWarning('Login failed. Please try redirect.');
       }
     } finally {
       this.loading = false;
@@ -106,23 +82,11 @@ export class LoginComponent implements OnInit {
     this.currentLoginMethod = null;
     this.showAlternativeLogin = false;
     this.hideWarning();
-    
     try {
-      // Use AuthStateManager for offline login
-      await this.authStateManager.login('offline');
-      
-      // Success - navigate to saved redirect URL or default route
-      const redirectUrl = await this.navigationService.getRedirectUrl();
-      if (redirectUrl) {
-        console.log('Offline login successful, redirecting to saved URL:', redirectUrl);
-        this.navigationService.clearRedirectUrl();
-        this.router.navigateByUrl(redirectUrl);
-      } else {
-        console.log('Offline login successful, going to default route');
-        this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
-      }
+      await this.loginService.loginOffline();
     } catch (error) {
       console.error('Offline login failed:', error);
+    } finally {
       this.loading = false;
     }
   }
@@ -135,18 +99,12 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.currentLoginMethod = 'redirect';
     this.hideWarning();
-    
     try {
       console.log('Starting redirect login...');
-      
-      // Use AuthStateManager for redirect login
-      await this.authStateManager.loginWithRedirect();
-      
-      // Note: This code won't execute as page will redirect
-      
+      await this.loginService.loginWithRedirect();
     } catch (error: any) {
       console.error('Redirect login failed:', error);
-      this.showWarning('Redirect login failed. Please try the popup method instead.');
+      this.showWarning('Redirect login failed. Please try popup.');
       this.loading = false;
       this.currentLoginMethod = null;
     }
@@ -170,17 +128,9 @@ export class LoginComponent implements OnInit {
   async logout() {
     try {
       console.log('Logging out...');
-      
-      // Use AuthStateManager for logout
-      await this.authStateManager.logout();
-      
-      // Navigate to gateway/login
-      this.router.navigate(['/gateway']);
-      
+      await this.loginService.logout();
     } catch (error) {
       console.error('Logout error:', error);
-      // Force redirect anyway
-      this.router.navigate(['/gateway']);
     }
   }
 

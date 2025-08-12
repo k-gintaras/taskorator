@@ -1,115 +1,78 @@
-<div class="welcome-container">
-  <!-- Header Section -->
-  <header class="welcome-header">
-    <div class="logo-section">
-      <img src="/assets/generated-app-logo.png" alt="Taskorator Logo" class="logo">
-      <h1 class="app-title">Taskorator</h1>
-      <p class="tagline">Master Your Tasks. Conquer Your Goals.</p>
+<div class="welcome-container theme-content min-h-[calc(100vh-6rem)] flex flex-col gap-10 px-4 sm:px-8 md:px-12 lg:px-16">
+  <section class="theme-card theme-bg-surface relative isolate overflow-hidden rounded-2xl p-6 sm:p-10 shadow-xl">
+    <div class="grid grid-cols-1 md:grid-cols-[auto,1fr,auto] items-center gap-6">
+      <img src="/assets/generated-app-logo.png" alt="Taskorator crest" class="h-16 w-16 md:h-20 md:w-20 rounded-xl shadow-md object-contain md:justify-self-start" />
+
+      <div class="text-center md:text-left">
+        <h1 class="theme-text-primary text-4xl md:text-5xl font-extrabold tracking-tight">Taskorator</h1>
+        <p class="theme-text-secondary text-lg md:text-xl mt-1">Forge the plan. Command the chaos.</p>
+        <p class="theme-text-muted mt-3 max-w-3xl md:pr-6">
+          Build living trees of work. Split titans into checkable atoms. Crush fragments back into focus. Glide between offline and online without breaking flow.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-2">
+          <span class="badge badge-md">Tree-first</span>
+          <span class="badge badge-md">Offline ⇄ Online</span>
+          <span class="badge badge-md">Priority Engine</span>
+          <span class="badge badge-md">Smart Lists</span>
+        </div>
+      </div>
+
+      <div class="flex md:flex-col gap-2 md:justify-self-end">
+        <button class="action-btn theme-btn-primary btn" (click)="startOnlineLogin()">Sign in</button>
+        <button class="action-btn theme-btn-secondary btn" (click)="startOfflineMode()">Try Offline</button>
+      </div>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <main class="welcome-main">
-    <!-- Demo Slideshow -->
-    <section class="demo-section">
-      <div class="slideshow-container">
-        <div class="slide-wrapper">
-          @for (slide of slides; track slide; let i = $index) {
-            <div
-              class="slide"
-              [class.active]="i === currentSlide"
-              >
-              <div class="slide-content">
-                <img [src]="slide.gif" [alt]="slide.title" class="demo-gif" loading="lazy">
-                <div class="slide-info">
-                  <h3>{{ slide.title }}</h3>
-                  <p>{{ slide.description }}</p>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
+    <div class="pointer-events-none absolute inset-0 -z-10 opacity-20">
+      <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl" style="background: radial-gradient(closest-side, var(--purple-primary), transparent);"></div>
+    </div>
+  </section>
 
-        <!-- Navigation Controls -->
-        <div class="slide-controls">
-          <button
-            class="nav-btn prev"
-            (click)="previousSlide()"
-            aria-label="Previous slide"
-            >
-            ‹
-          </button>
+  <!-- Core -->
+  <section class="theme-card rounded-2xl overflow-hidden">
+    <div class="tabs tabs-border theme-bg-surface px-4 pt-4" role="tablist">
+      <a *ngFor="let slide of coreSlides; let i = index"
+         role="tab"
+         class="tab"
+         [class.tab-active]="i === coreIndex"
+         (click)="goToCore(i)">
+        {{ slide.title }}
+      </a>
+    </div>
+    <div class="theme-bg-surface p-6">
+      <ng-container *ngIf="coreSlides[coreIndex].gif; else coreDesc">
+        <img [src]="coreSlides[coreIndex].gif"
+             [alt]="coreSlides[coreIndex].title"
+             class="rounded-xl w-full shadow-md"
+             loading="lazy" />
+      </ng-container>
+      <ng-template #coreDesc>
+        <p class="theme-text-secondary">{{ coreSlides[coreIndex].description }}</p>
+      </ng-template>
+    </div>
+  </section>
 
-          <div class="slide-indicators">
-            @for (slide of slides; track slide; let i = $index) {
-              <button
-                class="indicator"
-                [class.active]="i === currentSlide"
-                (click)="goToSlide(i)"
-                [attr.aria-label]="'Go to slide ' + (i + 1)"
-              ></button>
-            }
-          </div>
-
-          <button
-            class="nav-btn next"
-            (click)="nextSlide()"
-            aria-label="Next slide"
-            >
-            ›
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-      <h2>Why Choose Taskorator?</h2>
-      <div class="features-grid">
-        @for (feature of features; track feature) {
-          <div class="feature-card">
-            {{ feature }}
-          </div>
-        }
-      </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="cta-section">
-      <div class="cta-content">
-        <h2>Ready to Get Started?</h2>
-        <p>Choose your preferred way to dive into task management</p>
-
-        <div class="cta-buttons">
-          <button
-            class="cta-btn primary"
-            (click)="startOnlineLogin()"
-            >
-            <span class="btn-icon">🚀</span>
-            Sign In with Google
-          </button>
-
-          <button
-            class="cta-btn secondary"
-            (click)="startOfflineMode()"
-            >
-            <span class="btn-icon">⚡</span>
-            Try Offline Mode
-          </button>
-        </div>
-
-        <button
-          class="learn-more-btn"
-          (click)="learnMore()"
-          >
-          Learn More About Features
-        </button>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="welcome-footer">
-    <p>&copy; 2025 Taskorator. Built for productivity enthusiasts.</p>
-  </footer>
+  <!-- Features -->
+  <section class="theme-card rounded-2xl overflow-hidden">
+    <div class="tabs tabs-border theme-bg-surface px-4 pt-4" role="tablist">
+      <a *ngFor="let slide of featureSlides; let i = index"
+         role="tab"
+         class="tab"
+         [class.tab-active]="i === featureIndex"
+         (click)="goToFeature(i)">
+        {{ slide.title }}
+      </a>
+    </div>
+    <div class="theme-bg-surface p-6">
+      <ng-container *ngIf="featureSlides[featureIndex].gif; else featureDesc">
+        <img [src]="featureSlides[featureIndex].gif"
+             [alt]="featureSlides[featureIndex].title"
+             class="rounded-xl w-full shadow-md"
+             loading="lazy" />
+      </ng-container>
+      <ng-template #featureDesc>
+        <p class="theme-text-secondary">{{ featureSlides[featureIndex].description }}</p>
+      </ng-template>
+    </div>
+  </section>
 </div>

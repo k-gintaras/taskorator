@@ -114,3 +114,9 @@
     gap: 4px;
   }
 } */
+
+/* Override global theme-card hover effect for TaskCard */
+:host ::ng-deep .theme-card:hover {
+  background-color: var(--card-bg) !important;
+  box-shadow: var(--card-shadow) !important;
+}
