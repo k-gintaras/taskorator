@@ -27,6 +27,7 @@ import { RouteMetadata } from '../../../../app.routes-models';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../../../services/navigation.service';
 import { ThemeService, ThemeMode } from '../../../../services/core/theme.service';
+import { AuthUser } from '../../../../models/service-strategies/auth-strategy.interface';
 
 @Component({
   selector: 'app-settings',
@@ -66,7 +67,6 @@ export class SettingsComponent implements OnInit {
     private sessionService: SessionManagerService,
     private navigationService: NavigationService,
     private router: Router,
-    private sessionManager: SessionManagerService,
     private themeService: ThemeService
   ) {
     // Initialize form with all settings including new preferences
@@ -141,39 +141,41 @@ export class SettingsComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.sessionManager.waitForInitialization();
+    await this.sessionService.waitForInitialization();
     this.loadCurrentSettings();
 
     // TODO: replace with the correct auth
     this.getAuth()
       .getCurrentUser()
-      .subscribe((u) => {
+      .subscribe((u: AuthUser | null) => {
         if (!u) return;
         this.taskService.getTaskById(this.task.taskId).then((t) => {
           if (!t) return;
           this.task = t;
         });
 
-        const userId = this.getAuth().getCurrentUserId();
-        if (!userId) return;
-        this.getApi()
-          .getUserInfo()
-          .then((u) => {
-            if (!u) return;
-            this.user = u;
-          });
+        const userIdPromise = this.getAuth().getCurrentUserId();
+        userIdPromise.then((id: string | undefined) => {
+          if (!id) return;
+          this.getApi()
+            .getUserInfo()
+            .then((u: TaskUserInfo | null) => {
+              if (!u) return;
+              this.user = u;
+            });
+        });
       });
     this.navItems = this.navigationService.getSettingsPaths();
   }
 
-  getApi() {
+  getApi(): any {
     return this.sessionService.getApiStrategy();
   }
   
   /**
    * Get current Auth strategy
    */
-  getAuth() {
+  getAuth(): any {
     return this.sessionService.getAuthStrategy();
   }
 

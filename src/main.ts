@@ -16,6 +16,13 @@ import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { TestAppComponent } from './app/test-files/test-app.component';
 import { setLogLevel,LogLevel } from '@angular/fire';
+import { API_STRATEGY, AUTH_STRATEGY } from './app/tokens';
+import { ApiFirebaseService } from './app/services/core/api-firebase.service';
+import { ApiOfflineService } from './app/services/core/api-offline.service';
+import { AuthService } from './app/services/core/auth.service';
+import { AuthOfflineService } from './app/services/core/auth-offline.service';
+import { SessionManagerService } from './app/services/session-manager.service';
+import { APP_INITIALIZER } from '@angular/core';
 // import { AuthService } from './app/services/core/auth.service';
 // import { TestAuthService } from './app/services/test-services/test-auth.service';
 // import { testRoutes } from './app/test-files/test-app.routes';
@@ -60,6 +67,10 @@ if (isTesting) {
       provideFirebaseApp(() => initializeApp(firebaseJson)),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
+      { provide: API_STRATEGY, useClass: localStorage.getItem('pref_mode') === 'offline' ? ApiOfflineService : ApiFirebaseService },
+      { provide: AUTH_STRATEGY, useClass: localStorage.getItem('pref_mode') === 'offline' ? AuthOfflineService : AuthService },
+      SessionManagerService,
+      { provide: APP_INITIALIZER, useFactory: (session: SessionManagerService) => () => session.initialize(), deps: [SessionManagerService], multi: true },
     ],
   }).catch((err) => console.error(err));
 }

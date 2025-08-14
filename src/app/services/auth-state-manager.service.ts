@@ -5,7 +5,8 @@ import { AuthOfflineService } from './core/auth-offline.service';
 import { SessionManagerService } from './session-manager.service';
 import { Router } from '@angular/router';
 import { CacheOrchestratorService } from './core/cache-orchestrator.service';
-import { OTHER_CONFIG } from '../app.config';
+import { ModeService } from './mode.service';
+import { ConfigService } from './config.service';
 
 export type AuthMode = 'online' | 'offline';
 
@@ -29,7 +30,9 @@ export class AuthStateManagerService {
     private authOfflineService: AuthOfflineService,
     private sessionManager: SessionManagerService,
     private cacheOrchestrator: CacheOrchestratorService,
-    private router: Router
+    private router: Router,
+    private modeService: ModeService,
+    private config: ConfigService
   ) {
     // Initialize auth service listeners
     this.authService.initialize();
@@ -44,21 +47,19 @@ export class AuthStateManagerService {
     this._isLoading.next(true);
 
     try {
-      // Check if we're in testing mode
-      const isTestingOffline = OTHER_CONFIG.OFFLINE_TESTING;
-      const mode: AuthMode = isTestingOffline ? 'offline' : 'online';
+      // Determine mode via ConfigService
+      const mode: AuthMode = this.config.offlineTesting ? 'offline' : 'online';
 
       if (mode === 'online') {
         // Wait for Firebase auth state to settle
         await this.waitForFirebaseAuthState();
-        
         if (this.authService.isAuthenticated()) {
-          await this.initializeSession('online');
+          await this.initializeSession();
         }
       } else {
         // For offline mode, check if we have offline auth
         if (this.authOfflineService.isAuthenticated()) {
-          await this.initializeSession('offline');
+          await this.initializeSession();
         }
       }
 
@@ -71,9 +72,10 @@ export class AuthStateManagerService {
   }
 
   /**
-   * Login with specified mode
+   * Login based on current ModeService setting
    */
-  async login(mode: AuthMode = 'online'): Promise<{ userId: string; isNewUser: boolean }> {
+  async login(): Promise<{ userId: string; isNewUser: boolean }> {
+    const mode: AuthMode = this.modeService.get();
     console.log(`AuthStateManager: Starting ${mode} login...`);
     this._isLoading.next(true);
     // Clear any existing caches to avoid mixing tasks between users/modes
@@ -83,8 +85,8 @@ export class AuthStateManagerService {
       let result: { userId: string; isNewUser: boolean };
 
       if (mode === 'online') {
-        // Initialize Firebase providers (no auth check)
-        await this.sessionManager.initializeHelpersOnly(mode);
+        // Initialize online session
+        await this.sessionManager.initialize();
         // Perform Google auth
         result = await this.sessionManager.getAuthStrategy().loginWithGoogle();
         // If first-time user, register initial data
@@ -96,12 +98,12 @@ export class AuthStateManagerService {
           );
         }
         // Complete session initialization
-        await this.initializeSession(mode);
+        await this.initializeSession();
       } else {
         // Perform offline login
         result = await this.authOfflineService.login();
-        // Seed test data if in TEST_DATA_MODE, else seed only for new users
-        if (OTHER_CONFIG.TEST_DATA_MODE) {
+        // Seed test data or real data
+        if (this.config.testDataMode) {
           console.log('AuthStateManager: Test data mode enabled, initializing test data');
           const seeded = await this.sessionManager.registerOfflineUser();
           console.log(
@@ -115,7 +117,7 @@ export class AuthStateManagerService {
           );
         }
         // Initialize session after offline login
-        await this.initializeSession(mode);
+        await this.initializeSession();
       }
 
       console.log(`AuthStateManager: ${mode} login successful`);
@@ -138,7 +140,7 @@ export class AuthStateManagerService {
 
     try {
       // Initialize session first to set up the auth strategy
-      await this.sessionManager.initialize('online');
+      await this.sessionManager.initialize();
       // Get the auth strategy and cast to Firebase helper for redirect method
       const authStrategy = this.sessionManager.getAuthStrategy();
       if ('loginWithGoogleRedirect' in authStrategy) {
@@ -205,7 +207,7 @@ export class AuthStateManagerService {
     }
 
     // User is authenticated but session not initialized - initialize it
-    await this.initializeSession(mode);
+    await this.initializeSession();
   }
 
   /**
@@ -238,11 +240,11 @@ export class AuthStateManagerService {
 
   // Private helper methods
 
-  private async initializeSession(mode: AuthMode): Promise<void> {
+  private async initializeSession(): Promise<void> {
+    const mode: AuthMode = this.modeService.get()!;
     console.log(`AuthStateManager: Initializing ${mode} session...`);
-
     try {
-      await this.sessionManager.initialize(mode);
+      await this.sessionManager.initialize();
 
       // Update state
       this._isAuthenticated.next(true);

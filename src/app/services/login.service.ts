@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStateManagerService } from './auth-state-manager.service';
 import { NavigationService } from './navigation.service';
+import { ModeService } from './mode.service';
 import { NAVIGATION_CONFIG } from '../app.config';
 
 @Injectable({ providedIn: 'root' })
@@ -9,12 +10,14 @@ export class LoginService {
   constructor(
     private authStateManager: AuthStateManagerService,
     private navigationService: NavigationService,
-    private router: Router
+    private router: Router,
+    private modeService: ModeService
   ) {}
 
   /** Perform online login and redirect appropriately */
   async loginOnline(): Promise<void> {
-    await this.authStateManager.login('online');
+    this.modeService.set('online');
+    await this.authStateManager.login();
     const redirectUrl = await this.navigationService.getRedirectUrl();
     if (redirectUrl) {
       this.navigationService.clearRedirectUrl();
@@ -26,7 +29,8 @@ export class LoginService {
 
   /** Perform offline login and redirect appropriately */
   async loginOffline(): Promise<void> {
-    await this.authStateManager.login('offline');
+    this.modeService.set('offline');
+    await this.authStateManager.login();
     const redirectUrl = await this.navigationService.getRedirectUrl();
     if (redirectUrl) {
       this.navigationService.clearRedirectUrl();
