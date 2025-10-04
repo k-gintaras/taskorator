@@ -1,4 +1,4 @@
-<div (click)="onTaskCardClick(task)">
+<div class="task-mini-container" (click)="onTaskCardClick(task)">
   <p class="task-title theme-text-primary">{{ task?.name }}</p>
   @if ((showPriority$ | async) && task?.priority) {
     <span class="task-priority theme-text-secondary">

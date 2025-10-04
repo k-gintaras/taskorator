@@ -18,7 +18,6 @@ export class SettingsService implements SettingsStrategy {
 
   initialize(apiStrategy: ApiStrategy): void {
     this.apiService = apiStrategy;
-    console.log('SettingsService initialized with API strategy');
   }
 
   private ensureApiService(): ApiStrategy {

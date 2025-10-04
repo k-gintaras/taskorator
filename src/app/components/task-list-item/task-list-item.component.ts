@@ -44,6 +44,10 @@ export class TaskListItemComponent {
       return `${baseClasses} border-purple-300 bg-purple-500 text-white dark:border-purple-400 dark:bg-purple-600`;
     }
     
+    if (this.task.isRecentlyUpdated) {
+      return `${baseClasses} border-green-300 bg-green-500 text-white dark:border-green-400 dark:bg-green-600`;
+    }
+    
     if (this.task.isRecentlyCreated) {
       return `${baseClasses} border-blue-300 bg-blue-500 text-white dark:border-blue-400 dark:bg-blue-600`;
     }

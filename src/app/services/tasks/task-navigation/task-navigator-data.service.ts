@@ -25,7 +25,16 @@ export class TaskNavigatorDataService {
     private taskUiDecorator: TaskUiDecoratorService
   ) {
     this.taskActionService.lastAction$.subscribe((action) => {
-      if (action && this.shouldRefreshOnAction(action.action)) {
+      if (!action) return;
+
+      // Always refresh on moved actions so lists that are currently showing
+      // a parent update immediately when tasks are moved away.
+      if (action.action === TaskActions.MOVED) {
+        this.refreshCurrentTasks();
+        return;
+      }
+
+      if (this.shouldRefreshOnAction(action.action)) {
         this.refreshCurrentTasks();
       }
     });

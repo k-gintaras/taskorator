@@ -76,6 +76,40 @@
   5. Provided copy/paste HTML/CSS patterns (buttons, cards, nav, inputs) for Copilot to mimic.
 - Outcome: Copilot now follows the Design System Contract, producing consistent, token-based styling and avoiding drift.
 
+## Task Selection & Database Persistence
+
+- **Issue**: Tasks added to focus/frog/favorites weren't persisting to database despite appearing to work in the UI.
+- **BIGGER MISTAKE**: The `selectedTasks` array was always empty `[]` because there was an unresolved decision/implementation issue (comment requiring a "decision") that neither of us addressed. We spent significant time debugging database persistence when the real issue was that no tasks were actually being selected/loaded.
+- **Root Cause**: Components were creating minimal task objects with only `taskId` and `name` properties instead of retrieving full `UiTask` objects from `TaskListCoordinator`.
+- **Micro Mistake (User)**: Not realizing that selected tasks weren't properly set with full task data before attempting to save to database.
+- **Little Mistake (AI)**: Not asking or realizing early enough that the task objects being passed to settings operations lacked the necessary properties for proper database persistence.
+- **Bigger Mistake (Both)**: Not addressing the fundamental issue that `selectedTasks` was always empty, leading us to debug the wrong problem entirely.
+- **Solution**: Unified all task management components (Focus, Frog, Favorite) to use `TaskListCoordinator.getTasksByIds()` to retrieve complete task objects before adding to settings.
+- **Lesson**: Always verify the fundamental data flow first - check if arrays are populated, services are returning data, and basic assumptions are correct before diving into complex debugging. Don't assume code is working as intended just because it compiles.
+
+## Icon + Text Alignment (Frontend UI)
+
+- **Issue**: Getting perfect horizontal alignment between Material Icons and text elements (h1, h2, etc.) consistently requires multiple attempts.
+- **Common Problems**:
+  1. Default `items-center` causes text to appear slightly above or below icon baseline
+  2. Using `items-baseline` flips the problem - icon floats up, text sinks down
+  3. Line-height adjustments create inconsistent results across different text sizes
+- **Working Solution**:
+
+  ```html
+  <div class="flex items-center gap-3">
+    <mat-icon style="font-size: 2rem; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">icon_name</mat-icon>
+    <h1 style="margin: 0; display: flex; align-items: center;">Title Text</h1>
+  </div>
+  ```
+
+- **Key Insights**:
+  - Make both icon and text into flex containers with `display: flex; align-items: center`
+  - This creates "double centering" - parent centers the containers, each container centers its content
+  - Eliminates line-height and baseline quirks that cause misalignment
+  - Works consistently across different text sizes and icon sizes
+- **Lesson**: When aligning icon + text, convert both elements to flex containers for reliable centering rather than relying on baseline or line-height adjustments.
+
 ## General Takeaway
 
 - Always check for default exports when using `require()`.

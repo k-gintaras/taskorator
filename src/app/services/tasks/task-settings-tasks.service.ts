@@ -9,80 +9,76 @@ import { TaskoratorTask } from '../../models/taskModelManager';
   providedIn: 'root',
 })
 export class TaskSettingsTasksService {
-  settings: TaskSettings | undefined;
+  constructor(private settingsService: SettingsService) {}
 
-  constructor(private settingsService: SettingsService) {
-    this.settingsService.getSettings().subscribe((s: TaskSettings | null) => {
-      if (s) this.settings = s;
+  private async getCurrentSettings(): Promise<TaskSettings | null> {
+    return new Promise((resolve) => {
+      const subscription = this.settingsService.getSettings().subscribe((settings) => {
+        subscription.unsubscribe();
+        resolve(settings);
+      });
     });
   }
 
-  private async updateSettings() {
-    if (this.settings) {
-      await this.settingsService.updateSettings(this.settings);
+  private async updateSettingsWithTask(settings: TaskSettings, taskId: string, arrayName: keyof TaskSettings): Promise<void> {
+    const array = settings[arrayName] as string[];
+    if (!array.includes(taskId)) {
+      array.push(taskId);
+      await this.settingsService.updateSettings(settings);
     }
   }
 
   async addTaskToFocus(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    if (!this.settings.focusTaskIds.includes(task.taskId)) {
-      this.settings.focusTaskIds.push(task.taskId);
-      await this.updateSettings();
-      console.log('Task added to focus:', task.taskId);
-    }
+    await this.updateSettingsWithTask(settings, task.taskId, 'focusTaskIds');
   }
 
   async removeTaskFromFocus(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    const index = this.settings.focusTaskIds.indexOf(task.taskId);
+    const index = settings.focusTaskIds.indexOf(task.taskId);
     if (index > -1) {
-      this.settings.focusTaskIds.splice(index, 1);
-      await this.updateSettings();
-      console.log('Task removed from focus:', task.taskId);
+      settings.focusTaskIds.splice(index, 1);
+      await this.settingsService.updateSettings(settings);
     }
   }
 
   async addTaskToFrogs(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    if (!this.settings.frogTaskIds.includes(task.taskId)) {
-      this.settings.frogTaskIds.push(task.taskId);
-      await this.updateSettings();
-      console.log('Task added to frogs:', task.taskId);
-    }
+    await this.updateSettingsWithTask(settings, task.taskId, 'frogTaskIds');
   }
 
   async removeTaskFromFrogs(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    const index = this.settings.frogTaskIds.indexOf(task.taskId);
+    const index = settings.frogTaskIds.indexOf(task.taskId);
     if (index > -1) {
-      this.settings.frogTaskIds.splice(index, 1);
-      await this.updateSettings();
-      console.log('Task removed from frogs:', task.taskId);
+      settings.frogTaskIds.splice(index, 1);
+      await this.settingsService.updateSettings(settings);
     }
   }
 
   async addTaskToFavorites(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    if (!this.settings.favoriteTaskIds.includes(task.taskId)) {
-      this.settings.favoriteTaskIds.push(task.taskId);
-      await this.updateSettings();
-      console.log('Task added to favorites:', task.taskId);
-    }
+    await this.updateSettingsWithTask(settings, task.taskId, 'favoriteTaskIds');
   }
 
   async removeTaskFromFavorites(task: TaskoratorTask) {
-    if (!this.settings) return;
+    const settings = await this.getCurrentSettings();
+    if (!settings) return;
 
-    const index = this.settings.favoriteTaskIds.indexOf(task.taskId);
+    const index = settings.favoriteTaskIds.indexOf(task.taskId);
     if (index > -1) {
-      this.settings.favoriteTaskIds.splice(index, 1);
-      await this.updateSettings();
-      console.log('Task removed from favorites:', task.taskId);
+      settings.favoriteTaskIds.splice(index, 1);
+      await this.settingsService.updateSettings(settings);
     }
   }
 }

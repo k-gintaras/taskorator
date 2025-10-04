@@ -132,7 +132,7 @@ export const defaultTaskLists: TaskListRules[] = [
         const { startTime, endTime } = calculatePeriodTimes('daily');
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO: enable once create task component can know what list is displayed, and if task is added and is task.repeat (then we add to the repeat list (cache), its added in api anyway)
         canMove: false, // this is loose list we can't just add tasks there (unless we allow it in future?)
@@ -156,7 +156,7 @@ export const defaultTaskLists: TaskListRules[] = [
         // Check if the task falls outside the current daily period
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO: enable once create task component can know what list is displayed, and if task is added and is task.repeat (then we add to the repeat list (cache), its added in api anyway)
         canMove: false,
@@ -180,7 +180,7 @@ export const defaultTaskLists: TaskListRules[] = [
         // Check if the task falls outside the current daily period
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO: enable once create task component can know what list is displayed, and if task is added and is task.repeat (then we add to the repeat list (cache), its added in api anyway)
         canMove: false,
@@ -204,7 +204,7 @@ export const defaultTaskLists: TaskListRules[] = [
         // Check if the task falls outside the current daily period
         return task.lastUpdated < startTime || task.lastUpdated >= endTime;
       },
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO: enable once create task component can know what list is displayed, and if task is added and is task.repeat (then we add to the repeat list (cache), its added in api anyway)
         canMove: false,
@@ -222,7 +222,7 @@ export const defaultTaskLists: TaskListRules[] = [
     description: 'Tasks set as focus tasks',
     rules: {
       filter: (task) => task.stage === 'todo',
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO:  is added through separate component, but we maybe can enable later in task create
         canMove: false, // we can never move because if we do, we don't even know where from... because those are lose
@@ -240,7 +240,7 @@ export const defaultTaskLists: TaskListRules[] = [
     description: 'Tasks set as "eat the frog" tasks',
     rules: {
       filter: (task) => task.stage === 'todo',
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: false, // TODO:  is added through separate component, but we maybe can enable later in task create
         canMove: false, // we can never move because if we do, we don't even know where from... because those are lose
@@ -258,7 +258,7 @@ export const defaultTaskLists: TaskListRules[] = [
     description: 'Tasks marked as favorites',
     rules: {
       filter: (task) => task.stage === 'todo',
-      sorter: (a, b) => (a.priority || 0) - (b.priority || 0),
+      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
         canAdd: true, // TODO:  is added through separate component, but we maybe can enable later in task create
         canMove: false, // we can never move because if we do, we don't even know where from... because those are lose

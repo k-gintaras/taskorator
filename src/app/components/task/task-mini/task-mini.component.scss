@@ -1,3 +1,17 @@
+/* Task Mini Container - ensures proper centering within flex layout */
+.task-mini-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px; /* Ensure minimum height for centering */
+
+  @media (max-width: 480px) {
+    min-height: 30px;
+  }
+}
+
 .task-title {
   margin-left: 10px;
   margin-top: 10px;
@@ -13,6 +27,10 @@
   max-width: 400px; /* Constrain width */
   white-space: normal; /* Allow text wrapping */
 
+  /* Ensure centering works across all screen sizes */
+  display: block;
+  width: 100%;
+
   @media (max-width: 480px) {
     font-size: 10px;
     margin-left: 3px;
@@ -20,11 +38,18 @@
     max-width: 200px;
   }
 
-  @media (min-width: 481px) and (max-width: 768px) {
+  @media (min-width: 481px) and (max-width: 1024px) {
     font-size: 12px;
     margin-left: 1px;
     margin-top: 1px;
-    max-width: 230px;
+    max-width: 300px;
+  }
+
+  @media (min-width: 1025px) {
+    font-size: 14px;
+    margin-left: 10px;
+    margin-top: 10px;
+    max-width: 400px;
   }
 }
 

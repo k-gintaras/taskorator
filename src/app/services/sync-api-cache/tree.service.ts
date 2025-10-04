@@ -24,8 +24,6 @@ export class TreeService implements TreeStrategy {
   ) {}
 
   getFlattenedTree(tree: TaskTree) {
-    console.log('Getting flattened tree');
-    console.log(tree);
     return this.treeNodeToolsService.getFlattened(tree);
   }
 
@@ -49,7 +47,6 @@ export class TreeService implements TreeStrategy {
   }
 
   initialize(apiStrategy: ApiStrategy): void {
-    console.log('TreeService initialized with API strategy');
     this.apiService = apiStrategy;
     this.fetchTree().then();
   }
@@ -89,8 +86,6 @@ export class TreeService implements TreeStrategy {
       // 🔥 CRITICAL: Update local cache AND BehaviorSubject
       this.cacheService.updateTree(taskTree);
       this.treeSubject.next(taskTree); // This was missing!
-
-      console.log('Tree updated in API and cache refreshed');
     } catch (error) {
       console.error('Error updating tree:', error);
     }
@@ -108,6 +103,5 @@ export class TreeService implements TreeStrategy {
   updateLocalTreeCache(taskTree: TaskTree): void {
     this.cacheService.updateTree(taskTree);
     this.treeSubject.next(taskTree);
-    console.log('🌳 TreeService: Local cache updated immediately');
   }
 }

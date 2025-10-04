@@ -14,6 +14,7 @@ import { Observable, map } from 'rxjs';
 })
 export class TaskMiniComponent {
   @Input() task: TaskoratorTask | undefined;
+  @Input() disableClick: boolean = false;
   
   showPriority$: Observable<boolean>;
 
@@ -28,7 +29,7 @@ export class TaskMiniComponent {
   }
 
   onTaskCardClick(task: TaskoratorTask | undefined): void {
-    if (!task) return;
+    if (!task || this.disableClick) return;
     this.dataFacade.toggleTaskSelection(task.taskId);
   }
 }

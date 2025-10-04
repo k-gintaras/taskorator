@@ -14,6 +14,7 @@ import { TaskCacheService } from '../../cache/task-cache.service';
 })
 export class TaskUiDecoratorService {
   private recentlyViewedTaskIds = new Set<string>();
+  private recentlyUpdatedTaskIds = new Set<string>();
   private selectedTaskIds = new Set<string>();
   private selectedTasks$ = new BehaviorSubject<UiTask[]>([]);
   private uiStateChangesSubject = new BehaviorSubject<void>(undefined);
@@ -32,6 +33,11 @@ export class TaskUiDecoratorService {
 
   markTaskViewed(taskId: string): void {
     this.recentlyViewedTaskIds.add(taskId);
+    this.uiStateChangesSubject.next();
+  }
+
+  markTaskUpdated(taskId: string): void {
+    this.recentlyUpdatedTaskIds.add(taskId);
     this.uiStateChangesSubject.next();
   }
 
@@ -92,7 +98,7 @@ export class TaskUiDecoratorService {
       ...baseTask,
       isSelected: this.selectedTaskIds.has(task.taskId),
       isRecentlyViewed: this.recentlyViewedTaskIds.has(task.taskId),
-      isRecentlyUpdated: now - task.lastUpdated < this.recentlyUpdatedThreshold,
+      isRecentlyUpdated: this.recentlyUpdatedTaskIds.has(task.taskId) || (now - (task.lastUpdated || task.timeCreated) < this.recentlyUpdatedThreshold),
       isRecentlyCreated: now - task.timeCreated < this.recentlyCreatedThreshold,
       completionPercent: this.colorService.getProgressPercent(treeNode),
       color: this.colorService.getDateBasedColor(task.timeCreated),

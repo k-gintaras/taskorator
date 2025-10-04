@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DreamforgeComponent } from './dreamforge/dreamforge.component';
 import { CreateRepetitiveTaskComponent } from './create-repetitive-task/create-repetitive-task.component';
+import { CreateSpecializedTaskComponent } from './create-specialized-task/create-specialized-task.component';
 import { FavoriteTaskComponent } from './favorite/favorite-task/favorite-task.component';
 import { FocusComponent } from './focus/focus/focus.component';
 import { FrogTaskComponent } from './frog/frog-task/frog-task.component';
@@ -38,6 +39,10 @@ const routes: Routes = [
         path: 'createRepetitive',
         component: CreateRepetitiveTaskComponent, // Replace with your actual component
       },
+      {
+        path: 'createSpecialized',
+        component: CreateSpecializedTaskComponent, // Replace with your actual component
+      },
     ],
     // create task tagger
     //
@@ -66,6 +71,12 @@ export const dreamforgeRouteMetadata: AppRouteMap = {
     title: 'Create Repetitive',
     icon: 'template', // Replace with the appropriate icon
     description: 'Create repetitive tasks.',
+    altName: '',
+  },
+  createSpecialized: {
+    title: 'Create Specialized',
+    icon: 'template', // Replace with the appropriate icon
+    description: 'Create specialized tasks by type.',
     altName: '',
   },
 };

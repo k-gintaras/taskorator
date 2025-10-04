@@ -33,7 +33,6 @@ export class TaskListService {
   apiService: ApiStrategy | null = null;
   initialize(apiStrategy: ApiStrategy): void {
     this.apiService = apiStrategy;
-    console.log('TaskListService initialized with API strategy');
   }
   private ensureApiService(): ApiStrategy {
     if (!this.apiService) {
@@ -65,24 +64,12 @@ export class TaskListService {
     const cacheState = this.taskIdCache.getListCacheState(groupName);
 
     if (cacheState?.hasGroupAndEmptyTasks) {
-      console.log(
-        'getTaskGroupWithCache: cached and empty ' +
-          taskListKey.type +
-          taskListKey.data
-      );
       this.eventBusService.getTasks([], taskListKey);
       return []; // Known to be empty, no need to fetch
     }
 
     if (cacheState?.hasGroupAndCachedTasks) {
-      console.log(
-        'getTaskGroupWithCache: fully cached ' +
-          taskListKey.type +
-          taskListKey.data
-      );
-
       this.eventBusService.getTasks(cacheState.tasksWithData, taskListKey);
-
       return cacheState.tasksWithData; // Return fully cached tasks
     }
 
@@ -102,11 +89,6 @@ export class TaskListService {
 
     // not cached as a list
     if (cacheState.hasGroupAndNotCachedTasks) {
-      console.log(
-        'getTaskGroupWithCache: has group but not cached tasks ' +
-          taskListKey.type +
-          taskListKey.data
-      );
       const fetchAll = (await fetchFn()) || [];
       const converted = this.transmutatorService.toUiTasks(fetchAll);
       this.taskIdCache.createNewGroup(converted, groupName);
@@ -117,11 +99,6 @@ export class TaskListService {
 
     // partially cached, fetch missing, add and return
     if (cacheState?.hasGroupAndSomeCachedTasks) {
-      console.log(
-        'getTaskGroupWithCache: has group and some cached tasks ' +
-          taskListKey.type +
-          taskListKey.data
-      );
       // Fetch missing tasks from API
       const missingTasks =
         cacheState.taskIdsWithoutData.length > 0

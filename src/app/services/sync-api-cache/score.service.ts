@@ -18,7 +18,6 @@ export class ScoreService implements ScoreStrategy {
   apiService: ApiStrategy | null = null;
   initialize(apiStrategy: ApiStrategy): void {
     this.apiService = apiStrategy;
-    console.log('ScoreService initialized with API strategy');
   }
   private ensureApiService(): ApiStrategy {
     if (!this.apiService) {

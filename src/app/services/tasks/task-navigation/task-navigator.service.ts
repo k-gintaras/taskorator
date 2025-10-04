@@ -26,22 +26,19 @@ export class TaskNavigatorService {
   ) {}
 
   async navigateInToTask(taskId: string): Promise<void> {
-    const task = await this.loadTaskOrWarn(taskId);
-    if (!task) return;
-
-    this.selectedOverlordService.setSelectedOverlord(task);
-    this.taskPathService.push({ id: task.taskId, name: task.name });
+    // Navigate immediately for better UX
     await this.navigateToTaskRoute(taskId);
+    
+    // Load task data in background and update state
+    this.loadTaskAndUpdateState(taskId, 'in');
   }
 
   async navigateOutOfTask(taskId: string): Promise<void> {
-    const task = await this.loadTaskOrWarn(taskId);
-    if (!task) return;
-
-    this.selectedOverlordService.setSelectedOverlord(task);
-    this.taskPathService.removePath(taskId);
-    this.taskPathService.push({ id: task.taskId, name: task.name });
+    // Navigate immediately for better UX
     await this.navigateToTaskRoute(taskId);
+    
+    // Load task data in background and update state
+    this.loadTaskAndUpdateState(taskId, 'out');
   }
 
   async navigateToTaskParent(taskId: string): Promise<void> {
@@ -103,5 +100,27 @@ export class TaskNavigatorService {
       this.errorService.error(`Task with ID ${taskId} not found.`);
     }
     return task;
+  }
+
+  private async loadTaskAndUpdateState(taskId: string, direction: 'in' | 'out'): Promise<void> {
+    try {
+      const task = await this.taskService.getTaskById(taskId);
+      if (!task) {
+        this.errorService.error(`Task with ID ${taskId} not found.`);
+        return;
+      }
+
+      // Update state after task is loaded
+      this.selectedOverlordService.setSelectedOverlord(task);
+      
+      if (direction === 'in') {
+        this.taskPathService.push({ id: task.taskId, name: task.name });
+      } else if (direction === 'out') {
+        this.taskPathService.removePath(taskId);
+        this.taskPathService.push({ id: task.taskId, name: task.name });
+      }
+    } catch (error) {
+      this.errorService.error(`Failed to load task: ${error}`);
+    }
   }
 }

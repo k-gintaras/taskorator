@@ -141,8 +141,6 @@ export class TaskTreeNodeToolsService {
    * Flatten the task tree into a list of nodes.
    */
   getFlattened(tree: TaskTree): TaskTreeNode[] {
-    console.log('Getting flattened tree 2 ');
-    console.log(tree);
     return this.flattenTree(tree.primarch);
   }
 
@@ -170,7 +168,6 @@ export class TaskTreeNodeToolsService {
       (node) => !node.connected
     );
     if (unconnectedTasks.length === 0) {
-      console.log('Tree is fully connected');
       tree.connected = true;
       return true;
     }

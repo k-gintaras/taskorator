@@ -3,12 +3,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskMiniComponent } from '../task-mini/task-mini.component';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.component';
 
 @Component({
   standalone: true,
-  imports: [TaskMiniComponent, MatIcon],
+  imports: [TaskMiniComponent, MatIcon, MatTooltip],
   selector: 'app-staged-task-list',
   templateUrl: './staged-task-list.component.html',
   styleUrls: ['./staged-task-list.component.scss'],

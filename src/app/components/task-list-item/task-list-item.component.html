@@ -14,8 +14,9 @@
       class="flex items-center justify-center rounded-md min-w-[2.5rem] min-h-[2.5rem] p-2"
       [ngClass]="{
         'theme-btn-primary': task.isRecentlyViewed,
-        'theme-btn-secondary': !task.isRecentlyViewed && task.isRecentlyCreated,
-        'theme-bg-elevated': !task.isRecentlyViewed && !task.isRecentlyCreated
+        'theme-btn-secondary': !task.isRecentlyViewed && task.isRecentlyUpdated,
+        'theme-btn-accent': !task.isRecentlyViewed && !task.isRecentlyUpdated && task.isRecentlyCreated,
+        'theme-bg-elevated': !task.isRecentlyViewed && !task.isRecentlyUpdated && !task.isRecentlyCreated
       }"
       (click)="onNavigateClick($event)"
     >

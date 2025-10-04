@@ -50,6 +50,7 @@ module.exports = {
     "theme-text-muted",
     "theme-btn-primary",
     "theme-btn-secondary",
+    "theme-btn-accent",
     "theme-nav-item",
     "tab",
     "tab-active",

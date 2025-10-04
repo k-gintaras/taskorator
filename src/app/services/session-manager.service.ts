@@ -38,13 +38,19 @@ export class SessionManagerService {
   async initialize(mode?: 'online'|'offline'): Promise<void> {
     // ignore mode param, actual mode from ModeService
     const actualMode = this.modeService.get();
+    console.log('SessionManager: Initializing with mode:', actualMode);
+
     if (actualMode === 'online') {
+      console.log('SessionManager: Online mode - checking authentication');
       const user = await firstValueFrom(this.auth.getCurrentUser());
+      console.log('SessionManager: Current user:', user);
       if (!this.auth.isAuthenticated()) {
+        console.error('SessionManager: User not authenticated');
         throw new Error('User not authenticated');
       }
       this.user = user;
     } else {
+      console.log('SessionManager: Offline mode - logging in');
       await this.auth.login();
       this.user = await firstValueFrom(this.auth.getCurrentUser());
       if (!this.user) {
@@ -58,6 +64,7 @@ export class SessionManagerService {
     }
 
     // initialize downstream services
+    console.log('SessionManager: Initializing downstream services');
     this.taskService.initialize(this.api);
     this.settingsService.initialize(this.api);
     this.scoreService.initialize(this.api);
@@ -65,6 +72,10 @@ export class SessionManagerService {
     this.treeService.initialize(this.api);
     this.registrationService.initialize(this.api);
     this.taskBatch.initialize(this.api);
+
+    // Preload settings to ensure focus tasks and other settings-based features work immediately
+    console.log('SessionManager: Preloading settings');
+    await this.settingsService.fetchSettings();
   }
 
   /** Compatibility: no-op since APP_INITIALIZER runs init */
@@ -92,6 +103,11 @@ export class SessionManagerService {
   /** Legacy: register offline user via TaskInitializerService */
   async registerOfflineUser(): Promise<boolean> {
     return this.taskInitializer.registerOfflineUser(this.api, this.registrationService);
+  }
+
+  /** Get the current session type (online/offline) */
+  getSessionType(): 'online' | 'offline' {
+    return this.modeService.get();
   }
 }
 

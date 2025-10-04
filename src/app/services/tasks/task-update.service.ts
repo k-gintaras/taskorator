@@ -16,7 +16,11 @@ import {
   TaskActionTrackerService,
 } from './task-action-tracker.service';
 import { ErrorService } from '../core/error.service';
+import { TaskUiDecoratorService } from './task-list/task-ui-decorator.service';
 import { TaskUiInteractionService } from './task-list/task-ui-interaction.service';
+import { TaskCacheService } from '../cache/task-cache.service';
+import { TaskTransmutationService } from './task-transmutation.service';
+import { TaskIdCacheService } from '../cache/task-id-cache.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,21 +32,40 @@ export class TaskUpdateService {
     private taskUiInteractionService: TaskUiInteractionService,
     private settingsService: SettingsService,
     private actionService: TaskActionTrackerService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private taskUiDecorator: TaskUiDecoratorService,
+    private taskCache: TaskCacheService,
+    private transmutatorService: TaskTransmutationService,
+    private taskIdCache: TaskIdCacheService
   ) {}
 
   async move(targetTask: TaskoratorTask) {
     const selectedTaskIds = this.taskUiInteractionService.getSelectedTaskIds();
 
     if (selectedTaskIds.length > 0 && targetTask.taskId) {
+      let selectedTasks: (TaskoratorTask | null)[] = [];
+      let oldOverlords: (string | undefined)[] = [];
+      const newGroup = `overlord_${targetTask.taskId}`;
       try {
-        const selectedTasks = await Promise.all(
+        selectedTasks = await Promise.all(
           selectedTaskIds.map((id) => this.taskService.getTaskById(id))
         );
+        // Store old overlords for rollback
+        oldOverlords = selectedTasks.map((task) => task?.overlord || undefined);
         selectedTasks.forEach((task) => {
-          if (task) task.overlord = targetTask.taskId;
+          if (task) {
+            task.overlord = targetTask.taskId;
+            task.lastUpdated = Date.now();
+          }
         });
-
+        // Update group cache optimistically
+        selectedTasks.forEach((task, index) => {
+          if (task) {
+            const oldGroup = oldOverlords[index] ? `overlord_${oldOverlords[index]}` : undefined;
+            if (oldGroup) this.taskIdCache.removeTaskFromGroup(oldGroup, task.taskId);
+            this.taskIdCache.addTaskToGroup(newGroup, task.taskId);
+          }
+        });
         await this.taskBatchService.updateTaskBatch(
           selectedTasks.filter(Boolean) as TaskoratorTask[],
           TaskActions.MOVED,
@@ -58,9 +81,23 @@ export class TaskUpdateService {
               .filter(Boolean)
               .join(',')
         );
-      } catch {
+      } catch (error: any) {
+        // Revert task changes
+        selectedTasks.forEach((task, index) => {
+          if (task && oldOverlords[index] !== undefined) {
+            task.overlord = oldOverlords[index];
+          }
+        });
+        // Revert group cache changes
+        selectedTasks.forEach((task, index) => {
+          if (task) {
+            this.taskIdCache.removeTaskFromGroup(newGroup, task.taskId);
+            const oldGroup = oldOverlords[index] ? `overlord_${oldOverlords[index]}` : undefined;
+            if (oldGroup) this.taskIdCache.addTaskToGroup(oldGroup, task.taskId);
+          }
+        });
         this.error(
-          "Can't update empty tasks or failed to create new overlord."
+          "Can't update empty tasks or failed to create new overlord: " + (error.message || 'Unknown error')
         );
       }
     } else {
@@ -100,10 +137,37 @@ export class TaskUpdateService {
 
   create(task: TaskoratorTask) {
     task.timeCreated = Date.now();
+    task.lastUpdated = task.timeCreated; // Ensure new tasks are marked as recently updated
+
+    // Generate temp ID for optimistic update
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const optimisticTaskData = { ...task, taskId: tempId };
+    const uiOptimisticTask = this.transmutatorService.toUiTask(optimisticTaskData);
+
+    // Add optimistic task to cache and group cache
+    this.taskCache.addTask(uiOptimisticTask);
+    this.taskIdCache.addTasksWithGroup([uiOptimisticTask], `overlord_${task.overlord}`);
+
+    // Trigger UI update
+    this.taskUiDecorator.markTaskUpdated(tempId);
+    this.feedback('Created: ' + task.name);
+
+    // Proceed with API call
     this.taskService.createTask(task).then((createdTask: TaskoratorTask) => {
+      // Success: TaskService.createTask adds the real task to cache and group cache
+      // Remove optimistic task
+      this.taskCache.removeTask(uiOptimisticTask);
+      this.taskIdCache.deleteTask(tempId);
+
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
       this.feedback('Created: ' + ' ' + createdTask.name);
       this.actionService.recordAction(createdTask.taskId, TaskActions.CREATED);
+    }).catch((error) => {
+      // Failure: Remove optimistic task
+      this.taskCache.removeTask(uiOptimisticTask);
+      this.taskIdCache.deleteTask(tempId);
+
+      this.error('Failed to create task: ' + (error.message || 'Unknown error'));
     });
   }
 
@@ -113,10 +177,16 @@ export class TaskUpdateService {
   }
 
   update(task: TaskoratorTask, action: TaskActions, subAction?: any) {
+    const oldLastUpdated = task.lastUpdated;
     task.lastUpdated = Date.now();
+    this.taskUiDecorator.markTaskUpdated(task.taskId);
     this.taskService.updateTask(task).then(() => {
       this.feedback(task.name + ' ' + action + ' ' + (subAction || ''));
       this.actionService.recordAction(task.taskId, action, subAction);
+    }).catch((error) => {
+      // Revert on failure
+      task.lastUpdated = oldLastUpdated;
+      this.error('Failed to update task: ' + (error.message || 'Unknown error'));
     });
   }
 

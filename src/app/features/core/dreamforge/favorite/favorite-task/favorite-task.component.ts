@@ -7,28 +7,33 @@ import {
 } from '../../../../../models/settings';
 import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
 import { TaskUiInteractionService } from '../../../../../services/tasks/task-list/task-ui-interaction.service';
-import { TaskoratorTask } from '../../../../../models/taskModelManager';
+import { TaskoratorTask, UiTask } from '../../../../../models/taskModelManager';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
-import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
+import { TaskListCoordinatorService } from '../../../../../services/tasks/task-list/task-list-coordinator.service';
+import { TaskListKey, TaskListType, TaskListSubtype } from '../../../../../models/task-list-model';
+import { TaskIdCacheService } from '../../../../../services/cache/task-id-cache.service';
+import { getIdFromKey } from '../../../../../models/task-list-model';
 
 @Component({
   selector: 'app-favorite-task',
   standalone: true,
-  imports: [MatIcon, StagedTaskListComponent],
+  imports: [MatIcon, MatTooltip, StagedTaskListComponent],
   templateUrl: './favorite-task.component.html',
   styleUrls: ['./favorite-task.component.scss'],
 })
 export class FavoriteTaskComponent implements OnInit {
   settings: TaskSettings = getDefaultTaskSettings();
   tree?: TaskTree;
-  tasks: TaskoratorTask[] = [];
-  selectedTasks: TaskoratorTask[] = [];
+  tasks: UiTask[] = [];
+  selectedTasks: UiTask[] = [];
 
   constructor(
     private settingsService: SettingsService,
-    private taskListService: TaskListService,
-    private taskUiInteractionService: TaskUiInteractionService
+    private taskListCoordinator: TaskListCoordinatorService,
+    private taskUiInteractionService: TaskUiInteractionService,
+    private taskIdCache: TaskIdCacheService
   ) {}
 
   ngOnInit(): void {
@@ -37,13 +42,12 @@ export class FavoriteTaskComponent implements OnInit {
       this.settings = s;
       this.loadFavoriteTasks();
     });
-    this.selectedTasks = this.getSelectedTasksSync();
+    this.loadSelectedTasks();
   }
 
-  private getSelectedTasksSync(): TaskoratorTask[] {
+  private async loadSelectedTasks(): Promise<void> {
     const selectedIds = this.taskUiInteractionService.getSelectedTaskIds();
-    // Map IDs to tasks if you have cache, else return empty
-    return [];
+    this.selectedTasks = await this.taskListCoordinator.getTasksByIds(selectedIds);
   }
 
   save(): void {
@@ -52,11 +56,32 @@ export class FavoriteTaskComponent implements OnInit {
   }
 
   updateTasks(updatedTasks: TaskoratorTask[]): void {
-    this.tasks = updatedTasks;
+    this.tasks = updatedTasks as UiTask[];
+  }
+
+  onFavoriteTasksChange(updatedTasks: TaskoratorTask[]): void {
+    this.tasks = updatedTasks as UiTask[];
+    this.settings.favoriteTaskIds = this.tasks.map((t) => t.taskId);
+    this.settingsService.updateSettings(this.settings);
+    // Update cache
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FAVORITE,
+      data: TaskListSubtype.SETTINGS,
+    };
+    const groupName = getIdFromKey(taskListKey);
+    // Clear the existing group
+    const cacheState = this.taskIdCache.getListCacheState(groupName);
+    if (cacheState) {
+      for (const task of cacheState.tasksWithData) {
+        this.taskIdCache.removeTaskFromGroup(groupName, task.taskId);
+      }
+    }
+    // Create new group with updated tasks
+    this.taskIdCache.createNewGroup(updatedTasks as UiTask[], groupName);
   }
 
   updateSelectedTasks(updatedTasks: TaskoratorTask[]): void {
-    this.selectedTasks = updatedTasks;
+    this.selectedTasks = updatedTasks as UiTask[];
   }
 
   add(): void {
@@ -70,6 +95,10 @@ export class FavoriteTaskComponent implements OnInit {
   }
 
   async loadFavoriteTasks(): Promise<void> {
-    this.tasks = (await this.taskListService.getFavoriteTasks()) || [];
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FAVORITE,
+      data: TaskListSubtype.SETTINGS,
+    };
+    this.tasks = (await this.taskListCoordinator.getTasks(taskListKey)) || [];
   }
 }

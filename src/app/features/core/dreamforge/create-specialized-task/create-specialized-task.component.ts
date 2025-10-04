@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {
   getDefaultTask,
-  RepeatOptions,
+  TaskType,
   TaskoratorTask,
   UiTask,
 } from '../../../../models/taskModelManager';
@@ -14,30 +14,34 @@ import { SelectedOverlordService } from '../../../../services/tasks/selected/sel
 import { OverlordNavigatorComponent } from '../../../../components/overlord-navigator/overlord-navigator.component';
 
 @Component({
-  selector: 'app-create-repetitive-task',
+  selector: 'app-create-specialized-task',
   standalone: true,
   imports: [
     FormsModule,
     MatIcon,
     OverlordNavigatorComponent
 ],
-  templateUrl: './create-repetitive-task.component.html',
-  styleUrl: './create-repetitive-task.component.scss',
+  templateUrl: './create-specialized-task.component.html',
+  styleUrl: './create-specialized-task.component.scss',
 })
-export class CreateRepetitiveTaskComponent implements OnInit {
+export class CreateSpecializedTaskComponent implements OnInit {
   task: TaskoratorTask = getDefaultTask(); // Start with a default task
   selectedOverlord: UiTask | null = null;
 
-  repeatOptions: RepeatOptions[] = [
-    'never',
-    'once',
-    'half-hourly',
-    'hourly',
-    'half-daily',
-    'daily',
-    'weekly',
-    'monthly',
-    'yearly',
+  taskTypes: TaskType[] = [
+    'code',
+    'idea',
+    'note',
+    'todo',
+    'checklist',
+    'tree',
+    'flowchart',
+    'task',
+    'next',
+    'job',
+    'feature',
+    'schedule',
+    'project',
   ];
 
   constructor(

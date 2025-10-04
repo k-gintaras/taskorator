@@ -64,9 +64,12 @@
   --btn-primary-bg: var(--purple-primary);
   --btn-primary-hover: var(--purple-hover);
   --btn-primary-text: white;
-  --btn-secondary-bg: var(--bg-elevated);
-  --btn-secondary-hover: var(--purple-soft);
-  --btn-secondary-text: var(--text-secondary);
+  --btn-secondary-bg: var(--purple-light);
+  --btn-secondary-hover: var(--purple-primary);
+  --btn-secondary-text: var(--text-primary);
+  --btn-accent-bg: var(--info);
+  --btn-accent-hover: #2563eb; /* blue-600 */
+  --btn-accent-text: white;
   
   /* Inputs */
   --input-bg: var(--bg-elevated);
@@ -165,6 +168,16 @@
 
 .theme-btn-secondary:hover {
   background-color: var(--btn-secondary-hover);
+}
+
+.theme-btn-accent {
+  background-color: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+  border: none;
+}
+
+.theme-btn-accent:hover {
+  background-color: var(--btn-accent-hover);
 }
 
 .theme-input {

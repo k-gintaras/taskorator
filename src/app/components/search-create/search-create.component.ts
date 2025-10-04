@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, HostListener, ElementRef } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -41,13 +41,15 @@ export class SearchCreateComponent {
   selectedOverlord: UiTask | null = this.taskTransmutationService.toUiTask(
     getRootTaskObject()
   );
+  isDropdownOpen = false;
 
   constructor(
     private taskupdateService: TaskUpdateService,
     private selectedOverlordService: SelectedOverlordService,
     private taskSearchService: SearchTasksService,
     private router: Router,
-    private taskTransmutationService: TaskTransmutationService
+    private taskTransmutationService: TaskTransmutationService,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -64,7 +66,10 @@ export class SearchCreateComponent {
           return []; // Return empty array for empty input
         })
       )
-      .subscribe((tasks) => (this.searchResults = tasks));
+      .subscribe((tasks) => {
+        this.searchResults = tasks;
+        this.isDropdownOpen = tasks.length > 0;
+      });
 
     // Watch for selected overlord changes
     this.selectedOverlordService
@@ -79,6 +84,19 @@ export class SearchCreateComponent {
   onSelectTask(taskId: string): void {
     this.router.navigate(['/tasks', taskId]);
     this.resetState();
+  }
+
+  onInputFocus(): void {
+    if (this.searchResults.length > 0) {
+      this.isDropdownOpen = true;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isDropdownOpen = false;
+    }
   }
 
   onCreateTask(taskName: string): void {
@@ -132,6 +150,7 @@ export class SearchCreateComponent {
   private resetState(): void {
     this.searchControl.reset();
     this.searchResults = [];
+    this.isDropdownOpen = false;
   }
 
   goToSelectedTask() {}

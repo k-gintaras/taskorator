@@ -14,7 +14,7 @@ export class TaskListCoordinatorService {
     private taskListSimple: TaskListSimpleService,
     private taskListRules: TaskListRulesService,
     private taskDecorator: TaskUiDecoratorService,
-    private taskUsageService: TaskUsageService
+    private taskUsageService: TaskUsageService,
   ) {}
 
   async getTasks(taskListKey: TaskListKey): Promise<UiTask[]> {

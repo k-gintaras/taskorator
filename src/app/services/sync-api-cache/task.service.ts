@@ -16,7 +16,6 @@ export class TaskService {
   apiService: ApiStrategy | null = null;
   initialize(apiStrategy: ApiStrategy): void {
     this.apiService = apiStrategy;
-    console.log('TaskService initialized with API strategy');
   }
 
   constructor(
@@ -71,13 +70,9 @@ export class TaskService {
         throw new Error('TaskService api not initialized');
       }
       task.lastUpdated = Date.now();
-      console.log('TASK BEFORE API update', task);
       await this.apiService.updateTask(task);
 
       const extendedTask = this.transmutatorService.toUiTask(task);
-      console.log('TRANSFORMED to UiTask', extendedTask);
-
-      console.log('Updating extendedTask:', extendedTask);
 
       if (task.stage === 'deleted') {
         this.taskCache.removeTask(extendedTask);
@@ -116,7 +111,7 @@ export class TaskService {
         this.eventBusService.getTaskById(extendedTask);
         return extendedTask;
       } else {
-        console.log(`Task ${taskId} not found`);
+        // Task not found
       }
       return null;
     } catch (error) {

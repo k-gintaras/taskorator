@@ -1,20 +1,60 @@
-<div class="notification-container" (click)="toggleFeedbackView()">
-  <!-- App title when no feedback -->
+<div
+  class="flex items-center justify-center w-full h-full cursor-pointer"
+  [class.opacity-80]="hasSelectedTasks() && !feedbackUpdated"
+  (click)="onNotificationClick()"
+>
+  <!-- App title or Selected Tasks title when no feedback -->
   @if (!feedbackUpdated) {
-    <h1 class="app-title">
-      {{ appTitle }}
+    <h1 class="theme-text-primary text-xl font-semibold text-center">
+      {{ getNotificationTitle() }}
     </h1>
   }
 
   <!-- Feedback message for larger screens -->
   @if (message && feedbackUpdated) {
-    <div class="feedback-message">
-      {{ message }}
+    <div class="theme-text-primary text-sm text-center px-2 py-1 rounded"
+         style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+      {{ getTruncatedMessage() }}
     </div>
   }
 
-  <!-- Blinker for smaller screens -->
+  <!-- Blinker/Indicator for smaller screens -->
   @if (feedbackUpdated) {
-    <div class="blinker"></div>
+    <div class="w-3 h-3 rounded-full animate-pulse" 
+         style="background-color: var(--error);"></div>
+  }
+
+  <!-- Selected tasks indicator for smaller screens -->
+  @if (hasSelectedTasks() && !feedbackUpdated) {
+    <div class="flex items-center justify-center" (click)="onNotificationClick()">
+      <mat-icon class="text-white opacity-90 hover:opacity-100 transition-opacity">check_box</mat-icon>
+    </div>
+  }
+
+  <!-- Status indicator (authentication/offline status) -->
+  @if (statusState$ | async; as status) {
+    @if (showStatus$ | async; as showStatus) {
+      @if (shouldShowStatus(showStatus)) {
+        <div class="status-indicator flex items-center justify-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all duration-300"
+             [style.background-color]="getStatusColor(status.color) + '20'"
+             [style.border]="'1px solid ' + getStatusColor(status.color)"
+             (click)="toggleStatusIndicator()">
+          
+          <!-- Status icon -->
+          <mat-icon 
+            class="text-sm status-icon transition-colors duration-300"
+            [style.color]="getStatusColor(status.color)">
+            {{ status.icon }}
+          </mat-icon>
+          
+          <!-- Status message for larger screens -->
+          <span 
+            class="status-message text-xs font-medium transition-colors duration-300 hidden sm:inline"
+            [style.color]="getStatusColor(status.color)">
+            {{ status.message }}
+          </span>
+        </div>
+      }
+    }
   }
 </div>

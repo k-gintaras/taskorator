@@ -5,6 +5,7 @@ import { SearchOverlordComponent } from '../../../components/search-overlord/sea
 import { SelectedMultipleComponent } from './selected-multiple/selected-multiple.component';
 import { InputToTasksComponent } from './input-to-tasks/input-to-tasks/input-to-tasks.component';
 import { AppRouteMap } from '../../../app.routes-models';
+import { OverlordNavigatorComponent } from '../../../components/overlord-navigator/overlord-navigator.component';
 
 // 'Task Group Actions';
 // 'Task Refinement';
@@ -27,8 +28,8 @@ const routes: Routes = [
         component: SelectedMultipleComponent, // Replace with your actual component
       },
       {
-        path: 'searchOverlord',
-        component: SearchOverlordComponent, // Replace with your actual component
+        path: 'search_overlord',
+        component: OverlordNavigatorComponent, // Replace with your actual component
       },
       {
         path: 'massAdd',
@@ -45,7 +46,7 @@ export const crucibleRouteMetadata: AppRouteMap = {
     description: 'Manage selected tasks.',
     altName: '',
   },
-  searchOverlord: {
+  search_overlord: {
     title: 'Search Overlord',
     icon: 'template', // Replace with the appropriate icon
     description: 'Search overlord.',

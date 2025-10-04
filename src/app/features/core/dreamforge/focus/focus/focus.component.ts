@@ -6,30 +6,34 @@ import {
 } from '../../../../../models/settings';
 import { TaskTree } from '../../../../../models/taskTree';
 import { SettingsService } from '../../../../../services/sync-api-cache/settings.service';
-import { TaskoratorTask } from '../../../../../models/taskModelManager';
+import { TaskoratorTask, UiTask } from '../../../../../models/taskModelManager';
 import { StagedTaskListComponent } from '../../../../../components/task/staged-task-list/staged-task-list.component';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TaskUiInteractionService } from '../../../../../services/tasks/task-list/task-ui-interaction.service';
-import { TaskListService } from '../../../../../services/sync-api-cache/task-list.service';
-import { SelectedMultipleComponent } from '../../../crucible/selected-multiple/selected-multiple.component';
+import { TaskListCoordinatorService } from '../../../../../services/tasks/task-list/task-list-coordinator.service';
+import { TaskListKey, TaskListType, TaskListSubtype } from '../../../../../models/task-list-model';
+import { TaskIdCacheService } from '../../../../../services/cache/task-id-cache.service';
+import { getIdFromKey } from '../../../../../models/task-list-model';
 
 @Component({
   selector: 'app-focus',
   standalone: true,
-  imports: [StagedTaskListComponent, MatIcon, SelectedMultipleComponent],
+  imports: [StagedTaskListComponent, MatIcon, MatTooltip],
   templateUrl: './focus.component.html',
   styleUrls: ['./focus.component.scss'],
 })
 export class FocusComponent implements OnInit {
   settings: TaskSettings = getDefaultTaskSettings();
   tree?: TaskTree;
-  tasks: TaskoratorTask[] = [];
-  selectedTasks: TaskoratorTask[] = [];
+  tasks: UiTask[] = [];
+  selectedTasks: UiTask[] = [];
 
   constructor(
     private settingsService: SettingsService,
-    private taskListService: TaskListService,
-    private taskUiInteractionService: TaskUiInteractionService
+    private taskListCoordinator: TaskListCoordinatorService,
+    private taskUiInteractionService: TaskUiInteractionService,
+    private taskIdCache: TaskIdCacheService
   ) {}
 
   ngOnInit(): void {
@@ -38,26 +42,42 @@ export class FocusComponent implements OnInit {
       this.settings = s;
       this.loadFocusTasks();
     });
-    this.selectedTasks = this.getSelectedTasksSync();
+    this.loadSelectedTasks();
   }
 
-  private getSelectedTasksSync(): TaskoratorTask[] {
+  private async loadSelectedTasks(): Promise<void> {
     const selectedIds = this.taskUiInteractionService.getSelectedTaskIds();
-    // You may map IDs to full tasks if you have local cache; else return empty
-    return [];
+    this.selectedTasks = await this.taskListCoordinator.getTasksByIds(selectedIds);
   }
 
   updateTasks(updatedTasks: TaskoratorTask[]): void {
-    this.tasks = updatedTasks;
+    this.tasks = updatedTasks as UiTask[];
+  }
+
+  onFocusTasksChange(updatedTasks: TaskoratorTask[]): void {
+    this.tasks = updatedTasks as UiTask[];
+    // Auto-save when focus tasks are modified
+    this.settings.focusTaskIds = this.tasks.map((t) => t.taskId);
+    this.settingsService.updateSettings(this.settings);
+    // Update cache
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FOCUS,
+      data: TaskListSubtype.SETTINGS,
+    };
+    const groupName = getIdFromKey(taskListKey);
+    // Clear the existing group
+    const cacheState = this.taskIdCache.getListCacheState(groupName);
+    if (cacheState) {
+      for (const task of cacheState.tasksWithData) {
+        this.taskIdCache.removeTaskFromGroup(groupName, task.taskId);
+      }
+    }
+    // Create new group with updated tasks
+    this.taskIdCache.createNewGroup(updatedTasks as UiTask[], groupName);
   }
 
   updateSelectedTasks(updatedTasks: TaskoratorTask[]): void {
-    this.selectedTasks = updatedTasks;
-  }
-
-  save(): void {
-    this.settings.focusTaskIds = this.tasks.map((t) => t.taskId);
-    this.settingsService.updateSettings(this.settings);
+    this.selectedTasks = updatedTasks as UiTask[];
   }
 
   add(): void {
@@ -71,6 +91,10 @@ export class FocusComponent implements OnInit {
   }
 
   async loadFocusTasks(): Promise<void> {
-    this.tasks = (await this.taskListService.getFocusTasks()) || [];
+    const taskListKey: TaskListKey = {
+      type: TaskListType.FOCUS,
+      data: TaskListSubtype.SETTINGS,
+    };
+    this.tasks = (await this.taskListCoordinator.getTasks(taskListKey)) || [];
   }
 }

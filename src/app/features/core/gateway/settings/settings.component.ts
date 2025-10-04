@@ -120,6 +120,12 @@ export class SettingsComponent implements OnInit {
       if (settings) {
         this.isInitializingForm = true;
         this.currentSettings = settings;
+
+        // Console log focus, frog, and favorite tasks
+        console.log('Focus Tasks:', settings.focusTaskIds);
+        console.log('Frog Tasks:', settings.frogTaskIds);
+        console.log('Favorite Tasks:', settings.favoriteTaskIds);
+
         // Patch form with loaded settings
         this.settingsForm.patchValue({
           isShowArchived: settings.isShowArchived,

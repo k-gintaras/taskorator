@@ -1,22 +1,62 @@
-<div class="overlord-navigator-container">
-  <!-- Overlord Name with Icon -->
-  <div class="overlord-title">
-    <!-- <mat-icon class="overlord-icon">account_tree</mat-icon> -->
-    <span class="overlord-name">{{ selectedList?.title }}</span>
-    <span class="overlord-name">/</span>
-    <span class="overlord-name">{{ selectedOverlord?.name }}</span>
+<div class="relative w-full max-w-sm">
+  <!-- Selected Overlord Display -->
+  <div class="mb-2 text-sm text-white/70">
+    Current Overlord: <span class="text-white font-medium">{{ selectedOverlord?.name || 'None' }}</span>
   </div>
 
-  <!-- Navigation Buttons -->
-  <div class="overlord-navigator">
-    <button mat-icon-button class="task-btn" (click)="goToSuperParent()">
-      <mat-icon>arrow_upward</mat-icon>
-    </button>
-    <button mat-icon-button class="task-btn" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <button mat-icon-button class="task-btn" (click)="goToRoot()">
-      <mat-icon>home</mat-icon>
-    </button>
+  <!-- Input row with buttons -->
+  <div class="flex items-center gap-2">
+    <!-- Input field -->
+    <div class="relative flex-1">
+      <input
+        type="text"
+        [formControl]="searchControl"
+        [placeholder]="'Search overlords...'"
+        class="w-full h-10 px-3 text-sm text-white placeholder-white/70 bg-white/10 border border-white/20 rounded-lg focus:border-white/50 focus:bg-white/20 focus:outline-none transition-all duration-200"
+        (click)="$event.stopPropagation()"
+        (focus)="onInputFocus()"
+        />
+      </div>
+
+      <!-- Clear button -->
+      <button
+        type="button"
+        (click)="clearInput()"
+        class="flex items-center justify-center w-10 h-10 text-white/60 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
+        aria-label="Clear"
+        >
+        <mat-icon class="text-base">close</mat-icon>
+      </button>
+
+      <!-- Back button (when enabled) -->
+      @if (isEnabledBack) {
+        <button
+          type="button"
+          (click)="goBack()"
+          class="flex items-center justify-center w-10 h-10 text-white/90 bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 hover:text-white hover:border-white/40 transition-all duration-200"
+          aria-label="Go Back"
+          >
+          <mat-icon class="text-base">arrow_back</mat-icon>
+        </button>
+      }
+    </div>
+
+    <!-- Search results dropdown -->
+      @if (isDropdownOpen && searchResults.length) {
+      <div
+        class="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
+        (click)="$event.stopPropagation()"
+        >
+        @for (task of searchResults; track task) {
+          <div
+            (click)="onSelectTask(task.taskId)"
+            [class.bg-purple-600]="task.taskId === selectedOverlord?.taskId"
+            [class.text-white]="task.taskId === selectedOverlord?.taskId"
+            class="px-4 py-3 text-sm text-gray-100 cursor-pointer hover:bg-gray-700 border-b border-gray-600 last:border-b-0 transition-colors duration-150"
+            >
+            {{ task.name }}
+          </div>
+        }
+      </div>
+    }
   </div>
-</div>

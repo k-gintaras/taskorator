@@ -1,12 +1,27 @@
-/* Navigation Buttons */
+/* Overlord Navigator Component - Tailwind Implementation */
+/* Minimal SCSS - using Tailwind classes in template */
 
-// /* Search Overlord Component */
-// app-search-overlord {
-//   flex-grow: 1;
-//   max-width: 400px;
-//   min-width: 200px;
+/* Only custom styles needed for specific overrides if any */
+:host {
+  display: block;
+  width: 100%;
+}
 
-//   @media (max-width: 600px) {
-//     width: 100%;
-//   }
-// }
+/* Ensure proper scrollbar styling for search results */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

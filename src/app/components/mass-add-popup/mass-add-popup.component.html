@@ -1,4 +1,4 @@
-<h2 mat-dialog-title class="dialog-title">Mass Add</h2>
+<h2 mat-dialog-title class="dialog-title theme-text-primary">Mass Add</h2>
 <!-- <mat-dialog-title>Edit Task</mat-dialog-title> -->
 <mat-dialog-content>
   <app-input-to-tasks [overlord]="overlord"></app-input-to-tasks>
@@ -6,9 +6,7 @@
 <mat-dialog-actions>
   <button
     mat-icon-button
-    color="primary"
-    style="color: rgb(15, 177, 75)"
-    class="task-btn"
+    class="theme-btn-primary w-10 h-10 rounded-lg flex items-center justify-center"
     (click)="onSave()"
     aria-label="Save Task"
   >

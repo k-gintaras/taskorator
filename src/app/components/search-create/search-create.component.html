@@ -8,6 +8,8 @@
         [formControl]="searchControl"
         [placeholder]="selectedOverlord?.name || 'Search or Create'"
         class="w-full h-10 px-3 text-sm text-white placeholder-white/70 bg-white/10 border border-white/20 rounded-lg focus:border-white/50 focus:bg-white/20 focus:outline-none transition-all duration-200"
+        (click)="$event.stopPropagation()"
+        (focus)="onInputFocus()"
         />
       </div>
 
@@ -45,9 +47,10 @@
     </div>
 
     <!-- Search results dropdown -->
-      @if (searchResults.length) {
+      @if (isDropdownOpen && searchResults.length) {
       <div
         class="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
+        (click)="$event.stopPropagation()"
         >
         @for (task of searchResults; track task) {
           <div

@@ -1,0 +1,21 @@
+/* Staged Task List - Compact Layout */
+
+/* Compact task cards on small screens */
+@media (max-width: 640px) {
+  .space-y-2 > * + * {
+    margin-top: 0.5rem; /* Slightly more breathing room */
+  }
+  
+  /* Make task cards compact but not cramped */
+  [class*="bg-base-200"] {
+    padding: 0.625rem !important; /* 10px - better balance */
+  }
+  
+  /* Maintain reasonable button sizes on mobile */
+  @media (max-width: 480px) {
+    .w-9 {
+      width: 2rem !important; /* 32px - good touch target */
+      height: 2rem !important;
+    }
+  }
+}

@@ -1,108 +1,181 @@
-<div class="task-importer">
-  <h2>Mass Add Tasks</h2>
+<!-- Mass Add Tasks - Pure Tailwind + Design System -->
+<div class="theme-content p-4 md:p-6 min-h-screen">
 
   <!-- Input Section -->
-  <div class="input-section">
-    <!-- Text Input -->
-    <mat-form-field appearance="outline" class="full-width">
-      <textarea
-        matInput
-        [(ngModel)]="inputText"
-        placeholder="Enter tasks (CSV, JSON, list, or code)"
-        (input)="onInputChange()"
-        rows="1"
-      ></textarea>
-    </mat-form-field>
-
-    <!-- Input Action Buttons -->
-    <div class="input-actions">
-      <button
-        mat-icon-button
-        class="task-btn"
-        color="primary"
-        (click)="parseTasks()"
-        aria-label="Parse Tasks"
-      >
-        <mat-icon>check</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        class="task-btn"
-        color="warn"
-        (click)="clearInput()"
-        aria-label="Clear Input"
-      >
-        <mat-icon>clear</mat-icon>
-      </button>
-    </div>
-
-    <!-- Toggles -->
-    <div class="toggles">
-      <mat-slide-toggle
-        [(ngModel)]="isAutoParse"
-        color="primary"
-        aria-label="Auto-Parse"
-      >
-        Auto-Parse
-      </mat-slide-toggle>
-      <mat-slide-toggle
-        [(ngModel)]="isFunctionsWithTypes"
-        color="primary"
-        aria-label="With Function Types"
-      >
-        With Function Types
-      </mat-slide-toggle>
-      <mat-slide-toggle
-        [(ngModel)]="isLongNamesShortened"
-        color="primary"
-        aria-label="Shorten Names"
-      >
-        Names Shortened
-      </mat-slide-toggle>
-      <mat-slide-toggle
-        [(ngModel)]="isFilterUniques"
-        color="primary"
-        aria-label="Filter Uniques"
-      >
-        Filter Uniques
-      </mat-slide-toggle>
-    </div>
-  </div>
-
-  <!-- Task Summary -->
-
-  <div class="summary">
-    <div>
-      <p>
-        <strong>Input Type:</strong> {{ taskSummary.inputType || "Unknown" }}
+  <div class="theme-card p-6 mb-6">
+    <div class="mb-4">
+      <h2 class="card-title theme-text-primary flex items-center gap-2 mb-2">
+        <mat-icon>add_task</mat-icon>
+        Mass Add Tasks
+      </h2>
+      <p class="text-sm theme-text-secondary mb-4">
+        "Bulk task creation" - Enter tasks in various formats to create multiple tasks at once
       </p>
     </div>
-    <div>
-      <p><strong>Total Tasks:</strong> {{ taskSummary.taskCount }}</p>
-      <p><strong>Unique Tasks:</strong> {{ taskSummary.uniqueTaskCount }}</p>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="theme-text-secondary text-sm font-medium flex items-center gap-2 mb-2">
+          <mat-icon class="text-sm" style="color: var(--purple-light);">description</mat-icon>
+          Enter your tasks below
+        </label>
+        <textarea 
+          class="w-full p-3 rounded-lg border text-sm leading-relaxed resize-y"
+          style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"
+          [(ngModel)]="inputText"
+          placeholder="Paste your tasks here...&#10;&#10;Supported formats:&#10;• Line-separated list&#10;• CSV format&#10;• JSON array&#10;• Code functions&#10;&#10;Example:&#10;Task 1&#10;Task 2&#10;Task 3"
+          (input)="onInputChange()"
+          rows="6"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button
+          class="theme-nav-item w-10 h-10 rounded-lg flex items-center justify-center"
+          (click)="parseTasks()"
+          aria-label="Parse Tasks"
+        >
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button
+          class="theme-nav-item w-10 h-10 rounded-lg flex items-center justify-center"
+          (click)="clearInput()"
+          aria-label="Clear Input"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
-  <p>
-    <strong>Target:</strong>
-    <span class="overlord">{{ selectedOverlord?.name || "Unknown" }}</span>
-  </p>
 
-  <!-- Staged Task List -->
-  <div class="task-list">
+  <!-- Processing Options -->
+  <div class="theme-card p-6 mb-6">
+    <div class="flex items-center gap-2 mb-4">
+      <mat-icon style="color: var(--purple-primary);">tune</mat-icon>
+      <h3 class="theme-text-primary text-lg font-medium">Processing Options</h3>
+    </div>
+    
+    <div class="space-y-3">
+      <h3 class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-4">Import Settings</h3>
+
+      <!-- Toggles using Settings Pattern -->
+      <label class="flex items-center gap-4 p-3 rounded-lg cursor-pointer hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-5 transition-colors">
+        <input type="checkbox" [(ngModel)]="isAutoParse" class="sr-only" />
+        <div class="relative w-11 h-6 rounded-full transition-colors" 
+             [style.background-color]="isAutoParse ? 'var(--purple-primary)' : 'var(--bg-elevated)'"
+             [style.border]="'1px solid ' + (isAutoParse ? 'var(--purple-primary)' : 'var(--border)')">
+          <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
+               [style.background-color]="isAutoParse ? 'white' : 'var(--text-primary)'"
+               [style.transform]="isAutoParse ? 'translateX(20px)' : 'translateX(0)'">
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-1">
+          <mat-icon class="text-lg" style="color: var(--purple-light);">auto_mode</mat-icon>
+          <span class="theme-text-secondary">Auto-Parse</span>
+        </div>
+      </label>
+
+      <label class="flex items-center gap-4 p-3 rounded-lg cursor-pointer hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-5 transition-colors">
+        <input type="checkbox" [(ngModel)]="isFunctionsWithTypes" class="sr-only" />
+        <div class="relative w-11 h-6 rounded-full transition-colors" 
+             [style.background-color]="isFunctionsWithTypes ? 'var(--purple-primary)' : 'var(--bg-elevated)'"
+             [style.border]="'1px solid ' + (isFunctionsWithTypes ? 'var(--purple-primary)' : 'var(--border)')">
+          <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
+               [style.background-color]="isFunctionsWithTypes ? 'white' : 'var(--text-primary)'"
+               [style.transform]="isFunctionsWithTypes ? 'translateX(20px)' : 'translateX(0)'">
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-1">
+          <mat-icon class="text-lg" style="color: var(--purple-light);">code</mat-icon>
+          <span class="theme-text-secondary">Function Types</span>
+        </div>
+      </label>
+
+      <label class="flex items-center gap-4 p-3 rounded-lg cursor-pointer hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-5 transition-colors">
+        <input type="checkbox" [(ngModel)]="isLongNamesShortened" class="sr-only" />
+        <div class="relative w-11 h-6 rounded-full transition-colors" 
+             [style.background-color]="isLongNamesShortened ? 'var(--purple-primary)' : 'var(--bg-elevated)'"
+             [style.border]="'1px solid ' + (isLongNamesShortened ? 'var(--purple-primary)' : 'var(--border)')">
+          <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
+               [style.background-color]="isLongNamesShortened ? 'white' : 'var(--text-primary)'"
+               [style.transform]="isLongNamesShortened ? 'translateX(20px)' : 'translateX(0)'">
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-1">
+          <mat-icon class="text-lg" style="color: var(--purple-light);">short_text</mat-icon>
+          <span class="theme-text-secondary">Short Names</span>
+        </div>
+      </label>
+
+      <label class="flex items-center gap-4 p-3 rounded-lg cursor-pointer hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-5 transition-colors">
+        <input type="checkbox" [(ngModel)]="isFilterUniques" class="sr-only" />
+        <div class="relative w-11 h-6 rounded-full transition-colors" 
+             [style.background-color]="isFilterUniques ? 'var(--purple-primary)' : 'var(--bg-elevated)'"
+             [style.border]="'1px solid ' + (isFilterUniques ? 'var(--purple-primary)' : 'var(--border)')">
+          <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
+               [style.background-color]="isFilterUniques ? 'white' : 'var(--text-primary)'"
+               [style.transform]="isFilterUniques ? 'translateX(20px)' : 'translateX(0)'">
+          </div>
+        </div>
+        <div class="flex items-center gap-3 flex-1">
+          <mat-icon class="text-lg" style="color: var(--purple-light);">filter_list</mat-icon>
+          <span class="theme-text-secondary">Filter Unique</span>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="theme-card p-6 mb-6">
+    <div class="flex items-center gap-2 mb-4">
+      <mat-icon style="color: var(--purple-primary);">analytics</mat-icon>
+      <h3 class="theme-text-primary text-lg font-medium">Task Summary</h3>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Input Type</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ taskSummary.inputType || "Unknown" }}</div>
+      </div>
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Total Tasks</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ taskSummary.taskCount }}</div>
+      </div>
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Unique Tasks</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ taskSummary.uniqueTaskCount }}</div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 p-4 rounded-lg" style="background: var(--bg-elevated); border: 1px solid var(--border);">
+      <mat-icon class="text-xl" style="color: var(--purple-light);">target</mat-icon>
+      <div class="flex-1">
+        <div class="theme-text-muted text-xs font-medium mb-2">Target Overlord</div>
+        <app-overlord-navigator></app-overlord-navigator>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Section -->
+  <div class="theme-card p-6 mb-6">
+    <div class="flex items-center gap-2 mb-4">
+      <mat-icon style="color: var(--purple-primary);">preview</mat-icon>
+      <h3 class="theme-text-primary text-lg font-medium">Task Preview</h3>
+    </div>
+    
     <app-staged-task-list [tasks]="tasks" (tasksChange)="updateTasks($event)">
     </app-staged-task-list>
   </div>
 
   <!-- Save Button -->
-  <div class="action-buttons">
+  <div class="flex justify-center">
     <button
-      mat-raised-button
-      color="primary"
+      class="theme-btn-primary flex items-center gap-2 px-8 py-3 min-w-48"
       (click)="importTasks()"
       [disabled]="tasks.length === 0"
     >
       <mat-icon>save</mat-icon>
-      Save Tasks
+      Save Tasks ({{ tasks.length }})
     </button>
   </div>
 </div>

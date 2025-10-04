@@ -1,58 +1,65 @@
-.notification-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
+/* Notification Component - DSC Compliant (Minimal SCSS) */
 
-  .app-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    animation: fadeIn 0.5s ease-in-out;
+/* Small screen responsive behavior */
+@media (max-width: 600px) {
+  h1 {
+    display: none;
   }
-
-  .feedback-message {
-    font-size: 1.2rem;
-    font-weight: normal;
-    color: #ff5722;
-    animation: fadeIn 0.5s ease-in-out;
-    display: block; /* Default for large screens */
+  
+  .theme-text-primary {
+    display: none;
   }
-
-  .blinker {
-    width: 12px;
-    height: 12px;
-    background-color: #ff5722;
-    border-radius: 50%;
-    animation: blinker 1.5s infinite;
-    display: none; /* Hidden by default */
-  }
-
-  @media (max-width: 600px) {
-    .app-title {
-      display: none; /* Hide feedback message on small screens */
-    }
-    .feedback-message {
-      display: none; /* Hide feedback message on small screens */
-    }
-
-    .blinker {
-      display: inline-block; /* Show blinker on small screens */
-    }
+  
+  /* Show only indicators on small screens */
+  [class*="w-3"], [class*="check_box"] {
+    display: flex !important;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+/* Only custom animation that Tailwind can't do */
+@keyframes pulse-error {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-pulse {
+  animation: pulse-error 1.5s infinite;
+}
+
+/* Status indicator styles */
+.status-indicator {
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  max-width: 200px;
+  
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  to {
-    opacity: 1;
+  
+  .status-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .status-message {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
   }
 }
 
-@keyframes blinker {
-  50% {
-    opacity: 0.5;
+/* Responsive behavior for status indicator */
+@media (max-width: 600px) {
+  .status-indicator {
+    .status-message {
+      display: none !important;
+    }
+    
+    padding: 0.5rem;
+    min-width: 32px;
+    min-height: 32px;
   }
 }

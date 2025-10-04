@@ -18,7 +18,6 @@ export class TaskBatchService {
 
   initialize(apiStrategy: ApiStrategy): void {
     this.apiService = apiStrategy;
-    console.log('TaskService initialized with API strategy');
   }
 
   private ensureApiService(): ApiStrategy {

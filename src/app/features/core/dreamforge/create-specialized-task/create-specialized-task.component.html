@@ -1,6 +1,6 @@
 <div class="theme-content p-6">
   <div class="theme-card p-6 max-w-md mx-auto">
-    <h2 class="theme-text-primary text-xl font-semibold mb-6">Create Repetitive Task</h2>
+    <h2 class="theme-text-primary text-xl font-semibold mb-6">Create Specialized Task</h2>
 
     <form #taskForm="ngForm" (ngSubmit)="saveTask()" class="space-y-4">
       <!-- Task Name -->
@@ -17,19 +17,19 @@
         />
       </div>
 
-      <!-- Repetition -->
+      <!-- Task Type -->
       <div class="form-control">
-        <label class="theme-text-muted text-sm mb-2 block">Repeat</label>
+        <label class="theme-text-muted text-sm mb-2 block">Task Type</label>
         <select
           class="w-full rounded-md"
           style="background:var(--input-bg);border:1px solid var(--input-border);color:var(--text-primary);padding:.6rem .8rem;outline:none;box-shadow:none"
-          [(ngModel)]="task.repeat"
-          name="repeat"
+          [(ngModel)]="task.type"
+          name="type"
           required
         >
-          @for (option of repeatOptions; track option) {
-            <option [value]="option">
-              {{ option }}
+          @for (taskType of taskTypes; track taskType) {
+            <option [value]="taskType">
+              {{ taskType }}
             </option>
           }
         </select>
