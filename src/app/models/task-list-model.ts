@@ -27,7 +27,8 @@ export enum TaskListType {
   SELECTED = 'selected', // For selected tasks
   TASKORATOR = 'taskorator', // For Taskorator picks
   MOST_VIEWED = 'mostViewed',
-  RECENTLY_VIEWED = "RECENTLY_VIEWED", // For most viewed tasks
+  RECENTLY_VIEWED = "recentlyViewed", // For most viewed tasks
+  SMART_PRIORITY = 'smartPriority', // Smart sorting based on priority and views
 }
 
 export enum TaskListSubtype {
@@ -82,23 +83,22 @@ export const defaultTaskLists: TaskListRules[] = [
     autoRefresh: false, // or true if you wire selectedTasksChanges$
   },
   {
-    id: 'selectedTasks',
-    title: 'Selected Tasks',
-    type: TaskListType.SELECTED, // or new type like CUSTOM if needed
-    description: 'Tasks currently selected by the user',
+    id: 'smartPriority',
+    title: 'Smart Priority Tasks',
+    type: TaskListType.SMART_PRIORITY,
+    description: 'Tasks sorted intelligently: high priority (>5) by priority then views, low priority (≤5) by views then priority',
     rules: {
-      filter: (task) => true, // Placeholder: logic for selection across groups
-      // filter: (task) => task.isSelected,
-      sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
+      filter: (task) => task.stage === 'todo' && task.taskId !== ROOT_TASK_ID,
+      sorter: smartPrioritySorter,
       permissions: {
-        canAdd: false,
+        canAdd: true,
         canMove: true,
         canDelete: true,
         canComplete: true,
       },
     },
     parent: '',
-    autoRefresh: false, // or true if you wire selectedTasksChanges$
+    autoRefresh: true,
   },
 
   {
@@ -313,7 +313,8 @@ export const defaultTaskLists: TaskListRules[] = [
     description: 'Tasks associated with a specific overlord',
     rules: {
       filter: (task) => task.stage === 'todo' && task.taskId !== ROOT_TASK_ID, // Filter tasks that have an overlord
-      sorter: (a, b) => (b.priority || 0) - (a.priority || 0), // Most recent first
+      sorter: smartPrioritySorter, // Most recent first
+      // sorter: (a, b) => (b.priority || 0) - (a.priority || 0), // Most recent first
       permissions: {
         canAdd: true,
         canMove: true,
@@ -358,6 +359,40 @@ function filterTasks(
       task.lastUpdated < startTime || task.lastUpdated >= endTime;
     return isOutsideCurrentPeriod;
   });
+}
+
+/**
+ * Smart sorting function that balances priority and views.
+ * - Tasks with priority > 5 (manually set) are prioritized by priority first, then views
+ * - Tasks with priority <= 5 (default/low) are prioritized by views first, then priority
+ * This helps surface both important tasks and frequently accessed tasks appropriately.
+ */
+export function smartPrioritySorter(a: UiTask, b: UiTask): number {
+  const aPriority = a.priority || 0;
+  const bPriority = b.priority || 0;
+  const aViews = a.views || 0;
+  const bViews = b.views || 0;
+
+  const aIsHighPriority = aPriority > 5;
+  const bIsHighPriority = bPriority > 5;
+
+  // If both are in the same priority category, sort within category
+  if (aIsHighPriority === bIsHighPriority) {
+    if (aIsHighPriority) {
+      // Both high priority: sort by priority desc, then views desc
+      const priorityDiff = bPriority - aPriority;
+      if (priorityDiff !== 0) return priorityDiff;
+      return bViews - aViews;
+    } else {
+      // Both low priority: sort by views desc, then priority desc
+      const viewsDiff = bViews - aViews;
+      if (viewsDiff !== 0) return viewsDiff;
+      return bPriority - aPriority;
+    }
+  } else {
+    // Different categories: high priority tasks come first
+    return aIsHighPriority ? -1 : 1;
+  }
 }
 
 function calculatePeriodTimes(repeatInterval: string): {

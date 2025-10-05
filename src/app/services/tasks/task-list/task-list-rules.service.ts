@@ -3,6 +3,7 @@ import {
   TaskListRules,
   defaultTaskLists,
   TaskListKey,
+  smartPrioritySorter,
 } from '../../../models/task-list-model';
 import { UiTask } from '../../../models/taskModelManager';
 

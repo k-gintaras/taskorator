@@ -102,6 +102,7 @@ export class TaskListRouterService {
       [TaskListType.TASKORATOR]: '',
       [TaskListType.MOST_VIEWED]: '',
       [TaskListType.RECENTLY_VIEWED]: '',
+      [TaskListType.SMART_PRIORITY]: '',
     };
   }
 
