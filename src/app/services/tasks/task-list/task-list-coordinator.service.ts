@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { UiTask } from '../../../models/taskModelManager';
 import { TaskListRulesService } from './task-list-rules.service';
 import { TaskListSimpleService } from './task-list-simple.service';
 import { TaskUiDecoratorService } from './task-ui-decorator.service';
 import { TaskUsageService } from '../task-usage.service';
+import { TaskoratorListService } from '../taskorator-list.service';
+import { TreeService } from '../../sync-api-cache/tree.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +18,8 @@ export class TaskListCoordinatorService {
     private taskListRules: TaskListRulesService,
     private taskDecorator: TaskUiDecoratorService,
     private taskUsageService: TaskUsageService,
+    private taskoratorListService: TaskoratorListService,
+    private treeService: TreeService
   ) {}
 
   async getTasks(taskListKey: TaskListKey): Promise<UiTask[]> {
@@ -29,6 +34,10 @@ export class TaskListCoordinatorService {
 
     if (taskListKey.type === TaskListType.RECENTLY_VIEWED) {
       return this.getTasksByRecentlyViewed();
+    }
+
+    if (taskListKey.type === TaskListType.TASKORATOR) {
+      return this.getTasksByTaskorator();
     }
 
     const rawTasks = await this.taskListSimple.getTaskList(taskListKey);
@@ -93,6 +102,21 @@ export class TaskListCoordinatorService {
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       { type: TaskListType.RECENTLY_VIEWED, data: 'recentlyViewed' },
       decoratedTasks
+    );
+
+    return filteredSortedTasks;
+  }
+
+  async getTasksByTaskorator(): Promise<UiTask[]> {
+    const tree = await firstValueFrom(this.treeService.getTree());
+    if (!tree) return [];
+
+    const rawTasks = await this.taskoratorListService.generateSuperlist(tree);
+
+    // Apply rules for taskorator list (filtering and sorting)
+    const filteredSortedTasks = this.taskListRules.applyRulesToList(
+      { type: TaskListType.TASKORATOR, data: 'taskorator' },
+      rawTasks
     );
 
     return filteredSortedTasks;

@@ -1,5 +1,3 @@
-// src/app/services/sync-api-cache/tree.service.ts
-
 import { Injectable } from '@angular/core';
 import { TreeStrategy } from '../../models/service-strategies/tree-strategy.interface';
 import { TreeNodeService } from '../tree/tree-node.service';
@@ -7,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { getDefaultTree, TaskTree, TaskNodeInfo } from '../../models/taskTree';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
-import { ROOT_TASK_ID } from '../../models/taskModelManager';
+import { ROOT_TASK_ID, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
 
 @Injectable({
@@ -20,7 +18,8 @@ export class TreeService implements TreeStrategy {
 
   constructor(
     private cacheService: CacheOrchestratorService,
-    private treeNodeToolsService: TaskTreeNodeToolsService
+    private treeNodeToolsService: TaskTreeNodeToolsService,
+    private treeNodeService: TreeNodeService
   ) {}
 
   getFlattenedTree(tree: TaskTree) {
@@ -99,7 +98,91 @@ export class TreeService implements TreeStrategy {
     return this.treeSubject.getValue();
   }
 
-  // 🔥 NEW: Update local cache without API call
+  // 🔥 NEW: Add a single task to the tree structure
+  async addTaskToTree(task: TaskoratorTask): Promise<void> {
+    if (!this.apiService) {
+      throw new Error('API service not initialized.');
+    }
+
+    try {
+      let tree = this.getLatestTree();
+
+      if (!tree) {
+        await this.fetchTree();
+        tree = this.getLatestTree();
+      }
+
+      if (!tree) {
+        tree = getDefaultTree();
+      }
+
+      await this.treeNodeService.createTasks(tree, [task]);
+
+      await this.updateTree(tree);
+    } catch (error) {
+      console.error('Error adding task to tree:', error);
+    }
+  }
+
+  async ensureTasksInTree(tasks: TaskoratorTask[]): Promise<void> {
+    if (!tasks.length || !this.apiService) {
+      return;
+    }
+
+    try {
+      let tree = this.getLatestTree();
+
+      if (!tree) {
+        await this.fetchTree();
+        tree = this.getLatestTree();
+      }
+
+      if (!tree) {
+        tree = getDefaultTree();
+      }
+
+      const missing = tasks.filter((task) => {
+        const inTree = !!this.treeNodeToolsService.findNodeById(
+          tree!.primarch,
+          task.taskId
+        );
+        const inAbyss = tree!.abyss.some((node) => node.taskId === task.taskId);
+        return !inTree && !inAbyss;
+      });
+
+      if (!missing.length) {
+        return;
+      }
+
+      await this.treeNodeService.createTasks(tree, missing);
+      await this.updateTree(tree);
+    } catch (error) {
+      console.error('Error ensuring tasks are in tree:', error);
+    }
+  }
+
+  // 🔥 NEW: Rebuild tree from all tasks when structure changes
+  async rebuildTree(): Promise<void> {
+    if (!this.apiService) {
+      throw new Error('API service not initialized.');
+    }
+
+    try {
+      // Fetch fresh tree from API (which should rebuild it from all tasks)
+      const freshTree = await this.apiService.getTree();
+      if (freshTree) {
+        // Update local cache and notify subscribers
+        this.cacheService.updateTree(freshTree);
+        this.treeSubject.next(freshTree);
+      }
+    } catch (error) {
+      console.error('Error rebuilding tree:', error);
+      throw error;
+    }
+  }
+
+  // Update local cache without issuing an API call. Useful for optimistic
+  // local updates when we don't want to persist immediately.
   updateLocalTreeCache(taskTree: TaskTree): void {
     this.cacheService.updateTree(taskTree);
     this.treeSubject.next(taskTree);

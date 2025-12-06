@@ -8,6 +8,7 @@ import {
 } from '../task-action-tracker.service';
 import { TaskListCoordinatorService } from '../task-list/task-list-coordinator.service';
 import { TaskUiDecoratorService } from '../task-list/task-ui-decorator.service';
+import { TreeService } from '../../sync-api-cache/tree.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,15 +23,29 @@ export class TaskNavigatorDataService {
   constructor(
     private taskActionService: TaskActionTrackerService,
     private taskListCoordinator: TaskListCoordinatorService,
-    private taskUiDecorator: TaskUiDecoratorService
+    private taskUiDecorator: TaskUiDecoratorService,
+    private treeService: TreeService
   ) {
     this.taskActionService.lastAction$.subscribe((action) => {
       if (!action) return;
 
       // Always refresh on moved actions so lists that are currently showing
       // a parent update immediately when tasks are moved away.
+      // Also rebuild the tree structure since overlord relationships changed
       if (action.action === TaskActions.MOVED) {
         this.refreshCurrentTasks();
+        this.treeService.rebuildTree().catch(error => {
+          console.error('Failed to rebuild tree after move:', error);
+        });
+        return;
+      }
+
+      // Also rebuild tree on created actions since new tasks need to be added to tree
+      if (action.action === TaskActions.CREATED) {
+        this.refreshCurrentTasks();
+        this.treeService.rebuildTree().catch(error => {
+          console.error('Failed to rebuild tree after create:', error);
+        });
         return;
       }
 
@@ -62,17 +77,20 @@ export class TaskNavigatorDataService {
     if (!currentListKey) return;
 
     const tasks = await this.taskListCoordinator.getTasks(currentListKey);
+    await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
   }
 
   async refreshTasksForKey(listKey: TaskListKey): Promise<void> {
     const tasks = await this.taskListCoordinator.getTasks(listKey);
+    await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
   }
 
   async setTasksByKey(listKey: TaskListKey): Promise<void> {
     const tasks = await this.taskListCoordinator.getTasks(listKey);
+    await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
   }

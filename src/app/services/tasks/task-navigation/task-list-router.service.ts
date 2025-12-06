@@ -65,9 +65,11 @@ export class TaskListRouterService {
       [TaskListType.YEARLY]: 'yearlyTasks', // Add if needed
       [TaskListType.LATEST_UPDATED]: 'latestUpdated',
       [TaskListType.LATEST_CREATED]: 'latestCreated',
+      [TaskListType.OLDEST_CREATED]: 'oldestCreated',
       [TaskListType.FOCUS]: 'focusTasksList',
       [TaskListType.FROG]: 'frogTasks', // Add if needed
       [TaskListType.FAVORITE]: 'favorites', // Add if needed
+      [TaskListType.TASKORATOR]: 'taskorator',
       [TaskListType.SESSION]: 'session', // Add if needed
       [TaskListType.OVERLORD]: 'rootTasksList',
     };
@@ -90,6 +92,9 @@ export class TaskListRouterService {
       [TaskListType.LATEST_CREATED]: this.getRouteUrlByType(
         TaskListType.LATEST_CREATED
       ),
+      [TaskListType.OLDEST_CREATED]: this.getRouteUrlByType(
+        TaskListType.OLDEST_CREATED
+      ),
       [TaskListType.FOCUS]: this.getRouteUrlByType(TaskListType.FOCUS),
       [TaskListType.FROG]: this.getRouteUrlByType(TaskListType.FROG),
       [TaskListType.FAVORITE]: this.getRouteUrlByType(TaskListType.FAVORITE),
@@ -99,7 +104,7 @@ export class TaskListRouterService {
         TaskListType.SUPER_OVERLORD
       ),
       [TaskListType.SELECTED]: '', // todo: ADD NEW ROUTES
-      [TaskListType.TASKORATOR]: '',
+      [TaskListType.TASKORATOR]: this.getRouteUrlByType(TaskListType.TASKORATOR),
       [TaskListType.MOST_VIEWED]: '',
       [TaskListType.RECENTLY_VIEWED]: '',
       [TaskListType.SMART_PRIORITY]: '',
@@ -119,9 +124,11 @@ export class TaskListRouterService {
       yearlyTasks: TaskListType.YEARLY,
       latestUpdated: TaskListType.LATEST_UPDATED,
       latestCreated: TaskListType.LATEST_CREATED,
+      oldestCreated: TaskListType.OLDEST_CREATED,
       focusTasksList: TaskListType.FOCUS,
       frogTasks: TaskListType.FROG,
       favorites: TaskListType.FAVORITE,
+      taskorator: TaskListType.TASKORATOR,
       session: TaskListType.SESSION,
       rootTasksList: TaskListType.OVERLORD,
     };

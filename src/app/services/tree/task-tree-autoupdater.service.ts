@@ -49,9 +49,15 @@ export class TaskTreeAutoupdaterService {
       }
       // this is triggered even if TaskActions.VIEWED... BAD
 
-      if (this.isWorthUpdating(action.action)) {
-        this.queueUpdate();
-      }
+      // We currently auto-update the tree on actions, but the navigation
+      // and task-list code already ensure tasks are added into the tree
+      // (see TaskNavigatorDataService and TaskUpdateService). This double-repair
+      // caused redundant API calls. Commenting out the queueUpdate call so we
+      // don't automatically persist tree updates here. Keep the other handlers
+      // (updateTasks etc.) so the in-memory tree is consistent locally.
+      // if (this.isWorthUpdating(action.action)) {
+      //   this.queueUpdate();
+      // }
     });
   }
 

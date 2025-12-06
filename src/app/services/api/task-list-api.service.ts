@@ -107,6 +107,8 @@ export class TaskListApiService implements TaskListApiStrategy {
         return this.getLatestUpdatedTasks();
       case 'latestCreated':
         return this.getLatestCreatedTasks();
+      case 'oldestCreated':
+        return this.getOldestCreatedTasks();
       case 'overlord':
         return this.getOverlordTasks(taskListKey.data);
       case 'session':
@@ -224,6 +226,19 @@ export class TaskListApiService implements TaskListApiStrategy {
     return this.queryTasks(userId, [
       where('stage', '==', 'todo'),
       orderBy('timeCreated', 'desc'),
+      limit(this.TASK_LIST_LIMIT),
+    ]);
+  }
+
+  /**
+   * Retrieves the oldest tasks ordered by creation time.
+   */
+  async getOldestCreatedTasks(): Promise<TaskoratorTask[] | null> {
+    const userId = await this.getUserId();
+
+    return this.queryTasks(userId, [
+      where('stage', '==', 'todo'),
+      orderBy('timeCreated', 'asc'),
       limit(this.TASK_LIST_LIMIT),
     ]);
   }

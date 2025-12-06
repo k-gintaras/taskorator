@@ -40,6 +40,8 @@ export class TaskListSimpleService {
           return this.taskListService.getLatestUpdatedTasks();
         case TaskListType.LATEST_CREATED:
           return this.taskListService.getLatestTasks();
+        case TaskListType.OLDEST_CREATED:
+          return this.taskListService.getOldestTasks();
         case TaskListType.OVERLORD:
           return this.taskListService.getOverlordTasks(taskListKey.data);
         case TaskListType.SUPER_OVERLORD:

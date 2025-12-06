@@ -6,6 +6,7 @@ import { WeeklyTaskListComponent } from './lists/weekly-task-list/weekly-task-li
 import { RootTaskListComponent } from './lists/root-task-list/root-task-list.component';
 import { LatestCreatedTaskListComponent } from './lists/latest-created-task-list/latest-created-task-list.component';
 import { LatestUpdatedTaskListComponent } from './lists/latest-updated-task-list/latest-updated-task-list.component';
+import { TaskoratorListComponent } from './lists/taskorator-list/taskorator-list.component';
 import { AppRouteMap } from '../../../app.routes-models';
 import { TaskViewComponent } from '../../../components/task/task-view/task-view.component';
 
@@ -95,6 +96,18 @@ const routes: Routes = [
           taskListType: 'OVERLORD',
         },
       },
+      {
+        path: 'taskorator',
+        component: TaskoratorListComponent,
+      },
+      {
+        path: 'taskorator/tasks/:taskId',
+        component: TaskViewComponent,
+        data: {
+          listContext: 'taskorator',
+          taskListType: 'TASKORATOR',
+        },
+      },
     ],
   },
 ];
@@ -135,6 +148,12 @@ export const sentinelRouteMetadata: AppRouteMap = {
     icon: 'account_tree',
     description: 'View and manage the root-level tasks.',
     altName: 'Root Tasks',
+  },
+  taskorator: {
+    title: 'Taskorator Picks',
+    icon: 'auto_awesome',
+    description: 'A curated selection of tasks from various sources.',
+    altName: 'Smart Picks',
   },
 };
 

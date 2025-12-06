@@ -18,6 +18,7 @@ export enum TaskListType {
   YEARLY = 'yearly',
   LATEST_UPDATED = 'latestUpdated',
   LATEST_CREATED = 'latestCreated',
+  OLDEST_CREATED = 'oldestCreated',
   FOCUS = 'focus',
   FROG = 'frog',
   FAVORITE = 'favorite',
@@ -107,8 +108,8 @@ export const defaultTaskLists: TaskListRules[] = [
     type: TaskListType.TASKORATOR,
     description: 'A curated mix: latest, oldest, popular, random etc.',
     rules: {
-      filter: (task) => true, // Placeholder: logic for selection across groups
-      sorter: (a, b) => 0, // Placeholder: future mixed sorting strategy
+      filter: (task) => task.stage === 'todo' && task.taskId !== ROOT_TASK_ID,
+      sorter: smartPrioritySorter, // Use smart sorting for mixed content
       permissions: {
         canAdd: false,
         canMove: false,
@@ -129,8 +130,11 @@ export const defaultTaskLists: TaskListRules[] = [
         if (task.repeat !== 'daily') {
           return false;
         }
+        // If task is not completed, always show it
+        if (task.stage !== 'completed') return true;
+
         const { startTime, endTime } = calculatePeriodTimes('daily');
-        return task.lastUpdated < startTime || task.lastUpdated >= endTime;
+        return task.lastUpdated < startTime;
       },
       sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
@@ -152,9 +156,12 @@ export const defaultTaskLists: TaskListRules[] = [
       filter: (task) => {
         if (task.repeat !== 'weekly') return false;
 
+        // If task is not completed, always show it
+        if (task.stage !== 'completed') return true;
+
         const { startTime, endTime } = calculatePeriodTimes('weekly');
-        // Check if the task falls outside the current daily period
-        return task.lastUpdated < startTime || task.lastUpdated >= endTime;
+        // Check if the task was completed before the current weekly period
+        return task.lastUpdated < startTime;
       },
       sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
@@ -176,9 +183,12 @@ export const defaultTaskLists: TaskListRules[] = [
       filter: (task) => {
         if (task.repeat !== 'monthly') return false;
 
+        // If task is not completed, always show it
+        if (task.stage !== 'completed') return true;
+
         const { startTime, endTime } = calculatePeriodTimes('monthly');
-        // Check if the task falls outside the current daily period
-        return task.lastUpdated < startTime || task.lastUpdated >= endTime;
+        // Check if the task was completed before the current monthly period
+        return task.lastUpdated < startTime;
       },
       sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {
@@ -200,9 +210,12 @@ export const defaultTaskLists: TaskListRules[] = [
       filter: (task) => {
         if (task.repeat !== 'yearly') return false;
 
+        // If task is not completed, always show it
+        if (task.stage !== 'completed') return true;
+
         const { startTime, endTime } = calculatePeriodTimes('yearly');
-        // Check if the task falls outside the current daily period
-        return task.lastUpdated < startTime || task.lastUpdated >= endTime;
+        // Check if the task was completed before the current yearly period
+        return task.lastUpdated < startTime;
       },
       sorter: (a, b) => (b.priority || 0) - (a.priority || 0),
       permissions: {

@@ -12,7 +12,7 @@ import { TaskListKey } from '../../models/task-list-model';
 import { RegistrationData } from '../../models/service-strategies/registration-strategy';
 import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
 import { AuthOfflineService } from './auth-offline.service';
-import { OTHER_CONFIG } from '../../app.config';
+import { OTHER_CONFIG, TASK_CONFIG } from '../../app.config';
 
 export const getUserStorageKeys = (userId: string) => ({
   TASKS: `tasks_${userId}`,
@@ -123,20 +123,22 @@ export class ApiOfflineService implements ApiStrategy {
   // Tasks collection methods
   async getLatestCreatedTasks(): Promise<TaskoratorTask[] | null> {
     const userId = await this.getUserId();
-    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
-    return tasks.sort(
-      (a, b) =>
-        new Date(b.timeCreated).getTime() - new Date(a.timeCreated).getTime()
-    );
+    const storageKeys = getUserStorageKeys(userId);
+    const tasks = this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    return tasks
+      .filter((task) => task.stage === 'todo')
+      .sort((a, b) => b.timeCreated - a.timeCreated)
+      .slice(0, TASK_CONFIG.TASK_LIST_LIMIT);
   }
 
-  async getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null> {
+  async getOldestCreatedTasks(): Promise<TaskoratorTask[] | null> {
     const userId = await this.getUserId();
-    const tasks = this.getStorageItem<TaskoratorTask[]>(getUserStorageKeys(userId).TASKS) || [];
-    return tasks.sort(
-      (a, b) =>
-        new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
-    );
+    const storageKeys = getUserStorageKeys(userId);
+    const tasks = this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    return tasks
+      .filter((task) => task.stage === 'todo')
+      .sort((a, b) => a.timeCreated - b.timeCreated)
+      .slice(0, TASK_CONFIG.TASK_LIST_LIMIT);
   }
 
   async getDailyTasks(): Promise<TaskoratorTask[] | null> {
@@ -288,6 +290,15 @@ export class ApiOfflineService implements ApiStrategy {
     const ids = toSplit?.map((n) => n.taskId);
     if (!ids) return null;
     return this.getTasksFromIds(ids);
+  }
+
+  async getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null> {
+    const userId = await this.getUserId();
+    const storageKeys = getUserStorageKeys(userId);
+    const tasks = this.getStorageItem<TaskoratorTask[]>(storageKeys.TASKS) || [];
+    return tasks
+      .sort((a, b) => b.lastUpdated - a.lastUpdated)
+      .slice(0, TASK_CONFIG.TASK_LIST_LIMIT);
   }
 
   // Additional required methods with basic implementations

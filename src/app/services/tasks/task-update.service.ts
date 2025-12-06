@@ -19,6 +19,7 @@ import { ErrorService } from '../core/error.service';
 import { TaskUiDecoratorService } from './task-list/task-ui-decorator.service';
 import { TaskUiInteractionService } from './task-list/task-ui-interaction.service';
 import { TaskCacheService } from '../cache/task-cache.service';
+import { TreeService } from '../sync-api-cache/tree.service';
 import { TaskTransmutationService } from './task-transmutation.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
 
@@ -36,7 +37,8 @@ export class TaskUpdateService {
     private taskUiDecorator: TaskUiDecoratorService,
     private taskCache: TaskCacheService,
     private transmutatorService: TaskTransmutationService,
-    private taskIdCache: TaskIdCacheService
+    private taskIdCache: TaskIdCacheService,
+    private treeService: TreeService
   ) {}
 
   async move(targetTask: TaskoratorTask) {
@@ -158,6 +160,11 @@ export class TaskUpdateService {
       // Remove optimistic task
       this.taskCache.removeTask(uiOptimisticTask);
       this.taskIdCache.deleteTask(tempId);
+
+      // Add the created task to the tree structure
+      this.treeService.addTaskToTree(createdTask).catch(error => {
+        console.error('Failed to add created task to tree:', error);
+      });
 
       this.log('Created: ' + createdTask.taskId + ' ' + createdTask.name);
       this.feedback('Created: ' + ' ' + createdTask.name);

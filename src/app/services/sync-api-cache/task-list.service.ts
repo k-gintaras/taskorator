@@ -307,6 +307,16 @@ export class TaskListService {
     return this.getRepeatingTasks('yearly');
   }
 
+  async getOldestTasks(): Promise<UiTask[] | null> {
+    const taskListKey: TaskListKey = {
+      type: TaskListType.OLDEST_CREATED,
+      data: TaskListSubtype.API,
+    };
+    return this.getTaskGroupWithCache(taskListKey, () =>
+      this.ensureApiService().getOldestCreatedTasks()
+    );
+  }
+
   /**
    * @warn do not use, it is ambiguous, what is this list name, what if part of it is missing? how you know if tasks are loose?
    * Get tasks by IDs, dynamically fetching any missing ones.

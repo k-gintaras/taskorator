@@ -252,4 +252,42 @@ export class TreeNodeService {
     tree.totalTasks--;
     return true;
   }
+
+  private classifyParents(tree: TaskTree): {
+    bigParents: TaskTreeNode[];
+    miniParents: TaskTreeNode[];
+  } {
+    if (!tree?.primarch) return { bigParents: [], miniParents: [] };
+
+    const ROOT_ID = ROOT_TASK_ID; // from your constants
+    const bigParents: TaskTreeNode[] = [];
+    const miniParents: TaskTreeNode[] = [];
+
+    const stack: { node: TaskTreeNode; depth: number }[] = [
+      { node: tree.primarch, depth: 0 },
+    ];
+
+    while (stack.length) {
+      const { node, depth } = stack.pop()!;
+
+      const hasChildren = node.children.length > 0;
+      const hasGrandchildren = node.children.some(
+        (c) => c.children.length > 0
+      );
+
+      if (node.taskId !== ROOT_ID && node.stage === 'todo' && hasChildren) {
+        if (hasGrandchildren && depth >= 1) {
+          bigParents.push(node);
+        } else if (!hasGrandchildren && node.children.length >= 2) {
+          miniParents.push(node);
+        }
+      }
+
+      node.children.forEach((child) =>
+        stack.push({ node: child, depth: depth + 1 })
+      );
+    }
+
+    return { bigParents, miniParents };
+  }
 }

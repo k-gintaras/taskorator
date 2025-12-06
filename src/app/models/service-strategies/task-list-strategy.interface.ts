@@ -2,6 +2,7 @@ import { TaskListKey } from '../task-list-model';
 import { TaskoratorTask } from '../taskModelManager';
 export interface TaskListApiStrategy {
   getLatestCreatedTasks(): Promise<TaskoratorTask[] | null>;
+  getOldestCreatedTasks(): Promise<TaskoratorTask[] | null>;
   getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null>;
   getOverlordTasks(taskId: string): Promise<TaskoratorTask[] | null>; // same as overlord tasks but we move here for cleanliness
   getSessionTasks(sessionId: string): Promise<TaskoratorTask[] | null>; // same as overlord tasks but we move here for cleanliness

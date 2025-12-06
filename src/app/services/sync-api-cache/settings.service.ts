@@ -70,14 +70,21 @@ export class SettingsService implements SettingsStrategy {
         }
       }
       if (!settings) {
-        // No settings found or API unavailable, use default
-        const defaultSettings = getDefaultTaskSettings();
-        // Persist to cache and API if available
-        await this.cacheService.createSettings(defaultSettings);
-        if (this.apiService) {
-          try { await this.apiService.createSettings(defaultSettings); } catch {}
+        // No settings found or API unavailable, use default but preserve existing cache if available
+        const existingSettings = await this.cacheService.getSettings();
+        if (existingSettings) {
+          // Preserve existing settings, just update the subject
+          settings = existingSettings;
+        } else {
+          // No existing settings, use defaults
+          const defaultSettings = getDefaultTaskSettings();
+          // Persist to cache and API if available
+          await this.cacheService.createSettings(defaultSettings);
+          if (this.apiService) {
+            try { await this.apiService.createSettings(defaultSettings); } catch {}
+          }
+          settings = defaultSettings;
         }
-        settings = defaultSettings;
       }
       this.cacheService.updateSettings(settings);
       this.settingsSubject.next(settings);

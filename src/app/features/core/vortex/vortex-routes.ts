@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { VortexComponent } from './vortex/vortex.component';
 import { Routes, RouterModule } from '@angular/router';
 import { TreeViewComponent } from './tree-view/tree-view.component';
+import { TreeRepairComponent } from '../../admin/tree-repair/tree-repair.component';
 import { AppRouteMap } from '../../../app.routes-models';
 
 // 'Task Visualization';
@@ -23,6 +24,10 @@ const routes: Routes = [
         path: 'vizualizer',
         component: TreeViewComponent, // Replace with your actual component
       },
+      {
+        path: 'repair',
+        component: TreeRepairComponent,
+      },
     ],
   },
 ];
@@ -32,6 +37,12 @@ export const vortexRouteMetadata: AppRouteMap = {
     icon: 'template', // Replace with the appropriate icon
     description: 'View tasks as a tree.',
     altName: '',
+  },
+  repair: {
+    title: 'Tree Repair',
+    icon: 'build',
+    description: 'Repair and maintain the task tree structure.',
+    altName: 'Fix Tree',
   },
 };
 export const vortexChildPaths =

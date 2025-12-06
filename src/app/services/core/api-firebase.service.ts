@@ -60,6 +60,10 @@ export class ApiFirebaseService implements ApiStrategy {
     return this.taskListService.getLatestCreatedTasks();
   }
 
+  getOldestCreatedTasks(): Promise<TaskoratorTask[] | null> {
+    return this.taskListService.getOldestCreatedTasks();
+  }
+
   getLatestUpdatedTasks(): Promise<TaskoratorTask[] | null> {
     return this.taskListService.getLatestUpdatedTasks();
   }
