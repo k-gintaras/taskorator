@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TaskListKey } from '../../../models/task-list-model';
+import { UiTask } from '../../../models/taskModelManager';
 import { TaskNavigatorDataService } from '../task-navigation/task-navigator-data.service';
 import { TaskUiInteractionService } from './task-ui-interaction.service';
 import { TaskListOrganizationService, SortMode } from './task-list-organization.service';
@@ -18,6 +19,11 @@ export class TaskListDataFacadeService {
   async loadTaskList(taskListKey: TaskListKey): Promise<void> {
     await this.navigatorData.setTasksByKey(taskListKey);
     this.organizationService.setCurrentListKey(taskListKey);
+  }
+
+  async setTasks(tasks: UiTask[]): Promise<void> {
+    await this.navigatorData.setTasks(tasks);
+    this.organizationService.setCurrentListKey(null); // Custom list
   }
 
   get currentTasks$() {

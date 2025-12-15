@@ -1,16 +1,29 @@
-/* In tree-view.component.css */
+/* Tree view component styles */
 
-.node circle,
+.node circle {
+  fill: var(--bg-surface);
+  stroke: var(--border);
+  cursor: pointer;
+}
+
 .node text {
+  fill: var(--text-secondary);
+  font-family: inherit;
   cursor: pointer;
 }
 
 .node:hover circle {
-  fill: #3498db;
-  stroke: #2980b9;
+  fill: var(--purple-primary);
+  stroke: var(--purple-hover);
 }
 
 .node:hover text {
-  fill: #2c3e50;
+  fill: var(--text-primary);
   font-weight: bold;
+}
+
+.link {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2px;
 }

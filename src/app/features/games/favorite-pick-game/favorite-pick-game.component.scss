@@ -1,0 +1,23 @@
+/* src/app/features/nexus/games/favorite-pick-game/favorite-pick-game.component.scss */
+.favorite-pick-container {
+  padding: 20px;
+}
+
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.task-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.task-card:hover {
+  background-color: #f0f0f0;
+}

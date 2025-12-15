@@ -1,60 +1,43 @@
 <div
-  class="flex items-center justify-center w-full h-full cursor-pointer"
-  [class.opacity-80]="hasSelectedTasks() && !feedbackUpdated"
-  (click)="onNotificationClick()"
+  class="w-full h-full flex items-center justify-center"
+  (click)="onClick()"
 >
-  <!-- App title or Selected Tasks title when no feedback -->
-  @if (!feedbackUpdated) {
-    <h1 class="theme-text-primary text-xl font-semibold text-center">
-      {{ getNotificationTitle() }}
-    </h1>
-  }
+  <!-- Small screens: icon-only bubble -->
+  <button
+    class="theme-nav-item md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-transform"
+    [ngClass]="uiState.pulse ? 'notify-pulse' : ''"
+    [style.background-color]="'color-mix(in srgb, ' + getColor(uiState.colorVar) + ' 12%, transparent)'"
+    [style.border]="'1px solid ' + getColor(uiState.colorVar)"
+  >
+    <mat-icon
+      class="text-base"
+      [style.color]="getColor(uiState.colorVar)"
+    >
+      {{ uiState.icon }}
+    </mat-icon>
+  </button>
 
-  <!-- Feedback message for larger screens -->
-  @if (message && feedbackUpdated) {
-    <div class="theme-text-primary text-sm text-center px-2 py-1 rounded"
-         style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
-      {{ getTruncatedMessage() }}
-    </div>
-  }
+  <!-- Larger screens: icon + label pill (but hide label for status) -->
+  <button
+    class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full theme-nav-item max-w-xs"
+    [ngClass]="uiState.pulse ? 'notify-pulse' : ''"
+    [style.background-color]="'color-mix(in srgb, ' + getColor(uiState.colorVar) + ' 12%, transparent)'"
+    [style.border]="'1px solid ' + getColor(uiState.colorVar)"
+  >
+    <mat-icon
+      class="text-sm shrink-0"
+      [style.color]="getColor(uiState.colorVar)"
+    >
+      {{ uiState.icon }}
+    </mat-icon>
 
-  <!-- Blinker/Indicator for smaller screens -->
-  @if (feedbackUpdated) {
-    <div class="w-3 h-3 rounded-full animate-pulse" 
-         style="background-color: var(--error);"></div>
-  }
-
-  <!-- Selected tasks indicator for smaller screens -->
-  @if (hasSelectedTasks() && !feedbackUpdated) {
-    <div class="flex items-center justify-center" (click)="onNotificationClick()">
-      <mat-icon class="text-white opacity-90 hover:opacity-100 transition-opacity">check_box</mat-icon>
-    </div>
-  }
-
-  <!-- Status indicator (authentication/offline status) -->
-  @if (statusState$ | async; as status) {
-    @if (showStatus$ | async; as showStatus) {
-      @if (shouldShowStatus(showStatus)) {
-        <div class="status-indicator flex items-center justify-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all duration-300"
-             [style.background-color]="getStatusColor(status.color) + '20'"
-             [style.border]="'1px solid ' + getStatusColor(status.color)"
-             (click)="toggleStatusIndicator()">
-          
-          <!-- Status icon -->
-          <mat-icon 
-            class="text-sm status-icon transition-colors duration-300"
-            [style.color]="getStatusColor(status.color)">
-            {{ status.icon }}
-          </mat-icon>
-          
-          <!-- Status message for larger screens -->
-          <span 
-            class="status-message text-xs font-medium transition-colors duration-300 hidden sm:inline"
-            [style.color]="getStatusColor(status.color)">
-            {{ status.message }}
-          </span>
-        </div>
-      }
-    }
-  }
+    <!-- Only show label for non-status states -->
+    <span
+      *ngIf="uiState.click !== 'status'"
+      class="theme-text-secondary text-xs font-medium truncate"
+      [style.color]="getColor(uiState.colorVar)"
+    >
+      {{ uiState.label }}
+    </span>
+  </button>
 </div>

@@ -3,6 +3,7 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
+import { NavigationDrawerService } from '../../services/navigation-drawer.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,6 +39,7 @@ export class HorizontalNavigationComponent implements OnInit {
   isHandset = false;
   isCompact = false;
   showArtificer = true;
+  appTitle = 'Taskorator';
 
   // Just track current URL for simplicity
   currentUrl = '';
@@ -45,7 +47,8 @@ export class HorizontalNavigationComponent implements OnInit {
   constructor(
     private navigationService: NavigationService,
     private router: Router,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private navigationDrawerService: NavigationDrawerService
   ) {}
 
   ngOnInit() {
@@ -66,6 +69,13 @@ export class HorizontalNavigationComponent implements OnInit {
     // Initialize on load
     this.currentUrl = this.router.url;
     this.updateChildItems();
+
+    // Subscribe to drawer close requests from child components
+    this.navigationDrawerService.closeDrawer$.subscribe(() => {
+      if (this.isHandset && this.drawer) {
+        this.drawer.close();
+      }
+    });
   }
 
   private updateChildItems() {
@@ -116,5 +126,11 @@ export class HorizontalNavigationComponent implements OnInit {
     if (this.isCompact && this.drawer.opened) {
       this.drawer.close();
     }
+  }
+
+  // Method to prevent drawer close on scroll events within action containers
+  onActionContainerScroll(event: Event): void {
+    // Stop propagation to prevent mat-sidenav from interpreting scroll as outside click
+    event.stopPropagation();
   }
 }

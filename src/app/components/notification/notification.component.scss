@@ -1,65 +1,15 @@
-/* Notification Component - DSC Compliant (Minimal SCSS) */
-
-/* Small screen responsive behavior */
-@media (max-width: 600px) {
-  h1 {
-    display: none;
+@keyframes notify-pulse {
+  0% {
+    opacity: 0.85;
   }
-  
-  .theme-text-primary {
-    display: none;
+  50% {
+    opacity: 1;
   }
-  
-  /* Show only indicators on small screens */
-  [class*="w-3"], [class*="check_box"] {
-    display: flex !important;
+  100% {
+    opacity: 0.85;
   }
 }
 
-/* Only custom animation that Tailwind can't do */
-@keyframes pulse-error {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.animate-pulse {
-  animation: pulse-error 1.5s infinite;
-}
-
-/* Status indicator styles */
-.status-indicator {
-  backdrop-filter: blur(8px);
-  border-radius: 20px;
-  max-width: 200px;
-  
-  &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .status-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-  
-  .status-message {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
-  }
-}
-
-/* Responsive behavior for status indicator */
-@media (max-width: 600px) {
-  .status-indicator {
-    .status-message {
-      display: none !important;
-    }
-    
-    padding: 0.5rem;
-    min-width: 32px;
-    min-height: 32px;
-  }
+.notify-pulse {
+  animation: notify-pulse 1.5s ease-in-out 4;
 }

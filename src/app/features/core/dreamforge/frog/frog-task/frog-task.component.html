@@ -1,40 +1,36 @@
-<div class="theme-content p-4 md:p-6">
-  <div class="card bg-base-100 shadow-md border border-base-300 mb-6">
-    <div class="card-body">
-      <div class="mb-4">
-        <h2 class="card-title theme-text-primary flex items-center gap-2 mb-2">
-          <mat-icon>psychology</mat-icon>
-          Frog Tasks
-        </h2>
-        <p class="text-sm theme-text-secondary mb-4">
-          "Eat the frog" - Tackle your most challenging, avoided, or procrastinated tasks first
-        </p>
-      </div>
-      <app-staged-task-list [tasks]="tasks" (tasksChange)="onFrogTasksChange($event)">
-      </app-staged-task-list>
+<div class="theme-content p-2 sm:p-4 md:p-6">
+  <div class="theme-card p-3 sm:p-4 md:p-6 shadow-lg mb-6 border overflow-x-hidden" style="border-color: var(--border);">
+    <div class="mb-4">
+      <h2 class="card-title theme-text-primary flex items-center gap-2 mb-2">
+        <mat-icon style="color: var(--purple-light);">psychology</mat-icon>
+        Frog Tasks
+      </h2>
+      <p class="text-sm theme-text-secondary mb-4">
+        "Eat the frog" - Tackle your most challenging, avoided, or procrastinated tasks first
+      </p>
     </div>
+    <app-staged-task-list [tasks]="tasks" (tasksChange)="onFrogTasksChange($event)">
+    </app-staged-task-list>
   </div>
 
-  <div class="card bg-base-100 shadow-md border border-base-300">
-    <div class="card-body">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="card-title theme-text-primary flex items-center gap-2">
-          <mat-icon>list</mat-icon>
-          Available Tasks
-        </h2>
-        <button 
-          class="theme-btn-primary flex items-center gap-2"
-          (click)="add()"
-          matTooltip="Add difficult/avoided tasks to your frog list"
-          >
-          <mat-icon>add</mat-icon>Add To Frog Tasks
-        </button>
-      </div>
-      <app-staged-task-list
-        [tasks]="selectedTasks"
-        (tasksChange)="updateSelectedTasks($event)"
-      >
-      </app-staged-task-list>
+  <div class="theme-card p-3 sm:p-4 md:p-6 shadow-lg border overflow-x-hidden" style="border-color: var(--border);">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="card-title theme-text-primary flex items-center gap-2">
+        <mat-icon>list</mat-icon>
+        Available Tasks
+      </h2>
+      <button 
+        class="theme-btn-primary flex items-center gap-2"
+        (click)="add()"
+        matTooltip="Add difficult/avoided tasks to your frog list"
+        >
+        <mat-icon>add</mat-icon>Add To Frog Tasks
+      </button>
     </div>
+    <app-staged-task-list
+      [tasks]="selectedTasks"
+      (tasksChange)="updateSelectedTasks($event)"
+    >
+    </app-staged-task-list>
   </div>
 </div>

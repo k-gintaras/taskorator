@@ -1,104 +1,137 @@
+export interface NotificationUiState {
+  icon: string;
+  label: string;
+  colorVar: string;   // e.g. '--error', '--purple-primary'
+  pulse: boolean;
+  click: 'feedback' | 'selected' | 'status' | 'idle';
+}
+
 import { Component, OnInit } from '@angular/core';
+import { combineLatest, Observable } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 import { ErrorService } from '../../services/core/error.service';
 import { TaskUiDecoratorService } from '../../services/tasks/task-list/task-ui-decorator.service';
 import { Router } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 import { StatusIndicatorService, StatusState } from '../../services/status/status-indicator.service';
-import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { OTHER_CONFIG } from '../../app.config';
 
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [MatIcon, AsyncPipe],
+  imports: [MatIcon, CommonModule],
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
 })
 export class NotificationComponent implements OnInit {
-  appTitle = 'Taskorator';
+  appTitle = OTHER_CONFIG.APP_TITLE || 'Taskorator';
+
   message: string | null = null;
-  feedbackUpdated = false;
   selectedTasksCount = 0;
-  
-  // Status indicator properties
-  statusState$: Observable<StatusState>;
-  showStatus$: Observable<boolean>;
+  statusState: StatusState | null = null;
+
+  uiState: NotificationUiState = {
+    icon: 'task_alt',
+    label: this.appTitle,
+    colorVar: '--text-secondary',
+    pulse: false,
+    click: 'idle',
+  };
 
   constructor(
     private errorService: ErrorService,
     private taskUiDecorator: TaskUiDecoratorService,
     private router: Router,
     private statusIndicatorService: StatusIndicatorService
-  ) {
-    // Initialize status observables
-    this.statusState$ = this.statusIndicatorService.statusState$;
-    this.showStatus$ = this.statusIndicatorService.showStatus$;
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.errorService.getFeedback().subscribe((s) => {
-      if (s) {
-        this.message = s;
-        this.feedbackUpdated = true; // Trigger blinker
-        setTimeout(() => (this.feedbackUpdated = false), 3000); // Stop blinking after 3 seconds
-      }
-    });
+    const feedback$ = this.errorService.getFeedback().pipe(startWith<string | null>(null));
+    const selected$ = this.taskUiDecorator.selectedTasksChanges$.pipe(startWith([]));
+    const status$ = this.statusIndicatorService.statusState$.pipe(startWith<StatusState | null>(null));
 
-    // Subscribe to selected tasks changes
-    this.taskUiDecorator.selectedTasksChanges$.subscribe((selectedTasks) => {
-      this.selectedTasksCount = selectedTasks.length;
+    combineLatest([feedback$, selected$, status$]).subscribe(([feedback, selected, status]) => {
+      this.message = feedback;
+      this.selectedTasksCount = selected.length;
+      this.statusState = status;
+      this.uiState = this.computeUiState();
     });
   }
 
-  toggleFeedbackView(): void {
-    if (this.message) this.feedbackUpdated = !this.feedbackUpdated; // Clear the message on toggle
-  }
-
-  onNotificationClick(): void {
-    if (this.hasSelectedTasks()) {
-      // Navigate to selected tasks view
-      this.router.navigate(['/crucible/selected']);
-    } else {
-      // Default behavior
-      this.toggleFeedbackView();
+  private computeUiState(): NotificationUiState {
+    // 1) Feedback / last action
+    if (this.message) {
+      return {
+        icon: 'info',
+        label: this.getTruncatedMessage(),
+        colorVar: '--topbar-text',
+        pulse: false,
+        click: 'feedback',
+      };
     }
+
+    // 2) Selected tasks
+    if (this.selectedTasksCount > 0) {
+      return {
+        icon: 'check_box',
+        label: `${this.selectedTasksCount} selected`,
+        colorVar: '--purple-primary',
+        pulse: false,
+        click: 'selected',
+      };
+    }
+
+    // 3) Status (online/offline/auth/etc.)
+    if (this.statusState) {
+      return {
+        icon: this.statusState.icon,
+        label: this.statusState.message,
+        colorVar: this.statusState.color, // e.g. '--success', '--warning', '--error'
+        pulse: false, // Status doesn't pulse
+        click: 'status',
+      };
+    }
+
+    // 4) Idle / title
+    return {
+      icon: 'task_alt',
+      label: this.appTitle,
+      colorVar: '--text-secondary',
+      pulse: false,
+      click: 'idle',
+    };
   }
 
-  hasSelectedTasks(): boolean {
-    return this.selectedTasksCount > 0;
-  }
-
-  getTruncatedMessage(): string {
+  private getTruncatedMessage(): string {
     if (!this.message) return '';
-    const maxLength = 50; // Adjust as needed
+    const maxLength = 50;
     return this.message.length > maxLength
-      ? this.message.substring(0, maxLength) + '...'
+      ? this.message.substring(0, maxLength) + '…'
       : this.message;
   }
 
-  getNotificationTitle(): string {
-    return this.appTitle;
-    // return this.hasSelectedTasks() ? 'Selected Tasks' : this.appTitle;
+  onClick(): void {
+    switch (this.uiState.click) {
+      case 'feedback':
+        // Navigate to last action viewer
+        this.router.navigate(['/dreamforge/lastAction']);
+        break;
+      case 'selected':
+        this.router.navigate(['/crucible/selected']);
+        break;
+      case 'status':
+        this.statusIndicatorService.toggleStatus();
+        break;
+      case 'idle':
+      default:
+        // maybe open "About / Version / Logs" later if you want
+        break;
+    }
   }
 
-  /**
-   * Toggle status indicator manually
-   */
-  toggleStatusIndicator(): void {
-    this.statusIndicatorService.toggleStatus();
-  }
-
-  /**
-   * Get CSS variable for status color
-   */
-  getStatusColor(color: string): string {
-    return `var(${color})`;
-  }
-
-  /**
-   * Check if status should be shown (either automatically or manually toggled)
-   */
-  shouldShowStatus(showStatus: boolean): boolean {
-    return showStatus && !this.feedbackUpdated; // Don't show status when feedback is active
+  getColor(varName: string): string {
+    return `var(${varName})`;
   }
 }

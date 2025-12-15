@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { TaskoratorTask } from '../../../models/taskModelManager';
 import { TaskMiniComponent } from '../task-mini/task-mini.component';
 import { MatIcon } from '@angular/material/icon';
@@ -9,7 +9,7 @@ import { TaskEditPopupComponent } from '../task-edit-popup/task-edit-popup.compo
 
 @Component({
   standalone: true,
-  imports: [TaskMiniComponent, MatIcon, MatTooltip],
+  imports: [CommonModule, TaskMiniComponent, MatIcon, MatTooltip],
   selector: 'app-staged-task-list',
   templateUrl: './staged-task-list.component.html',
   styleUrls: ['./staged-task-list.component.scss'],

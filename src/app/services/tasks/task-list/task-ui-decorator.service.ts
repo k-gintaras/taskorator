@@ -8,6 +8,7 @@ import { ColorService } from '../../utils/color.service';
 import { TaskUsageService } from '../task-usage.service';
 import { TaskTransmutationService } from '../task-transmutation.service';
 import { TaskCacheService } from '../../cache/task-cache.service';
+import { TaskPriorityService } from '../task-priority.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,8 @@ export class TaskUiDecoratorService {
     private taskUsageService: TaskUsageService,
     private taskTransmutationService: TaskTransmutationService,
     private treeService: TreeService,
-    private taskCache: TaskCacheService
+    private taskCache: TaskCacheService,
+    private taskPriority: TaskPriorityService
   ) {}
 
   markTaskViewed(taskId: string): void {
@@ -86,31 +88,37 @@ export class TaskUiDecoratorService {
 
   decorateTask(task: TaskoratorTask): UiTask {
     const now = Date.now();
-    // 🔥 FIX: Update cache FIRST, then fetch tree node info
     const baseTask = this.taskTransmutationService.toUiTask(task);
-    this.taskCache.addTask(baseTask); // Cache the updated task FIRST
+    this.taskCache.addTask(baseTask);
 
-    // Now fetch tree node info - this will use the updated cache
     const treeNode = this.treeService.getTaskTreeData(task.taskId);
     const views = this.taskUsageService.getTaskViews(task.taskId);
 
+    const elo = this.taskPriority.getElo(task);
+    const uiPriority = this.taskPriority.eloToUiPriority(elo);
+    const magnitude = this.calculateMagnitudeFromElo(uiPriority, treeNode);
+
     const enhancedTask: UiTask = {
       ...baseTask,
+      // override with effective priority if you want:
+      priority: uiPriority,
+
       isSelected: this.selectedTaskIds.has(task.taskId),
       isRecentlyViewed: this.recentlyViewedTaskIds.has(task.taskId),
-      isRecentlyUpdated: this.recentlyUpdatedTaskIds.has(task.taskId) || (now - (task.lastUpdated || task.timeCreated) < this.recentlyUpdatedThreshold),
+      isRecentlyUpdated:
+        this.recentlyUpdatedTaskIds.has(task.taskId) ||
+        now - (task.lastUpdated || task.timeCreated) < this.recentlyUpdatedThreshold,
       isRecentlyCreated: now - task.timeCreated < this.recentlyCreatedThreshold,
       completionPercent: this.colorService.getProgressPercent(treeNode),
       color: this.colorService.getDateBasedColor(task.timeCreated),
-      secondaryColor: this.getPriorityColor(task.priority),
+      secondaryColor: this.getPriorityColor(uiPriority),
       views,
       isConnectedToTree: treeNode?.connected ?? false,
       children: treeNode?.childrenCount || 0,
       completedChildren: treeNode?.completedChildrenCount || 0,
-      magnitude: this.calculateMagnitude(task, treeNode),
+      magnitude,
     };
 
-    // Update cache with the fully enhanced task
     this.taskCache.addTask(enhancedTask);
     return enhancedTask;
   }
@@ -127,8 +135,8 @@ export class TaskUiDecoratorService {
     return '#6b7280';
   }
 
-  private calculateMagnitude(task: TaskoratorTask, treeNode: any): number {
-    let magnitude = task.priority;
+  private calculateMagnitudeFromElo(uiPriority: number, treeNode: any): number {
+    let magnitude = uiPriority;
     if (treeNode && treeNode.childrenCount > 0) {
       magnitude += treeNode.childrenCount * 0.5;
     }

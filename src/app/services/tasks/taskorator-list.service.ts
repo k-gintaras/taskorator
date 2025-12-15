@@ -71,8 +71,11 @@ export class TaskoratorListService {
       superlist.push(...oldestTasks.slice(0, 2));
     }
 
+    // Deduplicate tasks to avoid showing the same task multiple times
+    const deduplicatedTasks = this.deduplicateTasks(superlist);
+
     // Decorate tasks with UI properties
-    const decoratedTasks = this.taskUiDecorator.decorateTasks(superlist);
+    const decoratedTasks = this.taskUiDecorator.decorateTasks(deduplicatedTasks);
 
     return decoratedTasks;
   }
@@ -80,5 +83,12 @@ export class TaskoratorListService {
   private getRandomItems<T>(array: T[], count: number): T[] {
     const shuffled = [...array].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
+  }
+
+  private deduplicateTasks(tasks: TaskoratorTask[]): TaskoratorTask[] {
+    return tasks.filter(
+      (task, index, self) =>
+        index === self.findIndex((t) => t.taskId === task.taskId)
+    );
   }
 }

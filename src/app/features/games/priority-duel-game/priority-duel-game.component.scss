@@ -1,0 +1,27 @@
+/* src/app/features/nexus/games/priority-duel-game/priority-duel-game.component.scss */
+.priority-duel-container {
+  padding: 20px;
+}
+
+.tasks-container {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.task-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  flex: 1;
+}
+
+.actions {
+  margin-top: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  cursor: pointer;
+}

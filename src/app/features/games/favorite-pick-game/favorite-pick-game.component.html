@@ -1,0 +1,11 @@
+<!-- src/app/features/nexus/games/favorite-pick-game/favorite-pick-game.component.html -->
+<div class="favorite-pick-container">
+  <h3>{{ round.question }}</h3>
+  <div class="tasks-grid">
+    <div class="task-card" *ngFor="let task of round.tasks" (click)="onTaskSelected(task.taskId)">
+      <h4>{{ task.name }}</h4>
+      <p>{{ task.todo }}</p>
+      <p>Priority: {{ task.priority }}</p>
+    </div>
+  </div>
+</div>

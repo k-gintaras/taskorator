@@ -82,12 +82,10 @@ export class FocusComponent implements OnInit {
 
   add(): void {
     const ids = this.selectedTasks.map((t) => t.taskId);
-    this.tasks = [...this.tasks, ...this.selectedTasks];
-    this.settings.focusTaskIds = [
-      ...(this.settings.focusTaskIds || []),
-      ...ids,
-    ];
-    this.settingsService.updateSettings(this.settings);
+    const updatedTasks = [...this.tasks, ...this.selectedTasks];
+    
+    // Update tasks and trigger cache update via onFocusTasksChange
+    this.onFocusTasksChange(updatedTasks);
   }
 
   async loadFocusTasks(): Promise<void> {

@@ -1,15 +1,32 @@
-<!-- In tree-view.component.html -->
-<button (click)="resetTree()">Reset Tree</button>
-<button (click)="toggleFilteredTree()">
-  {{ showFilteredTree ? "Show All Tasks" : "Show Filtered Tasks" }}
-</button>
-<button (click)="toggleFilteredCompletedTree()">
-  {{
-    showCompletedTasks
-      ? "Show Completed Tasks"
-      : "Show Filtered Completed Tasks"
-  }}
-</button>
-<div id="tree-container"></div>
-
-<!-- <input type="text" value="{{ getTreeAsText() }}" /> -->
+<div class="theme-content p-4 md:p-6 min-h-screen">
+  <div class="theme-card p-6 mb-6">
+    <div class="mb-4">
+      <h2 class="card-title theme-text-primary flex items-center gap-2 mb-2">
+        <mat-icon>account_tree</mat-icon>
+        Task Tree Visualization
+      </h2>
+      <p class="text-sm theme-text-secondary mb-4">Interactive tree view of all tasks</p>
+    </div>
+    
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button class="theme-btn-secondary flex items-center gap-2 px-4 py-2" (click)="resetTree()">
+        <mat-icon>refresh</mat-icon>
+        Reset Tree
+      </button>
+      <button class="theme-btn-secondary flex items-center gap-2 px-4 py-2" (click)="toggleFilteredTree()">
+        <mat-icon>{{ showFilteredTree ? 'visibility_off' : 'visibility' }}</mat-icon>
+        {{ showFilteredTree ? "Show All Tasks" : "Show Filtered Tasks" }}
+      </button>
+      <button class="theme-btn-secondary flex items-center gap-2 px-4 py-2" (click)="toggleFilteredCompletedTree()">
+        <mat-icon>{{ showCompletedTasks ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+        {{
+          showCompletedTasks
+            ? "Show Completed Tasks"
+            : "Show Filtered Completed Tasks"
+        }}
+      </button>
+    </div>
+    
+    <div id="tree-container" class="w-full min-h-[600px] rounded-lg" style="background: var(--bg-surface); border: 1px solid var(--border);"></div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthStateManagerService } from '../auth-state-manager.service';
 import { ModeService } from '../mode.service';
+import { OTHER_CONFIG } from '../../app.config';
 
 export interface StatusState {
   type: 'authenticated' | 'unauthenticated' | 'offline';
@@ -15,6 +16,8 @@ export interface StatusState {
   providedIn: 'root'
 })
 export class StatusIndicatorService {
+    appTitle = OTHER_CONFIG.APP_TITLE || 'Taskorator';
+  
   private _showStatus = new BehaviorSubject<boolean>(false);
   
   // Public observable for status visibility

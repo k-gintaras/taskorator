@@ -10,6 +10,7 @@ import { TaskSettings } from '../../models/settings';
 import { SettingsService } from '../../services/sync-api-cache/settings.service';
 import { ThemeMode } from '../../services/core/theme.service';
 import { SortMode, TaskListOrganizationService } from '../../services/tasks/task-list/task-list-organization.service';
+import { NavigationDrawerService } from '../../services/navigation-drawer.service';
 
 @Component({
   selector: 'app-extra-actions',
@@ -26,8 +27,9 @@ export class ExtraActionsComponent implements OnInit {
   constructor(
     public extraActionsService: ExtraActionsService,
     private settingsService: SettingsService,
-    private taskListFacade: TaskListDataFacadeService
-    , private orgService: TaskListOrganizationService
+    private taskListFacade: TaskListDataFacadeService,
+    private orgService: TaskListOrganizationService,
+    private navigationDrawerService: NavigationDrawerService
   ) {
     this.currentTheme = this.extraActionsService.getCurrentTheme();
     this.currentSort = 'rules'; // default to rules-based sorting
@@ -67,6 +69,9 @@ export class ExtraActionsComponent implements OnInit {
         }
       })
       .catch(console.error);
+    
+    // Close the navigation drawer on mobile when a sort option is selected
+    this.navigationDrawerService.requestDrawerClose();
   }
 
   /** Reset to default rules-based sorting */
@@ -82,5 +87,12 @@ export class ExtraActionsComponent implements OnInit {
   /** Get available sort options */
   getAvailableSorts(): SortMode[] {
     return this.taskListFacade.getAvailableSortModes();
+  }
+
+  /** Toggle theme and close drawer on mobile */
+  toggleTheme(): void {
+    this.extraActionsService.toggleTheme();
+    // Close the navigation drawer on mobile when theme is toggled
+    this.navigationDrawerService.requestDrawerClose();
   }
 }

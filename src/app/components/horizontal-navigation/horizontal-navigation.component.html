@@ -12,6 +12,10 @@
   </div>
 
   <div class="nav-toolbar-center">
+    <!-- Background app title - always visible but subtle -->
+    <div class="nav-background-title">
+      {{ appTitle }}
+    </div>
     <!-- Notification component replaces title - shows app name normally, notifications when active -->
     <app-notification class="nav-notification-topbar"></app-notification>
   </div>
@@ -72,7 +76,7 @@
       </div>
 
       <!-- Bottom Actions Container -->
-      <div class="nav-actions-container">
+      <div class="nav-actions-container" (scroll)="onActionContainerScroll($event)" (touchmove)="onActionContainerScroll($event)">
         <!-- Extra Controls Section -->
         <div class="nav-extra-actions">
           <h4 class="nav-section-title">View Controls</h4>

@@ -28,6 +28,10 @@ export class TaskMiniComponent {
     );
   }
 
+  get overlordName(): string | null {
+    return (this.task as any)?.overlordName || null;
+  }
+
   onTaskCardClick(task: TaskoratorTask | undefined): void {
     if (!task || this.disableClick) return;
     this.dataFacade.toggleTaskSelection(task.taskId);

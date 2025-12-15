@@ -16,6 +16,7 @@ export interface TaskoratorTask {
   size: TaskSize; // we can delegate this to another owner or something, probably rename... its what action shall be taken ?
   owner: string; // for future use of who does whose tasks
   priority: number; // Task priority (1 to 10, for example)
+  elo?: number;    // NEW: internal score (optional!)
   backupLink: string; // github, file location, web link, nothing
   imageUrl: string | null; // URL to the image file
   imageDataUrl: string | null; // Base64 representation of the image

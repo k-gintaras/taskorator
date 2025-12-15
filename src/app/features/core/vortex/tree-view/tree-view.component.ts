@@ -9,6 +9,9 @@ import * as d3 from 'd3';
 import { ZoomBehavior, Selection, zoomIdentity } from 'd3';
 import { TaskTreeNode, TaskTree } from '../../../../models/taskTree';
 import { TreeService } from '../../../../services/sync-api-cache/tree.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 interface TreeNode extends TaskTreeNode {
   x?: number;
@@ -18,6 +21,7 @@ interface TreeNode extends TaskTreeNode {
 @Component({
   selector: 'app-tree-view',
   standalone: true,
+  imports: [MatIconModule, MatButtonModule, CommonModule],
   templateUrl: './tree-view.component.html',
   styleUrls: ['./tree-view.component.css'],
 })

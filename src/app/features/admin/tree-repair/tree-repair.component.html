@@ -1,110 +1,71 @@
-<div class="tree-repair-container">
-  <mat-card class="summary-card">
-    <mat-card-header>
-      <mat-card-title>Tree Repair Tool</mat-card-title>
-      <mat-card-subtitle>{{ getAbyssSummary() }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p>This tool helps identify and fix tasks that have become disconnected from the tree structure (abyss tasks).</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="rebuildTree()" [disabled]="isLoading">
+<div class="theme-content p-4 md:p-6 min-h-screen">
+  <div class="theme-card p-6 mb-6">
+    <div class="mb-4">
+      <h2 class="card-title theme-text-primary flex items-center gap-2 mb-2">
+        <mat-icon>build</mat-icon>
+        Tree Repair Tool
+      </h2>
+      <p class="text-sm theme-text-secondary mb-4">Identify and fix tasks disconnected from the tree structure</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-surface); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Abyss Tasks</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ abyssTasks.length }}</div>
+      </div>
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-surface); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Total Tasks</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ tree?.totalTasks || 0 }}</div>
+      </div>
+      <div class="p-4 rounded-lg text-center" style="background: var(--bg-surface); border: 1px solid var(--border);">
+        <div class="theme-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Tree Status</div>
+        <div class="theme-text-primary text-lg font-semibold">{{ tree?.connected ? 'Connected' : 'Disconnected' }}</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button mat-raised-button color="primary" (click)="rebuildTree()" [disabled]="isLoading" class="flex items-center gap-2">
         <mat-icon>refresh</mat-icon>
-        Rebuild Tree
+        <span>Rebuild Tree</span>
       </button>
-      <button mat-button (click)="loadTree()" [disabled]="isLoading">
+      <button mat-stroked-button (click)="loadTree()" [disabled]="isLoading" class="flex items-center gap-2">
         <mat-icon>sync</mat-icon>
-        Refresh
+        <span>Refresh</span>
       </button>
-      <button mat-button color="warn" (click)="forceHealTreeNow()" [disabled]="isLoading">
+      <button mat-stroked-button color="warn" (click)="forceHealTreeNow()" [disabled]="isLoading" class="flex items-center gap-2">
         <mat-icon>healing</mat-icon>
-        Force Heal
+        <span>Force Heal</span>
       </button>
-    </mat-card-actions>
-  </mat-card>
+    </div>
+  </div>
 
-  <mat-card class="overlord-card">
-    <mat-card-header>
-      <mat-card-title>Fetch Overlord Children</mat-card-title>
-      <mat-card-subtitle>Query tasks for a specific overlord and optionally add them to the tree</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-form-field appearance="outline">
-        <mat-label>Overlord Task ID</mat-label>
-        <input matInput [(ngModel)]="overlordIdQuery" placeholder="e.g. 128" />
-      </mat-form-field>
-      <div class="overlord-actions">
-        <button mat-raised-button color="primary" (click)="fetchOverlordTasks()" [disabled]="isQuerying || !overlordIdQuery">
-          <mat-icon>search</mat-icon>
-          Fetch
-        </button>
-        <button mat-stroked-button color="accent" (click)="ensureOverlordInTree()" [disabled]="!overlordTasks.length">
-          <mat-icon>device_hub</mat-icon>
-          Ensure In Tree
-        </button>
-      </div>
-      <mat-list *ngIf="overlordTasks.length">
-        <mat-list-item *ngFor="let t of overlordTasks">
-          <h4>{{ t.name }} <small>({{ t.taskId }})</small></h4>
-          <p>{{ t.todo }}</p>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  <!-- Abyss Tasks Section -->
+  <div class="theme-card p-6" *ngIf="abyssTasks.length > 0">
+    <div class="mb-4">
+      <h3 class="theme-text-primary flex items-center gap-2 mb-2">
+        <mat-icon>warning</mat-icon>
+        Disconnected Tasks (showing first 10)
+      </h3>
+      <p class="text-sm theme-text-secondary">These tasks are not properly connected to the tree</p>
+    </div>
+    
+    <app-task-navigator></app-task-navigator>
+  </div>
 
-  <mat-card class="abyss-card" *ngIf="abyssTasks.length > 0">
-    <mat-card-header>
-      <mat-card-title>Abyss Tasks ({{ abyssTasks.length }})</mat-card-title>
-      <mat-card-subtitle>Tasks disconnected from the tree structure</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let task of abyssTasks">
-          <div class="task-info">
-            <h4>{{ task.name }} <small class="text-muted">({{ task.taskId }})</small></h4>
-            <p>{{ task.todo }}</p>
-            <mat-chip-listbox>
-              <mat-chip>{{ task.stage }}</mat-chip>
-              <mat-chip>Parent: {{ getParentLabel(task) }}</mat-chip>
-            </mat-chip-listbox>
-          </div>
-          <div class="task-actions">
-            <button
-              mat-stroked-button
-              color="accent"
-              (click)="reattachTask(task)"
-              [disabled]="isLoading || !task.parentId"
-            >
-              <mat-icon>device_hub</mat-icon>
-              Reattach to Parent
-            </button>
-            <button
-              mat-button
-              color="primary"
-              (click)="reconnectTask(task, rootTaskId)"
-              [disabled]="isLoading"
-            >
-              <mat-icon>link</mat-icon>
-              Connect to Root
-            </button>
-          </div>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  <!-- No Abyss Tasks -->
+  <div class="theme-card p-6" *ngIf="abyssTasks.length === 0 && !isLoading">
+    <div class="text-center py-8">
+      <mat-icon class="text-4xl mb-4" style="color: var(--purple-primary);">check_circle</mat-icon>
+      <h3 class="theme-text-primary text-lg font-semibold mb-2">Tree is Healthy!</h3>
+      <p class="theme-text-secondary">All tasks are properly connected to the tree structure.</p>
+    </div>
+  </div>
 
-  <mat-card *ngIf="abyssTasks.length === 0 && !isLoading">
-    <mat-card-content>
-      <div class="no-abyss">
-        <mat-icon color="primary">check_circle</mat-icon>
-        <h3>All tasks are properly connected!</h3>
-        <p>No abyss tasks found. The tree structure appears to be healthy.</p>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <div *ngIf="isLoading" class="loading">
-    <mat-icon class="spin">refresh</mat-icon>
-    <p>Loading tree data...</p>
+  <!-- Loading -->
+  <div class="text-center py-8" *ngIf="isLoading">
+    <mat-icon class="text-2xl animate-spin mb-4" style="color: var(--purple-primary);">refresh</mat-icon>
+    <p class="theme-text-secondary">Loading tree data...</p>
   </div>
 </div>

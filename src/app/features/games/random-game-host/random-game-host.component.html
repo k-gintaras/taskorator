@@ -1,0 +1,18 @@
+<!-- src/app/features/nexus/games/random-game-host/random-game-host.component.html -->
+<div class="random-game-host">
+  <ng-container *ngIf="currentRound">
+    <app-priority-duel-game
+      *ngIf="currentRound.gameId === 'priority-duel'"
+      [round]="currentRound"
+      (answer)="onAnswer($event)">
+    </app-priority-duel-game>
+
+    <app-favorite-pick-game
+      *ngIf="currentRound.gameId === 'favorite-pick'"
+      [round]="currentRound"
+      (answer)="onAnswer($event)">
+    </app-favorite-pick-game>
+  </ng-container>
+
+  <p *ngIf="!currentRound">No tasks available for games.</p>
+</div>

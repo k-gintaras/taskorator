@@ -4,6 +4,7 @@ import { ArtificerDetails } from './artificer.interface';
 import { ArtificerService } from './artificer.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NavigationDrawerService } from '../../services/navigation-drawer.service';
 /**
  * what we can do with each task
  * delete
@@ -27,7 +28,10 @@ export class ArtificerComponent {
   currentAction!: ArtificerDetails;
   isHorizontal = true;
 
-  constructor(private artificerService: ArtificerService) {
+  constructor(
+    private artificerService: ArtificerService,
+    private navigationDrawerService: NavigationDrawerService
+  ) {
     this.actions = this.artificerService.getActions();
     this.artificerService.currentAction$.subscribe((action) => {
       this.currentAction = action;
@@ -36,6 +40,8 @@ export class ArtificerComponent {
 
   selectAction(action: ArtificerDetails): void {
     this.artificerService.setCurrentAction(action);
+    // Close the navigation drawer on mobile when an action is selected
+    this.navigationDrawerService.requestDrawerClose();
   }
 
   // Helper to build a space-separated string of utility classes

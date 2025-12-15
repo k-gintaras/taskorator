@@ -1,3 +1,30 @@
 {
-    "nxConsole.generateAiAgentRules": true
+    // Disable Nx Console AI agent rules to restore normal Quick Fix behavior
+    "nxConsole.generateAiAgentRules": false,
+
+    // Turn off editor inlay hints (type/parameter hints) which can be noisy
+    "editor.inlayHints.enabled": false,
+
+    // Disable Error Lens overlays if the user has that extension installed
+    "errorLens.enabled": false,
+
+    // Prefer the TypeScript language service defaults (disable aggressive inline diagnostics)
+    "typescript.tsserver.trace": "off",
+
+    // Disable inline/automatic code actions from AI-like extensions where possible
+    "editor.inlineSuggest.enabled": false,
+
+    // Keep hover enabled but avoid too-aggressive previews
+    "editor.hover.delay": 300
+    ,
+    // Turn off semantic highlighting (coloring/annotations based on type)
+    "editor.semanticHighlighting.enabled": false,
+
+    // Reduce TypeScript inline suggestions/quick info decorations
+    "typescript.suggestionActions.enabled": false,
+    "typescript.disableAutomaticTypeAcquisition": true
+    ,
+    // Ensure quick-fix lightbulb and hover are enabled so keyboard quick-fix works on hover
+    "editor.lightbulb.enabled": true,
+    "editor.hover.enabled": true
 }

@@ -1,0 +1,110 @@
+<div class="theme-content p-2 sm:p-4 md:p-6">
+  <div class="theme-card p-3 sm:p-4 md:p-6 max-w-2xl mx-auto overflow-x-hidden">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="theme-text-primary text-xl font-semibold">Last Action</h2>
+      @if (canUndo()) {
+        <button
+          class="theme-btn-secondary px-4 py-2 rounded-lg flex items-center gap-2"
+          (click)="undoAction()"
+          title="Undo last action"
+        >
+          <mat-icon>undo</mat-icon>
+          <span>Undo Completed</span>
+        </button>
+      }
+    </div>
+
+    @if (lastAction) {
+      <!-- Action Summary -->
+      <div class="theme-bg-elevated rounded-lg p-4 mb-4">
+        <div class="flex items-start gap-4">
+          <div
+            class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+            [style.background-color]="'color-mix(in srgb, var(' + getActionColor(lastAction.action) + ') 20%, transparent)'"
+            [style.border]="'2px solid var(' + getActionColor(lastAction.action) + ')'"
+          >
+            <mat-icon [style.color]="'var(' + getActionColor(lastAction.action) + ')'">
+              {{ getActionIcon(lastAction.action) }}
+            </mat-icon>
+          </div>
+
+          <div class="flex-1">
+            <h3 class="theme-text-primary font-semibold text-lg mb-1">
+              {{ lastAction.message }}
+            </h3>
+            <div class="flex items-center gap-4 theme-text-muted text-sm">
+              <span>{{ formatTimestamp(lastAction.timestamp) }}</span>
+              <span class="flex items-center gap-1">
+                <mat-icon class="text-sm">source</mat-icon>
+                {{ lastAction.source }}
+              </span>
+            </div>
+            @if (lastAction.subAction) {
+              <p class="theme-text-secondary text-sm mt-2">
+                {{ lastAction.subAction }}
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Affected Tasks -->
+      <div class="space-y-3">
+        <h3 class="theme-text-muted text-sm font-semibold uppercase tracking-wide mb-3">
+          Affected Tasks ({{ affectedTasks.length }})
+        </h3>
+
+        @if (isLoading) {
+          <div class="text-center py-8 theme-text-muted">
+            <mat-icon class="animate-spin">refresh</mat-icon>
+            <p>Loading tasks...</p>
+          </div>
+        } @else if (affectedTasks.length === 0) {
+          <div class="text-center py-8 theme-text-muted">
+            <mat-icon>inbox</mat-icon>
+            <p>No tasks found</p>
+          </div>
+        } @else {
+          @for (task of affectedTasks; track task.taskId) {
+            <div
+              class="theme-bg-elevated rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow overflow-x-hidden"
+              (click)="navigateToTask(task.taskId)"
+            >
+              <div class="flex items-start gap-3">
+                <mat-icon class="theme-text-muted text-xl">task</mat-icon>
+                <div class="flex-1">
+                  <h4 class="theme-text-primary font-medium mb-1 break-words max-w-xs sm:max-w-sm md:max-w-md">
+                    {{ task.taskId }} - {{ task.name || 'Untitled Task' }}
+                  </h4>
+                  @if (task.todo) {
+                    <p class="theme-text-secondary text-sm line-clamp-2">
+                      {{ task.todo }}
+                    </p>
+                  }
+                  <div class="flex items-center gap-3 mt-2 theme-text-muted text-xs">
+                    <span class="px-2 py-1 rounded-md break-words" [style.background-color]="'var(--bg-primary)'">
+                      {{ task.type }}
+                    </span>
+                    @if (task.priority) {
+                      <span class="flex items-center gap-1 break-words">
+                        <mat-icon class="text-xs">flag</mat-icon>
+                        {{ task.priority }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    } @else {
+      <!-- No Action Yet -->
+      <div class="text-center py-12 theme-text-muted">
+        <mat-icon class="text-6xl mb-4 opacity-50">history</mat-icon>
+        <p class="text-lg">No actions recorded yet</p>
+        <p class="text-sm mt-2">Perform an action on a task to see it here</p>
+      </div>
+    }
+  </div>
+</div>

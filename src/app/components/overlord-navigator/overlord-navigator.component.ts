@@ -38,6 +38,7 @@ import { TaskUtilityService } from '../../services/tasks/task-utility.service';
   styleUrls: ['./overlord-navigator.component.scss'],
 })
 export class OverlordNavigatorComponent implements OnInit {
+  
   @Input() isEnabledBack = false;
   searchControl = new FormControl('');
   searchResults: TaskTreeNode[] = [];

@@ -1,0 +1,18 @@
+<!-- src/app/features/nexus/games/priority-duel-game/priority-duel-game.component.html -->
+<div class="priority-duel-container">
+  <h3>{{ round.question }}</h3>
+  <div class="tasks-container">
+    <div class="task-card" *ngFor="let task of round.tasks; let i = index">
+      <h4>{{ task.name }}</h4>
+      <p>{{ task.todo }}</p>
+      <p>Priority: {{ task.priority }}</p>
+      <button (click)="onTaskSelected(task.taskId)">
+        {{ i === 0 ? 'Task A' : 'Task B' }} is higher
+      </button>
+    </div>
+  </div>
+  <div class="actions">
+    <button (click)="onEqual()">Equal</button>
+    <button (click)="onSkip()">Skip</button>
+  </div>
+</div>

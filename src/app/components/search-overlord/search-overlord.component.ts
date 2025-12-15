@@ -8,12 +8,14 @@ import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
 import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
-import { TaskoratorTask } from '../../models/taskModelManager';
-import { AsyncPipe } from '@angular/common';
+import { TaskoratorTask, UiTask } from '../../models/taskModelManager';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { TaskService } from '../../services/sync-api-cache/task.service';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
 import { TaskTransmutationService } from '../../services/tasks/task-transmutation.service';
+import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 
 /**
  * @deprecated no point to search overlord, we just search tasks
@@ -22,13 +24,15 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
   selector: 'app-search-overlord',
   standalone: true,
   imports: [
+    CommonModule,
     AsyncPipe,
     MatFormField,
     MatLabel,
     MatSelect,
     MatOption,
     ReactiveFormsModule,
-    NgxMatSelectSearchModule
+    NgxMatSelectSearchModule,
+    MatButtonModule
 ],
   templateUrl: './search-overlord.component.html',
   styleUrl: './search-overlord.component.scss',
@@ -37,6 +41,7 @@ export class SearchOverlordComponent implements OnInit {
   filteredTaskOptions: Observable<TaskTreeNode[] | null> | null = null;
   selectedOverlordId = '';
   taskSearchCtrl: FormControl = new FormControl();
+  selectedOverlord: UiTask | null = null;
 
   taskOptions: TaskTreeNode[] = []; // Initialize with an empty list
 
@@ -45,17 +50,15 @@ export class SearchOverlordComponent implements OnInit {
     private treeNodeToolsService: TaskTreeNodeToolsService,
     private selectedOverlordService: SelectedOverlordService,
     private taskService: TaskService,
-    private taskTransmutationService: TaskTransmutationService
+    private taskTransmutationService: TaskTransmutationService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    // this.authService
-    //   .isAuthenticatedObservable()
-    //   .subscribe((isAuthenticated) => {
-    //     if (isAuthenticated) {
-    //       this.loadTaskOptions();
-    //     }
-    //   });
+    // Subscribe to selected overlord changes
+    this.selectedOverlordService.getSelectedOverlordObservable().subscribe((overlord) => {
+      this.selectedOverlord = overlord;
+    });
 
     // Set up the filter for the select options
     this.filteredTaskOptions = this.taskSearchCtrl.valueChanges.pipe(
@@ -127,5 +130,11 @@ export class SearchOverlordComponent implements OnInit {
           this.taskTransmutationService.toUiTask(task)
         );
       });
+  }
+
+  navigateToSelectedOverlord(): void {
+    if (this.selectedOverlord && this.selectedOverlord.taskId) {
+      this.router.navigate(['/tasks', this.selectedOverlord.taskId]);
+    }
   }
 }

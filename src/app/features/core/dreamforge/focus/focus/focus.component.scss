@@ -18,3 +18,22 @@
     }
   }
 }
+
+/* Responsive overflow handling for small screens */
+@media (max-width: 768px) {
+  .theme-content {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .theme-card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Prevent content from extending beyond viewport */
+:host {
+  display: block;
+  max-width: 100vw;
+  overflow-x: hidden;
+}

@@ -6,6 +6,7 @@ import { CreateSpecializedTaskComponent } from './create-specialized-task/create
 import { FavoriteTaskComponent } from './favorite/favorite-task/favorite-task.component';
 import { FocusComponent } from './focus/focus/focus.component';
 import { FrogTaskComponent } from './frog/frog-task/frog-task.component';
+import { LastActionViewerComponent } from '../../../components/last-action-viewer/last-action-viewer.component';
 import { AppRouteMap } from '../../../app.routes-models';
 
 // 'Task Creation';
@@ -43,6 +44,10 @@ const routes: Routes = [
         path: 'createSpecialized',
         component: CreateSpecializedTaskComponent, // Replace with your actual component
       },
+      {
+        path: 'lastAction',
+        component: LastActionViewerComponent,
+      },
     ],
     // create task tagger
     //
@@ -78,6 +83,12 @@ export const dreamforgeRouteMetadata: AppRouteMap = {
     icon: 'template', // Replace with the appropriate icon
     description: 'Create specialized tasks by type.',
     altName: '',
+  },
+  lastAction: {
+    title: 'Last Action',
+    icon: 'history',
+    description: 'View and undo the last action performed.',
+    altName: 'Undo',
   },
 };
 export const dreamforgeChildPaths =

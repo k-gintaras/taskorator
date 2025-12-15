@@ -17,6 +17,19 @@
         />
       </div>
 
+      <!-- Task Todo -->
+      <div class="form-control">
+        <label class="theme-text-muted text-sm mb-2 block">Todo</label>
+        <textarea
+          class="w-full rounded-md"
+          style="background:var(--input-bg);border:1px solid var(--input-border);color:var(--text-primary);padding:.6rem .8rem;outline:none;box-shadow:none;min-height:100px;"
+          [(ngModel)]="task.todo"
+          name="todo"
+          placeholder="Enter task details..."
+          rows="4"
+        ></textarea>
+      </div>
+
       <!-- Task Type -->
       <div class="form-control">
         <label class="theme-text-muted text-sm mb-2 block">Task Type</label>

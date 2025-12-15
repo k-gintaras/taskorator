@@ -2,7 +2,7 @@
   <!-- Theme Toggle Button (Artificer Style) -->
   <button
     mat-icon-button
-    (click)="extraActionsService.toggleTheme()"
+    (click)="toggleTheme()"
     class="extra-action-btn-compact"
     [attr.aria-label]="'Current theme: ' + extraActionsService.getCurrentTheme()"
     [title]="'Switch to ' + (extraActionsService.getCurrentTheme() === 'light' ? 'dark' : extraActionsService.getCurrentTheme() === 'dark' ? 'high contrast' : 'light') + ' theme'"

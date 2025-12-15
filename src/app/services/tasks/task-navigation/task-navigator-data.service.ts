@@ -95,6 +95,12 @@ export class TaskNavigatorDataService {
     this.currentListKeySubject.next(listKey);
   }
 
+  async setTasks(tasks: UiTask[]): Promise<void> {
+    await this.treeService.ensureTasksInTree(tasks);
+    this.currentTasksSubject.next(tasks);
+    this.currentListKeySubject.next(null); // No key for custom lists
+  }
+
   getCurrentTasks(): UiTask[] {
     return this.currentTasksSubject.value;
   }
