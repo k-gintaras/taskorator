@@ -1,27 +1,10 @@
-/* src/app/features/nexus/games/priority-duel-game/priority-duel-game.component.scss */
-.priority-duel-container {
-  padding: 20px;
+/* Minimal SCSS per design system: use theme shells and CSS variables */
+/* Only small interaction styles here */
+.task-card:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08);
 }
 
-.tasks-container {
-  display: flex;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.task-card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  flex: 1;
-}
-
-.actions {
-  margin-top: 20px;
-}
-
-button {
-  margin: 5px;
-  padding: 10px;
-  cursor: pointer;
+.theme-btn-primary:focus {
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
 }

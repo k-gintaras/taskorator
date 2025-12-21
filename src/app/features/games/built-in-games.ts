@@ -61,7 +61,7 @@ export const favoritePickGame: NexusGame = {
     if (allTasks.length === 0) return null;
 
     const shuffled = [...allTasks].sort(() => 0.5 - Math.random());
-    const selectedTasks = shuffled.slice(0, Math.min(10, allTasks.length));
+    const selectedTasks = shuffled.slice(0, Math.min(5, allTasks.length));
 
     return {
       id: `round_${Date.now()}_${Math.random()}`,

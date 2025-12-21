@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { NexusComponent } from './nexus/nexus.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SessionComponent } from './session/session/session.component';
+import { NexusGamesComponent } from './games/nexus-games.component';
 import { AppRouteMap } from '../../../app.routes-models';
 
 // 'Task Planning';
@@ -22,6 +23,10 @@ const routes: Routes = [
         path: 'session',
         component: SessionComponent, // Replace with your actual component
       },
+      {
+        path: 'games',
+        component: NexusGamesComponent,
+      },
     ],
   },
 ];
@@ -31,6 +36,12 @@ export const nexusRouteMetadata: AppRouteMap = {
     title: 'Session',
     icon: 'template', // Replace with the appropriate icon
     description: 'Start session to do certain tasks in certain time.',
+    altName: '',
+  },
+  games: {
+    title: 'Games',
+    icon: 'gamepad',
+    description: 'Play quick games to surface task choices and update tasks.',
     altName: '',
   },
 };

@@ -1,18 +1,32 @@
 <!-- src/app/features/nexus/games/priority-duel-game/priority-duel-game.component.html -->
-<div class="priority-duel-container">
-  <h3>{{ round.question }}</h3>
-  <div class="tasks-container">
-    <div class="task-card" *ngFor="let task of round.tasks; let i = index">
-      <h4>{{ task.name }}</h4>
-      <p>{{ task.todo }}</p>
-      <p>Priority: {{ task.priority }}</p>
-      <button (click)="onTaskSelected(task.taskId)">
-        {{ i === 0 ? 'Task A' : 'Task B' }} is higher
-      </button>
+<div>
+  <h3 class="theme-text-primary text-lg font-medium mb-4">{{ round.question }}</h3>
+
+  <div class="flex gap-4 mb-6">
+    <div class="flex-1" *ngFor="let task of round.tasks; let i = index">
+      <div class="p-4 rounded-lg" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+        <h4 class="theme-text-primary font-semibold mb-2">{{ task.name }}</h4>
+        <p class="theme-text-secondary text-sm mb-1">{{ task.todo }}</p>
+        <p *ngIf="getParentName(task)" class="theme-text-muted text-xs mb-1">in {{ getParentName(task) }}</p>
+        <p class="theme-text-muted text-xs">Priority: {{ task.priority }}</p>
+        <button 
+          class="theme-btn-primary flex items-center gap-2 mt-3 w-full justify-center" 
+          (click)="onTaskSelected(task.taskId)">
+          <mat-icon class="text-base">check_circle</mat-icon>
+          {{ i === 0 ? 'Task A' : 'Task B' }} is higher
+        </button>
+      </div>
     </div>
   </div>
-  <div class="actions">
-    <button (click)="onEqual()">Equal</button>
-    <button (click)="onSkip()">Skip</button>
+
+  <div class="flex gap-2 justify-end">
+    <button class="theme-nav-item px-4 py-2 rounded-lg flex items-center gap-2" (click)="onEqual()">
+      <mat-icon class="text-base">drag_handle</mat-icon>
+      <span class="theme-text-secondary">Equal</span>
+    </button>
+    <button class="theme-nav-item px-4 py-2 rounded-lg flex items-center gap-2" (click)="onSkip()">
+      <mat-icon class="text-base">skip_next</mat-icon>
+      <span class="theme-text-secondary">Skip</span>
+    </button>
   </div>
 </div>

@@ -1,11 +1,23 @@
 <!-- src/app/features/nexus/games/favorite-pick-game/favorite-pick-game.component.html -->
-<div class="favorite-pick-container">
-  <h3>{{ round.question }}</h3>
-  <div class="tasks-grid">
-    <div class="task-card" *ngFor="let task of round.tasks" (click)="onTaskSelected(task.taskId)">
-      <h4>{{ task.name }}</h4>
-      <p>{{ task.todo }}</p>
-      <p>Priority: {{ task.priority }}</p>
-    </div>
+<div>
+  <h3 class="theme-text-primary text-lg font-medium mb-4">{{ round.question }}</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <button 
+      class="p-4 rounded-lg text-left transition-all"
+      style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);"
+      *ngFor="let task of round.tasks" 
+      (click)="onTaskSelected(task.taskId)">
+      <h4 class="theme-text-primary font-semibold mb-2">{{ task.name }}</h4>
+      <p class="theme-text-secondary text-sm mb-1">{{ task.todo }}</p>
+      <p *ngIf="getParentName(task)" class="theme-text-muted text-xs mb-1">in {{ getParentName(task) }}</p>
+      <p class="theme-text-muted text-xs">Priority: {{ task.priority }}</p>
+    </button>
+  </div>
+  <div class="flex justify-end mt-4">
+    <button class="theme-nav-item px-4 py-2 rounded-lg flex items-center gap-2" (click)="onSkip()">
+      <mat-icon class="text-base">skip_next</mat-icon>
+      <span class="theme-text-secondary">Skip</span>
+    </button>
   </div>
 </div>

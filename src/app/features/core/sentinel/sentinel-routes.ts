@@ -21,7 +21,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'latestCreated',
+        redirectTo: 'taskorator',
         pathMatch: 'full',
       },
       {

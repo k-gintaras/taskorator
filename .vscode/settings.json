@@ -22,9 +22,6 @@
 
     // Reduce TypeScript inline suggestions/quick info decorations
     "typescript.suggestionActions.enabled": false,
-    "typescript.disableAutomaticTypeAcquisition": true
-    ,
-    // Ensure quick-fix lightbulb and hover are enabled so keyboard quick-fix works on hover
-    "editor.lightbulb.enabled": true,
-    "editor.hover.enabled": true
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "editor.hover.enabled": "on"
 }
