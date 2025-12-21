@@ -6,6 +6,7 @@ import { TaskCacheService } from '../../../../services/cache/task-cache.service'
 import { ROOT_TASK_ID } from '../../../../models/taskModelManager';
 import { TaskListService } from '../../../../services/sync-api-cache/task-list.service';
 import { TreeService } from '../../../../services/sync-api-cache/tree.service';
+import { TaskTreeNodeToolsService } from '../../../../services/tree/task-tree-node-tools.service';
 import { filter, take } from 'rxjs/operators';
 
 @Component({
@@ -28,7 +29,8 @@ export class NexusGamesComponent implements OnInit {
   constructor(
     private cache: TaskCacheService,
     private tree: TreeService,
-    private taskList: TaskListService
+    private taskList: TaskListService,
+    private treeTools: TaskTreeNodeToolsService
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +39,25 @@ export class NexusGamesComponent implements OnInit {
       .getTree()
       .pipe(filter((t) => !!t), take(1))
       .subscribe(async () => {
-        // Try to fetch latest updated tasks to populate caches if empty
+        // Build tasks list from the authoritative tree so games see internal nodes
+        const latest = this.tree.getLatestTree();
+        if (latest) {
+          const primarchNodes = this.treeTools.getFlattened(latest) || [];
+          const abyssNodes = latest.abyss || [];
+          const allNodes = [...primarchNodes, ...abyssNodes];
+
+          const nodes = allNodes.filter(
+            (n) => n.taskId !== ROOT_TASK_ID && n.stage === 'todo'
+          );
+
+          if (nodes.length > 0) {
+            this.tasks = nodes; // pass raw tree nodes to the games host
+            return;
+          }
+
+        }
+
+        // Fallback: try to fetch latest updated tasks to populate caches if empty
         try {
           const fetched = await this.taskList.getLatestUpdatedTasks();
           if (fetched && fetched.length > 0) {
@@ -50,7 +70,7 @@ export class NexusGamesComponent implements OnInit {
           // ignore - fallback to cache
         }
 
-        // fallback to cache
+        // final fallback to cache
         const allTasks = this.cache.getAllTasks();
         if (allTasks && allTasks.length > 0) {
           this.tasks = allTasks.filter((t) =>

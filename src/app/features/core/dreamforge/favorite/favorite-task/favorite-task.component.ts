@@ -86,12 +86,15 @@ export class FavoriteTaskComponent implements OnInit {
 
   add(): void {
     const ids = this.selectedTasks.map((t) => t.taskId);
-    this.tasks = [...this.tasks, ...this.selectedTasks];
-    this.settings.favoriteTaskIds = [
-      ...(this.settings.favoriteTaskIds || []),
-      ...ids,
-    ];
-    this.settingsService.updateSettings(this.settings);
+    // Merge current tasks and selected tasks, deduplicate by taskId
+    const merged = [...this.tasks, ...this.selectedTasks];
+    const uniqueMap = new Map<string, TaskoratorTask>();
+    for (const t of merged) {
+      uniqueMap.set(t.taskId, t);
+    }
+    const uniqueTasks = Array.from(uniqueMap.values());
+    // Use the centralized change handler to update settings and cache
+    this.onFavoriteTasksChange(uniqueTasks);
   }
 
   async loadFavoriteTasks(): Promise<void> {

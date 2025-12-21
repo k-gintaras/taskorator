@@ -9,7 +9,7 @@
 
   <!-- Task List -->
   @if (tasks.length > 0) {
-    @for (task of tasks; track task) {
+    @for (task of tasks; track task.taskId) {
       <div class="relative">
         <div
           class="theme-card flex items-center justify-between rounded-md p-3 mb-3 border box-border w-full max-w-full relative transition-shadow"

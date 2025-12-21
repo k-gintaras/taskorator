@@ -14,45 +14,63 @@ export class TaskSessionService {
   ) {}
 
   async getSessions(): Promise<TaskSession[]> {
-    const userId = null; //await this.auth.getCurrentUserId();
-    if (!userId) return [];
+    // Try cache first
     let sessions = this.cacheService.getCache();
-    if (sessions) {
-      return Promise.resolve(sessions);
-    } else {
-      sessions = await this.apiService.getSessions(userId);
-      this.cacheService.setCache(sessions);
-      return sessions;
+    if (sessions) return Promise.resolve(sessions);
+
+    // Try remote API; if it fails (no auth or network), fall back to empty
+    try {
+      sessions = await this.apiService.getSessions();
+      if (sessions) {
+        this.cacheService.setCache(sessions);
+        return sessions;
+      }
+    } catch (err) {
+      console.warn('TaskSessionService: API getSessions failed, using cache/default', err);
     }
+
+    return [];
   }
 
   async createSession(session: TaskSession): Promise<void> {
-    const userId = null; //await this.auth.getCurrentUserId();
-    if (!userId) return;
+    // Try to persist remotely first
     try {
-      const createdSession = await this.apiService.createSession(
-        userId,
-        session
-      );
-      this.cacheService.updateCache(createdSession); // Use the returned session with its new ID
-      console.log('Session created successfully:', createdSession);
-    } catch (error) {
-      console.error('Failed to create session:', error);
+      const created = await this.apiService.createSession(session);
+      // Update cache with created session (includes server-generated id)
+      this.cacheService.updateCache(created);
+      return;
+    } catch (err) {
+      console.warn('TaskSessionService: API createSession failed, falling back to local cache', err);
     }
+
+    // Fallback: create locally in cache
+    const localId = `local-${Date.now()}`;
+    const localSession: TaskSession = { ...session, id: localId };
+    const existing = this.cacheService.getCache();
+    if (!existing) {
+      this.cacheService.setCache([localSession]);
+    } else {
+      this.cacheService.updateCache(localSession);
+    }
+    console.log('Session created locally:', localSession);
   }
 
   async updateSession(session: TaskSession): Promise<void> {
-    const userId = null; //await this.auth.getCurrentUserId();
-    if (!userId) return;
-    await this.apiService.updateSession(userId, session);
+    try {
+      await this.apiService.updateSession(session);
+    } catch (err) {
+      console.warn('TaskSessionService: API updateSession failed, updating local cache', err);
+    }
     this.cacheService.updateCache(session);
   }
 
   async deleteSession(sessionId: string): Promise<void> {
     if (!sessionId) return;
-    const userId = null; //await this.auth.getCurrentUserId();
-    if (!userId) return;
-    await this.apiService.deleteSession(userId, sessionId);
+    try {
+      await this.apiService.deleteSession(sessionId);
+    } catch (err) {
+      console.warn('TaskSessionService: API deleteSession failed, removing from local cache', err);
+    }
     this.cacheService.removeFromCache(sessionId);
   }
 }

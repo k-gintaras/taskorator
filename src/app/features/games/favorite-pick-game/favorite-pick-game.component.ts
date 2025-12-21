@@ -2,7 +2,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TaskService } from '../../../services/sync-api-cache/task.service';
+import { TreeService } from '../../../services/sync-api-cache/tree.service';
+import { TaskTreeNodeToolsService } from '../../../services/tree/task-tree-node-tools.service';
 import { NexusRound, NexusAnswer } from '../nexus-game.types';
 
 @Component({
@@ -18,7 +19,10 @@ export class FavoritePickGameComponent implements OnInit, OnChanges {
 
   private parentNames = new Map<string, string>();
 
-  constructor(private taskService: TaskService) {}
+  constructor(
+    private treeService: TreeService,
+    private treeTools: TaskTreeNodeToolsService
+  ) {}
 
   ngOnInit(): void {
     this.loadParentNames();
@@ -43,17 +47,15 @@ export class FavoritePickGameComponent implements OnInit, OnChanges {
       // no selectedTaskIds indicates a skip
     });
   }
-  private async loadParentNames(): Promise<void> {
+  private loadParentNames(): void {
     this.parentNames.clear();
     if (!this.round || !this.round.tasks) return;
+    const tree = this.treeService.getLatestTree();
+    if (!tree) return;
     for (const t of this.round.tasks) {
       if (!t.overlord) continue;
-      try {
-        const parent = await this.taskService.getTaskById(t.overlord);
-        if (parent) this.parentNames.set(t.taskId, parent.name);
-      } catch (e) {
-        // ignore
-      }
+      const parentNode = this.treeTools.findNodeById(tree.primarch, t.overlord) || tree.abyss.find(n => n.taskId === t.overlord);
+      if (parentNode) this.parentNames.set(t.taskId, parentNode.name);
     }
   }
 

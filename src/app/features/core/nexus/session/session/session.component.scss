@@ -1,65 +1,53 @@
-.task-session {
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+// Session Component - Following DSC: minimal SCSS, use theme shells + Tailwind
 
-  h2 {
-    margin-top: 0;
-    font-size: 1.5em;
+.session-tabs {
+  ::ng-deep .mat-mdc-tab-labels {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--card-border);
   }
 
-  .create-session {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-
-    mat-form-field,
-    button {
-      margin-top: 10px;
-    }
-
-    .time-picker {
-      display: flex;
-
-      mat-form-field {
-        margin-right: 10px;
-      }
+  ::ng-deep .mat-mdc-tab-label {
+    color: var(--text-secondary);
+    opacity: 1;
+    
+    &:hover {
+      background: var(--nav-item-hover);
     }
   }
 
-  .sessions-list {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-
-    .session-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-
-      mat-icon {
-        cursor: pointer;
-        color: #f44336; /* Red color for delete icon */
-      }
-
-      &.selected-session {
-        background-color: #e0e0e0; /* Light gray background for selected session */
-        font-weight: bold;
-      }
-    }
+  ::ng-deep .mat-mdc-tab-label-active {
+    color: var(--text-primary);
+    background: var(--nav-item-active);
+    font-weight: 600;
   }
 
-  .session-timer {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  ::ng-deep .mdc-tab-indicator__content--underline {
+    border-color: var(--purple-primary);
+  }
 
-    p {
-      margin: 10px 0;
-    }
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    background: var(--card-bg);
   }
 }
+
+.session-item {
+  &.active {
+    background: var(--nav-item-active) !important;
+    border-color: var(--purple-primary) !important;
+  }
+
+  &:hover {
+    background: var(--nav-item-hover) !important;
+  }
+}
+
+// Focus states for inputs
+input[type="text"],
+input[type="number"] {
+  &:focus {
+    outline: none;
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+}
+

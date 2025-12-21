@@ -115,18 +115,14 @@ export class TaskIdCacheService {
   }
 
   addTasksWithGroup(tasks: UiTask[], groupName: string): void {
+    // Ensure the group exists; create if missing so callers don't need to pre-create groups
     if (!this.idCache.has(groupName)) {
-      console.warn(
-        `Group ${groupName} does not exist. Skipping task association.`
-      );
-      return;
+      this.idCache.set(groupName, new Set());
     }
     tasks.forEach((task) => {
       this.taskCacheService.addTaskWithTime(task);
-      if (this.idCache.has(groupName)) {
-        // no point adding to group we don't have from server
-        this.addTaskToGroup(groupName, task.taskId);
-      }
+      // Add each task to the group and map the task->group
+      this.addTaskToGroup(groupName, task.taskId);
     });
   }
 

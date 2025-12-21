@@ -290,4 +290,78 @@ export class TreeNodeService {
 
     return { bigParents, miniParents };
   }
+
+  /**
+   * Returns parent nodes that have children which themselves have children.
+   * Useful for game logic that needs "big" containers.
+   */
+  getBigParents(tree: TaskTree): TaskTreeNode[] {
+    return this.classifyParents(tree).bigParents;
+  }
+
+  /**
+   * Return a random parent node that has at least `minChildren` children.
+   * If none found, returns `null`.
+   */
+  getRandomParentWithMinChildren(
+    tree: TaskTree,
+    minChildren = 3
+  ): TaskTreeNode | null {
+    if (!tree?.primarch) return null;
+    const all = this.treeTools.flattenTree(tree.primarch);
+    const candidates = all.filter((n) => (n.children || []).length >= minChildren);
+    if (!candidates.length) return null;
+    const idx = Math.floor(Math.random() * candidates.length);
+    return candidates[idx];
+  }
+
+  /**
+   * Given a `taskId`, return the node and its parent (if any).
+   * Searches both the main tree and the `abyss` for the node.
+   */
+  getNodeAndParent(
+    tree: TaskTree,
+    taskId: string
+  ): { node: TaskTreeNode | null; parent: TaskTreeNode | null } {
+    if (!tree?.primarch) return { node: null, parent: null };
+
+    const node = this.treeTools.findNodeById(tree.primarch, taskId) ||
+      (tree.abyss || []).find((n) => n.taskId === taskId) ||
+      null;
+
+    if (!node) return { node: null, parent: null };
+
+    const parent = node.overlord ? this.getParentNodeById(tree, node.overlord) : null;
+    return { node, parent };
+  }
+
+  /**
+   * Return all nodes that share duplicate names (case-insensitive).
+   * Useful for detecting collisions and creating game challenges.
+   */
+  getNodesWithDuplicateNames(tree: TaskTree): TaskTreeNode[] {
+    if (!tree?.primarch) return [];
+    const all = this.treeTools.flattenTree(tree.primarch).concat(tree.abyss || []);
+    const byName = new Map<string, TaskTreeNode[]>();
+
+    for (const n of all) {
+      const key = (n.name || '').trim().toLowerCase();
+      if (!byName.has(key)) byName.set(key, []);
+      byName.get(key)!.push(n);
+    }
+
+    const duplicates: TaskTreeNode[] = [];
+    for (const [k, arr] of byName) {
+      if (k && arr.length > 1) duplicates.push(...arr);
+    }
+
+    return duplicates;
+  }
+
+  /**
+   * Return a shallow copy of tasks currently in the abyss (orphaned tasks).
+   */
+  getAbyssTasks(tree: TaskTree): TaskTreeNode[] {
+    return tree?.abyss ? [...tree.abyss] : [];
+  }
 }

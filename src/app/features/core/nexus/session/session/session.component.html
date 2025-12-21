@@ -1,74 +1,205 @@
-<div class="center-horizontal">
-  <div class="fill-width width-task">
-    <div class="task-session">
-      <h2>Task Sessions</h2>
+<div class="theme-content min-h-screen p-6">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="theme-card p-6">
+      <h1 class="theme-text-primary text-2xl font-bold flex items-center gap-3">
+        <mat-icon style="color: var(--purple-primary);">timer</mat-icon>
+        Task Sessions
+      </h1>
+    </div>
 
-      <div class="create-session">
-        <input matInput placeholder="Session Name" #sessionName />
-
-        <div class="time-picker">
-          <mat-form-field>
-            <mat-label>Hours</mat-label>
-            <input
-              matInput
-              type="number"
-              placeholder="Hours"
-              [(ngModel)]="hours"
-              />
-            </mat-form-field>
-            <mat-form-field>
-              <mat-label>Minutes</mat-label>
-              <input
-                matInput
-                type="number"
-                placeholder="Minutes"
-                [(ngModel)]="minutes"
+    <!-- Tabs -->
+    <div class="theme-card">
+      <mat-tab-group class="session-tabs">
+        <mat-tab label="Manage Sessions">
+          <div class="p-6 space-y-6">
+            <!-- Create/Edit Form -->
+            <div class="space-y-4">
+              <div>
+                <label class="theme-text-secondary text-sm font-medium flex items-center gap-2 mb-2">
+                  <mat-icon class="text-sm" style="color: var(--purple-light);">edit_note</mat-icon>
+                  Session Name
+                </label>
+                <input 
+                  type="text"
+                  [(ngModel)]="sessionName"
+                  placeholder="e.g., Deep Work Session"
+                  class="w-full p-3 rounded-lg border text-sm"
+                  style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"
                 />
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Seconds</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  placeholder="Seconds"
-                  [(ngModel)]="seconds"
-                  />
-                </mat-form-field>
               </div>
 
-              <button
-                mat-button
-                color="primary"
-                (click)="createSession(sessionName.value, hours, minutes, seconds)"
-                >
-                Create Session
-              </button>
-            </div>
-
-            <div class="sessions-list">
-              @for (session of sessions; track session) {
-                <div
-                  class="session-item"
-                  [ngClass]="{ 'selected-session': session.id === selectedSession?.id }"
-                  >
-                  <span (click)="setNavigator(session)">{{ session.name }}</span>
-                  <span>{{ convertSecondsToTime(session.duration) }}</span>
-                  <mat-icon (click)="deleteSession(session.id)">delete</mat-icon>
+              <div>
+                <label class="theme-text-secondary text-sm font-medium flex items-center gap-2 mb-2">
+                  <mat-icon class="text-sm" style="color: var(--purple-light);">schedule</mat-icon>
+                  Duration
+                </label>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="theme-text-muted text-xs mb-1 block">Hours</label>
+                    <input 
+                      type="number"
+                      [(ngModel)]="hours"
+                      placeholder="0"
+                      min="0"
+                      class="w-full p-3 rounded-lg border text-sm text-center"
+                      style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"
+                    />
+                  </div>
+                  <div>
+                    <label class="theme-text-muted text-xs mb-1 block">Minutes</label>
+                    <input 
+                      type="number"
+                      [(ngModel)]="minutes"
+                      placeholder="0"
+                      min="0"
+                      max="59"
+                      class="w-full p-3 rounded-lg border text-sm text-center"
+                      style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"
+                    />
+                  </div>
+                  <div>
+                    <label class="theme-text-muted text-xs mb-1 block">Seconds</label>
+                    <input 
+                      type="number"
+                      [(ngModel)]="seconds"
+                      placeholder="0"
+                      min="0"
+                      max="59"
+                      class="w-full p-3 rounded-lg border text-sm text-center"
+                      style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);"
+                    />
+                  </div>
                 </div>
-              }
-            </div>
+              </div>
 
-            @if (selectedSession) {
-              <div class="session-timer">
-                <h3>{{ selectedSession.name }}</h3>
-                <p>Time Remaining: {{ remainingTime }}s</p>
-                <button mat-button color="primary" (click)="startSession()">
-                  Start Session
+              <div class="flex items-center gap-3">
+                <button class="theme-btn-primary flex items-center gap-2 px-6 py-3" (click)="createSession()">
+                  <mat-icon>{{ editMode ? 'save' : 'add' }}</mat-icon>
+                  {{ editMode ? 'Save Session' : 'Create Session' }}
+                </button>
+                <button *ngIf="editMode" class="theme-btn-secondary flex items-center gap-2 px-6 py-3" (click)="cancelEdit()">
+                  <mat-icon>close</mat-icon>
+                  Cancel
                 </button>
               </div>
-            }
-          </div>
+            </div>
 
-          <app-task-navigator></app-task-navigator>
-        </div>
-      </div>
+            <!-- Sessions List -->
+            <div class="space-y-2">
+              <h3 class="theme-text-secondary text-sm font-semibold uppercase tracking-wide flex items-center gap-2">
+                <mat-icon class="text-sm">list</mat-icon>
+                Your Sessions
+              </h3>
+              <div class="space-y-2">
+                @for (session of sessions; track session) {
+                  <div 
+                    class="session-item flex items-center justify-between p-4 rounded-lg cursor-pointer transition-all"
+                    [class.active]="session.id === selectedSession?.id"
+                    (click)="setNavigator(session)"
+                    style="background: var(--bg-surface); border: 1px solid var(--card-border);"
+                  >
+                    <div class="flex items-center gap-3 flex-1">
+                      <mat-icon style="color: var(--purple-light);">timer</mat-icon>
+                      <div>
+                        <div class="theme-text-primary font-medium">{{ session.name }}</div>
+                        <div class="theme-text-muted text-xs">{{ convertSecondsToTime(session.duration) }}</div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="theme-nav-item w-10 h-10 rounded-lg flex items-center justify-center" (click)="beginEdit(session); $event.stopPropagation()">
+                        <mat-icon class="text-lg">edit</mat-icon>
+                      </button>
+                      <button class="theme-nav-item w-10 h-10 rounded-lg flex items-center justify-center" (click)="deleteSession(session.id); $event.stopPropagation()">
+                        <mat-icon class="text-lg">delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Run Session">
+          <div class="p-6 space-y-6">
+            <!-- Running Session Status -->
+            <div *ngIf="selectedSession && remainingTime > 0" class="theme-card p-6" style="background: var(--purple-primary); background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-hover) 100%);">
+              <div class="text-center space-y-4">
+                <div class="flex items-center justify-center gap-3">
+                  <mat-icon class="text-white" style="font-size: 40px; width: 40px; height: 40px;">play_circle_filled</mat-icon>
+                  <h2 class="text-white text-2xl font-bold">{{ selectedSession.name }}</h2>
+                </div>
+                <div class="text-white text-5xl font-mono font-bold">
+                  {{ convertSecondsToTime(remainingTime) }}
+                </div>
+                <div class="text-white text-sm opacity-90">
+                  Running {{ currentRunTaskCount }} task{{ currentRunTaskCount !== 1 ? 's' : '' }}
+                </div>
+                <button class="px-6 py-3 rounded-lg font-medium flex items-center gap-2 mx-auto" 
+                        style="background: rgba(255,255,255,0.2); color: white;"
+                        (click)="stopSession()">
+                  <mat-icon>stop</mat-icon>
+                  Stop Session
+                </button>
+              </div>
+            </div>
+
+            <!-- Session Selection -->
+            <div class="space-y-2">
+              <h3 class="theme-text-secondary text-sm font-semibold uppercase tracking-wide flex items-center gap-2">
+                <mat-icon class="text-sm">play_arrow</mat-icon>
+                Select Session to Run
+              </h3>
+              <div class="space-y-2">
+                @for (session of sessions; track session) {
+                  <div 
+                    class="session-item flex items-center justify-between p-4 rounded-lg transition-all"
+                    [class.active]="session.id === selectedSession?.id"
+                    style="background: var(--bg-surface); border: 1px solid var(--card-border);"
+                  >
+                    <div class="flex items-center gap-3 flex-1 cursor-pointer" (click)="setNavigator(session)">
+                      <mat-icon style="color: var(--purple-light);">timer</mat-icon>
+                      <div>
+                        <div class="theme-text-primary font-medium">{{ session.name }}</div>
+                        <div class="theme-text-muted text-xs">{{ convertSecondsToTime(session.duration) }}</div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="theme-btn-primary flex items-center gap-2 px-4 py-2 text-sm" (click)="setNavigator(session); startSession(true)">
+                        <mat-icon class="text-lg">playlist_play</mat-icon>
+                        Run with Selected
+                      </button>
+                      <button class="theme-btn-secondary flex items-center gap-2 px-4 py-2 text-sm" (click)="setNavigator(session); startSession()">
+                        <mat-icon class="text-lg">play_arrow</mat-icon>
+                        Start
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Staged Tasks -->
+    <div class="theme-card p-6">
+      <h2 class="theme-text-primary text-lg font-medium flex items-center gap-2 mb-4">
+        <mat-icon style="color: var(--purple-primary);">checklist</mat-icon>
+        Staged Tasks
+      </h2>
+      <app-staged-task-list [tasks]="selectedTasks" (tasksChange)="onStagedTasksChange($event)"></app-staged-task-list>
+    </div>
+
+    <!-- Task Navigator -->
+    <div class="theme-card p-6">
+      <h2 class="theme-text-primary text-lg font-medium flex items-center gap-2 mb-4">
+        <mat-icon style="color: var(--purple-primary);">explore</mat-icon>
+        Task Navigator
+      </h2>
+      <app-task-navigator></app-task-navigator>
+    </div>
+  </div>
+</div>

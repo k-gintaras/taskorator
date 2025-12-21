@@ -16,7 +16,7 @@ import { FavoritePickGameComponent } from '../favorite-pick-game/favorite-pick-g
   styleUrls: ['./random-game-host.component.scss'],
 })
 export class RandomGameHostComponent implements OnInit, OnChanges {
-  @Input() tasks: UiTask[] = [];
+  @Input() tasks: any[] = [];
   currentRound: NexusRound | null = null;
 
   constructor(private gameEngine: NexusGameEngineService, private facade: NexusGameFacadeService) {}

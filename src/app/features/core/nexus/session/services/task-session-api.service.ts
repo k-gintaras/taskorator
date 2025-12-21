@@ -5,20 +5,30 @@ import {
   collection,
   doc,
   getDocs,
-  addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
-  setDoc,
+  getDoc,
 } from '@angular/fire/firestore';
 import { TaskSession } from '../task-session.model';
+import { AuthService } from '../../../../../services/core/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskSessionApiService {
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async getSessions(userId: string): Promise<TaskSession[]> {
+  private async getUserId(): Promise<string> {
+    const userId = await this.authService.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+    return userId;
+  }
+
+  async getSessions(): Promise<TaskSession[]> {
+    const userId = await this.getUserId();
     try {
       const sessionsCollection = collection(
         this.firestore,
@@ -38,11 +48,9 @@ export class TaskSessionApiService {
     }
   }
 
-  async createSession(
-    userId: string,
-    session: TaskSession
-  ): Promise<TaskSession> {
+  async createSession(session: TaskSession): Promise<TaskSession> {
     try {
+      const userId = await this.getUserId();
       const sessionsCollection = collection(
         this.firestore,
         `users/${userId}/task-sessions`
@@ -58,12 +66,13 @@ export class TaskSessionApiService {
     }
   }
 
-  async updateSession(userId: string, session: TaskSession): Promise<void> {
-    const sessionDoc = doc(
-      this.firestore,
-      `users/${userId}/task-sessions/${session.id}`
-    );
+  async updateSession(session: TaskSession): Promise<void> {
     try {
+      const userId = await this.getUserId();
+      const sessionDoc = doc(
+        this.firestore,
+        `users/${userId}/task-sessions/${session.id}`
+      );
       const sessionData = JSON.parse(JSON.stringify(session));
       await updateDoc(sessionDoc, sessionData);
     } catch (error) {
@@ -71,12 +80,13 @@ export class TaskSessionApiService {
     }
   }
 
-  async deleteSession(userId: string, id: string): Promise<void> {
-    const sessionDoc = doc(
-      this.firestore,
-      `users/${userId}/task-sessions/${id}`
-    );
+  async deleteSession(id: string): Promise<void> {
     try {
+      const userId = await this.getUserId();
+      const sessionDoc = doc(
+        this.firestore,
+        `users/${userId}/task-sessions/${id}`
+      );
       await deleteDoc(sessionDoc);
     } catch (error) {
       console.error('Failed to delete session:', error);

@@ -417,6 +417,7 @@ export class TaskListApiService implements TaskListApiStrategy {
         .filter((task): task is TaskoratorTask => task !== null); // Filter out null values
     } catch (error) {
       this.handleError('executeQuery', error);
+      // Return empty list on query errors to avoid breaking callers; caller may treat empty as no results
       return [];
     }
   }
@@ -425,6 +426,26 @@ export class TaskListApiService implements TaskListApiStrategy {
    * Logs errors and ensures smooth operation.
    */
   private handleError(method: string, error: unknown): void {
+    // Provide cleaner messaging for common Firestore index errors
+    try {
+      const err: any = error as any;
+      const msg: string = err && err.message ? err.message : String(err);
+      if (msg && msg.includes('create it here')) {
+        const urlMatch = msg.match(/https?:\/\/[^\s)]+/);
+        if (urlMatch && urlMatch[0]) {
+          console.warn(
+            `TaskListApiService.${method} failed: Firestore query requires an index. Create it here: ${urlMatch[0]}`
+          );
+          return;
+        }
+        console.warn(
+          `TaskListApiService.${method} failed: Firestore query requires an index. Check Firebase console.`
+        );
+        return;
+      }
+    } catch (e) {
+      // ignore parsing errors and fall through
+    }
     console.warn(`TaskListApiService.${method} failed:`, error);
   }
 }

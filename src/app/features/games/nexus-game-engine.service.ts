@@ -2,24 +2,53 @@
 import { Injectable } from '@angular/core';
 import { NexusRound, NexusAnswer, TaskActionPatch, NexusGame } from './nexus-game.types';
 import { priorityDuelGame, favoritePickGame } from './built-in-games';
-import { UiTask } from '../../models/taskModelManager';
+import { TaskTreeNode } from '../../models/taskTree';
 import { TreeService } from '../../services/sync-api-cache/tree.service';
 import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-tools.service';
+import { TreeNodeService } from '../../services/tree/tree-node.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NexusGameEngineService {
   private availableGames: NexusGame[] = [priorityDuelGame, favoritePickGame];
-  private currentTasks: UiTask[] = [];
+  // We only need minimal task shape for game logic: { taskId, name, overlord, stage?, status? }
+  private currentTasks: any[] = [];
 
   constructor(
     private treeService: TreeService,
-    private treeTools: TaskTreeNodeToolsService
+    private treeTools: TaskTreeNodeToolsService,
+    private treeNodeService: TreeNodeService
   ) {}
 
-  setTasks(tasks: UiTask[]): void {
-    this.currentTasks = tasks;
+  setTasks(tasks: any[]): void {
+    if (!tasks || !tasks.length) {
+      this.currentTasks = [];
+      return;
+    }
+
+    const first = tasks[0];
+    if (first && Array.isArray(first.children)) {
+      // Convert tree nodes to minimal task objects
+      this.currentTasks = (tasks as TaskTreeNode[])
+        .map((n) => ({
+          taskId: n.taskId,
+          name: n.name,
+          overlord: n.overlord,
+          stage: n.stage,
+          status: 'active',
+        }))
+        .filter((t) => t.taskId !== undefined && t.taskId !== null);
+    } else {
+      // Normalize incoming tasks to minimal shape
+      this.currentTasks = (tasks as any[]).map((t) => ({
+        taskId: t.taskId,
+        name: t.name,
+        overlord: t.overlord,
+        stage: t.stage,
+        status: t.status || 'active',
+      }));
+    }
   }
 
   getNextRandomRound(): NexusRound | null {
@@ -30,55 +59,75 @@ export class NexusGameEngineService {
     if (selectedGame.id === 'favorite-pick') {
       const fav = this.generateFavoriteRound(this.currentTasks);
       if (fav) return fav;
-      // fallback to default generator
+    }
+
+    // Special-case priority-duel to choose two children of the same parent
+    if (selectedGame.id === 'priority-duel') {
+      const pr = this.generatePriorityRound(this.currentTasks);
+      if (pr) return pr;
     }
 
     return selectedGame.generateRound(this.currentTasks);
   }
 
-  private generateFavoriteRound(allTasks: UiTask[]): NexusRound | null {
-    // Prefer tasks that have many descendants or deep nesting
+  private generateFavoriteRound(allTasks: any[]): NexusRound | null {
+    // Prefer tasks that live under "big" parents (many descendants / children)
     const tree = this.treeService.getLatestTree();
-    const candidates: UiTask[] = [];
+    const candidates: any[] = [];
 
     if (tree) {
-      const nodes = this.treeTools.getFlattened(tree);
-      // Find candidate node IDs where descendant count >= threshold
-      const bigNodes = nodes.filter((n) => this.treeTools.countDescendants(n) >= 4);
-      // Map to UiTask entries, ensure stage/status checks
-      const bigTasks = bigNodes
-        .map((n) => allTasks.find((t) => t.taskId === n.taskId))
-        .filter((t): t is UiTask => !!t && t.stage === 'todo' && t.status === 'active');
+      const bigParents = this.treeNodeService.getBigParents(tree);
 
-      // Shuffle and pick up to 4 big tasks
-      const shuffledBig = [...bigTasks].sort(() => 0.5 - Math.random()).slice(0, 4);
-      candidates.push(...shuffledBig);
+      // Rank parents by descendent count
+      const ranked = bigParents
+        .map((n) => ({ node: n, desc: this.treeTools.countDescendants(n) }))
+        .sort((a, b) => b.desc - a.desc);
+
+      const pool = ranked.slice(0, Math.min(10, ranked.length));
+      const chosenParents = new Set<string>();
+
+      for (let i = 0; i < Math.min(4, pool.length); i++) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        if (!pick || chosenParents.has(pick.node.taskId)) continue;
+        chosenParents.add(pick.node.taskId);
+
+        const subtree = this.treeTools.flattenTree(pick.node);
+        const descendantIds = new Set(subtree.map((n) => n.taskId));
+        const childCandidates = allTasks.filter(
+          (t) => descendantIds.has(t.taskId) && t.stage === 'todo' && t.status === 'active'
+        );
+
+        if (!childCandidates.length) continue;
+
+        const selectedChild = childCandidates[Math.floor(Math.random() * childCandidates.length)];
+        if (!candidates.find((c) => c.taskId === selectedChild.taskId)) {
+          candidates.push(selectedChild);
+        }
+      }
     }
 
-    // Always include one random task (may be big or small) to keep variety
-    const otherPool = allTasks.filter((t) => t.stage === 'todo' && t.status === 'active' && !candidates.find(c => c.taskId === t.taskId));
+    // Add a random active todo to keep variety
+    const otherPool = allTasks.filter((t) => t.stage === 'todo' && t.status === 'active' && !candidates.find((c) => c.taskId === t.taskId));
     if (otherPool.length === 0 && candidates.length === 0) return null;
 
-    const randomPick = otherPool.length ? otherPool[Math.floor(Math.random() * otherPool.length)] : null;
-    if (randomPick) candidates.push(randomPick);
+    if (otherPool.length) {
+      const randomPick = otherPool[Math.floor(Math.random() * otherPool.length)];
+      if (randomPick) candidates.push(randomPick);
+    }
 
-    // If we don't have enough candidates, fill with randoms
     while (candidates.length < 5 && otherPool.length > 0) {
       const pick = otherPool[Math.floor(Math.random() * otherPool.length)];
-      if (!candidates.find(c => c.taskId === pick.taskId)) candidates.push(pick);
-      if (candidates.length >= otherPool.length) break; // avoid infinite loop
+      if (!candidates.find((c) => c.taskId === pick.taskId)) candidates.push(pick);
+      if (candidates.length >= otherPool.length) break;
     }
 
     if (!candidates.length) return null;
-
-    // Limit to 5
-    const final = candidates.slice(0, 5);
 
     return {
       id: `round_${Date.now()}_${Math.random()}`,
       gameId: 'favorite-pick',
       question: 'Which of these is your favorite right now?',
-      tasks: final,
+      tasks: candidates.slice(0, 5),
       mode: 'pick1',
     };
   }
@@ -117,6 +166,33 @@ export class NexusGameEngineService {
 
     // Fallback to first game
     return this.availableGames[0];
+  }
+
+  private generatePriorityRound(allTasks: any[]): NexusRound | null {
+    const tree = this.treeService.getLatestTree();
+    if (!tree) return null;
+
+    // Use TreeNodeService to quickly find a parent with >=2 children
+    const parent = this.treeNodeService.getRandomParentWithMinChildren(tree, 2);
+    if (!parent) return null;
+
+    const childIds = parent.children.map((c) => c.taskId);
+    const eligibleChildren = allTasks.filter(
+      (t) => childIds.includes(t.taskId) && t.stage === 'todo' && t.status === 'active'
+    );
+
+    if (eligibleChildren.length < 2) return null;
+
+    const shuffled = [...eligibleChildren].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 2);
+
+    return {
+      id: `round_${Date.now()}_${Math.random()}`,
+      gameId: 'priority-duel',
+      question: `Within "${parent.name}", which task has higher priority?`,
+      tasks: selected,
+      mode: 'pick1',
+    };
   }
 
   private getRoundById(roundId: string): NexusRound | null {
