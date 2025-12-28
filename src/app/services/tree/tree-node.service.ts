@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ROOT_TASK_ID, TaskoratorTask } from '../../models/taskModelManager';
+import { ROOT_TASK_ID, TaskoratorTask, TaskStage } from '../../models/taskModelManager';
 import { TaskTree, TaskTreeNode } from '../../models/taskTree';
 import { TaskTreeNodeToolsService } from './task-tree-node-tools.service';
 
@@ -197,9 +197,48 @@ export class TreeNodeService {
   private updateNodeCounts(node: TaskTreeNode): void {
     // Update counts based on the node's actual children
     node.childrenCount = node.children.length;
-    node.completedChildrenCount = node.children.filter(
-      (c) => c.stage === 'completed' || c.stage === 'deleted'
+    node.completedChildrenCount = node.children.filter((c) =>
+      this.isCompletedStage(c.stage)
     ).length;
+  }
+
+  /**
+   * Recalculate children/completed counts for the provided parent nodes.
+   * Returns how many parents changed so callers can decide whether to persist.
+   */
+  recountParentCounts(tree: TaskTree, parentIds: Set<string>): number {
+    if (!tree?.primarch || !parentIds.size) return 0;
+
+    let updatedCount = 0;
+
+    for (const parentId of parentIds) {
+      if (!parentId) continue;
+
+      const parentNode =
+        parentId === ROOT_TASK_ID
+          ? tree.primarch
+          : this.treeTools.findNodeById(tree.primarch, parentId);
+
+      if (!parentNode) continue;
+
+      const beforeChildren = parentNode.childrenCount;
+      const beforeCompleted = parentNode.completedChildrenCount;
+
+      this.updateNodeCounts(parentNode);
+
+      if (
+        parentNode.childrenCount !== beforeChildren ||
+        parentNode.completedChildrenCount !== beforeCompleted
+      ) {
+        updatedCount++;
+      }
+    }
+
+    return updatedCount;
+  }
+
+  private isCompletedStage(stage: TaskStage): boolean {
+    return stage !== 'todo';
   }
 
   private getParentNode(

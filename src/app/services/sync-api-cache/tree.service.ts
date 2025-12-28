@@ -150,12 +150,30 @@ export class TreeService implements TreeStrategy {
         return !inTree && !inAbyss;
       });
 
-      if (!missing.length) {
-        return;
+      let treeChanged = false;
+
+      if (missing.length) {
+        const createdTasks = await this.treeNodeService.createTasks(tree, missing);
+        treeChanged = createdTasks.length > 0;
       }
 
-      await this.treeNodeService.createTasks(tree, missing);
-      await this.updateTree(tree);
+      const parentIds = new Set<string>();
+      for (const task of tasks) {
+        const parentId = task.overlord || ROOT_TASK_ID;
+        parentIds.add(parentId);
+      }
+
+      const updatedParents = this.treeNodeService.recountParentCounts(
+        tree,
+        parentIds
+      );
+      if (updatedParents > 0) {
+        treeChanged = true;
+      }
+
+      if (treeChanged) {
+        await this.updateTree(tree);
+      }
     } catch (error) {
       console.error('Error ensuring tasks are in tree:', error);
     }
@@ -186,5 +204,54 @@ export class TreeService implements TreeStrategy {
   updateLocalTreeCache(taskTree: TaskTree): void {
     this.cacheService.updateTree(taskTree);
     this.treeSubject.next(taskTree);
+  }
+
+  async refreshParentCounts(parentIds: string[]): Promise<void> {
+    if (!parentIds.length) return;
+
+    const tree = this.getLatestTree();
+    if (!tree) return;
+
+    const cleanedIds = parentIds.filter((id) => !!id);
+    if (!cleanedIds.length) return;
+
+    const updatedParents = this.treeNodeService.recountParentCounts(
+      tree,
+      new Set(cleanedIds)
+    );
+
+    if (updatedParents > 0) {
+      this.updateLocalTreeCache(tree);
+    }
+  }
+
+  async updateParentNodeCounts(
+    parentId: string,
+    childrenCount: number,
+    completedChildrenCount: number
+  ): Promise<void> {
+    if (!parentId) return;
+
+    const tree = this.getLatestTree();
+    if (!tree) return;
+
+    const parentNode = this.treeNodeToolsService.findNodeById(
+      tree.primarch,
+      parentId
+    );
+    if (!parentNode) return;
+
+    if (
+      parentNode.childrenCount === childrenCount &&
+      parentNode.completedChildrenCount === completedChildrenCount
+    ) {
+      return;
+    }
+
+    parentNode.childrenCount = childrenCount;
+    parentNode.completedChildrenCount = completedChildrenCount;
+
+    // Flush the updated counts into the local cache and emit the change.
+    this.updateLocalTreeCache(tree);
   }
 }

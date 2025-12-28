@@ -3,7 +3,7 @@ import { TaskCacheService } from '../cache/task-cache.service';
 import { TreeService } from '../sync-api-cache/tree.service';
 import { EventBusService } from '../core/event-bus.service';
 import { getDefaultTree, TaskTree, TaskTreeNode } from '../../models/taskTree';
-import { TaskoratorTask } from '../../models/taskModelManager';
+import { TaskoratorTask, TaskStage } from '../../models/taskModelManager';
 import { TreeNodeService } from './tree-node.service';
 import { TaskTreeNodeToolsService } from './task-tree-node-tools.service';
 
@@ -49,8 +49,8 @@ export class TaskTreeHealService {
 
     for (const node of allNodes) {
       const actualChildrenCount = node.children.length;
-      const actualCompletedCount = node.children.filter(
-        (c) => c.stage === 'completed' || c.stage === 'deleted'
+      const actualCompletedCount = node.children.filter((c) =>
+        this.isCompletedStage(c.stage)
       ).length;
 
       if (
@@ -71,8 +71,8 @@ export class TaskTreeHealService {
 
     for (const node of nodes) {
       const actualChildrenCount = node.children.length;
-      const actualCompletedCount = node.children.filter(
-        (c) => c.stage === 'completed' || c.stage === 'deleted'
+      const actualCompletedCount = node.children.filter((c) =>
+        this.isCompletedStage(c.stage)
       ).length;
 
       if (
@@ -234,8 +234,8 @@ export class TaskTreeHealService {
     // Simple counts from loaded data
     const actualChildrenCount = loadedChildren.length;
     const actualCompletedCount = loadedChildren.filter(
-      (task) => task.stage === 'completed' || task.stage === 'deleted'
-    ).length;
+        (task) => this.isCompletedStage(task.stage)
+      ).length;
 
     // Update counts if different
     if (
@@ -301,5 +301,9 @@ export class TaskTreeHealService {
     }
 
     return { missingTasksAdded, countsFixed };
+  }
+
+  private isCompletedStage(stage: TaskStage): boolean {
+    return stage !== 'todo';
   }
 }

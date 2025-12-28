@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TaskListKey } from '../../../models/task-list-model';
+import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { BehaviorSubject } from 'rxjs';
 import { UiTask } from '../../../models/taskModelManager';
 import {
@@ -76,23 +76,26 @@ export class TaskNavigatorDataService {
     const currentListKey = this.currentListKeySubject.value;
     if (!currentListKey) return;
 
-    const tasks = await this.taskListCoordinator.getTasks(currentListKey);
+    const tasks = (await this.taskListCoordinator.getTasks(currentListKey)) || [];
     await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
+    await this.refreshParentCountsForList(currentListKey, tasks);
   }
 
   async refreshTasksForKey(listKey: TaskListKey): Promise<void> {
-    const tasks = await this.taskListCoordinator.getTasks(listKey);
+    const tasks = (await this.taskListCoordinator.getTasks(listKey)) || [];
     await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
+    await this.refreshParentCountsForList(listKey, tasks);
   }
 
   async setTasksByKey(listKey: TaskListKey): Promise<void> {
-    const tasks = await this.taskListCoordinator.getTasks(listKey);
+    const tasks = (await this.taskListCoordinator.getTasks(listKey)) || [];
     await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
+    await this.refreshParentCountsForList(listKey, tasks);
   }
 
   async setTasks(tasks: UiTask[]): Promise<void> {
@@ -107,6 +110,34 @@ export class TaskNavigatorDataService {
 
   getCurrentListKey(): TaskListKey | null {
     return this.currentListKeySubject.value;
+  }
+
+  private async refreshParentCountsForList(
+    listKey: TaskListKey,
+    tasks: UiTask[]
+  ): Promise<void> {
+    const parentId = this.extractParentId(listKey);
+    if (!parentId) return;
+
+    const childrenCount = tasks.length;
+    const completedChildren = tasks.filter((task) => task.stage !== 'todo').length;
+    await this.treeService.updateParentNodeCounts(
+      parentId,
+      childrenCount,
+      completedChildren
+    );
+  }
+
+  private extractParentId(listKey: TaskListKey): string | null {
+    if (
+      (listKey.type === TaskListType.OVERLORD ||
+        listKey.type === TaskListType.SUPER_OVERLORD) &&
+      typeof listKey.data === 'string'
+    ) {
+      return listKey.data;
+    }
+
+    return null;
   }
 
   /**

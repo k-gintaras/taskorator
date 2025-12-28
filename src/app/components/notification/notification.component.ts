@@ -2,6 +2,7 @@ export interface NotificationUiState {
   icon: string;
   label: string;
   colorVar: string;   // e.g. '--error', '--purple-primary'
+  textColorVar: string; // color used for icon/label contrast
   pulse: boolean;
   click: 'feedback' | 'selected' | 'status' | 'idle';
 }
@@ -36,6 +37,7 @@ export class NotificationComponent implements OnInit {
     icon: 'task_alt',
     label: this.appTitle,
     colorVar: '--text-secondary',
+    textColorVar: '--text-secondary',
     pulse: false,
     click: 'idle',
   };
@@ -67,6 +69,7 @@ export class NotificationComponent implements OnInit {
         icon: 'info',
         label: this.getTruncatedMessage(),
         colorVar: '--topbar-text',
+        textColorVar: '--topbar-text',
         pulse: false,
         click: 'feedback',
       };
@@ -78,6 +81,7 @@ export class NotificationComponent implements OnInit {
         icon: 'check_box',
         label: `${this.selectedTasksCount} selected`,
         colorVar: '--purple-primary',
+        textColorVar: '--topbar-text',
         pulse: false,
         click: 'selected',
       };
@@ -89,6 +93,7 @@ export class NotificationComponent implements OnInit {
         icon: this.statusState.icon,
         label: this.statusState.message,
         colorVar: this.statusState.color, // e.g. '--success', '--warning', '--error'
+        textColorVar: this.statusState.color,
         pulse: false, // Status doesn't pulse
         click: 'status',
       };
@@ -99,6 +104,7 @@ export class NotificationComponent implements OnInit {
       icon: 'task_alt',
       label: this.appTitle,
       colorVar: '--text-secondary',
+      textColorVar: '--text-secondary',
       pulse: false,
       click: 'idle',
     };

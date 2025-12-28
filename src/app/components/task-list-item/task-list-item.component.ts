@@ -32,9 +32,13 @@ export class TaskListItemComponent {
   }
 
   getTreeNodeInfo(): TaskNodeInfo | null {
-    return this.task
+    const nodeInfo=this.task
       ? this.taskTransmutationService.toTaskNodeInfo(this.task)
       : null;
+      // console.log("this.task.name");
+      // console.log(this.task.name);
+      // console.log(nodeInfo);
+      return nodeInfo;
   }
 
   getButtonClasses(): string {

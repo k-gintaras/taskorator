@@ -9,10 +9,10 @@
     [style.background-color]="'color-mix(in srgb, ' + getColor(uiState.colorVar) + ' 12%, transparent)'"
     [style.border]="'1px solid ' + getColor(uiState.colorVar)"
   >
-    <mat-icon
-      class="text-base"
-      [style.color]="getColor(uiState.colorVar)"
-    >
+      <mat-icon
+        class="text-base"
+        [style.color]="getColor(uiState.textColorVar)"
+      >
       {{ uiState.icon }}
     </mat-icon>
   </button>
@@ -24,10 +24,10 @@
     [style.background-color]="'color-mix(in srgb, ' + getColor(uiState.colorVar) + ' 12%, transparent)'"
     [style.border]="'1px solid ' + getColor(uiState.colorVar)"
   >
-    <mat-icon
-      class="text-sm shrink-0"
-      [style.color]="getColor(uiState.colorVar)"
-    >
+      <mat-icon
+        class="text-sm shrink-0"
+        [style.color]="getColor(uiState.textColorVar)"
+      >
       {{ uiState.icon }}
     </mat-icon>
 
@@ -35,7 +35,7 @@
     <span
       *ngIf="uiState.click !== 'status'"
       class="theme-text-secondary text-xs font-medium truncate"
-      [style.color]="getColor(uiState.colorVar)"
+      [style.color]="getColor(uiState.textColorVar)"
     >
       {{ uiState.label }}
     </span>
