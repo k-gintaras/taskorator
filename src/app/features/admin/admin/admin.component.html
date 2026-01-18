@@ -1,38 +1,44 @@
-<p>admin works!</p>
-Message:
-<p *ngIf="message">message: {{ message }}</p>
-Loading:
-<p *ngIf="loading">loading: {{ loading }}</p>
-Error:
-<p *ngIf="error">error: {{ error }}</p>
-<p *ngIf="joke">Joke: {{ joke }}</p>
-<pre *ngIf="joke">{{ joke }}</pre>
+<div class="admin-container">
+  <div class="theme-card p-6 mb-6 shadow-lg border" style="border-color: var(--border);">
+    <div class="admin-header">
+      <h1 class="admin-title">Admin Panel</h1>
+      <div class="admin-actions">
+        <button class="btn" (click)="migrateDatesFix()">Run Migration Fix</button>
+        <button class="btn" (click)="loadTemplate()">Load Demo Template</button>
+        <button class="btn" (click)="gptTest()">GPT Test</button>
+      </div>
+    </div>
 
-<div *ngIf="template">
-  <h2>{{ template.name }}</h2>
-  <p>Author: {{ template.authorName }}</p>
-  <p>Price: {{ template.price ? template.price : "Free" }}</p>
-  <ul>
-    <li *ngFor="let task of template.tasks">
-      {{ task.name }}: {{ task.timeCreated }}
-    </li>
-  </ul>
+    <div class="admin-status">
+      <div *ngIf="message" class="status-item">Message: {{ message }}</div>
+      <div *ngIf="loading" class="status-item">Loading…</div>
+      <div *ngIf="error" class="status-item error">Error: {{ error }}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="theme-card p-6 mb-6 shadow-lg border" style="border-color: var(--border);">
+      <h2 class="section-title">Template Preview</h2>
+      <div *ngIf="template; else noTemplate">
+        <h3>{{ template.name }}</h3>
+        <p class="muted">Author: {{ template.authorName }} • Price: {{ template.price ? template.price : 'Free' }}</p>
+        <ul>
+          <li *ngFor="let task of template.tasks">{{ task.name }} <small class="muted">({{ task.taskId }})</small></li>
+        </ul>
+      </div>
+      <ng-template #noTemplate>
+        <div class="muted">No template loaded.</div>
+      </ng-template>
+    </div>
+
+    <div class="theme-card p-6 mb-6 shadow-lg border" style="border-color: var(--border);">
+      <h2 class="section-title">Tree Structure</h2>
+      <div *ngIf="treeJson; else noTree">
+        <pre class="tree-pre">{{ treeJson }}</pre>
+      </div>
+      <ng-template #noTree>
+        <div class="muted">Tree not available.</div>
+      </ng-template>
+    </div>
+  </div>
 </div>
-<!-- <button (click)="loadTemplate()">Load Template</button>
-<button (click)="getTree()">Load Tree</button> -->
-<!-- <button (click)="sqliteTest()">Load sql</button> -->
-<!-- <button (click)="fixMissingTasks()">fix missing sql</button> -->
-<!-- <button (click)="registerTest()">register Test</button>
-<button (click)="addDocTest()">add doc test</button>
-<button (click)="getUserTest()">get doc test</button> -->
-
-<!-- <button (click)="gptTest()">get GTP test</button> -->
-<button (click)="migrateDatesFix()">migrate fix</button>
-
-<!-- YourComponent.html -->
-<div>
-  <h1>Tree Structure</h1>
-  <pre>{{ treeJson }}</pre>
-</div>
-
-<!-- <app-tree-view [treeInput]="tree"></app-tree-view> -->

@@ -39,7 +39,7 @@ export class NavigationBuilderService {
     citadel: citadelChildPaths.filter((s) => s !== ''), // Remove "" paths
     crucible: crucibleChildPaths.filter((s) => s !== ''),
     dreamforge: dreamforgeChildPaths.filter((s) => s !== ''),
-    gateway: gatewayChildPaths.filter((s) => s !== ''),
+    gateway: gatewayChildPaths.filter((s) => s !== '' && s !== 'unauthorized'),
     nexus: nexusChildPaths.filter((s) => s !== ''),
     sentinel: sentinelChildPaths.filter((s) => s !== ''),
     vortex: vortexChildPaths.filter((s) => s !== ''),

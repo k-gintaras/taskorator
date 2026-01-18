@@ -11,3 +11,12 @@ export const environment = {
     measurementId: 'G-HBL7JCRWL0',
   },
 };
+
+export const firebaseAiApi={
+  apiKey: "AIzaSyDsv1tMs0kxF0rfQdds0qKZh0ua9rPqamI",
+  authDomain: "ai-api-5c92d.firebaseapp.com",
+  projectId: "ai-api-5c92d",
+  storageBucket: "ai-api-5c92d.firebasestorage.app",
+  messagingSenderId: "737017354476",
+  appId: "1:737017354476:web:ff970053946c5292b6adc9"
+}

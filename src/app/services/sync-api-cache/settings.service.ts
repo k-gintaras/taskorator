@@ -5,6 +5,7 @@ import { TaskSettings, getDefaultTaskSettings } from '../../models/settings';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
 import { ErrorService } from '../core/error.service';
+import { getDefaultTask, ROOT_TASK_ID, TaskoratorTask } from '../../models/taskModelManager';
 /**
  * @deprecated TODO: probably not deprecated :DDDDDDDDDDDDDDDDDDDDDDDDDDDDD
  */
@@ -86,8 +87,10 @@ export class SettingsService implements SettingsStrategy {
           settings = defaultSettings;
         }
       }
-      this.cacheService.updateSettings(settings);
-      this.settingsSubject.next(settings);
+      // Normalize/merge settings to avoid partial objects wiping arrays
+      const normalized = this.normalizeSettings(settings);
+      this.cacheService.updateSettings(normalized);
+      this.settingsSubject.next(normalized);
     } catch (error) {
       this.error(error);
       throw error;
@@ -104,8 +107,43 @@ export class SettingsService implements SettingsStrategy {
           console.warn('SettingsService: API updateSettings failed, using cache', err);
         }
       }
-      this.cacheService.updateSettings(settings);
-      this.settingsSubject.next(settings);
+      const normalized = this.normalizeSettings(settings);
+
+      // detect focusTaskIds cleared
+      try {
+        const prev = this.cacheService.getSettings();
+        const prevHasFocus = !!(prev && Array.isArray(prev.focusTaskIds) && prev.focusTaskIds.length > 0);
+        const nowHasFocus = !!(normalized && Array.isArray(normalized.focusTaskIds) && normalized.focusTaskIds.length > 0);
+        if (prevHasFocus && !nowHasFocus) {
+          const msg = `Focus tasks cleared at ${new Date().toISOString()}`;
+          console.warn(msg);
+          this.errorService.log(msg);
+
+          // create a root task to notify the user
+          try {
+            const alertTask: TaskoratorTask = getDefaultTask();
+            alertTask.taskId = getDefaultTask().taskId + '_' + Date.now().toString(36);
+            alertTask.name = '⚠️ Focus tasks were cleared — investigate';
+            alertTask.why = `Focus tasks were cleared automatically on ${new Date().toLocaleString()}. If this was unexpected, check synchronization/caching.`;
+            alertTask.overlord = ROOT_TASK_ID;
+            alertTask.timeCreated = Date.now();
+            alertTask.lastUpdated = Date.now();
+            // Try to persist via API if available, else update cache
+            if (this.apiService && typeof this.apiService.createTask === 'function') {
+              try { await this.apiService.createTask(alertTask); } catch (e) { console.warn('Failed to create alert task via API', e); this.cacheService.createTask(alertTask); }
+            } else {
+              this.cacheService.createTask(alertTask);
+            }
+          } catch (e) {
+            console.warn('Failed to create focus-clear alert task', e);
+          }
+        }
+      } catch (e) {
+        console.warn('Error checking previous settings for focusTaskIds', e);
+      }
+
+      this.cacheService.updateSettings(normalized);
+      this.settingsSubject.next(normalized);
     } catch (error) {
       this.error(error);
       throw error;
@@ -140,12 +178,31 @@ export class SettingsService implements SettingsStrategy {
         }
       }
 
-      return settings;
+      return this.normalizeSettings(settings);
     } catch (error) {
       this.error(error);
       // Last resort
       return getDefaultTaskSettings();
     }
+  }
+
+  /**
+   * Ensure the settings object has all required fields and sensible defaults.
+   * This protects against partial/empty objects coming from cache or API.
+   */
+  private normalizeSettings(settings: any): TaskSettings {
+    const defaults = getDefaultTaskSettings();
+    if (!settings || typeof settings !== 'object') {
+      return { ...defaults };
+    }
+    const merged: TaskSettings = { ...defaults, ...settings } as TaskSettings;
+
+    // Ensure arrays are arrays (avoid undefined/null replacing them)
+    merged.focusTaskIds = Array.isArray(merged.focusTaskIds) ? merged.focusTaskIds : [];
+    merged.frogTaskIds = Array.isArray(merged.frogTaskIds) ? merged.frogTaskIds : [];
+    merged.favoriteTaskIds = Array.isArray(merged.favoriteTaskIds) ? merged.favoriteTaskIds : [];
+
+    return merged;
   }
 
   error(msg: unknown) {

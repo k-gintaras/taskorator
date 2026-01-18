@@ -24,6 +24,12 @@ export class TaskSettingsApiService implements SettingsApiStrategy {
       `users/${userId}/settings/${userId}`
     );
     try {
+      // Check if settings already exist on server to avoid overwriting
+      const existing = await getDoc(settingsDocRef);
+      if (existing.exists()) {
+        // Return existing settings instead of overwriting
+        return { ...getDefaultTaskSettings(), ...(existing.data() as any) } as TaskSettings;
+      }
       const settingsData = JSON.parse(JSON.stringify(settings));
       await setDoc(settingsDocRef, settingsData);
       return settings;

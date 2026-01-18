@@ -1,3 +1,72 @@
+.admin-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.admin-actions .btn {
+  margin-left: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+}
+
+.admin-status {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-item {
+  background: var(--surface);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.status-item.error {
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.section-title {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.tree-pre {
+  max-height: 360px;
+  overflow: auto;
+  background: var(--code-bg);
+  padding: 12px;
+  border-radius: 6px;
+}
 /* tree-viewer.component.css */
 pre {
   background-color: #f4f4f4;

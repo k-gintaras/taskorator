@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { CORE_APP_METADATA } from './app.routes-metadata';
-import { canActivate, canActivateChild } from './services/core/auth-guard';
+import { canActivate, canActivateChild, canActivateAdmin } from './services/core/auth-guard';
+import { AdminComponent } from './features/admin/admin/admin.component';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
 import { TaskViewComponent } from './components/task/task-view/task-view.component';
 import { AutoRedirectComponent } from './components/auto-redirect/auto-redirect.component';
@@ -93,6 +94,11 @@ export const routes: Route[] = [
     data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator
     canActivate: [canActivate],
     canActivateChild: [canActivateChild],
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [canActivate, canActivateAdmin],
   },
   { path: '**', component: AutoRedirectComponent },
 ];

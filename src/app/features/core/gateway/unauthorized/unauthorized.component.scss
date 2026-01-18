@@ -1,0 +1,42 @@
+.unauthorized-card {
+  max-width: 760px;
+  margin: 12px auto;
+  padding: 18px;
+}
+.admin-title {
+  margin: 0 0 8px 0;
+  font-size: 1.125rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.unauthorized-actions {
+  margin-top: 12px;
+}
+
+.link {
+  color: var(--primary);
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.sep { margin: 0 8px; color: var(--muted); }
+
+.debug { margin-top: 16px; }
+
+.debug-pre {
+  background: var(--code-bg);
+  padding: 10px;
+  border-radius: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.status-item.error {
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 6px 8px;
+  border-radius: 6px;
+}

@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthStateManagerService } from '../auth-state-manager.service';
 import { NavigationService } from '../navigation.service';
+import { SessionManagerService } from '../session-manager.service';
 
 export const canActivate: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -45,3 +46,50 @@ export const canActivate: CanActivateFn = (
 };
 
 export const canActivateChild: CanActivateChildFn = canActivate;
+
+export const canActivateAdmin: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+): Promise<boolean | UrlTree> => {
+  const router = inject(Router);
+  const authStateManager = inject(AuthStateManagerService);
+  const navigationService = inject(NavigationService);
+  const sessionManager = inject(SessionManagerService);
+
+  return (async () => {
+    try {
+      await authStateManager.ensureInitialized();
+
+      if (!authStateManager.isAuthenticated()) {
+        navigationService.setRedirectUrl(state.url);
+        return router.createUrlTree(['/gateway/login']);
+      }
+
+      // Get current user id and then load user info via API strategy
+      const authStrategy = sessionManager.getAuthStrategy();
+      const userId = await authStrategy.getCurrentUserId();
+      if (!userId) {
+        navigationService.setRedirectUrl(state.url);
+        return router.createUrlTree(['/gateway/login']);
+      }
+
+      const api = sessionManager.getApiStrategy();
+      if (!api || typeof api.getUserInfo !== 'function') {
+        // If API isn't available, deny access
+        return router.createUrlTree(['/gateway/unauthorized']);
+      }
+
+      const userInfo: any = await api.getUserInfo();
+      if (userInfo && userInfo.role === 'admin') {
+        return true;
+      }
+
+      // Not an admin - redirect to unauthorized page
+      return router.createUrlTree(['/gateway/unauthorized']);
+    } catch (error) {
+      console.error('Admin guard error:', error);
+      navigationService.setRedirectUrl(state.url);
+      return router.createUrlTree(['/gateway/unauthorized']);
+    }
+  })();
+};

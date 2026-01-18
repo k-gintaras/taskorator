@@ -1,0 +1,21 @@
+<div class="theme-card p-6 mb-6 unauthorized-card" style="border-color: var(--border);">
+  <h2 class="admin-title">Access denied</h2>
+  <p class="muted">You don't have permission to view this page.</p>
+  <p>If this looks wrong, try logging in with a different account or contact an administrator.</p>
+
+  <div class="unauthorized-actions">
+    <a class="link" routerLink="/gateway/login">Login</a>
+    <span class="sep">•</span>
+    <a class="link" routerLink="/gateway/welcome">Home</a>
+  </div>
+
+  <div class="debug">
+    <h3 class="section-title">Debug</h3>
+    <div *ngIf="error" class="status-item error">Error: {{ error }}</div>
+    <div *ngIf="userId"><strong>User ID:</strong> {{ userId }}</div>
+    <div *ngIf="userInfo"><strong>User Info:</strong>
+      <pre class="debug-pre">{{ userInfo | json }}</pre>
+    </div>
+    <div *ngIf="!userInfo && !error" class="muted">No user info available yet.</div>
+  </div>
+</div>
