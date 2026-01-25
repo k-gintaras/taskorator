@@ -8,7 +8,7 @@ import {
 } from '../task-action-tracker.service';
 import { TaskListCoordinatorService } from '../task-list/task-list-coordinator.service';
 import { TaskUiDecoratorService } from '../task-list/task-ui-decorator.service';
-import { TreeService } from '../../sync-api-cache/tree.service';
+import { TreeUpdateService } from '../../tree/tree-update.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,28 +24,20 @@ export class TaskNavigatorDataService {
     private taskActionService: TaskActionTrackerService,
     private taskListCoordinator: TaskListCoordinatorService,
     private taskUiDecorator: TaskUiDecoratorService,
-    private treeService: TreeService
+    private treeService: TreeUpdateService,
   ) {
     this.taskActionService.lastAction$.subscribe((action) => {
       if (!action) return;
 
       // Always refresh on moved actions so lists that are currently showing
       // a parent update immediately when tasks are moved away.
-      // Also rebuild the tree structure since overlord relationships changed
       if (action.action === TaskActions.MOVED) {
         this.refreshCurrentTasks();
-        this.treeService.rebuildTree().catch(error => {
-          console.error('Failed to rebuild tree after move:', error);
-        });
         return;
       }
 
-      // Also rebuild tree on created actions since new tasks need to be added to tree
       if (action.action === TaskActions.CREATED) {
         this.refreshCurrentTasks();
-        this.treeService.rebuildTree().catch(error => {
-          console.error('Failed to rebuild tree after create:', error);
-        });
         return;
       }
 
@@ -76,30 +68,22 @@ export class TaskNavigatorDataService {
     const currentListKey = this.currentListKeySubject.value;
     if (!currentListKey) return;
 
-    const tasks = (await this.taskListCoordinator.getTasks(currentListKey)) || [];
-    await this.treeService.ensureTasksInTree(tasks);
+    const tasks =
+      (await this.taskListCoordinator.getTasks(currentListKey)) || [];
     this.currentTasksSubject.next(tasks);
-    await this.refreshParentCountsForList(currentListKey, tasks);
-  }
-
-  async refreshTasksForKey(listKey: TaskListKey): Promise<void> {
-    const tasks = (await this.taskListCoordinator.getTasks(listKey)) || [];
-    await this.treeService.ensureTasksInTree(tasks);
-    this.currentTasksSubject.next(tasks);
-    this.currentListKeySubject.next(listKey);
-    await this.refreshParentCountsForList(listKey, tasks);
   }
 
   async setTasksByKey(listKey: TaskListKey): Promise<void> {
     const tasks = (await this.taskListCoordinator.getTasks(listKey)) || [];
-    await this.treeService.ensureTasksInTree(tasks);
+    if (listKey.type === TaskListType.OVERLORD && typeof listKey.data === 'string') {
+      const overlord = listKey.data;
+      await this.treeService.syncParentActiveChildren(overlord, tasks as any);
+    }
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(listKey);
-    await this.refreshParentCountsForList(listKey, tasks);
   }
 
   async setTasks(tasks: UiTask[]): Promise<void> {
-    await this.treeService.ensureTasksInTree(tasks);
     this.currentTasksSubject.next(tasks);
     this.currentListKeySubject.next(null); // No key for custom lists
   }
@@ -110,34 +94,6 @@ export class TaskNavigatorDataService {
 
   getCurrentListKey(): TaskListKey | null {
     return this.currentListKeySubject.value;
-  }
-
-  private async refreshParentCountsForList(
-    listKey: TaskListKey,
-    tasks: UiTask[]
-  ): Promise<void> {
-    const parentId = this.extractParentId(listKey);
-    if (!parentId) return;
-
-    const childrenCount = tasks.length;
-    const completedChildren = tasks.filter((task) => task.stage !== 'todo').length;
-    await this.treeService.updateParentNodeCounts(
-      parentId,
-      childrenCount,
-      completedChildren
-    );
-  }
-
-  private extractParentId(listKey: TaskListKey): string | null {
-    if (
-      (listKey.type === TaskListType.OVERLORD ||
-        listKey.type === TaskListType.SUPER_OVERLORD) &&
-      typeof listKey.data === 'string'
-    ) {
-      return listKey.data;
-    }
-
-    return null;
   }
 
   /**

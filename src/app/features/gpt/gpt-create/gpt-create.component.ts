@@ -188,7 +188,7 @@ export class GptCreateComponent implements OnInit {
       return '';
     }
 
-    return this.treeService.findPathStringToTask(overlord.taskId);
+    return "";//this.treeService.findPathStringToTask(overlord.taskId);
   }
 
   private async getOverlordChildren(

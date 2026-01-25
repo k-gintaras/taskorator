@@ -31,6 +31,9 @@ export class TreeNodeService {
     return created;
   }
 
+  /**
+   * @tip also updates if overlord change, moves node
+   */
   async updateTasks(
     tree: TaskTree,
     tasks: TaskoratorTask[]

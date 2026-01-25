@@ -22,6 +22,7 @@ import { TaskCacheService } from '../cache/task-cache.service';
 import { TreeService } from '../sync-api-cache/tree.service';
 import { TaskTransmutationService } from './task-transmutation.service';
 import { TaskIdCacheService } from '../cache/task-id-cache.service';
+import { TreeUpdateService } from '../tree/tree-update.service';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,7 @@ export class TaskUpdateService {
     private taskCache: TaskCacheService,
     private transmutatorService: TaskTransmutationService,
     private taskIdCache: TaskIdCacheService,
-    private treeService: TreeService
+    private treeUpdateService: TreeUpdateService
   ) {}
 
   async move(targetTask: TaskoratorTask) {
@@ -162,7 +163,7 @@ export class TaskUpdateService {
       this.taskIdCache.deleteTask(tempId);
 
       // Add the created task to the tree structure
-      this.treeService.addTaskToTree(createdTask).catch(error => {
+      this.treeUpdateService.create(createdTask).catch(error => {
         console.error('Failed to add created task to tree:', error);
       });
 
@@ -189,6 +190,11 @@ export class TaskUpdateService {
     this.taskUiDecorator.markTaskUpdated(task.taskId);
     this.taskService.updateTask(task).then(() => {
       this.feedback(task.name + ' ' + action + ' ' + (subAction || ''));
+      // Ensure tree reflects the updated task stage immediately (optimistic local sync)
+      this.treeUpdateService.update(task).catch((err) => {
+        console.error('Failed to ensure task in tree after update:', err);
+      });
+
       this.actionService.recordAction(task.taskId, action, subAction);
     }).catch((error) => {
       // Revert on failure

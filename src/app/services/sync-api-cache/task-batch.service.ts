@@ -8,6 +8,7 @@ import {
   TaskActionTrackerService,
 } from '../tasks/task-action-tracker.service';
 import { ErrorService } from '../core/error.service';
+import { TreeUpdateService } from '../tree/tree-update.service';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 
 @Injectable({
@@ -32,7 +33,8 @@ export class TaskBatchService {
     private eventBusService: EventBusService,
     private transmutatorService: TaskTransmutationService,
     private taskActionService: TaskActionTrackerService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private treeUpdateService: TreeUpdateService
   ) {}
 
   /**
@@ -61,6 +63,13 @@ export class TaskBatchService {
       const groupName = 'overlord_' + overlordId;
       this.taskIdCache.addTasksWithGroup(extendedTasks, groupName); // Notify TaskIdCache of addition
       const ids = this.transmutatorService.getIds(extendedTasks);
+
+      // Update tree once for the created tasks to avoid per-task updates
+      try {
+        await this.treeUpdateService.createTasksBatch(createdTasks);
+      } catch (err) {
+        console.error('Failed to update tree for created task batch:', err);
+      }
 
       // Notify other services
       this.eventBusService.createTasks(extendedTasks);
@@ -133,6 +142,13 @@ export class TaskBatchService {
       }
 
       const ids = this.transmutatorService.getIds(extendedTasks);
+
+      // Update tree in a single batch operation to avoid spamming updates
+      try {
+        await this.treeUpdateService.updateTasksBatch(tasks);
+      } catch (err) {
+        console.error('Failed to update tree for task batch:', err);
+      }
 
       // Notify other services
       this.eventBusService.updateTasks(extendedTasks);

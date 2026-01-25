@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UiTask } from '../../models/taskModelManager';
+import { UiTask, TaskoratorTask, getDefaultTask } from '../../models/taskModelManager';
 import { CommonModule } from '@angular/common';
 
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,7 @@ import { TaskNavigatorService } from '../../services/tasks/task-navigation/task-
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskListItemComponent } from '../task-list-item/task-list-item.component';
 import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-list-data-facade.service';
+import { StagedTaskListComponent } from '../task/staged-task-list/staged-task-list.component';
 
 @Component({
   standalone: true,
@@ -18,7 +19,8 @@ import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-l
     MatCardModule,
     TaskEditComponent,
     TaskCardComponent,
-    TaskListItemComponent
+    TaskListItemComponent,
+    StagedTaskListComponent
   ],
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.tailwind.html',
@@ -27,6 +29,7 @@ import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-l
 export class TaskNavigatorComponent implements OnInit {
   tasks: UiTask[] | null = null;
   selectedOverlord: UiTask | null = null;
+  stagedTasks: TaskoratorTask[] = this.generateFakeStagedTasks();
 
   constructor(
     private navigatorService: TaskNavigatorService,
@@ -87,5 +90,35 @@ export class TaskNavigatorComponent implements OnInit {
     // Return task data for progress calculation
     // This should be adapted based on your actual tree structure
     return task;
+  }
+
+  private generateFakeStagedTasks(): TaskoratorTask[] {
+    // Generate fake staged tasks for testing
+    // TODO: Replace with actual AI-generated or user-staged tasks
+    const fakeTaskIds = ['fake-task-1', 'fake-task-2', 'fake-task-3'];
+    const fakeTaskNames = [
+      'Setup development environment',
+      'Write unit tests',
+      'Review code changes'
+    ];
+    const fakeTaskDescriptions = [
+      'Install dependencies and configure local dev server',
+      'Add comprehensive test coverage for new features',
+      'Peer review all changes before merge'
+    ];
+
+    return fakeTaskIds.map((id, index) => {
+      const defaultTask = getDefaultTask();
+      return {
+        ...defaultTask,
+        taskId: id,
+        name: fakeTaskNames[index],
+        todo: fakeTaskDescriptions[index],
+        priority: Math.floor(Math.random() * 10),
+        stage: ['todo', 'in_progress', 'review'][index % 3] as any,
+        timeCreated: Date.now() - Math.random() * 86400000,
+        lastUpdated: Date.now() - Math.random() * 3600000,
+      };
+    });
   }
 }

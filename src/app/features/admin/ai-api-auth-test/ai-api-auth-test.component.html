@@ -1,0 +1,300 @@
+<div class="ai-api-auth-test-container">
+  <div class="theme-card p-6 mb-6 shadow-lg border" style="border-color: var(--border);">
+    <h2 class="section-title">AI-API Firebase Auth Test</h2>
+
+    <!-- Status Messages -->
+    <div class="status-section mb-4">
+      <div *ngIf="error" class="status-item error">
+        <strong>Error:</strong> {{ error }}
+      </div>
+      <div *ngIf="aiApiUid" class="status-item success">
+        <strong>AI-API UID:</strong> {{ aiApiUid }}
+      </div>
+      <div *ngIf="isLoading" class="status-item">
+        <strong>Loading...</strong>
+      </div>
+    </div>
+
+    <!-- Auth Buttons -->
+    <div class="button-group mb-6">
+      <button
+        class="btn btn-primary"
+        (click)="loginToAiApi()"
+        [disabled]="isLoading || !!aiApiUid"
+      >
+        <mat-icon>login</mat-icon>
+        Login to AI-API (Google)
+      </button>
+
+      <button
+        class="btn btn-danger"
+        (click)="logoutFromAiApi()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>logout</mat-icon>
+        Logout AI-API
+      </button>
+    </div>
+
+    <!-- Info Buttons -->
+    <div class="button-group mb-6">
+      <button
+        class="btn btn-secondary"
+        (click)="printAiApiUid()"
+        [disabled]="isLoading"
+      >
+        <mat-icon>info</mat-icon>
+        Print AI-API UID
+      </button>
+
+      <button
+        class="btn btn-secondary"
+        (click)="copyAiApiTokenToClipboard()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>content_copy</mat-icon>
+        Copy AI-API Token to Clipboard
+      </button>
+    </div>
+
+    <!-- Health Check Button -->
+    <div class="button-group mb-6">
+      <button
+        class="btn btn-info"
+        (click)="callHealthApi()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>health_and_safety</mat-icon>
+        Call /admin/health (192.168.4.41:3001)
+      </button>
+    </div>
+
+    <!-- Claims & Token Refresh Buttons -->
+    <div class="button-group mb-6">
+      <button
+        class="btn btn-info"
+        (click)="showAiApiTokenClaims()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>verified_user</mat-icon>
+        Show AI-API Token Claims (Server)
+      </button>
+
+      <button
+        class="btn btn-info"
+        (click)="decodeTokenLocally()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>code</mat-icon>
+        Decode Token Locally
+      </button>
+
+      <button
+        class="btn btn-secondary"
+        (click)="refreshAiApiToken()"
+        [disabled]="isLoading || !aiApiUid"
+      >
+        <mat-icon>refresh</mat-icon>
+        Refresh AI-API Token
+      </button>
+    </div>
+
+    <!-- Set Claims Section -->
+    <div class="set-claims-section mb-6" *ngIf="aiApiUid">
+      <h3 class="subsection-title">Set AI-API Claims</h3>
+      <div class="claims-form">
+        <div class="form-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="claimsCanUseGpt"
+              [disabled]="isLoading"
+            />
+            Can Use GPT
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role:</label>
+          <select
+            id="role"
+            [(ngModel)]="claimsRole"
+            [disabled]="isLoading"
+            class="form-select"
+          >
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+            <option value="premium">premium</option>
+          </select>
+        </div>
+
+        <button
+          class="btn btn-success"
+          (click)="setAiApiClaims()"
+          [disabled]="isLoading || !aiApiUid"
+        >
+          <mat-icon>settings</mat-icon>
+          Set Claims on AI-API Server
+        </button>
+      </div>
+    </div>
+
+    <!-- Health Check Result -->
+    <div *ngIf="healthCheckResult" class="result-section">
+      <h3>Health Check Result:</h3>
+      <pre class="code-block">{{ healthCheckResult }}</pre>
+    </div>
+
+    <!-- Token Claims Result -->
+    <div *ngIf="claimsResult" class="result-section">
+      <h3>AI-API Token Claims (from server):</h3>
+      <pre class="code-block">{{ claimsResult }}</pre>
+    </div>
+
+    <!-- Decoded Token Result (Local) -->
+    <div *ngIf="decodedTokenResult" class="result-section">
+      <h3>Decoded Token (Local - No Server Needed):</h3>
+      <pre class="code-block">{{ decodedTokenResult }}</pre>
+    </div>
+
+    <!-- Set Claims Result -->
+    <div *ngIf="setClaimsResult" class="result-section">
+      <h3>Set Claims Result:</h3>
+      <pre class="code-block">{{ setClaimsResult }}</pre>
+    </div>
+
+    <!-- Prompt API Section -->
+    <div class="prompt-section mb-6" *ngIf="aiApiUid">
+      <h3 class="subsection-title">Call /prompt Endpoint</h3>
+      <div class="form-section">
+        <div class="form-group">
+          <label for="promptAssistantId">Assistant ID:</label>
+          <input
+            id="promptAssistantId"
+            type="text"
+            [(ngModel)]="promptAssistantId"
+            [disabled]="isLoading"
+            class="form-input"
+            placeholder="Assistant ID"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="promptText">Prompt:</label>
+          <textarea
+            id="promptText"
+            [(ngModel)]="promptText"
+            [disabled]="isLoading"
+            class="form-textarea"
+            placeholder="Enter your prompt..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="promptExtraInstruction">Extra Instruction (Optional):</label>
+          <textarea
+            id="promptExtraInstruction"
+            [(ngModel)]="promptExtraInstruction"
+            [disabled]="isLoading"
+            class="form-textarea"
+            placeholder="Extra instructions for the prompt..."
+            rows="2"
+          ></textarea>
+        </div>
+
+        <button
+          class="btn btn-success"
+          (click)="callPromptApi()"
+          [disabled]="isLoading || !aiApiUid"
+        >
+          <mat-icon>send</mat-icon>
+          Call Prompt API
+        </button>
+      </div>
+    </div>
+
+    <!-- Prompt Result -->
+    <div *ngIf="promptResult" class="result-section">
+      <h3>Prompt Result:</h3>
+      <pre class="code-block">{{ promptResult }}</pre>
+    </div>
+
+    <!-- Conversation API Section -->
+    <div class="conversation-section mb-6" *ngIf="aiApiUid">
+      <h3 class="subsection-title">Call /conversation Endpoint</h3>
+      <div class="form-section">
+        <div class="form-group">
+          <label for="conversationAssistantId">Assistant ID:</label>
+          <input
+            id="conversationAssistantId"
+            type="text"
+            [(ngModel)]="conversationAssistantId"
+            [disabled]="isLoading"
+            class="form-input"
+            placeholder="Assistant ID"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="conversationChatId">Chat ID (Optional):</label>
+          <input
+            id="conversationChatId"
+            type="text"
+            [(ngModel)]="conversationChatId"
+            [disabled]="isLoading"
+            class="form-input"
+            placeholder="Chat ID"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="conversationSessionId">Session ID (Optional):</label>
+          <input
+            id="conversationSessionId"
+            type="text"
+            [(ngModel)]="conversationSessionId"
+            [disabled]="isLoading"
+            class="form-input"
+            placeholder="Session ID"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="conversationPrompt">Prompt:</label>
+          <textarea
+            id="conversationPrompt"
+            [(ngModel)]="conversationPrompt"
+            [disabled]="isLoading"
+            class="form-textarea"
+            placeholder="Enter your conversation prompt..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <button
+          class="btn btn-success"
+          (click)="callConversationApi()"
+          [disabled]="isLoading || !aiApiUid"
+        >
+          <mat-icon>chat</mat-icon>
+          Call Conversation API
+        </button>
+      </div>
+    </div>
+
+    <!-- Conversation Result -->
+    <div *ngIf="conversationResult" class="result-section">
+      <h3>Conversation Result:</h3>
+      <pre class="code-block">{{ conversationResult }}</pre>
+    </div>
+
+    <!-- Token Display (for reference) -->
+    <div *ngIf="aiApiToken" class="result-section mt-4">
+      <h3>AI-API Token (last 50 chars):</h3>
+      <div class="token-display">
+        ...{{ aiApiToken.slice(-50) }}
+      </div>
+    </div>
+  </div>
+</div>

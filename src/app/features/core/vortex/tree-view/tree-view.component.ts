@@ -140,6 +140,19 @@ export class TreeViewComponent implements OnInit, OnChanges {
 
   private initTree() {
     this.treeService.getTree().subscribe((tree) => {
+      try {
+        // Avoid re-rendering when the incoming tree is deeply equal to the one we already rendered.
+        if (this.originalTree && tree) {
+          const prev = JSON.stringify(this.originalTree);
+          const next = JSON.stringify(tree);
+          if (prev === next) {
+            return; // No meaningful change
+          }
+        }
+      } catch (e) {
+        // If stringify fails for any reason, fall back to rendering.
+      }
+
       console.log(tree);
       if (tree) {
         this.renderTree(tree);

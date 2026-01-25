@@ -14,6 +14,7 @@ import { ScoreService } from './sync-api-cache/score.service';
 import { RegistrationService } from './core/registration.service';
 import { TestDataInitializerService } from '../test-files/test-services/test-data-initializer.service';
 import { TaskInitializerService } from './core/task-initializer.service';
+import { AiApiFirebaseService } from './core/ai-api-firebase.service';
 
 @Injectable({ providedIn: 'root' })
 export class SessionManagerService {
@@ -32,7 +33,8 @@ export class SessionManagerService {
     private scoreService: ScoreService,
     private registrationService: RegistrationService,
     private testDataInitializer: TestDataInitializerService,
-    private taskInitializer: TaskInitializerService
+    private taskInitializer: TaskInitializerService,
+    private aiApiFirebase: AiApiFirebaseService
   ) {}
 
   async initialize(mode?: 'online'|'offline'): Promise<void> {
@@ -49,6 +51,10 @@ export class SessionManagerService {
         throw new Error('User not authenticated');
       }
       this.user = user;
+      
+      // Fire and forget AI API login for online mode
+      console.log('SessionManager: Initiating AI API login');
+      this.aiApiFirebase.loginGoogle();
     } else {
       console.log('SessionManager: Offline mode - logging in');
       await this.auth.login();

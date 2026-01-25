@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { TreeStrategy } from '../../models/service-strategies/tree-strategy.interface';
-import { TreeNodeService } from '../tree/tree-node.service';
 import { BehaviorSubject } from 'rxjs';
-import { getDefaultTree, TaskTree, TaskNodeInfo } from '../../models/taskTree';
+import {  TaskTree, TaskNodeInfo } from '../../models/taskTree';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
-import { ROOT_TASK_ID, TaskoratorTask } from '../../models/taskModelManager';
 import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
+import { UiTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +18,6 @@ export class TreeService implements TreeStrategy {
   constructor(
     private cacheService: CacheOrchestratorService,
     private treeNodeToolsService: TaskTreeNodeToolsService,
-    private treeNodeService: TreeNodeService
   ) {}
 
   getFlattenedTree(tree: TaskTree) {
@@ -66,12 +64,6 @@ export class TreeService implements TreeStrategy {
     }
   }
 
-  findPathStringToTask(taskId: string): string {
-    const tree = this.getLatestTree();
-    if (!tree) return '';
-    return this.treeNodeToolsService.findPathStringToTask(taskId, tree);
-  }
-
   // 🔥 FIX: Update both API and local cache
   async updateTree(taskTree: TaskTree): Promise<void> {
     if (!this.apiService) {
@@ -98,89 +90,8 @@ export class TreeService implements TreeStrategy {
     return this.treeSubject.getValue();
   }
 
-  // 🔥 NEW: Add a single task to the tree structure
-  async addTaskToTree(task: TaskoratorTask): Promise<void> {
-    if (!this.apiService) {
-      throw new Error('API service not initialized.');
-    }
-
-    try {
-      let tree = this.getLatestTree();
-
-      if (!tree) {
-        await this.fetchTree();
-        tree = this.getLatestTree();
-      }
-
-      if (!tree) {
-        tree = getDefaultTree();
-      }
-
-      await this.treeNodeService.createTasks(tree, [task]);
-
-      await this.updateTree(tree);
-    } catch (error) {
-      console.error('Error adding task to tree:', error);
-    }
-  }
-
-  async ensureTasksInTree(tasks: TaskoratorTask[]): Promise<void> {
-    if (!tasks.length || !this.apiService) {
-      return;
-    }
-
-    try {
-      let tree = this.getLatestTree();
-
-      if (!tree) {
-        await this.fetchTree();
-        tree = this.getLatestTree();
-      }
-
-      if (!tree) {
-        tree = getDefaultTree();
-      }
-
-      const missing = tasks.filter((task) => {
-        const inTree = !!this.treeNodeToolsService.findNodeById(
-          tree!.primarch,
-          task.taskId
-        );
-        const inAbyss = tree!.abyss.some((node) => node.taskId === task.taskId);
-        return !inTree && !inAbyss;
-      });
-
-      let treeChanged = false;
-
-      if (missing.length) {
-        const createdTasks = await this.treeNodeService.createTasks(tree, missing);
-        treeChanged = createdTasks.length > 0;
-      }
-
-      const parentIds = new Set<string>();
-      for (const task of tasks) {
-        const parentId = task.overlord || ROOT_TASK_ID;
-        parentIds.add(parentId);
-      }
-
-      const updatedParents = this.treeNodeService.recountParentCounts(
-        tree,
-        parentIds
-      );
-      if (updatedParents > 0) {
-        treeChanged = true;
-      }
-
-      if (treeChanged) {
-        await this.updateTree(tree);
-      }
-    } catch (error) {
-      console.error('Error ensuring tasks are in tree:', error);
-    }
-  }
-
   // 🔥 NEW: Rebuild tree from all tasks when structure changes
-  async rebuildTree(): Promise<void> {
+  async getTreeFromApi(): Promise<void> {
     if (!this.apiService) {
       throw new Error('API service not initialized.');
     }
@@ -199,59 +110,16 @@ export class TreeService implements TreeStrategy {
     }
   }
 
-  // Update local cache without issuing an API call. Useful for optimistic
-  // local updates when we don't want to persist immediately.
+  /**
+   * Update local cache and notify subscribers without calling the API.
+   * Useful for optimistic/local-only updates.
+   */
   updateLocalTreeCache(taskTree: TaskTree): void {
-    this.cacheService.updateTree(taskTree);
-    this.treeSubject.next(taskTree);
-  }
-
-  async refreshParentCounts(parentIds: string[]): Promise<void> {
-    if (!parentIds.length) return;
-
-    const tree = this.getLatestTree();
-    if (!tree) return;
-
-    const cleanedIds = parentIds.filter((id) => !!id);
-    if (!cleanedIds.length) return;
-
-    const updatedParents = this.treeNodeService.recountParentCounts(
-      tree,
-      new Set(cleanedIds)
-    );
-
-    if (updatedParents > 0) {
-      this.updateLocalTreeCache(tree);
+    try {
+      this.cacheService.updateTree(taskTree);
+      this.treeSubject.next(taskTree);
+    } catch (err) {
+      console.error('Error updating local tree cache:', err);
     }
-  }
-
-  async updateParentNodeCounts(
-    parentId: string,
-    childrenCount: number,
-    completedChildrenCount: number
-  ): Promise<void> {
-    if (!parentId) return;
-
-    const tree = this.getLatestTree();
-    if (!tree) return;
-
-    const parentNode = this.treeNodeToolsService.findNodeById(
-      tree.primarch,
-      parentId
-    );
-    if (!parentNode) return;
-
-    if (
-      parentNode.childrenCount === childrenCount &&
-      parentNode.completedChildrenCount === completedChildrenCount
-    ) {
-      return;
-    }
-
-    parentNode.childrenCount = childrenCount;
-    parentNode.completedChildrenCount = completedChildrenCount;
-
-    // Flush the updated counts into the local cache and emit the change.
-    this.updateLocalTreeCache(tree);
   }
 }

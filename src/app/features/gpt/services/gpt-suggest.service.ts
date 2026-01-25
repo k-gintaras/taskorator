@@ -25,7 +25,7 @@ export class GptSuggestService {
     // const task = await this.taskService.getTaskById(taskId);
     // if (!task) throw new Error('Task not found.');
 
-    const treePath = await this.treeService.findPathStringToTask(task.taskId);
+    const treePath = "";//await this.treeService.findPathStringToTask(task.taskId);
     const relatedTasks = await this.getRelatedTasks(task);
     const request = this.generateGptRequest(treePath, relatedTasks, '', task);
 
