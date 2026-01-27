@@ -34,13 +34,13 @@ export const canActivate: CanActivateFn = (
 
       // Not authenticated - save the intended URL for redirect after login
       navigationService.setRedirectUrl(state.url);
-      return router.createUrlTree(['/gateway/login']);
+      return router.createUrlTree(['/login']);
       
     } catch (error) {
       console.error('Auth guard error:', error);
       // On any error, still save the URL and redirect to login
       navigationService.setRedirectUrl(state.url);
-      return router.createUrlTree(['/gateway/login']);
+      return router.createUrlTree(['/login']);
     }
   })();
 };
@@ -62,7 +62,7 @@ export const canActivateAdmin: CanActivateFn = (
 
       if (!authStateManager.isAuthenticated()) {
         navigationService.setRedirectUrl(state.url);
-        return router.createUrlTree(['/gateway/login']);
+        return router.createUrlTree(['/login']);
       }
 
       // Get current user id and then load user info via API strategy
@@ -70,7 +70,7 @@ export const canActivateAdmin: CanActivateFn = (
       const userId = await authStrategy.getCurrentUserId();
       if (!userId) {
         navigationService.setRedirectUrl(state.url);
-        return router.createUrlTree(['/gateway/login']);
+        return router.createUrlTree(['/login']);
       }
 
       const api = sessionManager.getApiStrategy();

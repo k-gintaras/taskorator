@@ -46,6 +46,9 @@ export class AiTaskService {
   // Include all children but only above max descendants
   private readonly MAX_DESCENDANTS_FOR_FULL_TREE = 50;
 
+    private taskAssistantId = 'a9308da4-dd17-466e-ab98-752c9764cfab';
+
+
   constructor(
     private aiApiFirebase: AiApiFirebaseService,
     private aiApiPrompt: AiApiPromptService,
@@ -189,7 +192,7 @@ scope and context. Generate tasks that fit naturally within this structure.
     // Call AI API
     const response = await this.aiApiPrompt.callPrompt({
       prompt: aiPrompt,
-      id: 'task-generator',
+      id: this.taskAssistantId,
       extraInstruction:
         'Generate tasks as a numbered list, one per line. Keep descriptions concise.',
     });
@@ -232,7 +235,7 @@ Please answer based on the task context provided above.
 
     const response = await this.aiApiPrompt.callPrompt({
       prompt: aiPrompt,
-      id: 'task-assistant',
+      id: this.taskAssistantId,
     });
 
     return response.answer;
@@ -318,7 +321,7 @@ Please answer based on the task context provided above.
 
   /**
    * Format a node and its children as human-readable tree
-   * Limits depth based on number of descendants
+   * Recursively shows children and grandchildren with full names for AI context
    */
   private formatNodeHierarchy(
     node: TaskTreeNode,
@@ -339,23 +342,18 @@ Please answer based on the task context provided above.
       `${indent}${marker}[${node.stage}] ${node.name}${completedInfo}`
     );
 
-    // Limit recursion depth to avoid huge contexts
-    if (depth < maxDepth && node.children.length > 0) {
-      // If too many children, give summary instead
-      if (node.children.length > 10) {
-        const childStages = this.summarizeChildStages(node.children);
-        lines.push(
-          `${indent}  ├─ (${node.children.length} children: ${childStages})`
-        );
-      } else {
-        // Show all children with limited recursion
-        for (const child of node.children) {
-          this.formatNodeHierarchy(child, tree, depth + 1, lines, false, maxDepth);
-        }
+    // Show all children with names, and recurse into grandchildren if depth allows
+    if (node.children.length > 0 && depth < maxDepth) {
+      for (const child of node.children) {
+        this.formatNodeHierarchy(child, tree, depth + 1, lines, false, maxDepth);
       }
     } else if (node.children.length > 0) {
-      // At max depth, just show count
-      lines.push(`${indent}  ├─ (${node.children.length} children)`);
+      // At max depth, show children names only (no grandchildren)
+      for (const child of node.children) {
+        const childIndent = '  '.repeat(depth + 1);
+        const childCompleted = child.completedChildrenCount > 0 ? ` [${child.completedChildrenCount}/${child.childrenCount}]` : '';
+        lines.push(`${childIndent}├─ [${child.stage}] ${child.name}${childCompleted}`);
+      }
     }
   }
 

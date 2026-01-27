@@ -18,6 +18,13 @@ export class TaskService {
     this.apiService = apiStrategy;
   }
 
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
   constructor(
     private eventBusService: EventBusService,
     private validatorService: TaskValidatorService,
@@ -35,11 +42,9 @@ export class TaskService {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
       }
-      if (!this.apiService) {
-        throw new Error('TaskService api not initialized');
-      }
+      const api = this.ensureApiService();
 
-      const createdTask = await this.apiService.createTask(task);
+      const createdTask = await api.createTask(task);
       if (!createdTask) throw new Error('Task creation failed');
 
       const extendedTask = this.transmutatorService.toUiTask(createdTask);
@@ -66,11 +71,9 @@ export class TaskService {
       if (!this.validatorService.isTaskValid(task)) {
         throw new Error('Invalid task, probably because it is empty');
       }
-      if (!this.apiService) {
-        throw new Error('TaskService api not initialized');
-      }
+      const api = this.ensureApiService();
       task.lastUpdated = Date.now();
-      await this.apiService.updateTask(task);
+      await api.updateTask(task);
 
       const extendedTask = this.transmutatorService.toUiTask(task);
 
@@ -101,10 +104,8 @@ export class TaskService {
         return cachedTask;
       }
 
-      if (!this.apiService) {
-        throw new Error('TaskService api not initialized');
-      }
-      const task = await this.apiService.getTaskById(taskId);
+      const api = this.ensureApiService();
+      const task = await api.getTaskById(taskId);
       if (task) {
         const extendedTask = this.transmutatorService.toUiTask(task);
         this.taskCache.addTask(extendedTask); // Cache ExtendedTask
@@ -143,10 +144,8 @@ export class TaskService {
       }
 
       // Fetch from API if not in cache
-      if (!this.apiService) {
-        throw new Error('TaskService api not initialized');
-      }
-      const latestTask = await this.apiService.getTaskById(this.latestTaskId);
+      const api = this.ensureApiService();
+      const latestTask = await api.getTaskById(this.latestTaskId);
       if (latestTask) {
         const extendedTask = this.transmutatorService.toUiTask(latestTask); // Convert to ExtendedTask
         this.taskCache.addTask(extendedTask); // Cache the ExtendedTask
@@ -167,10 +166,8 @@ export class TaskService {
       let task = this.taskCache.getTask(taskId) as UiTask | null; // Check cache first
       if (!task) {
         // Fetch from API if not cached
-        if (!this.apiService) {
-          throw new Error('TaskService api not initialized');
-        }
-        const superOverlordTask = await this.apiService.getSuperOverlord(
+        const api = this.ensureApiService();
+        const superOverlordTask = await api.getSuperOverlord(
           taskId
         );
         if (superOverlordTask) {

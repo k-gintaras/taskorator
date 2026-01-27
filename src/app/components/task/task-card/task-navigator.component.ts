@@ -3,8 +3,6 @@ import { UiTask, TaskoratorTask, getDefaultTask } from '../../models/taskModelMa
 import { CommonModule } from '@angular/common';
 
 import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { TaskEditComponent } from '../task-edit/task-edit.component';
 import { TaskCardComponent } from '../task/task-card/task-card.component';
 import { ErrorService } from '../../services/core/error.service';
@@ -12,19 +10,18 @@ import { TaskNavigatorService } from '../../services/tasks/task-navigation/task-
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskListItemComponent } from '../task-list-item/task-list-item.component';
 import { TaskListDataFacadeService } from '../../services/tasks/task-list/task-list-data-facade.service';
+// import { StagedTaskListComponent } from '../task/staged-task-list/staged-task-list.component';
 import { TaskBatchService } from '../../services/sync-api-cache/task-batch.service';
-import { AiApiPromptService } from '../../services/api/ai-api-prompt.service';
 
 @Component({
   standalone: true,
   imports: [
     CommonModule,
     MatCardModule,
-    MatButtonModule,
-    MatIconModule,
     TaskEditComponent,
     TaskCardComponent,
     TaskListItemComponent,
+    StagedTaskListComponent
   ],
   selector: 'app-task-navigator',
   templateUrl: './task-navigator.component.tailwind.html',
@@ -34,31 +31,17 @@ export class TaskNavigatorComponent implements OnInit {
   tasks: UiTask[] | null = null;
   selectedOverlord: UiTask | null = null;
   stagedTasks: TaskoratorTask[] = [];
+  aiApiRawResponse: string = '';
+  aiApiSuggestedTasks: string[] = [];
+  isLoadingAi: boolean = false;
 
   constructor(
     private navigatorService: TaskNavigatorService,
     private selectedOverlordService: SelectedOverlordService,
     private taskListFacade: TaskListDataFacadeService,
     private errorService: ErrorService,
-    private aiApiPrompt: AiApiPromptService,
     private taskBatchService: TaskBatchService
   ) {}
-  async approveStagedTasks() {
-    if (!this.selectedOverlord || !this.stagedTasks.length) return;
-    try {
-      await this.taskBatchService.createTaskBatch(this.stagedTasks, this.selectedOverlord.taskId);
-      this.stagedTasks = [];
-      this.errorService.feedback('Tasks added to overlord!');
-    } catch (err) {
-      let msg = '';
-      if (err && typeof err === 'object' && 'message' in err) {
-        msg = (err as any).message;
-      } else {
-        msg = JSON.stringify(err);
-      }
-      this.errorService.warn('Failed to add tasks: ' + msg);
-    }
-  }
 
   ngOnInit(): void {
     this.taskListFacade.currentTasks$.subscribe((tasks) => {
@@ -70,33 +53,6 @@ export class TaskNavigatorComponent implements OnInit {
       .subscribe((overlord) => {
         this.selectedOverlord = overlord;
       });
-
-    // Subscribe to AI API prompt responses and populate staged tasks
-    this.aiApiPrompt.latestResponse$.subscribe((response) => {
-      if (response && response.trim()) {
-        this.setStagedTasksFromAiResponse(response);
-      }
-    });
-  }
-  /**
-   * Call this with the AI API response string to populate stagedTasks
-   */
-  setStagedTasksFromAiResponse(response: string) {
-    const lines = response
-      .split('\n')
-      .map(line => line.replace(/^[-*]\s*/, '').trim())
-      .filter(line => !!line);
-    this.stagedTasks = lines.map((name, i) => {
-      const t = getDefaultTask();
-      t.name = name;
-      t.todo = '';
-      t.stage = 'todo';
-      t.taskId = 'staged-' + Date.now() + '-' + i;
-      t.timeCreated = Date.now();
-      t.lastUpdated = Date.now();
-      t.overlord = this.selectedOverlord?.taskId || '';
-      return t;
-    });
   }
 
   async onNext(task: UiTask): Promise<void> {
@@ -142,5 +98,44 @@ export class TaskNavigatorComponent implements OnInit {
   }
 
 
+  // Call this with the AI API response string
+  setAiApiResponse(response: string) {
+    this.aiApiRawResponse = response;
+    // Split by newlines, filter empty, trim
+    this.aiApiSuggestedTasks = response
+      .split('\n')
+      .map(line => line.replace(/^[-*]\s*/, '').trim())
+      .filter(line => !!line);
+    // Optionally, create stagedTasks as TaskoratorTask[] for preview
+    this.stagedTasks = this.aiApiSuggestedTasks.map((name, i) => {
+      const t = getDefaultTask();
+      t.name = name;
+      t.todo = '';
+      t.stage = 'todo';
+      t.taskId = 'staged-' + Date.now() + '-' + i;
+      t.timeCreated = Date.now();
+      t.lastUpdated = Date.now();
+      t.overlord = this.selectedOverlord?.taskId || '';
+      return t;
+    });
+  }
 
+  async approveStagedTasks() {
+    if (!this.selectedOverlord || !this.stagedTasks.length) return;
+    try {
+      await this.taskBatchService.createTaskBatch(this.stagedTasks, this.selectedOverlord.taskId);
+      this.stagedTasks = [];
+      this.aiApiSuggestedTasks = [];
+      this.aiApiRawResponse = '';
+      this.errorService.feedback('Tasks added to overlord!');
+    } catch (err) {
+      let msg = '';
+      if (err && typeof err === 'object' && 'message' in err) {
+        msg = (err as any).message;
+      } else {
+        msg = JSON.stringify(err);
+      }
+      this.errorService.warn('Failed to add tasks: ' + msg);
+    }
+  }
 }

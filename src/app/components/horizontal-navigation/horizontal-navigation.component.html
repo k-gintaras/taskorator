@@ -20,8 +20,8 @@
     <app-notification class="nav-notification-topbar"></app-notification>
   </div>
 
-  <div class="nav-toolbar-right">
-    <app-search-create class="nav-search-create"></app-search-create>
+  <div *ngIf="isAuthenticated" class="nav-toolbar-right">
+    <app-search-create class="nav-search-create" ></app-search-create>
   </div>
 </mat-toolbar>
 

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateManagerService } from './services/auth-state-manager.service';
 import { ThemeService } from './services/core/theme.service';
-import { NAVIGATION_CONFIG } from './app.config';
 import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 import { NavigationService } from './services/navigation.service';
 
@@ -15,7 +14,7 @@ import { NavigationService } from './services/navigation.service';
 })
 export class AppComponent implements OnInit {
   constructor(
-    private authStateManager: AuthStateManagerService,
+    public authStateManager: AuthStateManagerService,
     private router: Router,
     private navigationService: NavigationService,
     private themeService: ThemeService
@@ -28,7 +27,7 @@ export class AppComponent implements OnInit {
     // Initialize the auth state and session
     try {
       console.log('App: Initializing auth state...');
-      await this.authStateManager.initializeApp();
+      // await this.authStateManager.initializeApp();
       console.log('App: Auth state initialized successfully');
     } catch (error) {
       console.log('App: Auth state initialization failed:', error);

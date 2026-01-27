@@ -4,6 +4,7 @@ import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
 import { NavigationDrawerService } from '../../services/navigation-drawer.service';
+import { AuthStateManagerService } from '../../services/auth-state-manager.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,10 +15,11 @@ import { NotificationComponent } from '../notification/notification.component';
 import { filter } from 'rxjs/operators';
 import { ArtificerComponent } from '../artificer/artificer.component';
 import { ExtraActionsComponent } from '../extra-actions/extra-actions.component';
+import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-horizontal-navigation',
   standalone: true,
-  imports: [
+  imports: [NgIf,
     ExtraActionsComponent,
     ArtificerComponent,
     MatSidenavModule,
@@ -49,6 +51,7 @@ export class HorizontalNavigationComponent implements OnInit {
     private router: Router,
     private breakpointObserver: BreakpointObserver,
     private navigationDrawerService: NavigationDrawerService
+    , private authState: AuthStateManagerService
   ) {}
 
   ngOnInit() {
@@ -76,7 +79,15 @@ export class HorizontalNavigationComponent implements OnInit {
         this.drawer.close();
       }
     });
+
+    // Control whether the search-create control is active based on authentication
+    this.authState.isAuthenticated$.subscribe((authenticated) => {
+      // find the element or rely on template binding via property
+      this.isAuthenticated = authenticated;
+    });
   }
+
+  isAuthenticated = false;
 
   private updateChildItems() {
     const activeParent = this.parentItems.find((p) =>

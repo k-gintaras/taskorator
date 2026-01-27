@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { TaskListKey, TaskListType } from '../../../models/task-list-model';
 import { UiTask } from '../../../models/taskModelManager';
 import { TaskListRulesService } from './task-list-rules.service';
@@ -108,7 +109,12 @@ export class TaskListCoordinatorService {
   }
 
   async getTasksByTaskorator(): Promise<UiTask[]> {
-    const tree = await firstValueFrom(this.treeService.getTree());
+    // Wait for the tree to be loaded (filter out null values)
+    const tree = await firstValueFrom(
+      this.treeService.getTree().pipe(
+        filter((t) => t !== null)
+      )
+    );
     if (!tree) return [];
 
     const rawTasks = await this.taskoratorListService.generateSuperlist(tree);

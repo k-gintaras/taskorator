@@ -18,35 +18,53 @@ export class LoginComponent implements OnInit {
   showAlternativeLogin = false;
   currentLoginMethod: 'popup' | 'redirect' | null = null;
   popupBlocked = false;
+  private warningTimeout: any = null;
 
   constructor(
     private router: Router,
     private loginService: LoginService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     // Check if popups are supported/allowed on page load
     this.checkPopupSupport();
-    
-    // No need to initialize anything - AuthStateManager handles it
+
+    if (this.loginService.hasPendingOfflineLogin()) {
+      this.loading = true;
+      try {
+        await this.loginService.resumeOfflineLoginIfPending();
+      } catch (error) {
+        console.error('Resuming offline login failed:', error);
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 
   // Test if popups work - this gives us insight into popup blocking
   private checkPopupSupport() {
+    let blocked = false;
+    let error: any = null;
+
     try {
       const testPopup = window.open('', '_blank', 'width=1,height=1,top=0,left=0');
-      if (testPopup) {
-        testPopup.close();
-        this.popupBlocked = false;
-        console.log('✅ Popups appear to be allowed');
+      if (!testPopup) {
+        blocked = true;
       } else {
-        this.popupBlocked = true;
-        console.log('❌ Popups appear to be blocked');
-        this.showWarning('Note: Popups appear to be blocked. You may need to enable them for login to work.');
+        testPopup.close();
       }
-    } catch (error) {
-      this.popupBlocked = true;
-      console.log('❌ Error testing popup support:', error);
+    } catch (err) {
+      blocked = true;
+      error = err;
+    }
+
+    this.popupBlocked = blocked;
+
+    if (blocked) {
+      console.log('❌ Popups appear to be blocked', error ? error : '');
+      this.showWarning('Note: Popups appear to be blocked. You may need to enable them for login to work.', true);
+    } else {
+      console.log('✅ Popups appear to be allowed');
     }
   }
 
@@ -58,7 +76,7 @@ export class LoginComponent implements OnInit {
     try {
       console.log('Starting Google login...');
       if (this.popupBlocked) {
-        this.showWarning('Popups seem to be blocked. If login fails, try redirect.');
+        this.showWarning('Popups seem to be blocked. If login fails, try redirect.', true);
         this.showAlternativeLogin = true;
       }
       await this.loginService.loginOnline();
@@ -66,7 +84,7 @@ export class LoginComponent implements OnInit {
       console.error('Login failed:', error);
       this.showAlternativeLogin = true;
       if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup')) {
-        this.showWarning('Popup was blocked! Please use redirect.');
+        this.showWarning('Popup was blocked! Please use redirect.', true);
       } else if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
         this.showWarning('Login was cancelled.');
       } else {
@@ -110,17 +128,29 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  showWarning(message: string) {
+  // showWarning(message: string) {
+  //   this.showWarning(message, false);
+  // }
+
+  showWarning(message: string, persistent = false) {
     this.warningMessage = message;
     this.showPopupWarning = true;
-    
-    // Auto-hide after 8 seconds
-    setTimeout(() => {
-      this.hideWarning();
-    }, 8000);
+    if (this.warningTimeout) {
+      clearTimeout(this.warningTimeout);
+      this.warningTimeout = null;
+    }
+    if (!persistent) {
+      this.warningTimeout = setTimeout(() => {
+        this.hideWarning();
+      }, 8000);
+    }
   }
 
   hideWarning() {
+    if (this.warningTimeout) {
+      clearTimeout(this.warningTimeout);
+      this.warningTimeout = null;
+    }
     this.showPopupWarning = false;
     this.warningMessage = '';
   }

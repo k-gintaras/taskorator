@@ -102,9 +102,10 @@ export class TaskListService {
       // Fetch missing tasks from API
       const missingTasks =
         cacheState.taskIdsWithoutData.length > 0
-          ? await this.ensureApiService().getTasksFromIds(
-              cacheState.taskIdsWithoutData
-            )
+          ? await ((): Promise<TaskoratorTask[] | null> => {
+              const api = this.ensureApiService();
+              return api.getTasksFromIds(cacheState.taskIdsWithoutData);
+            })()
           : [];
 
       // Combine cached and fetched tasks
@@ -160,9 +161,10 @@ export class TaskListService {
       type: TaskListType.LATEST_UPDATED,
       data: TaskListSubtype.API,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.ensureApiService().getLatestUpdatedTasks()
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => {
+      const api = this.ensureApiService();
+      return api.getLatestUpdatedTasks();
+    });
   }
 
   async getLatestTasks(): Promise<UiTask[] | null> {
@@ -170,9 +172,10 @@ export class TaskListService {
       type: TaskListType.LATEST_CREATED,
       data: TaskListSubtype.API,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.ensureApiService().getLatestCreatedTasks()
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => {
+      const api = this.ensureApiService();
+      return api.getLatestCreatedTasks();
+    });
   }
 
   /**
@@ -185,9 +188,10 @@ export class TaskListService {
       data: overlordId,
     };
 
-    const tasks = await this.getTaskGroupWithCache(taskListKey, () =>
-      this.ensureApiService().getOverlordTasks(overlordId)
-    );
+    const tasks = await this.getTaskGroupWithCache(taskListKey, () => {
+      const api = this.ensureApiService();
+      return api.getOverlordTasks(overlordId);
+    });
 
     // ALWAYS emit event, even if no children (empty array means 0 children!)
     // This ensures parents with no children get their counts fixed to 0
@@ -235,9 +239,7 @@ export class TaskListService {
       type: TaskListType.FOCUS,
       data: TaskListSubtype.SETTINGS,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.getSettingsTasks('focus')
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => this.getSettingsTasks('focus'));
     // return this.getSettingsTasks('focus');
   }
 
@@ -246,9 +248,7 @@ export class TaskListService {
       type: TaskListType.FROG,
       data: TaskListSubtype.SETTINGS,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.getSettingsTasks('frog')
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => this.getSettingsTasks('frog'));
     // return this.getSettingsTasks('frog');
   }
 
@@ -257,9 +257,7 @@ export class TaskListService {
       type: TaskListType.FAVORITE,
       data: TaskListSubtype.SETTINGS,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.getSettingsTasks('favorite')
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => this.getSettingsTasks('favorite'));
     // return this.getSettingsTasks('favorite');
   }
 
@@ -312,9 +310,10 @@ export class TaskListService {
       type: TaskListType.OLDEST_CREATED,
       data: TaskListSubtype.API,
     };
-    return this.getTaskGroupWithCache(taskListKey, () =>
-      this.ensureApiService().getOldestCreatedTasks()
-    );
+    return this.getTaskGroupWithCache(taskListKey, () => {
+      const api = this.ensureApiService();
+      return api.getOldestCreatedTasks();
+    });
   }
 
   /**
@@ -335,9 +334,10 @@ export class TaskListService {
 
     if (missingIds.length > 0) {
       // Fetch missing tasks from the API
-      const fetchedTasks = await this.ensureApiService().getTasksFromIds(
-        missingIds
-      );
+      const fetchedTasks = await ((): Promise<TaskoratorTask[] | null> => {
+        const api = this.ensureApiService();
+        return api.getTasksFromIds(missingIds);
+      })();
       if (fetchedTasks) {
         const extendedFetchedTasks =
           this.transmutatorService.toUiTasks(fetchedTasks);
@@ -363,7 +363,10 @@ export class TaskListService {
     if (!missingIds.length) return cachedTasks;
 
     const fetchedTasks: TaskoratorTask[] =
-      (await this.ensureApiService().getTasksFromIds(missingIds)) || [];
+      (await ((): Promise<TaskoratorTask[] | null> => {
+        const api = this.ensureApiService();
+        return api.getTasksFromIds(missingIds);
+      })()) || [];
 
     const extendedFetchedTasks =
       this.transmutatorService.toUiTasks(fetchedTasks);

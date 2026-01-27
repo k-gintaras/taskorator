@@ -35,13 +35,12 @@ export class SettingsService implements SettingsStrategy {
 
   async createSettings(settings: TaskSettings): Promise<TaskSettings> {
     try {
-      // Persist to API if initialized
-      if (this.apiService) {
-        try {
-          await this.apiService.createSettings(settings);
-        } catch (err) {
-          console.warn('SettingsService: API createSettings failed, using cache', err);
-        }
+      // Persist to API if available (throws if API not initialized)
+      try {
+        const api = this.ensureApiService();
+        await api.createSettings(settings);
+      } catch (err) {
+        console.warn('SettingsService: API createSettings failed or unavailable, using cache', err);
       }
       await this.cacheService.createSettings(settings);
       this.settingsSubject.next(settings);
@@ -63,11 +62,12 @@ export class SettingsService implements SettingsStrategy {
     try {
       let settings = await this.cacheService.getSettings();
       // Try remote API only if initialized
-      if (!settings && this.apiService) {
+      if (!settings) {
         try {
-          settings = await this.apiService.getSettings();
+          const api = this.ensureApiService();
+          settings = await api.getSettings();
         } catch (err) {
-          console.warn('SettingsService: API getSettings failed, using cache/default', err);
+          console.warn('SettingsService: API getSettings failed or unavailable, using cache/default', err);
         }
       }
       if (!settings) {
@@ -79,11 +79,9 @@ export class SettingsService implements SettingsStrategy {
         } else {
           // No existing settings, use defaults
           const defaultSettings = getDefaultTaskSettings();
-          // Persist to cache and API if available
-          await this.cacheService.createSettings(defaultSettings);
-          if (this.apiService) {
-            try { await this.apiService.createSettings(defaultSettings); } catch {}
-          }
+            // Persist to cache and API if available
+            await this.cacheService.createSettings(defaultSettings);
+            try { const api = this.ensureApiService(); await api.createSettings(defaultSettings); } catch {}
           settings = defaultSettings;
         }
       }
@@ -99,13 +97,12 @@ export class SettingsService implements SettingsStrategy {
 
   async updateSettings(settings: TaskSettings): Promise<void> {
     try {
-      // Update API if initialized
-      if (this.apiService) {
-        try {
-          await this.apiService.updateSettings(settings);
-        } catch (err) {
-          console.warn('SettingsService: API updateSettings failed, using cache', err);
-        }
+      // Update API if available
+      try {
+        const api = this.ensureApiService();
+        await api.updateSettings(settings);
+      } catch (err) {
+        console.warn('SettingsService: API updateSettings failed or unavailable, using cache', err);
       }
       const normalized = this.normalizeSettings(settings);
 
@@ -129,11 +126,7 @@ export class SettingsService implements SettingsStrategy {
             alertTask.timeCreated = Date.now();
             alertTask.lastUpdated = Date.now();
             // Try to persist via API if available, else update cache
-            if (this.apiService && typeof this.apiService.createTask === 'function') {
-              try { await this.apiService.createTask(alertTask); } catch (e) { console.warn('Failed to create alert task via API', e); this.cacheService.createTask(alertTask); }
-            } else {
-              this.cacheService.createTask(alertTask);
-            }
+            try { const api = this.ensureApiService(); await api.createTask(alertTask); } catch (e) { console.warn('Failed to create alert task via API', e); this.cacheService.createTask(alertTask); }
           } catch (e) {
             console.warn('Failed to create focus-clear alert task', e);
           }
@@ -157,15 +150,16 @@ export class SettingsService implements SettingsStrategy {
       let settings = await this.cacheService.getSettings();
 
       // 2) If not in cache, try API only if initialized
-      if (!settings && this.apiService) {
+      if (!settings) {
         try {
-          settings = await this.apiService.getSettings();
+          const api = this.ensureApiService();
+          settings = await api.getSettings();
           if (settings) {
             // Update cache with fetched settings
             await this.cacheService.updateSettings(settings);
           }
         } catch (err) {
-          console.warn('SettingsService: API getSettingsOnce failed, using cache/default', err);
+          console.warn('SettingsService: API getSettingsOnce failed or unavailable, using cache/default', err);
         }
       }
 
@@ -173,9 +167,7 @@ export class SettingsService implements SettingsStrategy {
       if (!settings) {
         settings = getDefaultTaskSettings();
         await this.cacheService.createSettings(settings);
-        if (this.apiService) {
-          try { await this.apiService.createSettings(settings); } catch {}
-        }
+        try { const api = this.ensureApiService(); await api.createSettings(settings); } catch {}
       }
 
       return this.normalizeSettings(settings);

@@ -15,6 +15,13 @@ export class TreeService implements TreeStrategy {
     new BehaviorSubject<TaskTree | null>(null);
   private apiService: ApiStrategy | null = null;
 
+  private ensureApiService(): ApiStrategy {
+    if (!this.apiService) {
+      throw new Error('API service is not initialized.');
+    }
+    return this.apiService;
+  }
+
   constructor(
     private cacheService: CacheOrchestratorService,
     private treeNodeToolsService: TaskTreeNodeToolsService,
@@ -26,8 +33,8 @@ export class TreeService implements TreeStrategy {
 
   async createTree(taskTree: TaskTree): Promise<TaskTree | null> {
     try {
-      if (!this.apiService) return null;
-      const createdTree = await this.apiService.createTree(taskTree);
+      const api = this.ensureApiService();
+      const createdTree = await api.createTree(taskTree);
       this.cacheService.createTree(taskTree);
       this.treeSubject.next(createdTree);
       return createdTree;
@@ -51,10 +58,15 @@ export class TreeService implements TreeStrategy {
   async fetchTree(): Promise<void> {
     try {
       let tree = await this.cacheService.getTree();
-      if (!tree && this.apiService) {
-        tree = await this.apiService.getTree();
-        if (tree) {
-          this.cacheService.createTree(tree);
+      if (!tree) {
+        try {
+          const api = this.ensureApiService();
+          tree = await api.getTree();
+          if (tree) {
+            this.cacheService.createTree(tree);
+          }
+        } catch (err) {
+          console.warn('TreeService: API getTree failed or unavailable, using cache', err);
         }
       }
       this.treeSubject.next(tree || null);
@@ -66,17 +78,15 @@ export class TreeService implements TreeStrategy {
 
   // 🔥 FIX: Update both API and local cache
   async updateTree(taskTree: TaskTree): Promise<void> {
-    if (!this.apiService) {
-      throw new Error('API service not initialized.');
-    }
-
     try {
+      const api = this.ensureApiService();
+
       // Update API
-      await this.apiService.updateTree(taskTree);
+      await api.updateTree(taskTree);
 
       // 🔥 CRITICAL: Update local cache AND BehaviorSubject
       this.cacheService.updateTree(taskTree);
-      this.treeSubject.next(taskTree); // This was missing!
+      this.treeSubject.next(taskTree);
     } catch (error) {
       console.error('Error updating tree:', error);
     }
@@ -92,13 +102,11 @@ export class TreeService implements TreeStrategy {
 
   // 🔥 NEW: Rebuild tree from all tasks when structure changes
   async getTreeFromApi(): Promise<void> {
-    if (!this.apiService) {
-      throw new Error('API service not initialized.');
-    }
-
     try {
+      const api = this.ensureApiService();
+
       // Fetch fresh tree from API (which should rebuild it from all tasks)
-      const freshTree = await this.apiService.getTree();
+      const freshTree = await api.getTree();
       if (freshTree) {
         // Update local cache and notify subscribers
         this.cacheService.updateTree(freshTree);

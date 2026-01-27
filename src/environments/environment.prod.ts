@@ -1,7 +1,10 @@
 export const environment = {
-  production: false,
+  production: true,
   isTesting: false,
-  aiApiBaseUrl: 'http://192.168.4.41:3001', // Local development server
+  // IMPORTANT: Replace with your actual production AI API endpoint
+  // For now, this will cause the forge feature to be disabled in production
+  // You need to deploy your AI backend and update this URL
+  aiApiBaseUrl: 'https://your-production-ai-api.example.com',
   firebase: {
     projectId: 'taskorator',
     appId: '1:799643180199:web:3a44fe3dcb6b8b5aeecf82',

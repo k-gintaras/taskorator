@@ -50,8 +50,8 @@ export class TaskBatchService {
       // }
 
       // Create tasks via API
-      const createdTasks: TaskoratorTask[] | null =
-        await this.ensureApiService().createTasks(tasks);
+      const api = this.ensureApiService();
+      const createdTasks: TaskoratorTask[] | null = await api.createTasks(tasks);
       if (!createdTasks) {
         console.warn('No tasks were created.');
         return null;
@@ -102,7 +102,8 @@ export class TaskBatchService {
       // }
 
       // Update tasks via API
-      await this.ensureApiService().updateTasks(tasks);
+      const api = this.ensureApiService();
+      await api.updateTasks(tasks);
 
       // Refresh cache with updated tasks
       const extendedTasks = this.transmutatorService.toUiTasks(tasks);

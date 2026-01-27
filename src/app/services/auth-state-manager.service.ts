@@ -41,6 +41,7 @@ export class AuthStateManagerService {
 
   /**
    * Initialize the app - check existing auth state and set up session
+   * NOTE: Does NOT force navigation - let router guards handle redirects
    */
   async initializeApp(): Promise<void> {
     console.log('AuthStateManager: Initializing app...');
@@ -51,16 +52,18 @@ export class AuthStateManagerService {
       const mode: AuthMode = this.config.offlineTesting ? 'offline' : 'online';
 
       if (mode === 'online') {
-        // Wait for Firebase auth state to settle
+        // Wait for Firebase auth state to settle (resolve on first emission)
         await this.waitForFirebaseAuthState();
         if (this.authService.isAuthenticated()) {
           await this.initializeSession();
         }
+        // NOTE: Don't navigate to login here - let AutoRedirectComponent handle it
       } else {
         // For offline mode, check if we have offline auth
         if (this.authOfflineService.isAuthenticated()) {
           await this.initializeSession();
         }
+        // NOTE: Don't navigate to login here - let AutoRedirectComponent handle it
       }
 
       console.log('AuthStateManager: App initialization complete');
@@ -85,10 +88,10 @@ export class AuthStateManagerService {
       let result: { userId: string; isNewUser: boolean };
 
       if (mode === 'online') {
-        // Initialize online session
-        await this.sessionManager.initialize();
-        // Perform Google auth
+        // Perform Google auth first (shows popup)
         result = await this.sessionManager.getAuthStrategy().loginWithGoogle();
+        console.log('AuthStateManager: Google auth completed, result:', result);
+        
         // If first-time user, register initial data
         if (result.isNewUser) {
           console.log('AuthStateManager: New online user detected, registering data');
@@ -177,6 +180,11 @@ export class AuthStateManagerService {
       this.cacheOrchestrator.clearCache();
 
       console.log('AuthStateManager: Logout successful');
+      try {
+        this.router.navigate(['/login']);
+      } catch (e) {
+        console.warn('AuthStateManager: Navigation to login failed after logout', e);
+      }
     } catch (error) {
       console.error('AuthStateManager: Logout error:', error);
       // Force clear session and caches
@@ -254,6 +262,33 @@ export class AuthStateManagerService {
       console.log(`AuthStateManager: ${mode} session initialized successfully`);
     } catch (error) {
       console.error(`AuthStateManager: Failed to initialize ${mode} session:`, error);
+
+      // If online init failed due to network/auth, try falling back to offline mode
+      try {
+        if (mode === 'online' && typeof navigator !== 'undefined' && !navigator.onLine) {
+          console.warn('AuthStateManager: Network appears offline - falling back to offline mode');
+          try {
+            // Avoid forcing a full reload via ModeService.set(); write preference directly
+            localStorage.setItem('pref_mode', 'offline');
+          } catch (e) {
+            console.warn('AuthStateManager: Unable to persist pref_mode to localStorage:', e);
+          }
+
+          // Try initializing session again in offline mode
+          await this.sessionManager.initialize();
+
+          // Update state to reflect offline init
+          this._isAuthenticated.next(true);
+          this._isInitialized.next(true);
+          this._currentMode.next('offline');
+
+          console.log('AuthStateManager: Fallback offline session initialized successfully');
+          return;
+        }
+      } catch (fallbackError) {
+        console.error('AuthStateManager: Fallback offline initialization failed:', fallbackError);
+      }
+
       this.clearState();
       throw error;
     }
@@ -276,21 +311,19 @@ export class AuthStateManagerService {
 
   private async waitForFirebaseAuthState(): Promise<void> {
     return new Promise<void>((resolve) => {
+      let subscription: any = null;
       const timeout = setTimeout(() => {
         console.log('AuthStateManager: Firebase auth state timeout - proceeding anyway');
+        if (subscription) subscription.unsubscribe();
         resolve();
       }, 5000);
 
-      let settled = false;
-      const subscription = this.authService.getCurrentUser().subscribe((user) => {
-        if (!settled) {
-          settled = true;
-          setTimeout(() => {
-            clearTimeout(timeout);
-            subscription.unsubscribe();
-            resolve();
-          }, 1000);
-        }
+      // Resolve on first emission (user or null) so we don't wait unnecessarily when logged out
+      subscription = this.authService.getCurrentUser().subscribe((user) => {
+        clearTimeout(timeout);
+        if (subscription) subscription.unsubscribe();
+        // slight delay to let other listeners settle
+        setTimeout(() => resolve(), 300);
       });
     });
   }

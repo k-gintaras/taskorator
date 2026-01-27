@@ -90,13 +90,22 @@
 
       <!-- Footer Links -->
       <div class="login-footer">
-        <button
-          (click)="logout()"
-          class="login-footer-link login-footer-debug"
-          title="Clear session"
-          >
-          🧪 Reset
-        </button>
+        <div class="login-footer-actions">
+          <button
+            (click)="logout()"
+            class="login-footer-link login-footer-debug"
+            title="Clear session"
+            >
+            🧪 Reset
+          </button>
+          <button
+            (click)="logout()"
+            class="login-footer-link login-footer-logout"
+            title="Log out"
+            >
+            🔒 Log out
+          </button>
+        </div>
       </div>
     </div>
   </div>

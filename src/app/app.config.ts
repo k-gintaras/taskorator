@@ -51,5 +51,5 @@ export const TASK_CONFIG = {
 export const NAVIGATION_CONFIG = {
   ON_LOGIN_ROUTE_URL: 'sentinel',
   DEFAULT_AUTHENTICATED_ROUTE: '/sentinel',
-  DEFAULT_UNAUTHENTICATED_ROUTE: '/welcome',
+  DEFAULT_UNAUTHENTICATED_ROUTE: '/gateway/welcome',
 };

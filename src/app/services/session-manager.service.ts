@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, switchMap, of, EMPTY } from 'rxjs';
 import { API_STRATEGY, AUTH_STRATEGY } from '../tokens';
 import { ApiStrategy } from '../models/service-strategies/api-strategy.interface';
 import { AuthStrategy } from '../models/service-strategies/auth-strategy.interface';
@@ -14,7 +14,6 @@ import { ScoreService } from './sync-api-cache/score.service';
 import { RegistrationService } from './core/registration.service';
 import { TestDataInitializerService } from '../test-files/test-services/test-data-initializer.service';
 import { TaskInitializerService } from './core/task-initializer.service';
-import { AiApiFirebaseService } from './core/ai-api-firebase.service';
 
 @Injectable({ providedIn: 'root' })
 export class SessionManagerService {
@@ -34,7 +33,6 @@ export class SessionManagerService {
     private registrationService: RegistrationService,
     private testDataInitializer: TestDataInitializerService,
     private taskInitializer: TaskInitializerService,
-    private aiApiFirebase: AiApiFirebaseService
   ) {}
 
   async initialize(mode?: 'online'|'offline'): Promise<void> {
@@ -43,18 +41,20 @@ export class SessionManagerService {
     console.log('SessionManager: Initializing with mode:', actualMode);
 
     if (actualMode === 'online') {
-      console.log('SessionManager: Online mode - checking authentication');
-      const user = await firstValueFrom(this.auth.getCurrentUser());
+      console.log('SessionManager: Online mode - waiting for auth state');
+      // Wait for first non-null user (auth state to settle after login)
+      const user = await firstValueFrom(
+        this.auth.getCurrentUser().pipe(
+          // Skip null values, take first user
+          switchMap((user) => user ? of(user) : EMPTY)
+        )
+      );
       console.log('SessionManager: Current user:', user);
-      if (!this.auth.isAuthenticated()) {
-        console.error('SessionManager: User not authenticated');
-        throw new Error('User not authenticated');
-      }
       this.user = user;
       
-      // Fire and forget AI API login for online mode
-      console.log('SessionManager: Initiating AI API login');
-      this.aiApiFirebase.loginGoogle();
+      // DISABLED: Fire and forget AI API login for online mode - requires deployed AI API backend
+      // console.log('SessionManager: Initiating AI API login');
+      // this.aiApiFirebase.loginGoogle();
     } else {
       console.log('SessionManager: Offline mode - logging in');
       await this.auth.login();

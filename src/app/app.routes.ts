@@ -1,16 +1,17 @@
 import { Route } from '@angular/router';
 import { CORE_APP_METADATA } from './app.routes-metadata';
 import { canActivate, canActivateChild, canActivateAdmin } from './services/core/auth-guard';
+import { rootGuard } from './services/core/root-guard';
 import { AdminComponent } from './features/admin/admin/admin.component';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
 import { TaskViewComponent } from './components/task/task-view/task-view.component';
-import { AutoRedirectComponent } from './components/auto-redirect/auto-redirect.component';
+import { RootPlaceholderComponent } from './components/root-placeholder/root-placeholder.component';
 import { LoginComponent } from './features/core/gateway/login/login.component';
 import { TaskNavigatorV2Component } from './components/task-navigator-v2/task-navigator-v2.component';
 import { TestTaskTaggingComponent } from './components/test-task-tagging/test-task-tagging.component';
 
 export const routes: Route[] = [
-  { path: '', component: AutoRedirectComponent }, // Root redirect
+  { path: '', component: RootPlaceholderComponent, canActivate: [rootGuard] }, // Root guard handles auth-based redirect
   { path: 'welcome', redirectTo: '/gateway/welcome', pathMatch: 'full' }, // Redirect welcome to gateway/welcome
 
   { path: 'login', component: LoginComponent }, // Public login
@@ -100,5 +101,5 @@ export const routes: Route[] = [
     component: AdminComponent,
     canActivate: [canActivate, canActivateAdmin],
   },
-  { path: '**', component: AutoRedirectComponent },
+  { path: '**', redirectTo: '/gateway/welcome' },
 ];

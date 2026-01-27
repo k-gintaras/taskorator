@@ -48,15 +48,18 @@ export class RegistrationService {
   ) {}
 
   generateApiKey() {
-    this.ensureApiService().generateApiKey();
+    const api = this.ensureApiService();
+    api.generateApiKey();
   }
 
   getUserInfo(): Promise<TaskUserInfo | undefined> {
-    return this.ensureApiService().getUserInfo();
+    const api = this.ensureApiService();
+    return api.getUserInfo();
   }
 
   updateUser(userInfo: TaskUserInfo) {
-    return this.ensureApiService().updateUserInfo(userInfo);
+    const api = this.ensureApiService();
+    return api.updateUserInfo(userInfo);
   }
 
   async registerNewUser(): Promise<TaskUserInfo | null> {
@@ -114,13 +117,20 @@ export class RegistrationService {
   }
 
   async deleteUser(): Promise<void> {
-    if (!this.apiService) return;
-    return this.apiService.deleteUser();
+    try {
+      const api = this.ensureApiService();
+      return api.deleteUser();
+    } catch (err) {
+      // API not initialized or delete failed - swallow to avoid further cascading errors
+      console.warn('RegistrationService.deleteUser: API unavailable or delete failed', err);
+      return;
+    }
   }
 
   async handleFailedRegistration(): Promise<void> {
     console.error('Deleting user due to failed registration.');
-    await this.ensureApiService().deleteUser();
+    const api = this.ensureApiService();
+    await api.deleteUser();
     throw new Error('Registration failed and user has been deleted.');
   }
 
@@ -150,9 +160,8 @@ export class RegistrationService {
         userInfo,
       };
 
-      const registrationResult = await this.ensureApiService().register(
-        registrationData
-      );
+      const api = this.ensureApiService();
+      const registrationResult = await api.register(registrationData);
 
       if (registrationResult.success) {
         await this.cacheService.createTask(initialTask);

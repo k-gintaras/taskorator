@@ -1,4 +1,4 @@
-import { Component, Input, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, HostListener, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -33,6 +33,7 @@ import { TaskTransmutationService } from '../../services/tasks/task-transmutatio
 ],
   templateUrl: './search-create.component.html',
   styleUrls: ['./search-create.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchCreateComponent {
   @Input() isEnabledBack = false; // Or however you define this based on selection
@@ -49,7 +50,8 @@ export class SearchCreateComponent {
     private taskSearchService: SearchTasksService,
     private router: Router,
     private taskTransmutationService: TaskTransmutationService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +71,7 @@ export class SearchCreateComponent {
       .subscribe((tasks) => {
         this.searchResults = tasks;
         this.isDropdownOpen = tasks.length > 0;
+        this.cdr.markForCheck();
       });
 
     // Watch for selected overlord changes
@@ -77,6 +80,7 @@ export class SearchCreateComponent {
       .subscribe((overlord: UiTask | null) => {
         if (overlord) {
           this.selectedOverlord = overlord;
+          this.cdr.markForCheck(); // Mark for check when overlord changes
         }
       });
   }

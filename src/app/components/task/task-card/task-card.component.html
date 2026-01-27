@@ -15,16 +15,16 @@
 
       <!-- Main content - task description and why -->
       <div
-        class="flex-1 space-y-1 text-sm text-gray-700"
+        class="flex-1 space-y-1 text-sm theme-text-secondary"
         >
         @if (task.todo) {
           <div class="max-h-[40px] overflow-y-auto">
-            <p class="leading-relaxed text-xs">{{ task.todo }}</p>
+            <p class="leading-relaxed text-xs theme-text-secondary">{{ task.todo }}</p>
           </div>
         }
         @if (ifShowExtra && task.why) {
           <div class="max-h-[30px] overflow-y-auto">
-            <p class="leading-relaxed text-xs text-gray-700 dark:text-gray-300">
+            <p class="leading-relaxed text-xs theme-text-secondary">
               Why: {{ task.why }}
             </p>
           </div>
@@ -32,6 +32,7 @@
       </div>
 
       <!-- Action Buttons -->
+      <!-- DISABLED: Forge Tasks and Sentinel features require deployed AI API backend
       @if (ifShowExtra) {
         <div class="flex gap-2 mt-2 pt-2 border-t border-gray-100">
           <button
@@ -55,6 +56,7 @@
           </button>
         </div>
       }
+      -->
     </div>
   </div>
 }

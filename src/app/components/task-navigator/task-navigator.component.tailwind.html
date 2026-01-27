@@ -52,14 +52,25 @@ style="min-width: min(100vw - 2rem, 600px)"
     ></app-task-list-item>
   </div>
 
-  <!-- Staged Task List Section -->
+  <!-- DISABLED: Blueprints/Staged Tasks section - requires deployed AI API backend
   <div>
-    <div class="px-4 mb-2">
+    <div class="px-4 mb-2 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">✨ Blueprints</h2>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="approveStagedTasks()"
+        [disabled]="!stagedTasks.length"
+        class="h-8 text-xs"
+      >
+        <mat-icon class="text-sm">check_circle</mat-icon>
+        <span class="ml-1">Approve & Add</span>
+      </button>
     </div>
     <app-staged-task-list
       [tasks]="stagedTasks"
       (tasksChange)="stagedTasks = $event"
     ></app-staged-task-list>
   </div>
+  -->
 </div>
