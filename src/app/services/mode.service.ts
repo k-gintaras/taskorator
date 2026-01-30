@@ -19,8 +19,11 @@ export class ModeService {
 
   set(mode: 'online' | 'offline') {
     if (this.get() !== mode) {
+      console.log('ModeService: Switching mode from', this.get(), 'to', mode);
       localStorage.setItem(this.key, mode);
-      location.reload(); // rebind DI on reload
+      // Hard reload to rebind DI with new mode configuration
+      // Add small delay to ensure localStorage write completes
+      setTimeout(() => location.reload(), 50);
     }
   }
 }

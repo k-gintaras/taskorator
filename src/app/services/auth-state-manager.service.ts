@@ -142,16 +142,18 @@ export class AuthStateManagerService {
     this._isLoading.next(true);
 
     try {
-      // Initialize session first to set up the auth strategy
-      await this.sessionManager.initialize();
-      // Get the auth strategy and cast to Firebase helper for redirect method
+      // Get the auth strategy directly without initializing full session
+      // (session will be fully initialized after Google redirects back)
       const authStrategy = this.sessionManager.getAuthStrategy();
+      
+      console.log('AuthStateManager: Got auth strategy, initiating redirect to Google...');
       if ('loginWithGoogleRedirect' in authStrategy) {
+        console.log('AuthStateManager: Calling loginWithGoogleRedirect...');
         await (authStrategy as any).loginWithGoogleRedirect();
       } else {
         throw new Error('Redirect login not supported by current auth strategy');
       }
-      // Note: Page will redirect, so no need to continue
+      // Note: Page will redirect to Google, so no need to continue
     } catch (error) {
       this._isLoading.next(false);
       console.error('AuthStateManager: Redirect login failed:', error);
@@ -169,13 +171,20 @@ export class AuthStateManagerService {
     try {
       const currentMode = this._currentMode.value;
 
-      if (currentMode === 'online') {
-        await this.sessionManager.getAuthStrategy().logOut();
-      } else if (currentMode === 'offline') {
-        await this.authOfflineService.logOut();
+      try {
+        if (currentMode === 'online') {
+          await this.sessionManager.getAuthStrategy().logOut();
+          console.log('AuthStateManager: Online logout completed');
+        } else if (currentMode === 'offline') {
+          await this.authOfflineService.logOut();
+          console.log('AuthStateManager: Offline logout completed');
+        }
+      } catch (e) {
+        console.warn('AuthStateManager: Logout from auth service failed:', e);
+        // Continue with cleanup even if auth logout fails
       }
 
-      // Clear session and caches
+      // Clear session and caches ALWAYS, even if auth logout fails
       this.clearState();
       this.cacheOrchestrator.clearCache();
 

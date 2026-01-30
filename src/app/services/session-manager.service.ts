@@ -43,12 +43,30 @@ export class SessionManagerService {
     if (actualMode === 'online') {
       console.log('SessionManager: Online mode - waiting for auth state');
       // Wait for first non-null user (auth state to settle after login)
-      const user = await firstValueFrom(
-        this.auth.getCurrentUser().pipe(
-          // Skip null values, take first user
-          switchMap((user) => user ? of(user) : EMPTY)
-        )
-      );
+      // Use a more robust approach: take first emissions until we get a user
+      let user = null;
+      let attempts = 0;
+      const maxAttempts = 20; // 20 * 200ms = 4 seconds timeout
+      
+      while (!user && attempts < maxAttempts) {
+        user = await firstValueFrom(
+          this.auth.getCurrentUser().pipe(
+            // Take user if available, otherwise wait and retry
+            switchMap((u) => u ? of(u) : EMPTY)
+          )
+        ).catch(() => null);
+        
+        if (!user) {
+          attempts++;
+          console.log('SessionManager: Waiting for user auth state... attempt', attempts);
+          await new Promise(r => setTimeout(r, 200));
+        }
+      }
+      
+      if (!user) {
+        throw new Error('Online login failed: No authenticated user after timeout');
+      }
+      
       console.log('SessionManager: Current user:', user);
       this.user = user;
       

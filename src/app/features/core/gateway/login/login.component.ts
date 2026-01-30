@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { LoginService } from '../../../../services/login.service';
+import { ModeService } from '../../../../services/mode.service';
+import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
@@ -20,25 +22,26 @@ export class LoginComponent implements OnInit {
   popupBlocked = false;
   private warningTimeout: any = null;
 
+  // State tracking
+  currentMode: 'online' | 'offline' | null = null;
+  isAuthenticated = false;
+
   constructor(
     private router: Router,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private modeService: ModeService,
+    private authStateManager: AuthStateManagerService
   ) {}
 
   async ngOnInit(): Promise<void> {
     // Check if popups are supported/allowed on page load
     this.checkPopupSupport();
 
-    if (this.loginService.hasPendingOfflineLogin()) {
-      this.loading = true;
-      try {
-        await this.loginService.resumeOfflineLoginIfPending();
-      } catch (error) {
-        console.error('Resuming offline login failed:', error);
-      } finally {
-        this.loading = false;
-      }
-    }
+    // Get current state
+    this.currentMode = this.modeService.get();
+    this.isAuthenticated = this.authStateManager.isAuthenticated();
+
+    console.log('LoginComponent: Mode:', this.currentMode, 'Authenticated:', this.isAuthenticated);
   }
 
   // Test if popups work - this gives us insight into popup blocking
@@ -69,19 +72,30 @@ export class LoginComponent implements OnInit {
   }
 
   async loginOnline() {
+    if (this.currentMode !== 'online') {
+      this.showWarning('Please switch to online mode first.', false);
+      return;
+    }
+
+    // Prevent double-clicks while loading
+    if (this.loading) {
+      console.log('LoginComponent: Login already in progress, ignoring click');
+      return;
+    }
+
     this.loading = true;
     this.currentLoginMethod = 'popup';
     this.hideWarning();
     this.showAlternativeLogin = false;
     try {
-      console.log('Starting Google login...');
+      console.log('LoginComponent: Starting Google login...');
       if (this.popupBlocked) {
         this.showWarning('Popups seem to be blocked. If login fails, try redirect.', true);
         this.showAlternativeLogin = true;
       }
       await this.loginService.loginOnline();
     } catch (error: any) {
-      console.error('Login failed:', error);
+      console.error('LoginComponent: Login failed:', error);
       this.showAlternativeLogin = true;
       if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup')) {
         this.showWarning('Popup was blocked! Please use redirect.', true);
@@ -96,14 +110,27 @@ export class LoginComponent implements OnInit {
   }
 
   async loginOffline() {
+    if (this.currentMode !== 'offline') {
+      this.showWarning('Please switch to offline mode first.', false);
+      return;
+    }
+
+    // Prevent double-clicks while loading
+    if (this.loading) {
+      console.log('LoginComponent: Login already in progress, ignoring click');
+      return;
+    }
+
     this.loading = true;
     this.currentLoginMethod = null;
     this.showAlternativeLogin = false;
     this.hideWarning();
     try {
+      console.log('LoginComponent: Starting offline login...');
       await this.loginService.loginOffline();
     } catch (error) {
-      console.error('Offline login failed:', error);
+      console.error('LoginComponent: Offline login failed:', error);
+      this.showWarning('Offline login failed. Please try again.', false);
     } finally {
       this.loading = false;
     }
@@ -114,14 +141,25 @@ export class LoginComponent implements OnInit {
   }
 
   async loginWithRedirect() {
+    if (this.currentMode !== 'online') {
+      this.showWarning('Please switch to online mode first.', false);
+      return;
+    }
+
+    // Prevent double-clicks while loading
+    if (this.loading) {
+      console.log('LoginComponent: Login already in progress, ignoring click');
+      return;
+    }
+
     this.loading = true;
     this.currentLoginMethod = 'redirect';
     this.hideWarning();
     try {
-      console.log('Starting redirect login...');
+      console.log('LoginComponent: Starting redirect login...');
       await this.loginService.loginWithRedirect();
     } catch (error: any) {
-      console.error('Redirect login failed:', error);
+      console.error('LoginComponent: Redirect login failed:', error);
       this.showWarning('Redirect login failed. Please try popup.');
       this.loading = false;
       this.currentLoginMethod = null;
@@ -157,14 +195,54 @@ export class LoginComponent implements OnInit {
 
   async logout() {
     try {
-      console.log('Logging out...');
+      console.log('LoginComponent: Logging out...');
       await this.loginService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('LoginComponent: Logout error:', error);
     }
   }
 
-  goToGateway() {
-    this.router.navigate(['/gateway']);
+  async switchToOnlineMode() {
+    if (this.isAuthenticated) {
+      this.showWarning('You must logout before switching modes.', false);
+      return;
+    }
+
+    console.log('LoginComponent: Switching to online mode...');
+    this.loading = true;
+    this.warningMessage = 'Switching to online mode...';
+    this.showPopupWarning = true;
+    
+    try {
+      await this.loginService.switchToOnlineMode();
+      // Page will reload
+    } catch (error) {
+      console.error('LoginComponent: Mode switch failed:', error);
+      this.showWarning('Failed to switch mode. Please try again.', false);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async switchToOfflineMode() {
+    if (this.isAuthenticated) {
+      this.showWarning('You must logout before switching modes.', false);
+      return;
+    }
+
+    console.log('LoginComponent: Switching to offline mode...');
+    this.loading = true;
+    this.warningMessage = 'Switching to offline mode...';
+    this.showPopupWarning = true;
+    
+    try {
+      await this.loginService.switchToOfflineMode();
+      // Page will reload
+    } catch (error) {
+      console.error('LoginComponent: Mode switch failed:', error);
+      this.showWarning('Failed to switch mode. Please try again.', false);
+    } finally {
+      this.loading = false;
+    }
   }
 }

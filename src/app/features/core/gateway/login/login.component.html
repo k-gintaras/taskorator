@@ -33,60 +33,104 @@
           </div>
         }
 
-        <!-- Primary Login Button -->
-        <button
-          (click)="loginOnline()"
-          class="login-btn login-btn-primary"
-          [disabled]="loading"
-          >
-          {{ loading && currentLoginMethod === 'popup' ? "Signing in..." : "Continue with Google" }}
-        </button>
+        <!-- Mode Status Section -->
+        <div class="login-mode-status">
+          @if (isAuthenticated) {
+            <div class="login-alert alert-success">
+              <p class="theme-text-secondary font-semibold">
+                ✓ Logged in via {{ currentMode === 'online' ? 'Google' : 'Offline Mode' }}
+              </p>
+              <p class="theme-text-muted text-sm mt-2">
+                You must logout before switching modes
+              </p>
+            </div>
+          } @else {
+            <div class="login-alert alert-info">
+              <p class="theme-text-secondary font-semibold">
+                📝 Not logged in
+              </p>
+              <p class="theme-text-muted text-sm mt-2">
+                Select a mode to continue
+              </p>
+              
+              <!-- Mode Selector Buttons -->
+              <div class="login-mode-buttons">
+                <button
+                  (click)="switchToOnlineMode()"
+                  class="login-btn login-btn-mode"
+                  [class.active]="currentMode === 'online'"
+                  [disabled]="loading"
+                  >
+                  {{ loading && currentMode === null ? "Switching..." : "🌐 Enable Online Mode (Google)" }}
+                </button>
+                <button
+                  (click)="switchToOfflineMode()"
+                  class="login-btn login-btn-mode"
+                  [class.active]="currentMode === 'offline'"
+                  [disabled]="loading"
+                  >
+                  {{ loading && currentMode === null ? "Switching..." : "💾 Enable Offline Mode" }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
 
-        <!-- Alternative Login Options -->
-        @if (showAlternativeLogin) {
-          <div class="login-alert alert-info">
-            <button
-              (click)="hideAlternativeLogin()"
-              class="login-alert-close"
-              aria-label="Close alternative login"
-              >
-              ×
-            </button>
-            <p class="theme-text-secondary">
-              Enable popups or
+        <!-- Primary Login Button -->
+        @if (!isAuthenticated && currentMode === 'online') {
+          <button
+            (click)="loginOnline()"
+            class="login-btn login-btn-primary"
+            [disabled]="loading"
+            >
+            {{ loading && currentLoginMethod === 'popup' ? "Signing in..." : "Continue with Google" }}
+          </button>
+
+          <!-- Alternative Login Options -->
+          @if (showAlternativeLogin) {
+            <div class="login-alert alert-info">
               <button
-                (click)="loginWithRedirect()"
-                class="login-link"
-                [disabled]="loading"
+                (click)="hideAlternativeLogin()"
+                class="login-alert-close"
+                aria-label="Close alternative login"
                 >
-                try redirect login
+                ×
               </button>
-            </p>
+              <p class="theme-text-secondary">
+                Enable popups or
+                <button
+                  (click)="loginWithRedirect()"
+                  class="login-link"
+                  [disabled]="loading"
+                  >
+                  try redirect login
+                </button>
+              </p>
+            </div>
+          }
+
+          <!-- Alternative Link -->
+          <div class="text-center">
+            <button
+              (click)="loginWithRedirect()"
+              class="login-link"
+              [disabled]="loading"
+              >
+              {{ loading && currentLoginMethod === 'redirect' ? "redirecting..." : "Login without popup" }}
+            </button>
           </div>
         }
 
-        <!-- Alternative Link -->
-        <div class="text-center">
+        <!-- Offline Login Button -->
+        @if (!isAuthenticated && currentMode === 'offline') {
           <button
-            (click)="loginWithRedirect()"
-            class="login-link"
+            (click)="loginOffline()"
+            class="login-btn login-btn-primary"
             [disabled]="loading"
             >
-            {{ loading && currentLoginMethod === 'redirect' ? "redirecting..." : "Login without popup" }}
+            {{ loading ? "Logging in..." : "Login to Offline Mode" }}
           </button>
-        </div>
-      </div>
-
-      <!-- Offline Section -->
-      <div class="login-offline-section">
-        <button
-          (click)="loginOffline()"
-          class="login-btn login-btn-secondary"
-          [disabled]="loading"
-          >
-          Try Offline Mode
-        </button>
-      </div>
+        }
 
       <!-- Footer Links -->
       <div class="login-footer">
@@ -114,12 +158,9 @@
   <div class="login-external-footer">
     <p class="theme-text-muted">
       New to Taskorator?
-      <button
-        (click)="goToGateway()"
-        class="login-link"
-        >
+      <a href="/" class="login-link">
         Explore features
-      </button>
+      </a>
     </p>
   </div>
 </div>
