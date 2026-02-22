@@ -1,4 +1,10 @@
 <div class="theme-app">
-  <app-horizontal-navigation></app-horizontal-navigation>
-  <router-outlet></router-outlet>
+  <ng-container *ngIf="authStateManager.isAuthenticated$ | async; else publicOutlet">
+    <app-horizontal-navigation></app-horizontal-navigation>
+    <router-outlet></router-outlet>
+  </ng-container>
+
+  <ng-template #publicOutlet>
+    <router-outlet></router-outlet>
+  </ng-template>
 </div>
