@@ -103,8 +103,12 @@ export class TaskService {
 
         return cachedTask;
       }
-
-      const api = this.ensureApiService();
+      // If API service isn't initialized yet (race on slow devices), avoid throwing
+      // and return null silently so early components don't show errors.
+      if (!this.apiService) {
+        return null;
+      }
+      const api = this.apiService;
       const task = await api.getTaskById(taskId);
       if (task) {
         const extendedTask = this.transmutatorService.toUiTask(task);
