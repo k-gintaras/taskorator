@@ -15,7 +15,7 @@ import { UiTask } from '../../models/taskModelManager';
 export class TestTaskTaggingComponent implements OnInit {
   // Tag manager expects richer shapes (name/group fields). Provide compatible objects.
   tagGroups: { id: string; name: string; tags: { id: string; name: string; group: string; label?: string }[] }[] = [];
-  items: { id: string; name: string; label: string; tags: { id: string; name: string; group?: string; label?: string }[]; originalTask: UiTask }[] = [];
+  items: { id: string; name: string; label: string; tags: { id: string; name: string; group: string; label?: string }[]; originalTask: UiTask }[] = [];
   isLoading = true;
   errorMessage: string | null = null;
 
