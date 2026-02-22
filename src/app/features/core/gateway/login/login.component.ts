@@ -90,8 +90,10 @@ export class LoginComponent implements OnInit {
     try {
       console.log('LoginComponent: Starting Google login...');
       if (this.popupBlocked) {
-        this.showWarning('Popups seem to be blocked. If login fails, try redirect.', true);
-        this.showAlternativeLogin = true;
+        console.log('LoginComponent: Popups blocked - using redirect flow on mobile');
+        // Prefer redirect flow on devices/browsers where popups are blocked (mobile)
+        await this.loginWithRedirect();
+        return;
       }
       await this.loginService.loginOnline();
     } catch (error: any) {
