@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { NAVIGATION_CONFIG } from '../../../../app.config';
 import { LoginService } from '../../../../services/login.service';
 import { ModeService } from '../../../../services/mode.service';
 import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
@@ -32,6 +33,14 @@ export class LoginComponent implements OnInit {
     private modeService: ModeService,
     private authStateManager: AuthStateManagerService
   ) {}
+
+  continueToApp() {
+    try {
+      this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
+    } catch (e) {
+      console.error('LoginComponent: Continue navigation failed', e);
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     // Check if popups are supported/allowed on page load

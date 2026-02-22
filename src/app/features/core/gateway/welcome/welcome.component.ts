@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { Router } from '@angular/router';
 import { LoginService } from '../../../../services/login.service';
+import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
+import { NAVIGATION_CONFIG } from '../../../../app.config';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
@@ -15,8 +17,17 @@ import { interval, Subscription } from 'rxjs';
 export class WelcomeComponent {
   constructor(
     private router: Router,
-    private loginService: LoginService
+    private loginService: LoginService,
+    public authStateManager: AuthStateManagerService
   ) {}
+
+  continueToApp() {
+    try {
+      this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
+    } catch (e) {
+      console.error('WelcomeComponent: Continue navigation failed', e);
+    }
+  }
   currentSlide = 0;
   slides = [
     {

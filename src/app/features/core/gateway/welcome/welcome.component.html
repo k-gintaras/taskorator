@@ -20,6 +20,7 @@
       <div class="flex md:flex-col gap-2 md:justify-self-end">
         <button class="action-btn theme-btn-primary btn" (click)="startOnlineLogin()">Sign in</button>
         <button class="action-btn theme-btn-secondary btn" (click)="startOfflineMode()">Try Offline</button>
+        <button *ngIf="authStateManager.isAuthenticated$ | async" class="action-btn theme-btn-primary btn" (click)="continueToApp()">Continue to Taskorator</button>
       </div>
     </div>
 
