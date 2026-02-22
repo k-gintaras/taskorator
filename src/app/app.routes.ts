@@ -5,6 +5,7 @@ import { rootGuard } from './services/core/root-guard';
 import { AdminComponent } from './features/admin/admin/admin.component';
 import { NextTaskManagerComponent } from './features/next-task-manager/next-task-manager.component';
 import { TaskViewComponent } from './components/task/task-view/task-view.component';
+import { AuthShellComponent } from './features/ui-factory/auth-shell/auth-shell.component';
 import { RootPlaceholderComponent } from './components/root-placeholder/root-placeholder.component';
 import { LoginComponent } from './features/core/gateway/login/login.component';
 import { TaskNavigatorV2Component } from './components/task-navigator-v2/task-navigator-v2.component';
@@ -26,80 +27,52 @@ export const routes: Route[] = [
       import('./features/core/gateway/gateway-routes').then((m) => m.default),
     // No auth guard — public welcome area
   },
+  // Protected shell: navigation + protected routes live under this guarded parent
   {
-    path: 'next',
+    path: '',
+    component: AuthShellComponent,
     canActivate: [canActivate],
     canActivateChild: [canActivateChild],
-    component: NextTaskManagerComponent,
-  },
-  {
-    path: 'tasks/:taskId',
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-    component: TaskViewComponent, // allow simply navigate to task by url id
-  },
-  {
-    path: 'citadel',
-    loadChildren: () =>
-      import('./features/core/citadel/citadel-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['citadel'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'crucible',
-    loadChildren: () =>
-      import('./features/core/crucible/crucible-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['crucible'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'dreamforge',
-    loadChildren: () =>
-      import('./features/core/dreamforge/dreamforge-routes').then(
-        (m) => m.default
-      ),
-    data: CORE_APP_METADATA['dreamforge'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'gateway',
-    loadChildren: () =>
-      import('./features/core/gateway/gateway-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['gateway'], // Attach metadata for navigator
-    // canActivate: [canActivate],
-    // canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'nexus',
-    loadChildren: () =>
-      import('./features/core/nexus/nexus-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['nexus'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'sentinel',
-    loadChildren: () =>
-      import('./features/core/sentinel/sentinel-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['sentinel'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'vortex',
-    loadChildren: () =>
-      import('./features/core/vortex/vortex-routes').then((m) => m.default),
-    data: CORE_APP_METADATA['vortex'], // Attach metadata for navigator
-    canActivate: [canActivate],
-    canActivateChild: [canActivateChild],
-  },
-  {
-    path: 'admin',
-    component: AdminComponent,
-    canActivate: [canActivate, canActivateAdmin],
+    children: [
+      { path: 'next', component: NextTaskManagerComponent },
+      { path: 'tasks/:taskId', component: TaskViewComponent },
+      {
+        path: 'citadel',
+        loadChildren: () => import('./features/core/citadel/citadel-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['citadel'],
+      },
+      {
+        path: 'crucible',
+        loadChildren: () => import('./features/core/crucible/crucible-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['crucible'],
+      },
+      {
+        path: 'dreamforge',
+        loadChildren: () => import('./features/core/dreamforge/dreamforge-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['dreamforge'],
+      },
+      {
+        path: 'gateway',
+        loadChildren: () => import('./features/core/gateway/gateway-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['gateway'],
+      },
+      {
+        path: 'nexus',
+        loadChildren: () => import('./features/core/nexus/nexus-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['nexus'],
+      },
+      {
+        path: 'sentinel',
+        loadChildren: () => import('./features/core/sentinel/sentinel-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['sentinel'],
+      },
+      {
+        path: 'vortex',
+        loadChildren: () => import('./features/core/vortex/vortex-routes').then((m) => m.default),
+        data: CORE_APP_METADATA['vortex'],
+      },
+      { path: 'admin', component: AdminComponent, canActivate: [canActivateAdmin] },
+    ],
   },
   { path: '**', redirectTo: '/gateway/welcome' },
 ];
