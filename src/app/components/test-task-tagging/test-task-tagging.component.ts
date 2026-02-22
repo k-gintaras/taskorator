@@ -13,8 +13,9 @@ import { UiTask } from '../../models/taskModelManager';
   styleUrls: ['./test-task-tagging.component.scss'],
 })
 export class TestTaskTaggingComponent implements OnInit {
-  tagGroups: { id: string; name: string; tags: { id: string; label: string }[] }[] = [];
-  items: { id: string; label: string; tags: { id: string; label: string }[]; originalTask: UiTask }[] = [];
+  // Tag manager expects richer shapes (name/group fields). Provide compatible objects.
+  tagGroups: { id: string; name: string; tags: { id: string; name: string; group: string; label?: string }[] }[] = [];
+  items: { id: string; name: string; label: string; tags: { id: string; name: string; group?: string; label?: string }[]; originalTask: UiTask }[] = [];
   isLoading = true;
   errorMessage: string | null = null;
 
@@ -57,6 +58,8 @@ export class TestTaskTaggingComponent implements OnInit {
           name: 'All Tags',
           tags: allTags.map((tag) => ({
             id: tag,
+            name: tag,
+            group: 'all-tags',
             label: tag,
           })),
         },
@@ -65,8 +68,9 @@ export class TestTaskTaggingComponent implements OnInit {
       // Map tasks to items for the tag manager
       this.items = allTasks.map((task: UiTask) => ({
         id: task.taskId,
+        name: task.name || task.taskId,
         label: task.name || 'Untitled Task',
-        tags: (task.tags || []).map((tag: string) => ({ id: tag, label: tag })),
+        tags: (task.tags || []).map((tag: string) => ({ id: tag, name: tag, group: 'all-tags', label: tag })),
         originalTask: task, // Keep reference to original task
       }));
     } catch (error) {
