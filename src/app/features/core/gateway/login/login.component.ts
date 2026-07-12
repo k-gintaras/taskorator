@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Router } from '@angular/router';
 import { NAVIGATION_CONFIG } from '../../../../app.config';
 import { LoginService } from '../../../../services/login.service';
-import { ModeService } from '../../../../services/mode.service';
 import { AuthStateManagerService } from '../../../../services/auth-state-manager.service';
-import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
@@ -16,244 +13,80 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class LoginComponent implements OnInit {
   loading = false;
-  showPopupWarning = false;
+  showWarningBanner = false;
   warningMessage = '';
-  showAlternativeLogin = false;
-  currentLoginMethod: 'popup' | 'redirect' | null = null;
-  popupBlocked = false;
-  private warningTimeout: any = null;
-
-  // State tracking
-  currentMode: 'online' | 'offline' | null = null;
   isAuthenticated = false;
+  private warningTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private router: Router,
     private loginService: LoginService,
-    private modeService: ModeService,
     private authStateManager: AuthStateManagerService
   ) {}
 
-  continueToApp() {
-    try {
-      this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]);
-    } catch (e) {
-      console.error('LoginComponent: Continue navigation failed', e);
-    }
-  }
-
   async ngOnInit(): Promise<void> {
-    // Check if popups are supported/allowed on page load
-    this.checkPopupSupport();
-
-    // Get current state
-    this.currentMode = this.modeService.get();
     this.isAuthenticated = this.authStateManager.isAuthenticated();
-
-    console.log('LoginComponent: Mode:', this.currentMode, 'Authenticated:', this.isAuthenticated);
   }
 
-  // Test if popups work - this gives us insight into popup blocking
-  private checkPopupSupport() {
-    let blocked = false;
-    let error: any = null;
-
-    try {
-      const testPopup = window.open('', '_blank', 'width=1,height=1,top=0,left=0');
-      if (!testPopup) {
-        blocked = true;
-      } else {
-        testPopup.close();
-      }
-    } catch (err) {
-      blocked = true;
-      error = err;
-    }
-
-    this.popupBlocked = blocked;
-
-    if (blocked) {
-      console.log('❌ Popups appear to be blocked', error ? error : '');
-      this.showWarning('Note: Popups appear to be blocked. You may need to enable them for login to work.', true);
-    } else {
-      console.log('✅ Popups appear to be allowed');
-    }
+  continueToApp(): void {
+    this.router.navigate([NAVIGATION_CONFIG.DEFAULT_AUTHENTICATED_ROUTE]).catch((e) => {
+      console.error('LoginComponent: Continue navigation failed', e);
+    });
   }
 
-  async loginOnline() {
-    if (this.currentMode !== 'online') {
-      this.showWarning('Please switch to online mode first.', false);
-      return;
-    }
-
-    // Prevent double-clicks while loading
-    if (this.loading) {
-      console.log('LoginComponent: Login already in progress, ignoring click');
-      return;
-    }
-
+  async loginOnline(): Promise<void> {
+    if (this.loading) return;
     this.loading = true;
-    this.currentLoginMethod = 'popup';
     this.hideWarning();
-    this.showAlternativeLogin = false;
     try {
-      console.log('LoginComponent: Starting Google login...');
-      if (this.popupBlocked) {
-        console.log('LoginComponent: Popups blocked - using redirect flow on mobile');
-        // Prefer redirect flow on devices/browsers where popups are blocked (mobile)
-        await this.loginWithRedirect();
-        return;
-      }
       await this.loginService.loginOnline();
     } catch (error: any) {
       console.error('LoginComponent: Login failed:', error);
-      this.showAlternativeLogin = true;
-      if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup')) {
-        this.showWarning('Popup was blocked! Please use redirect.', true);
-      } else if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
-        this.showWarning('Login was cancelled.');
-      } else {
-        this.showWarning('Login failed. Please try redirect.');
-      }
+      this.showWarning(
+        error?.code === 'auth/popup-blocked' || error?.message?.includes('popup')
+          ? 'Popup was blocked. Use redirect login.'
+          : 'Login failed. Please try again.'
+      );
     } finally {
       this.loading = false;
     }
   }
 
-  async loginOffline() {
-    if (this.currentMode !== 'offline') {
-      this.showWarning('Please switch to offline mode first.', false);
-      return;
-    }
-
-    // Prevent double-clicks while loading
-    if (this.loading) {
-      console.log('LoginComponent: Login already in progress, ignoring click');
-      return;
-    }
-
+  async loginWithRedirect(): Promise<void> {
+    if (this.loading) return;
     this.loading = true;
-    this.currentLoginMethod = null;
-    this.showAlternativeLogin = false;
     this.hideWarning();
     try {
-      console.log('LoginComponent: Starting offline login...');
-      await this.loginService.loginOffline();
-    } catch (error) {
-      console.error('LoginComponent: Offline login failed:', error);
-      this.showWarning('Offline login failed. Please try again.', false);
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  hideAlternativeLogin() {
-    this.showAlternativeLogin = false;
-  }
-
-  async loginWithRedirect() {
-    if (this.currentMode !== 'online') {
-      this.showWarning('Please switch to online mode first.', false);
-      return;
-    }
-
-    // Prevent double-clicks while loading
-    if (this.loading) {
-      console.log('LoginComponent: Login already in progress, ignoring click');
-      return;
-    }
-
-    this.loading = true;
-    this.currentLoginMethod = 'redirect';
-    this.hideWarning();
-    try {
-      console.log('LoginComponent: Starting redirect login...');
       await this.loginService.loginWithRedirect();
-    } catch (error: any) {
+    } catch (error) {
       console.error('LoginComponent: Redirect login failed:', error);
-      this.showWarning('Redirect login failed. Please try popup.');
+      this.showWarning('Redirect login failed. Please try again.');
       this.loading = false;
-      this.currentLoginMethod = null;
     }
   }
 
-  // showWarning(message: string) {
-  //   this.showWarning(message, false);
-  // }
-
-  showWarning(message: string, persistent = false) {
-    this.warningMessage = message;
-    this.showPopupWarning = true;
-    if (this.warningTimeout) {
-      clearTimeout(this.warningTimeout);
-      this.warningTimeout = null;
-    }
-    if (!persistent) {
-      this.warningTimeout = setTimeout(() => {
-        this.hideWarning();
-      }, 8000);
-    }
-  }
-
-  hideWarning() {
-    if (this.warningTimeout) {
-      clearTimeout(this.warningTimeout);
-      this.warningTimeout = null;
-    }
-    this.showPopupWarning = false;
-    this.warningMessage = '';
-  }
-
-  async logout() {
+  async logout(): Promise<void> {
     try {
-      console.log('LoginComponent: Logging out...');
       await this.loginService.logout();
+      this.isAuthenticated = false;
     } catch (error) {
       console.error('LoginComponent: Logout error:', error);
     }
   }
 
-  async switchToOnlineMode() {
-    if (this.isAuthenticated) {
-      this.showWarning('You must logout before switching modes.', false);
-      return;
-    }
-
-    console.log('LoginComponent: Switching to online mode...');
-    this.loading = true;
-    this.warningMessage = 'Switching to online mode...';
-    this.showPopupWarning = true;
-    
-    try {
-      await this.loginService.switchToOnlineMode();
-      // Page will reload
-    } catch (error) {
-      console.error('LoginComponent: Mode switch failed:', error);
-      this.showWarning('Failed to switch mode. Please try again.', false);
-    } finally {
-      this.loading = false;
+  showWarning(message: string, persistent = false): void {
+    this.warningMessage = message;
+    this.showWarningBanner = true;
+    if (this.warningTimeout) clearTimeout(this.warningTimeout);
+    if (!persistent) {
+      this.warningTimeout = setTimeout(() => this.hideWarning(), 8000);
     }
   }
 
-  async switchToOfflineMode() {
-    if (this.isAuthenticated) {
-      this.showWarning('You must logout before switching modes.', false);
-      return;
-    }
-
-    console.log('LoginComponent: Switching to offline mode...');
-    this.loading = true;
-    this.warningMessage = 'Switching to offline mode...';
-    this.showPopupWarning = true;
-    
-    try {
-      await this.loginService.switchToOfflineMode();
-      // Page will reload
-    } catch (error) {
-      console.error('LoginComponent: Mode switch failed:', error);
-      this.showWarning('Failed to switch mode. Please try again.', false);
-    } finally {
-      this.loading = false;
-    }
+  hideWarning(): void {
+    if (this.warningTimeout) clearTimeout(this.warningTimeout);
+    this.warningTimeout = null;
+    this.showWarningBanner = false;
+    this.warningMessage = '';
   }
 }

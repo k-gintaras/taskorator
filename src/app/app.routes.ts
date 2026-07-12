@@ -12,7 +12,12 @@ import { TaskNavigatorV2Component } from './components/task-navigator-v2/task-na
 import { TestTaskTaggingComponent } from './components/test-task-tagging/test-task-tagging.component';
 
 export const routes: Route[] = [
-  { path: '', component: RootPlaceholderComponent, canActivate: [rootGuard] }, // Root guard handles auth-based redirect
+  {
+    path: '',
+    component: RootPlaceholderComponent,
+    canActivate: [rootGuard],
+    pathMatch: 'full',
+  }, // Root guard handles auth-based redirect
   { path: 'welcome', redirectTo: '/gateway/welcome', pathMatch: 'full' }, // Redirect welcome to gateway/welcome
 
   { path: 'login', component: LoginComponent }, // Public login
@@ -76,3 +81,4 @@ export const routes: Route[] = [
   },
   { path: '**', redirectTo: '/gateway/welcome' },
 ];
+

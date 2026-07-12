@@ -3,13 +3,12 @@ import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStateManagerService } from './services/auth-state-manager.service';
 import { ThemeService } from './services/core/theme.service';
-import { HorizontalNavigationComponent } from './components/horizontal-navigation/horizontal-navigation.component';
 import { NavigationService } from './services/navigation.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HorizontalNavigationComponent, RouterOutlet],
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -37,3 +36,4 @@ export class AppComponent implements OnInit {
     }
   }
 }
+

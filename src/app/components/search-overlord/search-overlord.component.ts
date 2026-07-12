@@ -6,7 +6,6 @@ import { MatSelect } from '@angular/material/select';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { map, Observable, startWith } from 'rxjs';
 import { TaskTreeNode } from '../../models/taskTree';
-import { TreeNodeService } from '../../services/tree/tree-node.service';
 import { SelectedOverlordService } from '../../services/tasks/selected/selected-overlord.service';
 import { TaskoratorTask, UiTask } from '../../models/taskModelManager';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -16,6 +15,7 @@ import { TaskTreeNodeToolsService } from '../../services/tree/task-tree-node-too
 import { TaskTransmutationService } from '../../services/tasks/task-transmutation.service';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { TaskCacheService } from '../../services/cache/task-cache.service';
 
 /**
  * @deprecated no point to search overlord, we just search tasks
@@ -32,8 +32,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatOption,
     ReactiveFormsModule,
     NgxMatSelectSearchModule,
-    MatButtonModule
-],
+    MatButtonModule,
+  ],
   templateUrl: './search-overlord.component.html',
   styleUrl: './search-overlord.component.scss',
 })
@@ -43,7 +43,7 @@ export class SearchOverlordComponent implements OnInit {
   taskSearchCtrl: FormControl = new FormControl();
   selectedOverlord: UiTask | null = null;
 
-  taskOptions: TaskTreeNode[] = []; // Initialize with an empty list
+  taskOptions: TaskTreeNode[] = [];
 
   constructor(
     private treeService: TreeService,
@@ -51,40 +51,44 @@ export class SearchOverlordComponent implements OnInit {
     private selectedOverlordService: SelectedOverlordService,
     private taskService: TaskService,
     private taskTransmutationService: TaskTransmutationService,
-    private router: Router
+    private router: Router,
+    private taskCache: TaskCacheService
   ) {}
 
   ngOnInit() {
-    // Subscribe to selected overlord changes
     this.selectedOverlordService.getSelectedOverlordObservable().subscribe((overlord) => {
       this.selectedOverlord = overlord;
     });
 
-    // Set up the filter for the select options
+    this.loadTaskOptions();
+
     this.filteredTaskOptions = this.taskSearchCtrl.valueChanges.pipe(
       startWith(''),
       map((value) => this.filterTasks(value || ''))
     );
   }
 
-  // ngOnInit() {
-  //   this.loadTaskOptions();
-
-  //   // Set up the filter for the select options
-  //   this.filteredTaskOptions = this.taskSearchCtrl.valueChanges.pipe(
-  //     startWith(''), // Ensure it starts with an empty string
-  //     map((value) => this.filterTasks(value || ''))
-  //   );
-  // }
-
   loadTaskOptions() {
-    this.treeService.getTree().subscribe((taskTree) => {
-      if (taskTree) {
-        console.log('Task tree loaded @ search overlord:', taskTree);
-        this.taskOptions = this.treeNodeToolsService.getFlattened(taskTree);
-        // Re-trigger the filtering logic to include newly loaded options
-        this.taskSearchCtrl.setValue(this.taskSearchCtrl.value || '');
+    this.treeService.getTree().subscribe((helperTree) => {
+      if (helperTree) {
+        this.taskOptions = this.treeNodeToolsService.getFlattened(helperTree);
+      } else {
+        // The helper tree can legitimately lag or be unavailable after reload.
+        // Fall back to tasks currently present in cache so search still works
+        // for the active working set.
+        this.taskOptions = this.taskCache.getAllTasks().map((task) => ({
+          taskId: task.taskId,
+          name: task.name,
+          overlord: task.overlord,
+          children: [],
+          childrenCount: 0,
+          completedChildrenCount: 0,
+          connected: false,
+          stage: task.stage,
+        }));
       }
+
+      this.taskSearchCtrl.setValue(this.taskSearchCtrl.value || '');
     });
   }
 
@@ -95,7 +99,6 @@ export class SearchOverlordComponent implements OnInit {
     }
 
     if (value.trim() === '') {
-      // If the search value is empty, return all options
       return this.taskOptions;
     }
 
@@ -104,10 +107,10 @@ export class SearchOverlordComponent implements OnInit {
     return this.taskOptions
       .filter(
         (option) =>
-          option.name?.toLowerCase().includes(filterValue) && // Safely check for name
+          option.name?.toLowerCase().includes(filterValue) &&
           option.stage !== 'completed'
       )
-      .sort((a, b) => b.children.length - a.children.length); // Sort by number of children
+      .sort((a, b) => b.children.length - a.children.length);
   }
 
   handleOverlordSelection(selectedTaskId: string) {
@@ -120,8 +123,9 @@ export class SearchOverlordComponent implements OnInit {
         if (!task) {
           /**
            * TODO:
-           * if task is not found, means it is in tree, but not in database anymore
-           * means tree is kinda broken, on task deletion it doesnt react?
+           * If a task is discoverable from the helper tree but not retrievable
+           * from cache/API, we should surface a clearer stale-tree warning and
+           * optionally offer a repair action.
            */
           console.error('Task not found for ID:', this.selectedOverlordId);
           return;

@@ -1,54 +1,91 @@
 import { Injectable } from '@angular/core';
-import { TASK_CONFIG } from '../../app.config';
 import { TaskSettings } from '../../models/settings';
 import { SettingsCacheStrategy } from '../../models/service-strategies/settings-strategy.interface';
+import { AuthService } from '../core/auth.service';
+import { AuthOfflineService } from '../core/auth-offline.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsCacheService implements SettingsCacheStrategy {
-  private STORAGE_KEY = 'taskorator-settings-cache';
+  private readonly STORAGE_KEY_PREFIX = 'taskorator-settings-cache';
+  private readonly LEGACY_STORAGE_KEY = 'taskorator-settings-cache';
   private cache: { settings: TaskSettings; timestamp: number } | null = null;
+  private loadedKey: string | null = null;
+
+  constructor(
+    private authService: AuthService,
+    private authOfflineService: AuthOfflineService
+  ) {}
+
+  private getStorageKey(): string {
+    const onlineUserId = this.authService.getCurrentUserIdSync();
+    if (onlineUserId) {
+      return `${this.STORAGE_KEY_PREFIX}:online:${onlineUserId}`;
+    }
+
+    const offlineUserId = this.authOfflineService.getCurrentUserIdSync();
+    if (offlineUserId) {
+      return `${this.STORAGE_KEY_PREFIX}:offline:${offlineUserId}`;
+    }
+
+    return this.LEGACY_STORAGE_KEY;
+  }
+
+  private loadCacheForKey(storageKey: string): void {
+    this.cache = null;
+    this.loadedKey = storageKey;
+
+    try {
+      const scoped = localStorage.getItem(storageKey);
+      if (scoped) {
+        this.cache = JSON.parse(scoped) as {
+          settings: TaskSettings;
+          timestamp: number;
+        };
+        return;
+      }
+
+      if (storageKey !== this.LEGACY_STORAGE_KEY) {
+        const legacy = localStorage.getItem(this.LEGACY_STORAGE_KEY);
+        if (legacy) {
+          this.cache = JSON.parse(legacy) as {
+            settings: TaskSettings;
+            timestamp: number;
+          };
+          localStorage.setItem(storageKey, legacy);
+        }
+      }
+    } catch {}
+  }
 
   createSettings(settings: TaskSettings): void {
     this.addSettings(settings);
   }
+
   /**
    * Add settings to the cache with a timestamp.
    */
   private addSettings(settings: TaskSettings): void {
     const timestamp = Date.now();
     this.cache = { settings, timestamp };
+    const storageKey = this.getStorageKey();
+    this.loadedKey = storageKey;
     try {
-      // Persist cache to localStorage
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.cache));
+      localStorage.setItem(storageKey, JSON.stringify(this.cache));
     } catch {}
   }
 
   /**
-   * Retrieve the settings from the cache, removing them if expired.
+   * Settings are small and user-critical, so this cache is durable and does not expire.
    */
   getSettings(): TaskSettings | null {
-    // Load from storage if no in-memory cache
-    if (!this.cache) {
-      try {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored) as { settings: TaskSettings; timestamp: number };
-          this.cache = parsed;
-        }
-      } catch {}
+    const storageKey = this.getStorageKey();
+    if (!this.cache || this.loadedKey !== storageKey) {
+      this.loadCacheForKey(storageKey);
     }
-    if (this.cache) {
-      const isExpired =
-        Date.now() - this.cache.timestamp > TASK_CONFIG.CACHE_EXPIRATION_MS;
-      if (isExpired) {
-        this.cache = null; // Clear expired cache
-        return null;
-      }
-      return this.cache.settings;
-    }
-    return null;
+
+    return this.cache?.settings ?? null;
   }
 
   /**
@@ -59,10 +96,11 @@ export class SettingsCacheService implements SettingsCacheStrategy {
   }
 
   /**
-   * Clear the cached settings.
+   * Clear only the in-memory settings cache.
+   * Persistent per-user settings stay in localStorage so mobile/offline sessions do not lose focus/frog/favorites.
    */
   clearCache(): void {
     this.cache = null;
-    try { localStorage.removeItem(this.STORAGE_KEY); } catch {}
+    this.loadedKey = null;
   }
 }

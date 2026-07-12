@@ -44,10 +44,7 @@ export class TaskListCoordinatorService {
     const rawTasks = await this.taskListSimple.getTaskList(taskListKey);
     if (!rawTasks) return [];
 
-    // FIRST: Decorate tasks with UI properties (views, priority, colors, etc.)
     const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
-
-    // THEN: Apply rules (filtering and sorting) to decorated tasks
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       taskListKey,
       decoratedTasks
@@ -59,29 +56,23 @@ export class TaskListCoordinatorService {
   async getTasksByIds(ids: string[]): Promise<UiTask[]> {
     if (!ids.length) return [];
     const rawTasks = await this.taskListSimple.getTasksByIds(ids);
-    
-    // FIRST: Decorate tasks with UI properties
+
     const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
-    
-    // THEN: Apply rules for selected tasks
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       { type: TaskListType.SELECTED, data: 'selected' },
       decoratedTasks
     );
-    
+
     return filteredSortedTasks;
   }
 
   async getTasksByMostViewed(): Promise<UiTask[]> {
-    const mostViewedTaskIds = this.taskUsageService.getMostViewedTasks(20); // Get top 20 most viewed
+    const mostViewedTaskIds = this.taskUsageService.getMostViewedTasks(20);
     if (!mostViewedTaskIds.length) return [];
 
     const rawTasks = await this.taskListSimple.getTasksByIds(mostViewedTaskIds);
-    
-    // FIRST: Decorate tasks with UI properties (including views count)
     const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
 
-    // THEN: Apply rules for most viewed list (sorting by views + priority)
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       { type: TaskListType.MOST_VIEWED, data: 'mostViewed' },
       decoratedTasks
@@ -91,15 +82,12 @@ export class TaskListCoordinatorService {
   }
 
   async getTasksByRecentlyViewed(): Promise<UiTask[]> {
-    const recentTaskIds = this.taskUsageService.getRecentlyViewedTasks(20); // Get top 20 recently viewed
+    const recentTaskIds = this.taskUsageService.getRecentlyViewedTasks(20);
     if (!recentTaskIds.length) return [];
 
     const rawTasks = await this.taskListSimple.getTasksByIds(recentTaskIds);
-    
-    // FIRST: Decorate tasks with UI properties (including views count)
     const decoratedTasks = this.taskDecorator.decorateTasks(rawTasks);
 
-    // THEN: Apply rules for recently viewed list (sorting by views + priority)
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       { type: TaskListType.RECENTLY_VIEWED, data: 'recentlyViewed' },
       decoratedTasks
@@ -109,17 +97,23 @@ export class TaskListCoordinatorService {
   }
 
   async getTasksByTaskorator(): Promise<UiTask[]> {
-    // Wait for the tree to be loaded (filter out null values)
-    const tree = await firstValueFrom(
-      this.treeService.getTree().pipe(
-        filter((t) => t !== null)
-      )
-    );
-    if (!tree) return [];
+    // TREE NOTE:
+    // Taskorator uses the helper tree only as a discovery index.
+    // The tree may lag behind canonical task documents after login/reload until
+    // a parent visit or explicit repair path reconciles it.
+    let helperTree = this.treeService.getLatestTree();
+    if (!helperTree) {
+      await this.treeService.fetchTree();
+      helperTree = this.treeService.getLatestTree();
+    }
+    if (!helperTree) {
+      // TODO: if this becomes a common UX gap, fall back to a purely task-based
+      // Taskorator seed strategy instead of depending on the helper tree.
+      return [];
+    }
 
-    const rawTasks = await this.taskoratorListService.generateSuperlist(tree);
+    const rawTasks = await this.taskoratorListService.generateSuperlist(helperTree);
 
-    // Apply rules for taskorator list (filtering and sorting)
     const filteredSortedTasks = this.taskListRules.applyRulesToList(
       { type: TaskListType.TASKORATOR, data: 'taskorator' },
       rawTasks

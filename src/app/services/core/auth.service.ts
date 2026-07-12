@@ -45,6 +45,10 @@ export class AuthService implements AuthStrategy {
     return user?.uid;
   }
 
+  getCurrentUserIdSync(): string | undefined {
+    return this.auth.currentUser?.uid;
+  }
+
   getCurrentUser(): Observable<AuthUser | null> {
     return authState(this.auth).pipe(
       map((user: User | null) =>

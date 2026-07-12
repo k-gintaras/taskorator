@@ -6,10 +6,12 @@ export class ModeService {
   private readonly key = 'pref_mode';
 
   constructor() {
-    // initialize default mode from config if not set
     if (!localStorage.getItem(this.key)) {
-      const defaultMode: 'online' | 'offline' = OTHER_CONFIG.OFFLINE_TESTING ? 'offline' : 'online';
-      localStorage.setItem(this.key, defaultMode);
+      localStorage.setItem(this.key, 'online');
+    }
+
+    if (OTHER_CONFIG.OFFLINE_TESTING) {
+      console.log('ModeService: Offline mode support remains available behind config flags.');
     }
   }
 
@@ -21,8 +23,6 @@ export class ModeService {
     if (this.get() !== mode) {
       console.log('ModeService: Switching mode from', this.get(), 'to', mode);
       localStorage.setItem(this.key, mode);
-      // Hard reload to rebind DI with new mode configuration
-      // Add small delay to ensure localStorage write completes
       setTimeout(() => location.reload(), 50);
     }
   }

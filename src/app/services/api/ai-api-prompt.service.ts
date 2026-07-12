@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { AiApiFirebaseService } from "../core/ai-api-firebase.service";
 import { Injectable } from "@angular/core";
-import { environment } from "../../../environments/environment";
+import { environment } from '../../../environments/environment';
 
 // Models for Prompt endpoint
 export interface PromptRequest {
@@ -128,3 +128,4 @@ export class AiApiPromptService {
     return response.json();
   }
 }
+

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  isTesting: true,
+  isTesting: false,
   aiApiBaseUrl: 'http://localhost:3000',
   firebase: {
     projectId: 'taskorator',
@@ -21,4 +21,5 @@ export const firebaseAiApi = {
   messagingSenderId: '737017354476',
   appId: '1:737017354476:web:ff970053946c5292b6adc9',
 };
+
 

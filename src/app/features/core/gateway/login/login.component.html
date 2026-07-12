@@ -1,169 +1,42 @@
-<!-- Login Container with Theme Integration -->
 <div class="login-container theme-content">
-  <!-- Login Card -->
   <div class="login-card theme-card">
     <div class="login-card-header">
       <h2 class="login-card-title theme-text-primary">Sign In</h2>
+      <p class="theme-text-muted">Use your Google account to continue.</p>
     </div>
+
     <div class="login-card-body">
+      @if (showWarningBanner) {
+        <div class="login-alert alert-warning">
+          <button (click)="hideWarning()" class="login-alert-close" aria-label="Close warning">�</button>
+          <p class="theme-text-secondary">{{ warningMessage }}</p>
+        </div>
+      }
 
-      <!-- Main Login Section -->
-      <div class="login-main-section">
-
-        <!-- Warning Banner -->
-        @if (showPopupWarning) {
-          <div class="login-alert alert-warning">
-            <button
-              (click)="hideWarning()"
-              class="login-alert-close"
-              aria-label="Close warning"
-              >
-              ×
-            </button>
-            <div class="flex items-start">
-              <div class="flex-shrink-0">
-                <svg class="w-5 h-5 text-amber-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div class="ml-3">
-                <p class="theme-text-secondary">{{ warningMessage }}</p>
-              </div>
-            </div>
+      @if (isAuthenticated) {
+        <div class="login-alert alert-success">
+          <p class="theme-text-secondary font-semibold">You are already signed in.</p>
+          <div class="login-actions">
+            <button class="login-btn login-btn-primary" (click)="continueToApp()">Continue</button>
+            <button class="login-link" (click)="logout()">Log out</button>
           </div>
-        }
-
-        <!-- Mode Status Section -->
-        <div class="login-mode-status">
-          @if (isAuthenticated) {
-            <div class="login-alert alert-success">
-              <p class="theme-text-secondary font-semibold">
-                ✓ Logged in via {{ currentMode === 'online' ? 'Google' : 'Offline Mode' }}
-              </p>
-              <p class="theme-text-muted text-sm mt-2">
-                You must logout before switching modes
-              </p>
-              <div class="mt-3">
-                <button class="login-btn login-btn-primary" (click)="continueToApp()">Continue to Taskorator</button>
-              </div>
-            </div>
-          } @else {
-            <div class="login-alert alert-info">
-              <p class="theme-text-secondary font-semibold">
-                📝 Not logged in
-              </p>
-              <p class="theme-text-muted text-sm mt-2">
-                Select a mode to continue
-              </p>
-              
-              <!-- Mode Selector Buttons -->
-              <div class="login-mode-buttons">
-                <button
-                  (click)="switchToOnlineMode()"
-                  class="login-btn login-btn-mode"
-                  [class.active]="currentMode === 'online'"
-                  [disabled]="loading"
-                  >
-                  {{ loading && currentMode === null ? "Switching..." : "🌐 Enable Online Mode (Google)" }}
-                </button>
-                <button
-                  (click)="switchToOfflineMode()"
-                  class="login-btn login-btn-mode"
-                  [class.active]="currentMode === 'offline'"
-                  [disabled]="loading"
-                  >
-                  {{ loading && currentMode === null ? "Switching..." : "💾 Enable Offline Mode" }}
-                </button>
-              </div>
-            </div>
-          }
+        </div>
+      } @else {
+        <div class="login-alert alert-info">
+          <p class="theme-text-secondary font-semibold">Single sign-in flow</p>
+          <p class="theme-text-muted text-sm mt-2">Popup first, redirect fallback if needed.</p>
         </div>
 
-        <!-- Primary Login Button -->
-        @if (!isAuthenticated && currentMode === 'online') {
-          <button
-            (click)="loginOnline()"
-            class="login-btn login-btn-primary"
-            [disabled]="loading"
-            >
-            {{ loading && currentLoginMethod === 'popup' ? "Signing in..." : "Continue with Google" }}
-          </button>
+        <button class="login-btn login-btn-primary" (click)="loginOnline()" [disabled]="loading">
+          {{ loading ? 'Signing in...' : 'Continue with Google' }}
+        </button>
 
-          <!-- Alternative Login Options -->
-          @if (showAlternativeLogin) {
-            <div class="login-alert alert-info">
-              <button
-                (click)="hideAlternativeLogin()"
-                class="login-alert-close"
-                aria-label="Close alternative login"
-                >
-                ×
-              </button>
-              <p class="theme-text-secondary">
-                Enable popups or
-                <button
-                  (click)="loginWithRedirect()"
-                  class="login-link"
-                  [disabled]="loading"
-                  >
-                  try redirect login
-                </button>
-              </p>
-            </div>
-          }
-
-          <!-- Alternative Link -->
-          <div class="text-center">
-            <button
-              (click)="loginWithRedirect()"
-              class="login-link"
-              [disabled]="loading"
-              >
-              {{ loading && currentLoginMethod === 'redirect' ? "redirecting..." : "Login without popup" }}
-            </button>
-          </div>
-        }
-
-        <!-- Offline Login Button -->
-        @if (!isAuthenticated && currentMode === 'offline') {
-          <button
-            (click)="loginOffline()"
-            class="login-btn login-btn-primary"
-            [disabled]="loading"
-            >
-            {{ loading ? "Logging in..." : "Login to Offline Mode" }}
-          </button>
-        }
-
-      <!-- Footer Links -->
-      <div class="login-footer">
-        <div class="login-footer-actions">
-          <button
-            (click)="logout()"
-            class="login-footer-link login-footer-debug"
-            title="Clear session"
-            >
-            🧪 Reset
-          </button>
-          <button
-            (click)="logout()"
-            class="login-footer-link login-footer-logout"
-            title="Log out"
-            >
-            🔒 Log out
+        <div class="text-center">
+          <button class="login-link" (click)="loginWithRedirect()" [disabled]="loading">
+            Use redirect instead
           </button>
         </div>
-      </div>
+      }
     </div>
-  </div>
-
-  <!-- External Footer -->
-  <div class="login-external-footer">
-    <p class="theme-text-muted">
-      New to Taskorator?
-      <a href="/" class="login-link">
-        Explore features
-      </a>
-    </p>
   </div>
 </div>

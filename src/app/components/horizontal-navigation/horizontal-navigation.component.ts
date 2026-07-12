@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { RouteMetadata } from '../../app.routes-models';
 import { NavigationService } from '../../services/navigation.service';
 import { NavigationDrawerService } from '../../services/navigation-drawer.service';
@@ -26,7 +26,6 @@ import { NgIf } from '@angular/common';
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
-    RouterOutlet,
     SearchCreateComponent,
     NotificationComponent
 ],

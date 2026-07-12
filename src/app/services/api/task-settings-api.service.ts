@@ -47,18 +47,18 @@ export class TaskSettingsApiService implements SettingsApiStrategy {
     );
     try {
       const docSnap = await getDoc(settingsDocRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return {
-          ...getDefaultTaskSettings(), // Start with default settings
-          ...data, // Override with data from the database
-        };
-      } else {
-        return getDefaultTaskSettings(); // Return default settings if none exist
+      if (!docSnap.exists()) {
+        return null;
       }
+
+      const data = docSnap.data();
+      return {
+        ...getDefaultTaskSettings(),
+        ...data,
+      };
     } catch (error) {
       console.error('Failed to get settings:', error);
-      return getDefaultTaskSettings(); // Return default settings in case of error
+      return null;
     }
   }
 

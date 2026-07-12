@@ -1,16 +1,25 @@
 import { Injectable } from '@angular/core';
 import { TreeStrategy } from '../../models/service-strategies/tree-strategy.interface';
 import { BehaviorSubject } from 'rxjs';
-import {  TaskTree, TaskNodeInfo } from '../../models/taskTree';
+import { TaskTree, TaskNodeInfo } from '../../models/taskTree';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
 import { TaskTreeNodeToolsService } from '../tree/task-tree-node-tools.service';
-import { UiTask } from '../../models/taskModelManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TreeService implements TreeStrategy {
+  /**
+   * IMPORTANT:
+   * Task documents are the canonical source of truth.
+   * This tree is a helper index for overview/navigation and is intentionally
+   * allowed to lag behind recent task changes to avoid expensive full-tree
+   * writes to Firebase on every mutation.
+   *
+   * Durable tree writes should happen only at explicit repair/reconciliation
+   * points. Local tree cache updates are UI helpers only.
+   */
   private treeSubject: BehaviorSubject<TaskTree | null> =
     new BehaviorSubject<TaskTree | null>(null);
   private apiService: ApiStrategy | null = null;
@@ -24,7 +33,7 @@ export class TreeService implements TreeStrategy {
 
   constructor(
     private cacheService: CacheOrchestratorService,
-    private treeNodeToolsService: TaskTreeNodeToolsService,
+    private treeNodeToolsService: TaskTreeNodeToolsService
   ) {}
 
   getFlattenedTree(tree: TaskTree) {
@@ -76,15 +85,14 @@ export class TreeService implements TreeStrategy {
     }
   }
 
-  // 🔥 FIX: Update both API and local cache
+  /**
+   * Persist the current helper-tree snapshot to the API.
+   * Use this only at explicit repair/reconciliation points.
+   */
   async updateTree(taskTree: TaskTree): Promise<void> {
     try {
       const api = this.ensureApiService();
-
-      // Update API
       await api.updateTree(taskTree);
-
-      // 🔥 CRITICAL: Update local cache AND BehaviorSubject
       this.cacheService.updateTree(taskTree);
       this.treeSubject.next(taskTree);
     } catch (error) {
@@ -100,15 +108,16 @@ export class TreeService implements TreeStrategy {
     return this.treeSubject.getValue();
   }
 
-  // 🔥 NEW: Rebuild tree from all tasks when structure changes
+  /**
+   * Fetch a fresh helper-tree snapshot from the API.
+   * Note that the API tree may itself lag behind the latest task truth until
+   * a repair/reconciliation point has saved it.
+   */
   async getTreeFromApi(): Promise<void> {
     try {
       const api = this.ensureApiService();
-
-      // Fetch fresh tree from API (which should rebuild it from all tasks)
       const freshTree = await api.getTree();
       if (freshTree) {
-        // Update local cache and notify subscribers
         this.cacheService.updateTree(freshTree);
         this.treeSubject.next(freshTree);
       }
@@ -119,8 +128,11 @@ export class TreeService implements TreeStrategy {
   }
 
   /**
-   * Update local cache and notify subscribers without calling the API.
-   * Useful for optimistic/local-only updates.
+   * Update the local helper-tree snapshot without calling the API.
+   * This is intentionally NOT a durable write.
+   *
+   * Any caller using this method must assume the tree can still be stale
+   * compared with canonical task documents after reload or cross-device usage.
    */
   updateLocalTreeCache(taskTree: TaskTree): void {
     try {

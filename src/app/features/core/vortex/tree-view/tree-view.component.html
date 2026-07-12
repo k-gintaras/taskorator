@@ -5,9 +5,12 @@
         <mat-icon>account_tree</mat-icon>
         Task Tree Visualization
       </h2>
-      <p class="text-sm theme-text-secondary mb-4">Interactive tree view of all tasks</p>
+      <p class="text-sm theme-text-secondary mb-2">Interactive tree view of all tasks</p>
+      <p class="text-xs theme-text-secondary mb-4">
+        Note: this tree is a helper view and may lag behind recent task changes until related parents are visited and repaired.
+      </p>
     </div>
-    
+
     <div class="flex flex-wrap gap-3 mb-6">
       <button class="theme-btn-secondary flex items-center gap-2 px-4 py-2" (click)="resetTree()">
         <mat-icon>refresh</mat-icon>
@@ -26,7 +29,7 @@
         }}
       </button>
     </div>
-    
+
     <div id="tree-container" class="w-full min-h-[600px] rounded-lg" style="background: var(--bg-surface); border: 1px solid var(--border);"></div>
   </div>
 </div>

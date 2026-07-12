@@ -125,6 +125,10 @@ export class AuthOfflineService implements AuthStrategy {
     return user ? user.uid : undefined;
   }
 
+  getCurrentUserIdSync(): string | undefined {
+    return this.currentUser.getValue()?.uid;
+  }
+
   getCurrentUser(): Observable<AuthUser | null> {
     return this.currentUser.asObservable();
   }

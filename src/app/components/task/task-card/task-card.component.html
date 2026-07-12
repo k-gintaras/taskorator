@@ -1,11 +1,13 @@
 @if (task) {
   <div
-    class="card theme-card shadow-md max-w-xl mx-auto rounded-t-lg border-l-4 flex flex-col"
-  [ngClass]="{
+    class="card theme-card shadow-md max-w-xl mx-auto rounded-t-lg border-l flex flex-col"
+    [ngClass]="{
     'min-h-[140px]': ifShowExtra,
     'min-h-[100px]': !ifShowExtra
   }"
     [style.borderLeftColor]="getAgeBasedBorderColor()"
+    [style.borderLeftWidth]="'var(--task-age-border-width)'"
+    [style.borderLeftStyle]="'solid'"
     >
     <div class="card-body p-4 flex flex-col flex-1">
       <!-- Breadcrumb Header -->

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ScoreStrategy } from '../../models/service-strategies/score-strategy.interface copy';
 import { BehaviorSubject } from 'rxjs';
-import { Score, getDefaultScore } from '../../models/score';
+import { Score } from '../../models/score';
 import { ApiStrategy } from '../../models/service-strategies/api-strategy.interface';
 import { CacheOrchestratorService } from '../core/cache-orchestrator.service';
 import { ErrorService } from '../core/error.service';
@@ -33,7 +33,11 @@ export class ScoreService implements ScoreStrategy {
 
   async createScore(score: Score): Promise<Score> {
     try {
-      await this.ensureApiService().createScore(score);
+      try {
+        await this.ensureApiService().createScore(score);
+      } catch (err) {
+        console.warn('ScoreService: API createScore failed or unavailable, using cache', err);
+      }
       this.cacheService.createScore(score);
       this.scoreSubject.next(score);
       return score;
@@ -53,17 +57,21 @@ export class ScoreService implements ScoreStrategy {
   async fetchScore(): Promise<void> {
     try {
       let score = await this.cacheService.getScore();
+
       if (!score) {
-        score = await this.ensureApiService().getScore();
-        if (!score) {
-          // Assume a default score; create it as appropriate for your application
-          const defaultScore = getDefaultScore(); // Assuming default score is 0, adjust as necessary
-          await this.createScore(defaultScore); // Assuming createScore method exists
-          score = defaultScore;
+        try {
+          score = await this.ensureApiService().getScore();
+          if (score) {
+            this.cacheService.updateScore(score);
+          }
+        } catch (err) {
+          console.warn('ScoreService: API getScore failed or unavailable, using cache', err);
         }
-        this.cacheService.updateScore(score);
       }
-      this.scoreSubject.next(score);
+
+      // IMPORTANT: do not auto-create defaults on cache/API miss.
+      // A transient fetch failure must not be treated like valid zero/default score state.
+      this.scoreSubject.next(score || null);
     } catch (error) {
       this.error(error);
       throw error;
@@ -72,7 +80,11 @@ export class ScoreService implements ScoreStrategy {
 
   async updateScore(score: Score): Promise<void> {
     try {
-      await this.ensureApiService().updateScore(score);
+      try {
+        await this.ensureApiService().updateScore(score);
+      } catch (err) {
+        console.warn('ScoreService: API updateScore failed or unavailable, using cache', err);
+      }
       this.cacheService.updateScore(score);
       this.scoreSubject.next(score);
     } catch (error) {
